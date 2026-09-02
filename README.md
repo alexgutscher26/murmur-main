@@ -87,9 +87,9 @@ artifact goes unsigned. In CI both come from repository secrets.
 
 ## Permissions, and what happens without them
 
-| Permission | Needed for | Without it |
-|---|---|---|
-| Microphone | Recording | Murmur cannot record. Required. |
+| Permission    | Needed for      | Without it                                                   |
+| ------------- | --------------- | ------------------------------------------------------------ |
+| Microphone    | Recording       | Murmur cannot record. Required.                              |
 | Accessibility | Pasting for you | Everything still works — text goes to the clipboard instead. |
 
 macOS shows each of these prompts **once per app**. If you dismiss one, the
