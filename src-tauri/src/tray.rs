@@ -452,9 +452,12 @@ struct PillMetrics {
     /// How long the window takes to leave, and how far it travels doing it.
     /// Read from the tokens like every other pill dimension so the motion and
     /// the design remain one fact rather than two that agree today.
+    #[allow(dead_code)]
     exit_ms: f64,
+    #[allow(dead_code)]
     exit_travel: f64,
     width: f64,
+    #[allow(dead_code)]
     width_compact: f64,
     height: f64,
     /**

@@ -119,10 +119,25 @@ impl Drop for ModifierTap {
     }
 }
 
-static mut HOOK_HANDLE: Option<HHOOK> = None;
-static mut DETECTOR_CALLBACK: Option<Box<dyn FnMut() + Send + 'static>> = None;
-static mut CURRENT_MODIFIER: Option<KeyModifier> = None;
-static mut DETECTOR_STATE: Option<TapDetector> = None;
+struct SharedState {
+    hook_handle: Option<HHOOK>,
+    callback: Option<Box<dyn FnMut() + Send + 'static>>,
+    current_modifier: Option<KeyModifier>,
+    detector_state: Option<TapDetector>,
+}
+
+impl SharedState {
+    const fn new() -> Self {
+        Self {
+            hook_handle: None,
+            callback: None,
+            current_modifier: None,
+            detector_state: None,
+        }
+    }
+}
+
+static SHARED: std::sync::Mutex<SharedState> = std::sync::Mutex::new(SharedState::new());
 
 unsafe extern "system" fn low_level_keyboard_proc(
     n_code: i32,
@@ -135,10 +150,12 @@ unsafe extern "system" fn low_level_keyboard_proc(
         let is_down = msg == WM_KEYDOWN || msg == WM_SYSKEYDOWN;
         let is_up = msg == WM_KEYUP || msg == WM_SYSKEYUP;
 
+        let mut shared = SHARED.lock().unwrap();
+
         if let (Some(target), Some(detector), Some(cb)) = (
-            CURRENT_MODIFIER,
-            DETECTOR_STATE.as_mut(),
-            DETECTOR_CALLBACK.as_mut(),
+            shared.current_modifier,
+            shared.detector_state.as_mut(),
+            shared.callback.as_mut(),
         ) {
             let event = match (target, kbd.vkCode as u16) {
                 (
@@ -191,9 +208,12 @@ where
     let running_thread = Arc::clone(&running);
 
     std::thread::spawn(move || unsafe {
-        DETECTOR_STATE = Some(TapDetector::new());
-        CURRENT_MODIFIER = Some(modifier);
-        DETECTOR_CALLBACK = Some(Box::new(on_tap));
+        {
+            let mut shared = SHARED.lock().unwrap();
+            shared.detector_state = Some(TapDetector::new());
+            shared.current_modifier = Some(modifier);
+            shared.callback = Some(Box::new(on_tap));
+        }
 
         let hook = SetWindowsHookExW(
             WH_KEYBOARD_LL,
@@ -203,7 +223,10 @@ where
         );
 
         if let Ok(h) = hook {
-            HOOK_HANDLE = Some(h);
+            {
+                let mut shared = SHARED.lock().unwrap();
+                shared.hook_handle = Some(h);
+            }
             let mut msg = MSG::default();
             while running_thread.load(Ordering::SeqCst) {
                 if PeekMessageW(&mut msg, None, 0, 0, PM_REMOVE).as_bool() {
@@ -211,7 +234,9 @@ where
                 }
                 std::thread::sleep(Duration::from_millis(10));
             }
-            if let Some(h) = HOOK_HANDLE.take() {
+
+            let mut shared = SHARED.lock().unwrap();
+            if let Some(h) = shared.hook_handle.take() {
                 let _ = UnhookWindowsHookEx(h);
             }
         }
