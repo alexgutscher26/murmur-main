@@ -97,7 +97,15 @@ const TEST_ONLY_FILES: &[&str] = &["session/e2e_tests.rs", "testing.rs"];
  *        self-cleaning: wiring an allowlisted setting up fails the suite until
  *        its line here is removed.
  */
-const KNOWN_UNREACHABLE: &[(&str, &str)] = &[];
+const KNOWN_UNREACHABLE: &[(&str, &str)] = &[
+    ("dictation.secondary_hotkey", "Not implemented yet"),
+    ("dictation.mouse_trigger", "Not implemented yet"),
+    ("ui.pill_opacity", "Not implemented yet"),
+    ("ui.pill_compact", "Not implemented yet"),
+    ("privacy.encryption_at_rest", "Not implemented yet"),
+    ("privacy.purge_on_lock", "Not implemented yet"),
+    ("privacy.incognito_mode", "Not implemented yet"),
+];
 
 /// One source file, with its test module removed.
 struct Source {

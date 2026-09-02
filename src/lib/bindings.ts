@@ -34,6 +34,15 @@ export const commands = {
 	getSettings: () => typedError<{ [key in string]: SettingValue }, AppError>(__TAURI_INVOKE("get_settings")),
 	setSetting: (input: SetSettingInput) => typedError<null, AppError>(__TAURI_INVOKE("set_setting", { input })),
 	resetSetting: (input: ResetSettingInput) => typedError<null, AppError>(__TAURI_INVOKE("reset_setting", { input })),
+	/**
+	 *
+	 *  * WHAT:  The whole capability table, for the frontend to render from.
+	 *  * WHY:   The frontend reads the SAME declarations the backend enforces. A
+	 *  *        settings section becomes a map over these defs, so adding a setting is
+	 *  *        a registry entry and never a new form component.
+	 *  * WHERE: Called once by the Settings view and the dashboard shell.
+	 *
+	 */
 	getRegistry: () => typedError<RegistrySnapshot, AppError>(__TAURI_INVOKE("get_registry")),
 	listAppProfiles: () => typedError<AppProfile[], AppError>(__TAURI_INVOKE("list_app_profiles")),
 	saveAppProfile: (input: SaveProfileInput) => typedError<null, AppError>(__TAURI_INVOKE("save_app_profile", { input })),
@@ -55,6 +64,7 @@ export const commands = {
 	openPrivacyPane: (input: PermissionInput) => typedError<null, AppError>(__TAURI_INVOKE("open_privacy_pane", { input })),
 	listInputDevices: () => typedError<DeviceInfo[], AppError>(__TAURI_INVOKE("list_input_devices")),
 	openOnboardingWindow: () => typedError<null, AppError>(__TAURI_INVOKE("open_onboarding_window")),
+	wipeAllData: () => typedError<WipeResult, AppError>(__TAURI_INVOKE("wipe_all_data")),
 	checkForUpdate: () => typedError<UpdateCheck, AppError>(__TAURI_INVOKE("check_for_update")),
 	installUpdate: () => typedError<null, AppError>(__TAURI_INVOKE("install_update")),
 };
@@ -371,8 +381,8 @@ export type ErrorCode = "MICROPHONE_DENIED" | "ACCESSIBILITY_DENIED" |
 /**
  * 
  *  * SOURCE OF TRUTH KEYWORDS: export_history, ExportHistoryInput, ExportFormat,
- *  *   to_markdown, to_plaintext
- *  * WHAT:  Serialises history to JSON, Markdown or plain text and returns the
+ *  *   to_markdown, to_plaintext, to_csv
+ *  * WHAT:  Serialises history to JSON, Markdown, CSV, or plain text and returns the
  *  *        content for the caller to save.
  *  * WHY:   It is the user's data and it stays that way — no lock-in was a stated
  *  *        non-negotiable, and an app that can only show you your transcripts has
@@ -642,10 +652,6 @@ export type OnboardingProgress = {
 	fraction: number | null,
 };
 
-export type PartialTranscript = {
-	text: string,
-};
-
 /**
  * 
  *  * SOURCE OF TRUTH KEYWORDS: OsPermission
@@ -659,6 +665,17 @@ export type OsPermission = "MICROPHONE" |
  *  clipboard-only; it never blocks recording.
  */
 "ACCESSIBILITY";
+
+/**
+ *
+ *  * SOURCE OF TRUTH KEYWORDS: PartialTranscript
+ *  * WHAT:  Partial transcript preview text decoded from interior chunks while recording.
+ *  * WHERE: Emitted by session/actor.rs; consumed by the pill overlay.
+ *
+ */
+export type PartialTranscript = {
+	text: string,
+};
 
 export type PermissionInput = {
 	permission: OsPermission,
@@ -1057,11 +1074,18 @@ export type UpdateDictionaryEntryInput = {
 	enabled: boolean,
 };
 
+export type WipeResult = {
+	sessions_deleted: number,
+	dictionary_entries_deleted: number,
+	settings_deleted: number,
+};
+
 /* Tauri Specta runtime */
 async function typedError<T, E>(result: Promise<T>): Promise<{ status: "ok"; data: T } | { status: "error"; error: E }> {
     try {
         return { status: "ok", data: await result };
     } catch (e) {
+        if (e instanceof Error) throw e;
         return { status: "error", error: e as any };
     }
 }
