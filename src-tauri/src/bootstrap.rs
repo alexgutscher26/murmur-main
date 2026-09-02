@@ -293,7 +293,7 @@ fn build_ports(app: &AppHandle, paths: &AppPaths) -> AppResult<Ports> {
         engine,
         audio: Arc::new(CpalAudioSource::new()),
         enhancer: Arc::new(RuleEnhancer::new()),
-        injector: Arc::new(OsInjector::new(OsPermissions::new())),
+        injector: Arc::new(OsInjector::new(Arc::new(OsPermissions::new()))),
         models,
         permissions: Arc::new(OsPermissions::new()),
         events,

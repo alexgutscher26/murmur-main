@@ -119,12 +119,8 @@ impl Drop for ModifierTap {
     }
 }
 
-struct HHOOKWrapper(HHOOK);
-unsafe impl Send for HHOOKWrapper {}
-unsafe impl Sync for HHOOKWrapper {}
-
 struct SharedState {
-    hook_handle: Option<HHOOKWrapper>,
+    hook_handle: Option<HHOOK>,
     callback: Option<Box<dyn FnMut() + Send + 'static>>,
     current_modifier: Option<KeyModifier>,
     detector_state: Option<TapDetector>,
@@ -155,17 +151,11 @@ unsafe extern "system" fn low_level_keyboard_proc(
         let is_up = msg == WM_KEYUP || msg == WM_SYSKEYUP;
 
         let mut shared = SHARED.lock().unwrap();
-        let SharedState {
-            ref mut current_modifier,
-            ref mut detector_state,
-            ref mut callback,
-            ..
-        } = &mut *shared;
 
         if let (Some(target), Some(detector), Some(cb)) = (
-            *current_modifier,
-            detector_state.as_mut(),
-            callback.as_mut(),
+            shared.current_modifier,
+            shared.detector_state.as_mut(),
+            shared.callback.as_mut(),
         ) {
             let event = match (target, kbd.vkCode as u16) {
                 (
@@ -235,7 +225,7 @@ where
         if let Ok(h) = hook {
             {
                 let mut shared = SHARED.lock().unwrap();
-                shared.hook_handle = Some(HHOOKWrapper(h));
+                shared.hook_handle = Some(h);
             }
             let mut msg = MSG::default();
             while running_thread.load(Ordering::SeqCst) {
@@ -247,7 +237,7 @@ where
 
             let mut shared = SHARED.lock().unwrap();
             if let Some(h) = shared.hook_handle.take() {
-                let _ = UnhookWindowsHookEx(h.0);
+                let _ = UnhookWindowsHookEx(h);
             }
         }
     });
