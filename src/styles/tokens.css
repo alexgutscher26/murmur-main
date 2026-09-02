@@ -1,0 +1,334 @@
+/**
+ * SOURCE OF TRUTH KEYWORDS: tokens.css, surface-glass, surface-elevated,
+ *   border-hairline, text-primary, accent, shadow-pill, radius-pill, space-1,
+ *   noise-image, spring-pill-appear, motion-duration-fast, row-height, keycap-height,
+ *   surface-sunken-strong, rail-width, control-height, chart-height, chart-point-size,
+ *   chart-inset, segment-height, mark-size-md, mark-ratio-peak
+ * WHAT:  Every literal value the frontend is allowed to contain — colour,
+ *        material, geometry, type, motion and component metric — as CSS custom
+ *        properties on :root, redefined for dark and for reduced transparency.
+ * WHY:   This is the ONLY file in src/ permitted to hold a raw value. A hex,
+ *        px, ms or spring constant anywhere else is a bug, because the moment
+ *        the same number exists twice the two copies start disagreeing and the
+ *        look has to be re-decided per component. Values come from
+ *        docs/04-DESIGN-SYSTEM.md; a value not in that doc goes into the doc
+ *        first and only then appears here.
+ * WHERE: Imported by src/styles/global.css, which maps these into Tailwind
+ *        utilities through @theme. Read from JS only by src/lib/motion.ts,
+ *        which turns the --spring-* pairs into Framer configs.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* ── Colour — light (docs/04 §2) ──────────────────────────────────── */
+  --surface-glass: rgba(252, 250, 247, 0.55);
+  --surface-elevated: rgba(255, 254, 252, 0.72);
+  --surface-sunken: rgba(40, 34, 28, 0.04);
+  --surface-sunken-strong: rgba(40, 34, 28, 0.07);
+  --surface-opaque: #f7f4f0;
+  --surface-opaque-elevated: #fdfbf8;
+
+  --border-hairline: rgba(40, 34, 28, 0.09);
+  --border-highlight: rgba(255, 255, 255, 0.7);
+
+  --text-primary: rgba(28, 24, 20, 0.9);
+  --text-secondary: rgba(28, 24, 20, 0.54);
+  --text-tertiary: rgba(28, 24, 20, 0.32);
+
+  /* ── State colour (docs/04 §2) ──────────────────────────────────────── */
+  --accent: rgba(28, 24, 20, 0.9);
+  --accent-soft: rgba(40, 34, 28, 0.06);
+  --success: rgba(28, 24, 20, 0.9);
+  --success-soft: rgba(40, 34, 28, 0.06);
+  --warning: rgba(28, 24, 20, 0.54);
+  --warning-soft: rgba(40, 34, 28, 0.06);
+  --danger: #a8342c;
+  --danger-soft: rgba(168, 52, 44, 0.1);
+
+  --shadow-pill: 0 12px 40px rgba(28, 24, 20, 0.16);
+  --shadow-panel: 0 24px 64px rgba(28, 24, 20, 0.14);
+  --shadow-card: 0 8px 24px rgba(28, 24, 20, 0.1);
+
+  /* ── Materials (docs/04 §3) ─────────────────────────────────────────── */
+  --material-pill-surface: var(--surface-glass);
+  --material-pill-shadow: none;
+  --material-panel-surface: var(--surface-glass);
+  --material-panel-shadow: var(--shadow-panel);
+  --material-elevated-surface: var(--surface-elevated);
+  --material-elevated-shadow: var(--shadow-panel);
+
+  --border-width-hairline: 0.5px;
+  --glass-backdrop-blur: 24px;
+
+  --noise-opacity: 0.03;
+  --noise-frequency: 0.8;
+  --noise-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  /* ── Geometry (docs/04 §4) ────────────────────────────────────────── */
+  --radius-pill: 18px;
+  --pill-width: 176px;
+  --pill-width-compact: 140px;
+  --pill-height: 36px;
+  --pill-width-failed: 320px;
+  --pill-height-failed: 48px;
+  --pill-exit-duration-ms: 180ms;
+  --pill-exit-travel: 8px;
+
+  --radius-window: 26px;
+  --radius-panel: 32px;
+  --radius-card: 24px;
+  --radius-input: 12px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-8: 48px;
+
+  --rail-gap: 8px;
+  --rail-width: 56px;
+  --rail-padding: 6px;
+  --rail-item-size: 44px;
+  --rail-item-gap: 6px;
+  --rail-mark-gap: 8px;
+  --rail-radius: 24px;
+
+  --control-height: 32px;
+  --control-height-sm: 24px;
+  --control-height-lg: 40px;
+
+  --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono-stack: "SF Mono", "Segoe UI Mono", Menlo, Consolas, monospace;
+
+  --text-display-size: 28px;
+  --text-display-line: 34px;
+  --text-display-weight: 600;
+  --text-display-tracking: -0.02em;
+
+  --text-title-size: 18px;
+  --text-title-line: 24px;
+  --text-title-weight: 500;
+  --text-title-tracking: -0.01em;
+
+  --text-heading-size: 14px;
+  --text-heading-line: 20px;
+  --text-heading-weight: 500;
+  --text-heading-tracking: 0em;
+
+  --text-body-size: 13px;
+  --text-body-line: 18px;
+  --text-body-weight: 400;
+  --text-body-tracking: 0em;
+
+  --text-label-size: 11px;
+  --text-label-line: 14px;
+  --text-label-weight: 500;
+  --text-label-tracking: 0.04em;
+
+  --text-caption-size: 11px;
+  --text-caption-line: 14px;
+  --text-caption-weight: 400;
+  --text-caption-tracking: 0em;
+
+  --text-mono-size: 12px;
+  --text-mono-line: 16px;
+  --text-mono-weight: 400;
+  --text-mono-tracking: 0em;
+
+  --motion-duration-fast: 160ms;
+  --motion-duration-base: 240ms;
+  --motion-duration-medium: 240ms;
+  --motion-duration-slow: 360ms;
+
+  --motion-ease-standard: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-ease-linear: linear;
+
+  --spring-pill-appear-stiffness: 400;
+  --spring-pill-appear-damping: 30;
+  --spring-state-stiffness: 300;
+  --spring-state-damping: 25;
+  --spring-panel-stiffness: 260;
+  --spring-panel-damping: 26;
+
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+
+  --pill-exit-duration-ms: 160;
+  --pill-exit-travel: 8;
+
+  --pill-width: 176px;
+  --pill-width-compact: 48px;
+  --pill-height: 36px;
+  --pill-width-failed: 260px;
+  --pill-height-failed: 52px;
+
+  --pill-dot-size: 8px;
+  --pill-timer-width: 38px;
+  --countdown-line-height: 2px;
+
+  --waveform-bars: 20;
+  --waveform-bar-min: 3px;
+  --waveform-bar-max: 16px;
+  --waveform-bar-width: 2px;
+  --waveform-bar-gap: 2px;
+  --waveform-input-ceiling: 0.25;
+  --waveform-input-gamma: 0.7;
+
+  --pill-message-max-width: 360px;
+  --pill-message-side-pad: 12px;
+
+  --pill-pulse-duration: 2.8s;
+  --pill-pulse-opacity-min: 0.55;
+
+  --page-header-height: 52px;
+  --page-padding-x: 32px;
+  --titlebar-safe-inset: 80px;
+  --traffic-light-band: 28px;
+  --scroll-fade-size: 52px;
+
+  --window-width: 960px;
+  --window-height: 640px;
+  --window-min-width: 840px;
+  --window-min-height: 560px;
+
+  --chart-line-width: 1.5px;
+  --chart-ink-opacity: 0.72;
+  --chart-row-height: 32px;
+  --chart-label-gutter: 96px;
+  --chart-height: 96px;
+  --chart-point-size: 3px;
+  --chart-inset: 4px;
+
+  --segment-height: var(--control-height-sm);
+  --segment-radius: var(--radius-input);
+  --segment-padding: 2px;
+
+  --search-debounce: 180ms;
+  --feedback-hold: 1200ms;
+  --titlebar-height: 38px;
+
+  --row-height: 56px;
+  --row-overscan: 6;
+
+  --mark-bar-width: 2px;
+  --mark-bar-gap: 2px;
+  --mark-size-md: 24px;
+  --mark-size-lg: 40px;
+
+  --mark-ratio-outer: 0.25;
+  --mark-ratio-mid: 0.5;
+  --mark-ratio-peak: 0.75;
+
+  --keycap-height-sm: 18px;
+  --keycap-height-md: 24px;
+  --keycap-min-width-sm: 18px;
+  --keycap-min-width-md: 24px;
+  --keycap-radius: var(--radius-input);
+}
+
+/**
+ * WHAT:  The dark palette (docs/04 §2).
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --surface-glass: rgba(24, 22, 20, 0.94);
+    --surface-elevated: rgba(36, 32, 29, 0.96);
+    --surface-sunken: rgba(255, 255, 255, 0.06);
+    --surface-sunken-strong: rgba(255, 255, 255, 0.1);
+    --surface-opaque: #181614;
+    --surface-opaque-elevated: #24201c;
+
+    --border-hairline: rgba(255, 255, 255, 0.12);
+    --border-highlight: rgba(255, 255, 255, 0.15);
+
+    --text-primary: rgba(255, 255, 255, 0.95);
+    --text-secondary: rgba(255, 255, 255, 0.62);
+    --text-tertiary: rgba(255, 255, 255, 0.40);
+
+    --accent: rgba(255, 255, 255, 0.95);
+    --accent-soft: rgba(255, 255, 255, 0.08);
+    --success: rgba(255, 255, 255, 0.95);
+    --success-soft: rgba(255, 255, 255, 0.08);
+    --warning: rgba(255, 255, 255, 0.62);
+    --warning-soft: rgba(255, 255, 255, 0.08);
+    --danger: #e2685c;
+    --danger-soft: rgba(226, 104, 92, 0.14);
+
+    --shadow-pill: 0 12px 40px rgba(0, 0, 0, 0.5);
+    --shadow-panel: 0 24px 64px rgba(0, 0, 0, 0.46);
+    --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.34);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-glass: rgba(24, 22, 20, 0.94);
+  --surface-elevated: rgba(36, 32, 29, 0.96);
+  --surface-sunken: rgba(255, 255, 255, 0.06);
+  --surface-sunken-strong: rgba(255, 255, 255, 0.1);
+  --surface-opaque: #181614;
+  --surface-opaque-elevated: #24201c;
+
+  --border-hairline: rgba(255, 255, 255, 0.12);
+  --border-highlight: rgba(255, 255, 255, 0.15);
+
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.62);
+  --text-tertiary: rgba(255, 255, 255, 0.40);
+
+  --accent: rgba(255, 255, 255, 0.95);
+  --accent-soft: rgba(255, 255, 255, 0.08);
+  --success: rgba(255, 255, 255, 0.95);
+  --success-soft: rgba(255, 255, 255, 0.08);
+  --warning: rgba(255, 255, 255, 0.62);
+  --warning-soft: rgba(255, 255, 255, 0.08);
+  --danger: #e2685c;
+  --danger-soft: rgba(226, 104, 92, 0.14);
+
+  --shadow-pill: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --shadow-panel: 0 24px 64px rgba(0, 0, 0, 0.46);
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.34);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --surface-glass: rgba(252, 250, 247, 0.55);
+  --surface-elevated: rgba(255, 254, 252, 0.72);
+  --surface-sunken: rgba(40, 34, 28, 0.04);
+  --surface-sunken-strong: rgba(40, 34, 28, 0.07);
+  --surface-opaque: #f7f4f0;
+  --surface-opaque-elevated: #fdfbf8;
+
+  --border-hairline: rgba(40, 34, 28, 0.09);
+  --border-highlight: rgba(255, 255, 255, 0.7);
+
+  --text-primary: rgba(28, 24, 20, 0.9);
+  --text-secondary: rgba(28, 24, 20, 0.54);
+  --text-tertiary: rgba(28, 24, 20, 0.32);
+
+  --accent: rgba(28, 24, 20, 0.9);
+  --accent-soft: rgba(40, 34, 28, 0.06);
+  --success: rgba(28, 24, 20, 0.9);
+  --success-soft: rgba(40, 34, 28, 0.06);
+  --warning: rgba(28, 24, 20, 0.54);
+  --warning-soft: rgba(40, 34, 28, 0.06);
+  --danger: #a8342c;
+  --danger-soft: rgba(168, 52, 44, 0.1);
+}
+
+/**
+ * WHAT:  Opaque surfaces under prefers-reduced-transparency (docs/04 §10).
+ */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --material-pill-surface: var(--surface-opaque);
+    --material-panel-surface: var(--surface-opaque);
+    --material-elevated-surface: var(--surface-opaque-elevated);
+    --noise-opacity: 0;
+    --glass-backdrop-blur: 0px;
+  }
+}

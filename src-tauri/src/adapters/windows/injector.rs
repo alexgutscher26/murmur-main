@@ -1,0 +1,545 @@
+/*!
+ * SOURCE OF TRUTH KEYWORDS: WindowsInjector, deliver, can_inject, frontmost_app,
+ *   post_paste, SendInput, VK_CONTROL, PasteTiming, is_process_elevated,
+ *   UIPI_BLOCKED_REASON, clipboard_seq, GetClipboardSequenceNumber
+ * WHAT:  Puts finished text on the clipboard and simulates Ctrl+V on Windows.
+ * WHY:   Implements TextInjector for Windows using SendInput and arboard,
+ *        respecting per-request delays and clipboard restoration.
+ *        Also detects whether the frontmost process is running at a higher
+ *        integrity level (elevated / administrator) than Murmur itself.
+ *        When it is, User Interface Privilege Isolation (UIPI) will silently
+ *        swallow every SendInput call — the clipboard write still succeeds and
+ *        the text is there to paste manually, but the automatic Ctrl+V will
+ *        never reach the target window. Detecting this up-front lets us skip
+ *        the dead keystroke injection and tell the user exactly what happened
+ *        instead of leaving them confused about missing text.
+ * WHERE: Implements ports/injector.rs; called by session actor and deliver.
+ */
+
+use std::time::{Duration, Instant};
+
+use arboard::Clipboard;
+use windows::core::{BSTR, Interface};
+use windows::Win32::Foundation::{CloseHandle, HANDLE, HWND};
+use windows::Win32::Security::{
+    GetTokenInformation, TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY,
+};
+use windows::Win32::System::Com::{
+    CoCreateInstance, CoInitializeEx, CLSCTX_INPROC_SERVER, COINIT_APARTMENTTHREADED,
+};
+use windows::Win32::System::DataExchange::GetClipboardSequenceNumber;
+use windows::Win32::System::Threading::{
+    OpenProcess, OpenProcessToken, QueryFullProcessImageNameW, PROCESS_NAME_FORMAT,
+    PROCESS_QUERY_LIMITED_INFORMATION,
+};
+use windows::Win32::UI::Accessibility::{
+    CUIAutomation, IUIAutomation, IUIAutomationElement, IUIAutomationValuePattern, UIA_ValuePatternId,
+};
+use windows::Win32::UI::Input::KeyboardAndMouse::{
+    SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT, KEYBD_EVENT_FLAGS, KEYEVENTF_KEYUP,
+    VK_CONTROL, VK_V,
+};
+use windows::Win32::UI::WindowsAndMessaging::{
+    GetForegroundWindow, GetWindowTextW, GetWindowThreadProcessId,
+};
+
+use crate::error::{AppError, AppResult, ErrorCode};
+use crate::ports::injector::{FrontmostApp, InjectionOutcome, InjectionRequest, TextInjector};
+use crate::ports::permissions::PermissionProvider;
+use crate::types::DeliveryKind;
+
+pub struct WindowsInjector<P: PermissionProvider> {
+    _permissions: P,
+}
+
+impl<P: PermissionProvider> WindowsInjector<P> {
+    pub fn new(permissions: P) -> Self {
+        Self {
+            _permissions: permissions,
+        }
+    }
+
+    fn post_paste() -> AppResult<()> {
+        use windows::Win32::UI::Input::KeyboardAndMouse::{
+            GetKeyState, VK_LWIN, VK_MENU, VK_RWIN, VK_SHIFT,
+        };
+
+        // 1. Release any held modifier keys (Alt, Shift, Windows, Ctrl) from hotkey combos
+        let mut release_inputs = Vec::new();
+        for &vk in &[VK_MENU, VK_SHIFT, VK_LWIN, VK_RWIN, VK_CONTROL] {
+            let state = unsafe { GetKeyState(vk.0 as i32) };
+            if (state & (0x8000u16 as i16)) != 0 {
+                release_inputs.push(INPUT {
+                    r#type: INPUT_KEYBOARD,
+                    Anonymous: INPUT_0 {
+                        ki: KEYBDINPUT {
+                            wVk: vk,
+                            wScan: 0,
+                            dwFlags: KEYEVENTF_KEYUP,
+                            time: 0,
+                            dwExtraInfo: 0,
+                        },
+                    },
+                });
+            }
+        }
+        if !release_inputs.is_empty() {
+            unsafe {
+                SendInput(&release_inputs, std::mem::size_of::<INPUT>() as i32);
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        }
+
+        // 2. Press Ctrl+V with explicit key-state propagation
+        let paste_down = [
+            INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: VK_CONTROL,
+                        wScan: 0,
+                        dwFlags: KEYBD_EVENT_FLAGS(0),
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
+                },
+            },
+            INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: VK_V,
+                        wScan: 0,
+                        dwFlags: KEYBD_EVENT_FLAGS(0),
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
+                },
+            },
+        ];
+
+        let paste_up = [
+            INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: VK_V,
+                        wScan: 0,
+                        dwFlags: KEYEVENTF_KEYUP,
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
+                },
+            },
+            INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: VK_CONTROL,
+                        wScan: 0,
+                        dwFlags: KEYEVENTF_KEYUP,
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
+                },
+            },
+        ];
+
+        let sent1 = unsafe { SendInput(&paste_down, std::mem::size_of::<INPUT>() as i32) };
+        std::thread::sleep(Duration::from_millis(15));
+        let sent2 = unsafe { SendInput(&paste_up, std::mem::size_of::<INPUT>() as i32) };
+
+        if sent1 != paste_down.len() as u32 || sent2 != paste_up.len() as u32 {
+            return Err(AppError::new(
+                ErrorCode::InjectionFailed,
+                "Murmur could not send the paste keystroke. Text is copied to clipboard.",
+            ));
+        }
+
+        Ok(())
+    }
+
+    /**
+     * SOURCE OF TRUTH KEYWORDS: type_text_unicode
+     * WHAT:  Direct character-by-character keyboard simulation via SendInput KEYEVENTF_UNICODE.
+     * WHY:   Works in apps that disable clipboard paste (e.g. game launchers, terminal emulators, security prompts).
+     */
+    pub fn type_text_unicode(text: &str) -> AppResult<()> {
+        let mut inputs = Vec::with_capacity(text.len() * 2);
+        for ch in text.encode_utf16() {
+            inputs.push(INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: windows::Win32::UI::Input::KeyboardAndMouse::VIRTUAL_KEY(0),
+                        wScan: ch,
+                        dwFlags: windows::Win32::UI::Input::KeyboardAndMouse::KEYEVENTF_UNICODE,
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
+                },
+            });
+            inputs.push(INPUT {
+                r#type: INPUT_KEYBOARD,
+                Anonymous: INPUT_0 {
+                    ki: KEYBDINPUT {
+                        wVk: windows::Win32::UI::Input::KeyboardAndMouse::VIRTUAL_KEY(0),
+                        wScan: ch,
+                        dwFlags: windows::Win32::UI::Input::KeyboardAndMouse::KEYEVENTF_UNICODE | KEYEVENTF_KEYUP,
+                        time: 0,
+                        dwExtraInfo: 0,
+                    },
+                },
+            });
+        }
+
+        let sent = unsafe {
+            SendInput(
+                &inputs,
+                std::mem::size_of::<INPUT>() as i32,
+            )
+        };
+
+        if sent != inputs.len() as u32 {
+            return Err(AppError::new(
+                ErrorCode::InjectionFailed,
+                "Murmur could not simulate direct unicode keyboard input.",
+            ));
+        }
+
+        Ok(())
+    }
+
+    fn clipboard() -> AppResult<Clipboard> {
+        Clipboard::new().map_err(|err| {
+            AppError::new(
+                ErrorCode::ClipboardUnavailable,
+                "Murmur could not reach the clipboard.",
+            )
+            .with_detail(err)
+        })
+    }
+
+    /**
+     * SOURCE OF TRUTH KEYWORDS: is_process_elevated, UIPI_BLOCKED_REASON
+     * WHAT:  Returns true when the process owning `process_id` holds a high or
+     *        system integrity token — i.e. it is running as Administrator.
+     * WHY:   Windows User Interface Privilege Isolation (UIPI) silently blocks
+     *        cross-integrity SendInput. When Murmur (medium integrity) calls
+     *        SendInput targeting an elevated window (high integrity), the OS
+     *        accepts the call (returns success) but never delivers the keystrokes
+     *        to the target. There is no error code; the text is on the clipboard
+     *        but Ctrl+V never fires. Detecting elevation lets the caller skip
+     *        the dead keystroke and surface a clear "paste manually" message
+     *        rather than leaving the user confused.
+     *
+     *        Implementation: open the process token with TOKEN_QUERY and call
+     *        GetTokenInformation(TokenElevation). This works even when Murmur
+     *        only has PROCESS_QUERY_LIMITED_INFORMATION on the target, because
+     *        OpenProcessToken requires PROCESS_QUERY_INFORMATION but we reuse
+     *        the same limited handle — it is enough on Windows 10+.
+     *        Returns false on any API failure (safer than refusing to paste on
+     *        a query error).
+     * WHERE: Called by deliver() before attempting post_paste().
+     */
+    fn is_process_elevated(process_id: u32) -> bool {
+        unsafe {
+            let process_handle = match OpenProcess(
+                PROCESS_QUERY_LIMITED_INFORMATION,
+                false,
+                process_id,
+            ) {
+                Ok(h) => h,
+                Err(_) => return false,
+            };
+
+            let mut token: HANDLE = HANDLE::default();
+            if OpenProcessToken(process_handle, TOKEN_QUERY, &mut token).is_err() {
+                let _ = CloseHandle(process_handle);
+                return false;
+            }
+
+            let mut elevation = TOKEN_ELEVATION { TokenIsElevated: 0 };
+            let mut return_length: u32 = 0;
+            let info_size = std::mem::size_of::<TOKEN_ELEVATION>() as u32;
+
+            let elevated = GetTokenInformation(
+                token,
+                TokenElevation,
+                Some(&mut elevation as *mut _ as *mut _),
+                info_size,
+                &mut return_length,
+            )
+            .is_ok()
+                && elevation.TokenIsElevated != 0;
+
+            let _ = CloseHandle(token);
+            let _ = CloseHandle(process_handle);
+
+            elevated
+        }
+    }
+
+    /**
+     * SOURCE OF TRUTH KEYWORDS: try_uia_inject, IUIAutomation, SetValue
+     * WHAT:  Inserts text directly into the focused UI element via Windows UI Automation.
+     * WHY:   Provides an alternative/secondary injection pathway for applications where
+     *        SendInput (Ctrl+V) or clipboard paste is blocked or slow. Direct SetValue via
+     *        IUIAutomationValuePattern works cleanly across WinUI, WPF, UWP, and standard
+     *        accessible text controls.
+     * WHERE: WindowsInjector::deliver.
+     */
+    fn try_uia_inject(text: &str) -> bool {
+        unsafe {
+            let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
+
+            let automation: IUIAutomation = match CoCreateInstance(&CUIAutomation, None, CLSCTX_INPROC_SERVER) {
+                Ok(auto) => auto,
+                Err(_) => return false,
+            };
+
+            let focused_element: IUIAutomationElement = match automation.GetFocusedElement() {
+                Ok(elem) => elem,
+                Err(_) => return false,
+            };
+
+            let pattern_unknown = match focused_element.GetCurrentPattern(UIA_ValuePatternId) {
+                Ok(unk) => unk,
+                Err(_) => return false,
+            };
+
+            let value_pattern: IUIAutomationValuePattern = match pattern_unknown.cast() {
+                Ok(pat) => pat,
+                Err(_) => return false,
+            };
+
+            let bstr_text = BSTR::from(text);
+            value_pattern.SetValue(&bstr_text).is_ok()
+        }
+    }
+}
+
+impl<P: PermissionProvider> TextInjector for WindowsInjector<P> {
+    fn can_inject(&self) -> bool {
+        true
+    }
+
+    fn frontmost_app(&self) -> Option<FrontmostApp> {
+        unsafe {
+            let hwnd: HWND = GetForegroundWindow();
+            if hwnd.0.is_null() {
+                return None;
+            }
+
+            let mut title_buf = [0u16; 512];
+            let len = GetWindowTextW(hwnd, &mut title_buf);
+            let title = if len > 0 {
+                String::from_utf16_lossy(&title_buf[..len as usize])
+            } else {
+                "Unknown".to_string()
+            };
+
+            let mut process_id = 0u32;
+            GetWindowThreadProcessId(hwnd, Some(&mut process_id));
+            if process_id == 0 {
+                return Some(FrontmostApp {
+                    bundle_id: "unknown".to_string(),
+                    name: title,
+                });
+            }
+
+            let process_handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, process_id);
+            if let Ok(handle) = process_handle {
+                let mut path_buf = [0u16; 1024];
+                let mut path_len = path_buf.len() as u32;
+                let full_path = if QueryFullProcessImageNameW(
+                    handle,
+                    PROCESS_NAME_FORMAT(0),
+                    windows::core::PWSTR(path_buf.as_mut_ptr()),
+                    &mut path_len,
+                )
+                .is_ok()
+                {
+                    String::from_utf16_lossy(&path_buf[..path_len as usize])
+                } else {
+                    "unknown.exe".to_string()
+                };
+
+                let _ = CloseHandle(handle);
+
+                let exe_name = std::path::Path::new(&full_path)
+                    .file_name()
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("unknown")
+                    .to_string();
+
+                Some(FrontmostApp {
+                    bundle_id: exe_name,
+                    name: if title.is_empty() { full_path } else { title },
+                })
+            } else {
+                Some(FrontmostApp {
+                    bundle_id: "unknown".to_string(),
+                    name: title,
+                })
+            }
+        }
+    }
+
+    fn deliver(&self, request: &InjectionRequest) -> AppResult<InjectionOutcome> {
+        let mut cb = Self::clipboard()?;
+        let previous_text = if request.restore_clipboard {
+            cb.get_text().ok()
+        } else {
+            None
+        };
+
+        let start_write = Instant::now();
+        cb.set_text(&request.text).map_err(|err| {
+            AppError::new(
+                ErrorCode::ClipboardUnavailable,
+                "Could not write to the clipboard.",
+            )
+            .with_detail(err)
+        })?;
+        let clipboard_write_ms = start_write.elapsed().as_secs_f64() * 1000.0;
+
+        // Snapshot the clipboard sequence number immediately after our write.
+        // Windows atomically increments this counter every time clipboard
+        // ownership changes — any other process (clipboard manager, password
+        // manager, the target app's own listener) that touches the clipboard
+        // between now and when our Ctrl+V arrives will leave a different number.
+        let seq_after_write = unsafe { GetClipboardSequenceNumber() };
+
+        if !request.auto_paste {
+            return Ok(InjectionOutcome {
+                delivery: DeliveryKind::ClipboardOnly,
+                reason: Some("Auto-paste is disabled in settings".to_string()),
+                clipboard_write_ms,
+            });
+        }
+
+        // Detect whether the foreground window belongs to an elevated process.
+        // UIPI silently drops SendInput calls directed at higher-integrity
+        // windows, so we check before attempting — an accepted-but-ignored
+        // keystroke is indistinguishable from a delivered one by return value
+        // alone, and the user would simply see no text appear.
+        let foreground_pid = unsafe {
+            let hwnd = GetForegroundWindow();
+            let mut pid = 0u32;
+            if !hwnd.0.is_null() {
+                GetWindowThreadProcessId(hwnd, Some(&mut pid));
+            }
+            pid
+        };
+
+        if foreground_pid != 0 && Self::is_process_elevated(foreground_pid) {
+            tracing::warn!(
+                pid = foreground_pid,
+                "foreground process is elevated; UIPI will block SendInput — \
+                 attempting UIA fallback or advising user to paste manually"
+            );
+
+            if Self::try_uia_inject(&request.text) {
+                tracing::info!("text successfully delivered to elevated window via UI Automation");
+                return Ok(InjectionOutcome {
+                    delivery: DeliveryKind::Pasted,
+                    reason: None,
+                    clipboard_write_ms,
+                });
+            }
+
+            return Ok(InjectionOutcome {
+                delivery: DeliveryKind::ClipboardOnly,
+                reason: Some(
+                    "The active window is running as Administrator. \
+                     Murmur has copied your text to the clipboard — press Ctrl+V to paste."
+                        .to_string(),
+                ),
+                clipboard_write_ms,
+            });
+        }
+
+        std::thread::sleep(Duration::from_millis(request.paste_delay_ms));
+
+        // Pre-paste race check: if the sequence number changed during the sleep,
+        // another process replaced our text before Ctrl+V could fire. Re-write
+        // the clipboard once and continue — this covers the common case where a
+        // clipboard history tool (e.g. Windows Clipboard History, 1Password)
+        // processes our original write and resets ownership back to itself.
+        let seq_before_paste = unsafe { GetClipboardSequenceNumber() };
+        if seq_before_paste != seq_after_write {
+            tracing::warn!(
+                seq_after_write,
+                seq_before_paste,
+                "clipboard was modified by another process before paste; re-writing"
+            );
+            // Re-write. If this also fails, fall through to paste anyway — at
+            // worst the wrong text lands (or nothing), which is better than
+            // silently dropping the entire delivery.
+            let _ = cb.set_text(&request.text);
+        }
+
+        if let Err(err) = Self::post_paste() {
+            // Secondary delivery pathway via Windows UI Automation (Accessibility API)
+            if Self::try_uia_inject(&request.text) {
+                tracing::info!("SendInput paste failed, but text was successfully injected via Windows UI Automation");
+                return Ok(InjectionOutcome {
+                    delivery: DeliveryKind::Pasted,
+                    reason: None,
+                    clipboard_write_ms,
+                });
+            }
+
+            // Tertiary delivery pathway via direct Unicode character simulation
+            if Self::type_text_unicode(&request.text).is_ok() {
+                tracing::info!("SendInput paste failed, but text was successfully typed via direct Unicode input");
+                return Ok(InjectionOutcome {
+                    delivery: DeliveryKind::Pasted,
+                    reason: None,
+                    clipboard_write_ms,
+                });
+            }
+
+            return Ok(InjectionOutcome {
+                delivery: DeliveryKind::ClipboardOnly,
+                reason: Some(format!("Paste keystroke injection failed: {err}")),
+                clipboard_write_ms,
+            });
+        }
+
+        if request.restore_clipboard {
+            if let Some(prev) = previous_text {
+                std::thread::sleep(Duration::from_millis(request.clipboard_restore_delay_ms));
+
+                // Post-paste race check: after the sleep, verify the clipboard
+                // still holds our transcript text (sequence number has only
+                // advanced by the single paste event, i.e. at most 1 step from
+                // the pre-paste snapshot). If another process wrote to the
+                // clipboard since we pasted — e.g. the target app's own paste
+                // handler stored something, or a clipboard manager captured and
+                // re-wrote — skip the restore to avoid clobbering their content.
+                let seq_after_paste = unsafe { GetClipboardSequenceNumber() };
+                // A single Ctrl+V that the OS processes does not change the
+                // clipboard sequence number (only clipboard *writes* do).
+                // So if seq has advanced beyond seq_before_paste, another
+                // process touched the clipboard after we pasted.
+                if seq_after_paste != seq_before_paste {
+                    tracing::debug!(
+                        seq_before_paste,
+                        seq_after_paste,
+                        "clipboard was modified after paste; skipping restore to avoid clobbering"
+                    );
+                } else {
+                    let _ = cb.set_text(prev);
+                }
+            }
+        }
+
+        Ok(InjectionOutcome {
+            delivery: DeliveryKind::Pasted,
+            reason: None,
+            clipboard_write_ms,
+        })
+    }
+}

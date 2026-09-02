@@ -1,0 +1,110 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Murmur",
+  "version": "0.1.0",
+  "identifier": "com.webprodigies.murmur",
+  "build": {
+    "beforeDevCommand": "bun run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "bun run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "dashboard",
+        "url": "index.html",
+        "title": "Murmur",
+        "width": 904,
+        "height": 640,
+        "minWidth": 784,
+        "minHeight": 560,
+        "center": true,
+        "resizable": true,
+        "visible": false,
+        "transparent": false,
+        "acceptFirstMouse": true
+      },
+      {
+        "label": "sidebar",
+        "url": "sidebar.html",
+        "width": 56,
+        "height": 220,
+        "resizable": false,
+        "visible": false,
+        "transparent": true,
+        "decorations": false,
+        "shadow": true,
+        "skipTaskbar": true,
+        "focus": false
+      },
+      {
+        "label": "pill",
+        "url": "pill.html",
+        "width": 176,
+        "height": 36,
+        "resizable": false,
+        "visible": false,
+        "transparent": true,
+        "decorations": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "shadow": true,
+        "focus": false,
+        "acceptFirstMouse": false
+      },
+      {
+        "label": "onboarding",
+        "url": "onboarding.html",
+        "title": "Welcome to Murmur",
+        "width": 680,
+        "height": 560,
+        "resizable": false,
+        "center": true,
+        "visible": false,
+        "transparent": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEJBOTgyMjc1RjE3RUVENTgKUldSWTdYN3hkU0tZdWxuS1QxWDdvUHIvQzk3dVc3Vm1hNkRvZERWcUJ2NFhxeTBJNWdxWlp2RDgK",
+      "endpoints": [
+        "https://github.com/webprodigies/murmur/releases/latest/download/latest.json"
+      ]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "createUpdaterArtifacts": false,
+    "category": "Productivity",
+    "shortDescription": "Local-first speech to text.",
+    "longDescription": "Press a hotkey, talk, press it again \u2014 your words are pasted where you were typing. Runs entirely on your machine.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "13.0",
+      "entitlements": "entitlements.plist"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      },
+      "wix": {
+        "language": "en-US"
+      }
+    },
+    "resources": []
+  }
+}

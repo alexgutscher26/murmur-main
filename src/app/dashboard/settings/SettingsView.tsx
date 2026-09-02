@@ -1,0 +1,470 @@
+/**
+ * SOURCE OF TRUTH KEYWORDS: SettingsView, getRegistry, getSettings, setSetting,
+ *   SettingSection, SECTION_ORDER, advanced-disclosure, toControlSetting, AppProfiles,
+ *   settings-search, theme-switcher
+ * WHAT:  The settings page: real-time search, registry SettingDefs grouped by section,
+ *        theme switcher (System/Light/Dark), model manager, dictionary, per-app profiles,
+ *        and settings backup.
+ * WHY:   Dynamic search and explicit theme control make power-user workflows instant.
+ * WHERE: Rendered by Dashboard.tsx for the registry's "settings" route.
+ */
+
+import { useCallback, useMemo, useState } from "react";
+import { ChevronDown, Search, X, Sun, Moon, Monitor } from "lucide-react";
+import {
+  commands,
+  type AppError,
+  type EngineCapabilities,
+  type OsPermission,
+  type PermissionReport,
+  type RegistrySnapshot,
+  type SettingDef as RegistrySettingDef,
+  type SettingSection,
+  type SettingValue,
+} from "@/lib/bindings";
+import { unwrapCommand, useCommand } from "@/lib/ipc";
+import { missingPermissions, usePermissions } from "@/lib/use-permissions";
+import { useSettings } from "../use-settings";
+import { formatBytes } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { useTheme, type ThemeChoice } from "@/lib/theme";
+import { ErrorSurface, ScrollArea, SettingControl, Skeleton, EmptyState } from "@/components/global";
+import type { SettingOption } from "@/components/global";
+import { PermissionNotice } from "./_components/PermissionNotice";
+import { ModelManager } from "./_components/ModelManager";
+import { DictionaryManager } from "./_components/DictionaryManager";
+import { AppProfiles } from "./_components/AppProfiles";
+import { SettingsBackup } from "./_components/SettingsBackup";
+import { WpmCalibrationWizard } from "../_components/WpmCalibrationWizard";
+import { toControlSetting, type DynamicOptions } from "./to-setting-def";
+
+/** Presentation order and wording */
+const SECTION_ORDER: readonly SettingSection[] = [
+  "RECORDING",
+  "TRANSCRIPTION",
+  "OUTPUT",
+  "VOCABULARY",
+  "PRIVACY",
+  "GENERAL",
+];
+
+const SECTION_LABEL: Readonly<Record<SettingSection, string>> = {
+  RECORDING: "Recording",
+  TRANSCRIPTION: "Transcription",
+  OUTPUT: "Output",
+  VOCABULARY: "Vocabulary",
+  PRIVACY: "Privacy",
+  GENERAL: "General",
+};
+
+export interface SettingsViewProps {
+  registry: RegistrySnapshot;
+  section: string | null;
+}
+
+export function SettingsView({ registry, section }: SettingsViewProps) {
+  const settings = useSettings();
+  const devices = useCommand(commands.listInputDevices, []);
+  const models = useCommand(commands.listModels, []);
+  const languages = useCommand(commands.listLanguages, []);
+  const engine = useCommand(commands.getEngineCapabilities, []);
+  const permissions = usePermissions();
+  const [writeError, setWriteError] = useState<AppError | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const dynamic = useMemo<DynamicOptions>(() => {
+    const deviceOptions: SettingOption[] = (devices.data ?? []).map((device) => ({
+      value: device.id,
+      label: device.is_default ? `${device.name} (system default)` : device.name,
+    }));
+    const modelOptions: SettingOption[] = (models.data ?? []).map((model) => ({
+      value: model.descriptor.id,
+      label: model.descriptor.display_name,
+      description: `${formatBytes(model.descriptor.size_bytes)} · ${model.descriptor.approx_ram_mb} MB memory`,
+      disabled: model.state.kind !== "READY",
+    }));
+
+    const engineName = engine.data?.display_name ?? "the selected engine";
+    const languageOptions: SettingOption[] = (languages.data ?? []).map((language) => ({
+      value: language.code,
+      label: language.supported ? language.label : `${language.label} — not supported by ${engineName}`,
+      description: language.supported ? undefined : `${engineName} cannot transcribe ${language.label}.`,
+      disabled: !language.supported,
+    }));
+    return { INPUT_DEVICES: deviceOptions, MODELS: modelOptions, LANGUAGES: languageOptions };
+  }, [devices.data, engine.data, languages.data, models.data]);
+
+  const write = useCallback((key: string, value: SettingValue) => {
+    void unwrapCommand(() => commands.setSetting({ key, value })).then((result) => {
+      setWriteError(result.status === "error" ? result.error : null);
+    });
+  }, []);
+
+  const allDefs = useMemo(
+    () => registry.capabilities.flatMap((capability) => capability.settings),
+    [registry],
+  );
+
+  const grouped = useMemo(() => {
+    const map = new Map<SettingSection, RegistrySettingDef[]>();
+    for (const capability of registry.capabilities) {
+      for (const def of capability.settings) {
+        const bucket = map.get(def.section);
+        if (bucket) bucket.push(def);
+        else map.set(def.section, [def]);
+      }
+    }
+    return map;
+  }, [registry]);
+
+  const filteredDefs = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return null;
+    return allDefs.filter(
+      (def) =>
+        def.label.toLowerCase().includes(query) ||
+        def.description.toLowerCase().includes(query) ||
+        def.key.toLowerCase().includes(query) ||
+        SECTION_LABEL[def.section]?.toLowerCase().includes(query)
+    );
+  }, [allDefs, searchQuery]);
+
+  if (settings.error) return <ErrorSurface error={settings.error} onRetry={settings.reload} />;
+
+  if (!settings.data) {
+    return (
+      <ScrollArea contentClassName="px-[var(--page-padding-x)]">
+        <Skeleton rows={8} />
+      </ScrollArea>
+    );
+  }
+
+  return (
+    <ScrollArea contentClassName="flex flex-col gap-6 px-[var(--page-padding-x)] pb-8">
+      {writeError ? <ErrorSurface size="compact" error={writeError} /> : null}
+
+      {/* Real-time Settings Search Bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-text-tertiary" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search settings, models, shortcuts, or hotkeys..."
+          className="hairline w-full h-9 rounded-input bg-surface pl-9 pr-8 text-body text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-1 focus:ring-text-primary transition-all"
+        />
+        {searchQuery && (
+          <button
+            type="button"
+            onClick={() => setSearchQuery("")}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary p-0.5 rounded-full"
+          >
+            <X className="size-3.5" />
+          </button>
+        )}
+      </div>
+
+      {/* Search Results View */}
+      {filteredDefs !== null ? (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-caption text-text-secondary">
+              Found {filteredDefs.length} matching setting{filteredDefs.length === 1 ? "" : "s"}
+            </span>
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              className="text-caption text-text-primary underline hover:opacity-80"
+            >
+              Clear search
+            </button>
+          </div>
+
+          {filteredDefs.length === 0 ? (
+            <EmptyState
+              headline="No settings match your search"
+              description="Try searching for a different setting, keyword, or clear your query."
+            />
+          ) : (
+            <div className="hairline rounded-card bg-surface p-4 divide-y divide-[var(--border-hairline)]">
+              {filteredDefs.map((def) => (
+                <div key={def.key} className="py-2">
+                  <span className="text-[10px] font-mono text-text-tertiary uppercase block">
+                    {SECTION_LABEL[def.section]}
+                  </span>
+                  <SettingControl
+                    setting={toControlSetting(def, settings.data?.[def.key], dynamic, engine.data, permissions.data, (value) =>
+                      write(def.key, value),
+                    )}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Regular Grouped Sections View */
+        <>
+          {SECTION_ORDER.map((key) => {
+            const defs = grouped.get(key) ?? [];
+            const extra = EXTRAS[key];
+            if (defs.length === 0 && !extra) return null;
+
+            return (
+              <SettingsSection
+                key={key}
+                title={SECTION_LABEL[key]}
+                highlighted={section === key.toLowerCase()}
+                defs={defs}
+                values={settings.data}
+                dynamic={dynamic}
+                engine={engine.data}
+                permissions={permissions.data}
+                onWrite={write}
+                extra={extra}
+              />
+            );
+          })}
+
+          {/* Per-App Profiles Section */}
+          <section className="flex flex-col gap-1">
+            <h2 className="text-heading text-text-primary">Per-app profiles</h2>
+            <p className="text-caption text-text-secondary">
+              Settings that apply only while a particular app is in front. Anything a profile does not override keeps
+              following the global setting.
+            </p>
+            <AppProfiles
+              defs={allDefs}
+              globals={settings.data}
+              dynamic={dynamic}
+              engine={engine.data}
+              permissions={permissions.data}
+            />
+          </section>
+        </>
+      )}
+    </ScrollArea>
+  );
+}
+
+/** Panels that are not settings but belong inside a section. */
+type SectionPanel = "MODELS_PANEL" | "DICTIONARY_PANEL" | "PRIVACY_PANEL";
+
+const EXTRAS: Partial<Record<SettingSection, SectionPanel>> = {
+  TRANSCRIPTION: "MODELS_PANEL",
+  VOCABULARY: "DICTIONARY_PANEL",
+  PRIVACY: "PRIVACY_PANEL",
+};
+
+function SettingsSection({
+  title,
+  highlighted,
+  defs,
+  values,
+  dynamic,
+  engine,
+  permissions,
+  onWrite,
+  extra,
+}: {
+  title: string;
+  highlighted: boolean;
+  defs: readonly RegistrySettingDef[];
+  values: { [key in string]: SettingValue } | null;
+  dynamic: DynamicOptions;
+  engine: EngineCapabilities | null;
+  permissions: readonly PermissionReport[] | null;
+  onWrite: (key: string, value: SettingValue) => void;
+  extra: SectionPanel | undefined;
+}) {
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showCalibration, setShowCalibration] = useState(false);
+  const { theme, setTheme } = useTheme();
+
+  const plain = defs.filter((def) => !def.advanced);
+  const advanced = defs.filter((def) => def.advanced);
+  const hasBaselineWpm = defs.some((def) => def.key === "general.baseline_wpm");
+  const baselineWpm =
+    (values?.["general.baseline_wpm"]?.type === "NUMBER"
+      ? values["general.baseline_wpm"].value
+      : null) ?? 40;
+
+  const blocking = [
+    ...new Set(defs.flatMap((def) => missingPermissions(def.requires_permission, permissions))),
+  ] as OsPermission[];
+
+  return (
+    <section
+      className={cn(
+        "flex flex-col gap-1 rounded-card transition-colors",
+        highlighted && "bg-elevated p-4 ring-1 ring-[var(--accent)]",
+      )}
+    >
+      {showCalibration ? (
+        <WpmCalibrationWizard
+          currentBaselineWpm={baselineWpm}
+          onClose={() => setShowCalibration(false)}
+          onSaved={() => {}}
+        />
+      ) : null}
+
+      <h2 className="text-heading text-text-primary">{title}</h2>
+
+      <PermissionNotice permissions={blocking} />
+
+      {/* Explicit Theme Switcher in General Section */}
+      {title === "General" && (
+        <div className="flex items-center justify-between py-3 hairline-b">
+          <div className="min-w-0 flex-1">
+            <p className="text-body text-text-primary">Interface theme</p>
+            <p className="text-caption text-text-secondary">
+              Follow system appearance or force light or dark mode.
+            </p>
+          </div>
+          <div className="hairline flex items-center gap-1 rounded-input bg-sunken p-0.5">
+            {(
+              [
+                { id: "system", label: "System", icon: <Monitor className="size-3.5" /> },
+                { id: "light", label: "Light", icon: <Sun className="size-3.5" /> },
+                { id: "dark", label: "Dark", icon: <Moon className="size-3.5" /> },
+              ] as { id: ThemeChoice; label: string; icon: React.ReactNode }[]
+            ).map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setTheme(opt.id)}
+                className={cn(
+                  "flex items-center gap-1 px-2.5 py-1 rounded-input text-caption font-medium transition-all",
+                  theme === opt.id
+                    ? "bg-elevated text-text-primary shadow-sm"
+                    : "text-text-secondary hover:text-text-primary"
+                )}
+              >
+                {opt.icon}
+                <span>{opt.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {plain.map((def) => (
+        <SettingControl
+          key={def.key}
+          className="hairline-b last:border-b-0"
+          setting={toControlSetting(def, values?.[def.key], dynamic, engine, permissions, (value) =>
+            onWrite(def.key, value),
+          )}
+        />
+      ))}
+
+      {hasBaselineWpm ? (
+        <>
+          <div className="flex items-center justify-between py-3 hairline-b">
+            <div className="min-w-0 flex-1">
+              <p className="text-body text-text-primary">Calibrate typing speed</p>
+              <p className="text-caption text-text-secondary">
+                Measure your speech pace or take a typing test to accurately benchmark your baseline speed.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowCalibration(true)}
+              className="hairline h-8 shrink-0 rounded-input bg-sunken px-3 text-body text-text-primary transition-colors hover:bg-sunken-strong"
+            >
+              Calibrate speed…
+            </button>
+          </div>
+          <div className="flex items-center justify-between py-3 hairline-b">
+            <div className="min-w-0 flex-1">
+              <p className="text-body text-text-primary">First-run setup</p>
+              <p className="text-caption text-text-secondary">
+                Redo microphone permissions, audio calibration, and the dictation hotkey test.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                void unwrapCommand(commands.openOnboardingWindow);
+              }}
+              className="hairline h-8 shrink-0 rounded-input bg-sunken px-3 text-body text-text-primary transition-colors hover:bg-sunken-strong"
+            >
+              Run setup again…
+            </button>
+          </div>
+          <div className="pt-2">
+            <SettingsBackup />
+          </div>
+        </>
+      ) : null}
+
+      {extra === "MODELS_PANEL" ? <ModelManager /> : null}
+      {extra === "DICTIONARY_PANEL" ? <DictionaryManager /> : null}
+      {extra === "PRIVACY_PANEL" ? <ClearHistoryControl /> : null}
+
+      {advanced.length > 0 ? (
+        <>
+          <button
+            type="button"
+            onClick={() => setShowAdvanced((open) => !open)}
+            aria-expanded={showAdvanced}
+            className="flex w-fit items-center gap-1 py-2 text-label text-text-secondary transition-colors hover:text-text-primary"
+          >
+            <ChevronDown className={cn("size-4 transition-transform", showAdvanced && "rotate-180")} />
+            Advanced
+          </button>
+          {showAdvanced
+            ? advanced.map((def) => (
+                <SettingControl
+                  key={def.key}
+                  className="hairline-b last:border-b-0"
+                  setting={toControlSetting(def, values?.[def.key], dynamic, engine, permissions, (value) =>
+                    onWrite(def.key, value),
+                  )}
+                />
+              ))
+            : null}
+        </>
+      ) : null}
+    </section>
+  );
+}
+
+/** The delete-everything control */
+function ClearHistoryControl() {
+  const [confirming, setConfirming] = useState(false);
+  const [deleted, setDeleted] = useState<number | null>(null);
+
+  return (
+    <div className="flex items-center justify-between gap-4 py-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-body text-text-primary">Delete all history</p>
+        <p className="text-caption text-text-secondary">
+          {deleted === null
+            ? "Every transcript, permanently. This cannot be undone."
+            : `Deleted ${deleted} transcript${deleted === 1 ? "" : "s"}.`}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => {
+          if (!confirming) {
+            setConfirming(true);
+            return;
+          }
+          void unwrapCommand(commands.clearHistory).then((result) => {
+            if (result.status === "ok") setDeleted(result.data);
+            setConfirming(false);
+          });
+        }}
+        onBlur={() => setConfirming(false)}
+        className={cn(
+          "hairline h-8 shrink-0 rounded-input px-3 text-body transition-colors",
+          confirming ? "bg-danger text-opaque-elevated" : "bg-sunken text-text-primary hover:text-danger",
+        )}
+      >
+        {confirming ? "Delete everything" : "Delete…"}
+      </button>
+    </div>
+  );
+}
