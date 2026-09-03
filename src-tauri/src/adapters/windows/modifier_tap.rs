@@ -13,13 +13,13 @@ use std::time::{Duration, Instant};
 
 use windows::Win32::Foundation::{HINSTANCE, LPARAM, LRESULT, WPARAM};
 use windows::Win32::UI::Input::KeyboardAndMouse::{
-    VK_CONTROL, VK_LCONTROL, VK_LMENU, VK_LSHIFT, VK_LWIN, VK_MENU, VK_RCONTROL,
-    VK_RMENU, VK_RSHIFT, VK_RWIN, VK_SHIFT,
+    VK_CONTROL, VK_LCONTROL, VK_LMENU, VK_LSHIFT, VK_LWIN, VK_MENU, VK_RCONTROL, VK_RMENU,
+    VK_RSHIFT, VK_RWIN, VK_SHIFT,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
-    CallNextHookEx, DispatchMessageW, PeekMessageW,
-    SetWindowsHookExW, UnhookWindowsHookEx, HHOOK, KBDLLHOOKSTRUCT, MSG, PM_REMOVE,
-    WH_KEYBOARD_LL, WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP,
+    CallNextHookEx, DispatchMessageW, PeekMessageW, SetWindowsHookExW, UnhookWindowsHookEx,
+    KBDLLHOOKSTRUCT, MSG, PM_REMOVE, WH_KEYBOARD_LL, WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN,
+    WM_SYSKEYUP,
 };
 
 use crate::types::KeyModifier;
@@ -120,7 +120,6 @@ impl Drop for ModifierTap {
 }
 
 struct SharedState {
-    hook_handle: Option<HHOOK>,
     callback: Option<Box<dyn FnMut() + Send + 'static>>,
     current_modifier: Option<KeyModifier>,
     detector_state: Option<TapDetector>,
@@ -129,7 +128,6 @@ struct SharedState {
 impl SharedState {
     const fn new() -> Self {
         Self {
-            hook_handle: None,
             callback: None,
             current_modifier: None,
             detector_state: None,
@@ -152,46 +150,62 @@ unsafe extern "system" fn low_level_keyboard_proc(
 
         let mut shared = SHARED.lock().unwrap();
 
-        if let (Some(target), Some(detector), Some(cb)) = (
-            shared.current_modifier,
-            shared.detector_state.as_mut(),
-            shared.callback.as_mut(),
-        ) {
+        let triggered = if let (Some(target), Some(detector)) =
+            (shared.current_modifier, shared.detector_state.as_mut())
+        {
             let event = match (target, kbd.vkCode as u16) {
-                (
-                    KeyModifier::Control,
-                    x,
-                ) if x == VK_CONTROL.0 || x == VK_LCONTROL.0 || x == VK_RCONTROL.0 => {
-                    if is_down { TapEvent::ModifierDown } else if is_up { TapEvent::ModifierUp } else { TapEvent::KeyPressed }
-                }
-                (
-                    KeyModifier::Option,
-                    x,
-                ) if x == VK_MENU.0 || x == VK_LMENU.0 || x == VK_RMENU.0 => {
-                    if is_down { TapEvent::ModifierDown } else if is_up { TapEvent::ModifierUp } else { TapEvent::KeyPressed }
-                }
-                (
-                    KeyModifier::Shift,
-                    x,
-                ) if x == VK_SHIFT.0 || x == VK_LSHIFT.0 || x == VK_RSHIFT.0 => {
-                    if is_down { TapEvent::ModifierDown } else if is_up { TapEvent::ModifierUp } else { TapEvent::KeyPressed }
-                }
-                (
-                    KeyModifier::Command,
-                    x,
-                ) if x == VK_LWIN.0 || x == VK_RWIN.0 => {
-                    if is_down { TapEvent::ModifierDown } else if is_up { TapEvent::ModifierUp } else { TapEvent::KeyPressed }
-                }
-                _ => {
+                (KeyModifier::Control, x)
+                    if x == VK_CONTROL.0 || x == VK_LCONTROL.0 || x == VK_RCONTROL.0 =>
+                {
                     if is_down {
-                        TapEvent::KeyPressed
+                        TapEvent::ModifierDown
+                    } else if is_up {
+                        TapEvent::ModifierUp
                     } else {
                         TapEvent::KeyPressed
                     }
                 }
+                (KeyModifier::Option, x)
+                    if x == VK_MENU.0 || x == VK_LMENU.0 || x == VK_RMENU.0 =>
+                {
+                    if is_down {
+                        TapEvent::ModifierDown
+                    } else if is_up {
+                        TapEvent::ModifierUp
+                    } else {
+                        TapEvent::KeyPressed
+                    }
+                }
+                (KeyModifier::Shift, x)
+                    if x == VK_SHIFT.0 || x == VK_LSHIFT.0 || x == VK_RSHIFT.0 =>
+                {
+                    if is_down {
+                        TapEvent::ModifierDown
+                    } else if is_up {
+                        TapEvent::ModifierUp
+                    } else {
+                        TapEvent::KeyPressed
+                    }
+                }
+                (KeyModifier::Command, x) if x == VK_LWIN.0 || x == VK_RWIN.0 => {
+                    if is_down {
+                        TapEvent::ModifierDown
+                    } else if is_up {
+                        TapEvent::ModifierUp
+                    } else {
+                        TapEvent::KeyPressed
+                    }
+                }
+                _ => TapEvent::KeyPressed,
             };
 
-            if detector.handle(event, Instant::now()) == TapOutcome::Triggered {
+            detector.handle(event, Instant::now()) == TapOutcome::Triggered
+        } else {
+            false
+        };
+
+        if triggered {
+            if let Some(cb) = shared.callback.as_mut() {
                 cb();
             }
         }
@@ -223,10 +237,6 @@ where
         );
 
         if let Ok(h) = hook {
-            {
-                let mut shared = SHARED.lock().unwrap();
-                shared.hook_handle = Some(h);
-            }
             let mut msg = MSG::default();
             while running_thread.load(Ordering::SeqCst) {
                 if PeekMessageW(&mut msg, None, 0, 0, PM_REMOVE).as_bool() {
@@ -235,10 +245,7 @@ where
                 std::thread::sleep(Duration::from_millis(10));
             }
 
-            let mut shared = SHARED.lock().unwrap();
-            if let Some(h) = shared.hook_handle.take() {
-                let _ = UnhookWindowsHookEx(h);
-            }
+            let _ = UnhookWindowsHookEx(h);
         }
     });
 
@@ -253,7 +260,10 @@ mod tests {
     fn single_tap_detector_triggers_on_modifier_up() {
         let mut detector = TapDetector::new();
         let now = Instant::now();
-        assert_eq!(detector.handle(TapEvent::ModifierDown, now), TapOutcome::None);
+        assert_eq!(
+            detector.handle(TapEvent::ModifierDown, now),
+            TapOutcome::None
+        );
         assert_eq!(
             detector.handle(TapEvent::ModifierUp, now + Duration::from_millis(50)),
             TapOutcome::Triggered

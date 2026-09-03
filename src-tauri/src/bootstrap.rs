@@ -31,8 +31,8 @@ use crate::config::AppPaths;
 use crate::db::Database;
 use crate::error::{AppError, AppResult, ErrorCode};
 use crate::ipc::context::{AppState, Ports, SessionHandle};
-use crate::ports::permissions::OsPermission;
 use crate::pipeline::worker::AsrWorker;
+use crate::ports::permissions::OsPermission;
 use crate::registry::{self, keys};
 use crate::services;
 use crate::session::{SessionActor, SessionEvent, SessionSettings};
@@ -95,7 +95,10 @@ fn keep_windows_alive(app: &AppHandle) {
                 if let Err(err) = handle.hide() {
                     tracing::warn!(error = %err, "could not hide the window on close");
                 }
-                tracing::debug!(window = handle.label(), "window hidden rather than destroyed");
+                tracing::debug!(
+                    window = handle.label(),
+                    "window hidden rather than destroyed"
+                );
             }
         });
     }
@@ -138,17 +141,35 @@ fn apply_window_vibrancy(app: &AppHandle) {
 
         let window_radius = crate::tray::design_token("--radius-window");
         for (label, material, radius) in [
-            (PILL_WINDOW, NSVisualEffectMaterial::HudWindow, Some(crate::tray::pill_radius())),
-            (SIDEBAR_WINDOW, NSVisualEffectMaterial::Sidebar, Some(window_radius)),
-            (DASHBOARD_WINDOW, NSVisualEffectMaterial::Sidebar, Some(window_radius)),
-            (ONBOARDING_WINDOW, NSVisualEffectMaterial::Popover, Some(window_radius)),
+            (
+                PILL_WINDOW,
+                NSVisualEffectMaterial::HudWindow,
+                Some(crate::tray::pill_radius()),
+            ),
+            (
+                SIDEBAR_WINDOW,
+                NSVisualEffectMaterial::Sidebar,
+                Some(window_radius),
+            ),
+            (
+                DASHBOARD_WINDOW,
+                NSVisualEffectMaterial::Sidebar,
+                Some(window_radius),
+            ),
+            (
+                ONBOARDING_WINDOW,
+                NSVisualEffectMaterial::Popover,
+                Some(window_radius),
+            ),
         ] {
             let Some(window) = app.get_webview_window(label) else {
                 continue;
             };
             match apply_vibrancy(&window, material, Some(NSVisualEffectState::Active), radius) {
                 Ok(()) => tracing::debug!(window = label, "vibrancy applied"),
-                Err(err) => tracing::warn!(window = label, error = %err, "could not apply vibrancy"),
+                Err(err) => {
+                    tracing::warn!(window = label, error = %err, "could not apply vibrancy")
+                }
             }
         }
     }
@@ -293,7 +314,7 @@ fn build_ports(app: &AppHandle, paths: &AppPaths) -> AppResult<Ports> {
         engine,
         audio: Arc::new(CpalAudioSource::new()),
         enhancer: Arc::new(RuleEnhancer::new()),
-        injector: Arc::new(OsInjector::new(Arc::new(OsPermissions::new()))),
+        injector: Arc::new(OsInjector::new(OsPermissions::new())),
         models,
         permissions: Arc::new(OsPermissions::new()),
         events,
@@ -610,9 +631,8 @@ fn retention_days(db: &Database) -> i64 {
         .ok()
         .flatten();
 
-    let value = stored.or_else(|| {
-        registry::setting_def(keys::RETENTION_DAYS).map(|def| def.default.clone())
-    });
+    let value = stored
+        .or_else(|| registry::setting_def(keys::RETENTION_DAYS).map(|def| def.default.clone()));
 
     match value {
         Some(SettingValue::Number(days)) => days as i64,
@@ -695,7 +715,11 @@ fn bind_dictation(app: &AppHandle, binding: &HotkeyBinding) -> AppResult<()> {
         return match tap {
             Some(tap) => {
                 *MODIFIER_TAP.lock() = Some(tap);
-                tracing::info!(?modifier, taps = crate::adapters::os::TAPS_REQUIRED, "dictation bound to a modifier tap");
+                tracing::info!(
+                    ?modifier,
+                    taps = crate::adapters::os::TAPS_REQUIRED,
+                    "dictation bound to a modifier tap"
+                );
                 Ok(())
             }
             None => Err(AppError::new(
@@ -864,7 +888,9 @@ fn apply_launch_at_login(app: &AppHandle) {
         Ok(()) => tracing::info!(enabled = wanted, "launch at login applied"),
         // Reported rather than fatal: the app works fine, it just will not
         // start itself. Silence here is what made this setting look supported.
-        Err(err) => tracing::error!(error = %err, enabled = wanted, "could not apply launch at login"),
+        Err(err) => {
+            tracing::error!(error = %err, enabled = wanted, "could not apply launch at login")
+        }
     }
 }
 
@@ -995,7 +1021,9 @@ fn recording_mode(db: &Database) -> RecordingMode {
 
 /// The user's binding if they have set one, otherwise the registry default.
 fn dictation_binding(db: &Database) -> HotkeyBinding {
-    let stored = services::settings::get_setting(db, keys::DICTATION_HOTKEY).ok().flatten();
+    let stored = services::settings::get_setting(db, keys::DICTATION_HOTKEY)
+        .ok()
+        .flatten();
 
     if let Some(SettingValue::Hotkey(binding)) = stored {
         return binding;
@@ -1055,19 +1083,61 @@ pub(crate) fn code_from_name(name: &str) -> Option<Code> {
         "Comma" => Comma,
         "Period" => Period,
         "Slash" => Slash,
-        "F1" => F1, "F2" => F2, "F3" => F3, "F4" => F4, "F5" => F5, "F6" => F6,
-        "F7" => F7, "F8" => F8, "F9" => F9, "F10" => F10, "F11" => F11, "F12" => F12,
-        "F13" => F13, "F14" => F14, "F15" => F15, "F16" => F16, "F17" => F17,
-        "F18" => F18, "F19" => F19,
-        "KeyA" => KeyA, "KeyB" => KeyB, "KeyC" => KeyC, "KeyD" => KeyD, "KeyE" => KeyE,
-        "KeyF" => KeyF, "KeyG" => KeyG, "KeyH" => KeyH, "KeyI" => KeyI, "KeyJ" => KeyJ,
-        "KeyK" => KeyK, "KeyL" => KeyL, "KeyM" => KeyM, "KeyN" => KeyN, "KeyO" => KeyO,
-        "KeyP" => KeyP, "KeyQ" => KeyQ, "KeyR" => KeyR, "KeyS" => KeyS, "KeyT" => KeyT,
-        "KeyU" => KeyU, "KeyV" => KeyV, "KeyW" => KeyW, "KeyX" => KeyX, "KeyY" => KeyY,
+        "F1" => F1,
+        "F2" => F2,
+        "F3" => F3,
+        "F4" => F4,
+        "F5" => F5,
+        "F6" => F6,
+        "F7" => F7,
+        "F8" => F8,
+        "F9" => F9,
+        "F10" => F10,
+        "F11" => F11,
+        "F12" => F12,
+        "F13" => F13,
+        "F14" => F14,
+        "F15" => F15,
+        "F16" => F16,
+        "F17" => F17,
+        "F18" => F18,
+        "F19" => F19,
+        "KeyA" => KeyA,
+        "KeyB" => KeyB,
+        "KeyC" => KeyC,
+        "KeyD" => KeyD,
+        "KeyE" => KeyE,
+        "KeyF" => KeyF,
+        "KeyG" => KeyG,
+        "KeyH" => KeyH,
+        "KeyI" => KeyI,
+        "KeyJ" => KeyJ,
+        "KeyK" => KeyK,
+        "KeyL" => KeyL,
+        "KeyM" => KeyM,
+        "KeyN" => KeyN,
+        "KeyO" => KeyO,
+        "KeyP" => KeyP,
+        "KeyQ" => KeyQ,
+        "KeyR" => KeyR,
+        "KeyS" => KeyS,
+        "KeyT" => KeyT,
+        "KeyU" => KeyU,
+        "KeyV" => KeyV,
+        "KeyW" => KeyW,
+        "KeyX" => KeyX,
+        "KeyY" => KeyY,
         "KeyZ" => KeyZ,
-        "Digit0" => Digit0, "Digit1" => Digit1, "Digit2" => Digit2, "Digit3" => Digit3,
-        "Digit4" => Digit4, "Digit5" => Digit5, "Digit6" => Digit6, "Digit7" => Digit7,
-        "Digit8" => Digit8, "Digit9" => Digit9,
+        "Digit0" => Digit0,
+        "Digit1" => Digit1,
+        "Digit2" => Digit2,
+        "Digit3" => Digit3,
+        "Digit4" => Digit4,
+        "Digit5" => Digit5,
+        "Digit6" => Digit6,
+        "Digit7" => Digit7,
+        "Digit8" => Digit8,
+        "Digit9" => Digit9,
         _ => return None,
     })
 }
@@ -1085,7 +1155,9 @@ pub(crate) fn code_from_name(name: &str) -> Option<Code> {
  */
 fn show_first_window(app: &AppHandle, db: &Database) -> AppResult<()> {
     let complete = matches!(
-        services::settings::get_setting(db, keys::ONBOARDING_COMPLETE).ok().flatten(),
+        services::settings::get_setting(db, keys::ONBOARDING_COMPLETE)
+            .ok()
+            .flatten(),
         Some(SettingValue::Bool(true))
     );
 
@@ -1125,7 +1197,6 @@ fn show_dashboard_on_launch(app: &AppHandle) {
     tracing::info!("MURMUR_SHOW_DASHBOARD set — opening the dashboard");
     crate::tray::show_dashboard(app);
 }
-
 
 /**
  * SOURCE OF TRUTH KEYWORDS: set_escape_registered, escape_shortcut,
@@ -1189,7 +1260,6 @@ fn on_escape(app: &AppHandle) {
         let _ = state.session.send(event).await;
     });
 }
-
 
 /**
  * SOURCE OF TRUTH KEYWORDS: let_the_pill_float_over_everything, spaces,
@@ -1362,7 +1432,6 @@ fn watch_permissions(app: &AppHandle) {
  * WHERE: Called once by setup, after the windows exist.
  */
 fn attach_sidebar(app: &AppHandle) {
-
     let (Some(rail), Some(dashboard)) = (
         app.get_webview_window(SIDEBAR_WINDOW),
         app.get_webview_window(DASHBOARD_WINDOW),
@@ -1381,9 +1450,13 @@ fn attach_sidebar(app: &AppHandle) {
         tracing::warn!(error = %err, "could not size the rail");
     }
 
-
     let _ = dashboard;
-    tracing::info!(nav_items, width, height, "rail sized from the design tokens");
+    tracing::info!(
+        nav_items,
+        width,
+        height,
+        "rail sized from the design tokens"
+    );
 }
 
 /**
@@ -1701,9 +1774,9 @@ mod tests {
         use crate::adapters::cpal::CpalAudioSource;
         #[cfg(target_os = "macos")]
         use crate::adapters::macos::{MacosInjector, MacosPermissions};
+        use crate::adapters::rules::RuleEnhancer;
         #[cfg(target_os = "windows")]
         use crate::adapters::windows::{WindowsInjector, WindowsPermissions};
-        use crate::adapters::rules::RuleEnhancer;
         use crate::pipeline::Chunker;
         use crate::session::SessionSettings;
 
@@ -1795,7 +1868,9 @@ mod tests {
             .expect("setup exists")
             .1;
 
-        let recover = setup.find("recover_orphans(&db)").expect("setup recovers orphans");
+        let recover = setup
+            .find("recover_orphans(&db)")
+            .expect("setup recovers orphans");
         let manage = setup.find("app.manage(state").expect("setup manages state");
         let spawn = setup
             .find("spawn(actor.run(")
@@ -1887,18 +1962,14 @@ mod tests {
     #[test]
     fn the_retention_window_falls_back_to_the_registry() -> AppResult<()> {
         let db = Database::open_in_memory()?;
-        let declared = match registry::setting_def(keys::RETENTION_DAYS).map(|d| d.default.clone()) {
+        let declared = match registry::setting_def(keys::RETENTION_DAYS).map(|d| d.default.clone())
+        {
             Some(SettingValue::Number(days)) => days as i64,
             other => panic!("retention_days must be declared as a Number, got {other:?}"),
         };
         assert_eq!(retention_days(&db), declared);
 
-        services::settings::set_setting(
-            &db,
-            keys::RETENTION_DAYS,
-            &SettingValue::Number(14.0),
-            1,
-        )?;
+        services::settings::set_setting(&db, keys::RETENTION_DAYS, &SettingValue::Number(14.0), 1)?;
         assert_eq!(retention_days(&db), 14);
         Ok(())
     }
@@ -2032,7 +2103,10 @@ mod tests {
         let declared = conf["app"]["windows"]
             .as_array()
             .expect("tauri.conf.json declares windows");
-        assert!(!declared.is_empty(), "no windows declared — the check would be vacuous");
+        assert!(
+            !declared.is_empty(),
+            "no windows declared — the check would be vacuous"
+        );
 
         for window in declared {
             let label = window["label"].as_str().expect("every window has a label");
