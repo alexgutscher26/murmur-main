@@ -400,7 +400,7 @@ function SettingsSection({
 
       {extra === "MODELS_PANEL" ? <ModelManager /> : null}
       {extra === "DICTIONARY_PANEL" ? <DictionaryManager /> : null}
-      {extra === "PRIVACY_PANEL" ? <ClearHistoryControl /> : null}
+      {extra === "PRIVACY_PANEL" ? <PrivacyControls /> : null}
 
       {advanced.length > 0 ? (
         <>
@@ -430,41 +430,88 @@ function SettingsSection({
   );
 }
 
-/** The delete-everything control */
-function ClearHistoryControl() {
-  const [confirming, setConfirming] = useState(false);
-  const [deleted, setDeleted] = useState<number | null>(null);
+/** Privacy panel controls for history clearing and full data wipe */
+function PrivacyControls() {
+  const [confirmingHistory, setConfirmingHistory] = useState(false);
+  const [deletedHistory, setDeletedHistory] = useState<number | null>(null);
+
+  const [confirmingWipe, setConfirmingWipe] = useState(false);
+  const [wipeStats, setWipeStats] = useState<string | null>(null);
 
   return (
-    <div className="flex items-center justify-between gap-4 py-3">
-      <div className="min-w-0 flex-1">
-        <p className="text-body text-text-primary">Delete all history</p>
-        <p className="text-caption text-text-secondary">
-          {deleted === null
-            ? "Every transcript, permanently. This cannot be undone."
-            : `Deleted ${deleted} transcript${deleted === 1 ? "" : "s"}.`}
-        </p>
+    <div className="flex flex-col divide-y divide-[var(--border-hairline)] pt-1">
+      {/* Clear Transcripts */}
+      <div className="flex items-center justify-between gap-4 py-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-body text-text-primary">Delete all history</p>
+          <p className="text-caption text-text-secondary">
+            {deletedHistory === null
+              ? "Every transcript, permanently. This cannot be undone."
+              : `Deleted ${deletedHistory} transcript${deletedHistory === 1 ? "" : "s"}.`}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (!confirmingHistory) {
+              setConfirmingHistory(true);
+              return;
+            }
+            void unwrapCommand(commands.clearHistory).then((result) => {
+              if (result.status === "ok") setDeletedHistory(result.data);
+              setConfirmingHistory(false);
+            });
+          }}
+          onBlur={() => setConfirmingHistory(false)}
+          className={cn(
+            "hairline h-8 shrink-0 rounded-input px-3 text-body transition-colors",
+            confirmingHistory
+              ? "bg-danger text-opaque-elevated"
+              : "bg-sunken text-text-primary hover:text-danger",
+          )}
+        >
+          {confirmingHistory ? "Delete history" : "Delete history…"}
+        </button>
       </div>
-      <button
-        type="button"
-        onClick={() => {
-          if (!confirming) {
-            setConfirming(true);
-            return;
-          }
-          void unwrapCommand(commands.clearHistory).then((result) => {
-            if (result.status === "ok") setDeleted(result.data);
-            setConfirming(false);
-          });
-        }}
-        onBlur={() => setConfirming(false)}
-        className={cn(
-          "hairline h-8 shrink-0 rounded-input px-3 text-body transition-colors",
-          confirming ? "bg-danger text-opaque-elevated" : "bg-sunken text-text-primary hover:text-danger",
-        )}
-      >
-        {confirming ? "Delete everything" : "Delete…"}
-      </button>
+
+      {/* Wipe All Data / Factory Reset */}
+      <div className="flex items-center justify-between gap-4 py-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-body text-danger font-medium">Delete all data & reset</p>
+          <p className="text-caption text-text-secondary">
+            {wipeStats ??
+              "Drops all transcripts, custom dictionary entries, and resets all settings to defaults."}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            if (!confirmingWipe) {
+              setConfirmingWipe(true);
+              return;
+            }
+            void unwrapCommand(commands.wipeAllData).then((result) => {
+              if (result.status === "ok") {
+                const { sessions_deleted, dictionary_entries_deleted, settings_deleted } =
+                  result.data;
+                setWipeStats(
+                  `Reset complete. Wiped ${sessions_deleted} sessions, ${dictionary_entries_deleted} vocabulary items, and reset ${settings_deleted} settings.`,
+                );
+              }
+              setConfirmingWipe(false);
+            });
+          }}
+          onBlur={() => setConfirmingWipe(false)}
+          className={cn(
+            "hairline h-8 shrink-0 rounded-input px-3 text-body transition-colors",
+            confirmingWipe
+              ? "bg-danger text-opaque-elevated font-semibold shadow-sm"
+              : "bg-sunken text-danger hover:bg-danger/10",
+          )}
+        >
+          {confirmingWipe ? "Confirm wipe all" : "Delete all data…"}
+        </button>
+      </div>
     </div>
   );
 }

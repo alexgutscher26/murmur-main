@@ -131,11 +131,10 @@
 
 - [x] [SEC] Transcript encryption at rest — Encrypt session raw_text and final_text columns in SQLite using SQLCipher or an application-level AES-256-GCM key stored in Windows Credential Manager.
 - [x] [SEC] Auto-purge on lock screen — When Windows locks, automatically clear the in-memory transcript buffer and the clipboard if it contains a Murmur-set value.
-- [x] [FEAT] Incognito / no-history mode — A hotkey or menu option to start a session that is never written to the database. The transcript is delivered and then immediately discarded.
-- [FEAT] Configurable data retention — The RETENTION_DAYS key exists. Build a background job that runs purge_older_than() on launch and on a daily timer.
-- [FEAT] Audit log — Write an append-only log separate from the sessions table recording session timestamps, durations, and delivery outcomes but never the transcript text for enterprise compliance.
-- [FEAT] Remote wipe / data clear — A "Delete all data" option in settings that drops all sessions, dictionary entries, and resets all settings to defaults in one step.
-- [UX] Privacy policy in onboarding — Link to a local privacy.md during onboarding that explains exactly what data stays on device.
+- [x] [FEAT] Configurable data retention — The RETENTION_DAYS key exists. Build a background job that runs purge_older_than() on launch and on a daily timer.
+- [x] [FEAT] Audit log — Write an append-only log separate from the sessions table recording session timestamps, durations, and delivery outcomes but never the transcript text for enterprise compliance.
+- [x] [FEAT] Remote wipe / data clear — A "Delete all data" option in settings that drops all sessions, dictionary entries, and resets all settings to defaults in one step.
+- [x] [UX] Privacy policy in onboarding — Link to a local privacy.md during onboarding that explains exactly what data stays on device.
 
 ---
 
@@ -145,7 +144,7 @@
 - [FEAT] Right-to-left layout support — For Arabic and Hebrew transcription, flip the pill and history view layout to RTL.
 - [FEAT] Language auto-detection confidence display — Show the detected language and its confidence score in the History view per session.
 - [FEAT] Multilingual session — Allow Whisper language = None (auto-detect) and pin the detected language from the first interior chunk to subsequent chunks via the existing detected_language pinning mechanism.
-- [FEAT] Language-specific filler word lists — The STRIP_FILLERS rule currently only handles English fillers ("um", "uh", "like"). Add curated lists for each supported language.
+- [x] [FEAT] Language-specific filler word lists — The STRIP_FILLERS rule currently only handles English fillers ("um", "uh", "like"). Add curated lists for each supported language.
 - [FEAT] Romanization mode — For CJK input, add an option to output pinyin/romaji alongside or instead of the native script.
 
 ---

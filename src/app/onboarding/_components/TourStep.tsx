@@ -29,12 +29,12 @@
  */
 
 import { useState } from "react";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ShieldCheck } from "lucide-react";
 import type { HotkeyBinding } from "@/lib/bindings";
 import type { DictationMode } from "@/lib/dictation-mode";
 import { glyphsForBinding } from "@/lib/hotkey";
 import { cn } from "@/lib/utils";
-import { Keycap, Mark } from "@/components/global";
+import { Keycap, Mark, PrivacyModal } from "@/components/global";
 
 interface TourSlide {
   /** Derived from the gesture, because slide one teaches it and the two
@@ -76,8 +76,8 @@ const TOUR_SLIDES: readonly TourSlide[] = [
     media: "/onboarding/step-2.gif",
   },
   {
-    title: () => "Nothing leaves your Mac",
-    body: () => <>Every word is transcribed on your own machine. No account, no upload.</>,
+    title: () => "Nothing leaves your device",
+    body: () => <>Every word is transcribed locally on your own machine. No account, no upload.</>,
     media: "/onboarding/step-3.gif",
   },
 ];
@@ -94,12 +94,15 @@ export function TourStep({
   onDone: () => void;
 }) {
   const [index, setIndex] = useState(0);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   const slide = TOUR_SLIDES[index]!;
   const title = slide.title(mode);
   const isLast = index === TOUR_SLIDES.length - 1;
 
   return (
-    <section className="flex h-full flex-col items-center justify-center gap-6 px-8">
+    <section className="flex h-full flex-col items-center justify-center gap-6 px-8 relative">
+      <PrivacyModal isOpen={privacyOpen} onClose={() => setPrivacyOpen(false)} />
+
       <Mark size="lg" label="Murmur" />
 
       <TourMedia key={slide.media} src={slide.media} title={title} />
@@ -109,6 +112,16 @@ export function TourStep({
         <p className="max-w-96 text-body text-text-secondary">
           {slide.body(hotkey, mode)}
         </p>
+        {isLast ? (
+          <button
+            type="button"
+            onClick={() => setPrivacyOpen(true)}
+            className="mt-1 inline-flex items-center gap-1 text-caption text-text-secondary hover:text-text-primary underline transition-colors"
+          >
+            <ShieldCheck className="size-3.5" />
+            <span>How your data stays on-device</span>
+          </button>
+        ) : null}
       </header>
 
       <div className="flex items-center gap-3">

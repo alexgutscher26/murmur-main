@@ -229,7 +229,17 @@ const CLEAR: CommandSpec = CommandSpec::new("clear_history", CapabilityKey::Hist
 #[specta::specta]
 pub async fn clear_history(state: State<'_, AppState>) -> Result<u32, AppError> {
     execute(&state, CLEAR, (), |ctx, ()| async move {
-        Ok(sessions::delete_all_sessions(ctx.db())? as u32)
+        let count = sessions::delete_all_sessions(ctx.db())? as u32;
+        crate::services::audit::append(
+            ctx.db(),
+            crate::services::audit::AuditEntry {
+                kind: crate::services::audit::AuditKind::HistoryCleared,
+                duration_ms: None,
+                outcome: Some(format!("deleted_{count}")),
+                delivery: None,
+            },
+        );
+        Ok(count)
     })
     .await
 }
