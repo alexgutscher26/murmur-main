@@ -136,11 +136,19 @@
 - [x] [FEAT] Remote wipe / data clear — A "Delete all data" option in settings that drops all sessions, dictionary entries, and resets all settings to defaults in one step.
 - [x] [UX] Privacy policy in onboarding — Link to a local privacy.md during onboarding that explains exactly what data stays on device.
 
+## Developer Beachhead & Code-Aware Dictation
+
+- [x] [FEAT] Code casing voice directives — Convert spoken voice cues into programming casing styles (`camelCase`, `PascalCase`, `snake_case`, `SCREAMING_SNAKE_CASE`, `kebab-case`, inline backticks).
+- [x] [FEAT] GitHub Issue, PR & Markdown voice macros — Dictate markdown scaffolding (`issue title`, `steps to reproduce`, `expected behavior`, `acceptance criteria`, `pr description`, `todo item`, `code block <lang>`).
+- [x] [FEAT] Developer technical vocabulary pack — Expanded named entity normalization with 60+ frameworks, databases, and languages (`Next.js`, `TypeScript`, `PostgreSQL`, `FastAPI`, `PyTorch`, `Docker`, `Kubernetes`, `Tauri`, etc.).
+- [x] [FEAT] 1-Click Codebase & Repository Symbol Importer — Parse `package.json`, `Cargo.toml`, and source code to batch-import project identifiers, functions, and types into local dictionary.
+- [x] [FEAT] Developer domain packs — React/Web, Backend/Rust/Python, and Git/Cloud/DevOps 1-click domain dictionary presets in Settings.
+
 ---
 
 ## Internationalization & Languages
 
-- [FEAT] UI localization — Externalize all UI strings to a locales/*.json structure and ship with English, Spanish, French, German, Japanese, and Simplified Chinese to start.
+- [FEAT] UI localization — Externalize all UI strings to a locales/\*.json structure and ship with English, Spanish, French, German, Japanese, and Simplified Chinese to start.
 - [FEAT] Right-to-left layout support — For Arabic and Hebrew transcription, flip the pill and history view layout to RTL.
 - [FEAT] Language auto-detection confidence display — Show the detected language and its confidence score in the History view per session.
 - [FEAT] Multilingual session — Allow Whisper language = None (auto-detect) and pin the detected language from the first interior chunk to subsequent chunks via the existing detected_language pinning mechanism.

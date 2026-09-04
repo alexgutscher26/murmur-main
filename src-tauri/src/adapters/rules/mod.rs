@@ -57,9 +57,11 @@ impl TextEnhancer for RuleEnhancer {
             return Ok(out);
         }
 
-        // 2. Spoken formatting: inserts punctuation and newlines.
+        // 2. Spoken formatting: inserts punctuation, newlines, code casing, and markdown blocks.
         if context.expand_spoken_commands {
             out = text::expand_spoken_commands(&out, language);
+            out = text::format_code_casing(&out);
+            out = text::format_markdown_mode(&out);
         }
 
         // 3. Fillers, before the dictionary can try to match across one.

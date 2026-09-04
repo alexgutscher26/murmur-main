@@ -7,11 +7,12 @@
  */
 
 import { useCallback, useState, type FormEvent } from "react";
-import { Plus, Trash2, Sparkles, BookOpen } from "lucide-react";
+import { Plus, Trash2, Sparkles, BookOpen, Code } from "lucide-react";
 import { commands, type DictionaryEntry, type MatchKind } from "@/lib/bindings";
 import { unwrapCommand, useCommand } from "@/lib/ipc";
 import { ErrorSurface, EmptyState } from "@/components/global";
 import { usePlan, getDictionaryWordLimit, canUseDomainPacks } from "@/lib/plan";
+import { RepoImporterModal } from "./RepoImporterModal";
 
 const MATCH_LABEL: Readonly<Record<MatchKind, string>> = {
   WORD: "Whole word",
@@ -32,19 +33,53 @@ interface DomainPack {
 
 const DOMAIN_PACKS: readonly DomainPack[] = [
   {
-    id: "dev",
-    name: "Developer & Code",
-    badge: "Pro",
-    description: "TypeScript, PostgreSQL, Kubernetes, GitHub PR, GraphQL, API endpoints, boolean, async/await.",
+    id: "frontend-react",
+    name: "React, Next.js & Web",
+    badge: "Developer",
+    description: "Next.js, TypeScript, Tailwind CSS, Zustand, TanStack Query, tRPC, Vite, useEffect, useState.",
     entries: [
-      { pattern: "post gres", replacement: "PostgreSQL" },
+      { pattern: "next js", replacement: "Next.js" },
       { pattern: "type script", replacement: "TypeScript" },
+      { pattern: "tailwind css", replacement: "Tailwind CSS" },
+      { pattern: "zoo stand", replacement: "Zustand" },
+      { pattern: "tan stack query", replacement: "TanStack Query" },
+      { pattern: "t r p c", replacement: "tRPC" },
+      { pattern: "use effect", replacement: "useEffect" },
+      { pattern: "use state", replacement: "useState" },
+      { pattern: "use callback", replacement: "useCallback" },
+      { pattern: "use memo", replacement: "useMemo" },
+    ],
+  },
+  {
+    id: "backend-systems",
+    name: "Backend, Python & Rust",
+    badge: "Developer",
+    description: "FastAPI, PyTorch, PostgreSQL, SQLite, Prisma, Docker, Tokio, Cargo, Serde, async/await.",
+    entries: [
+      { pattern: "fast a p i", replacement: "FastAPI" },
+      { pattern: "pie torch", replacement: "PyTorch" },
+      { pattern: "post gres", replacement: "PostgreSQL" },
+      { pattern: "sequel lite", replacement: "SQLite" },
+      { pattern: "prisma", replacement: "Prisma" },
+      { pattern: "tokyo", replacement: "Tokio" },
       { pattern: "cube nettes", replacement: "Kubernetes" },
-      { pattern: "graph ql", replacement: "GraphQL" },
-      { pattern: "a p i", replacement: "API" },
-      { pattern: "pull request", replacement: "PR" },
       { pattern: "a sync", replacement: "async" },
       { pattern: "a wait", replacement: "await" },
+    ],
+  },
+  {
+    id: "cloud-devops",
+    name: "Git, DevOps & Cloud",
+    badge: "Developer",
+    description: "GitHub Actions, CI/CD, Terraform, Cloudflare Workers, AWS, Kubernetes, pull request, merge conflict.",
+    entries: [
+      { pattern: "git hub actions", replacement: "GitHub Actions" },
+      { pattern: "c i c d", replacement: "CI/CD" },
+      { pattern: "terra form", replacement: "Terraform" },
+      { pattern: "cloud flare workers", replacement: "Cloudflare Workers" },
+      { pattern: "pull request", replacement: "PR" },
+      { pattern: "a p i endpoint", replacement: "API endpoint" },
+      { pattern: "web hook", replacement: "webhook" },
     ],
   },
   {
@@ -60,19 +95,6 @@ const DOMAIN_PACKS: readonly DomainPack[] = [
       { pattern: "affidavit", replacement: "affidavit" },
       { pattern: "indemnification", replacement: "indemnification" },
       { pattern: "sub poena", replacement: "subpoena" },
-    ],
-  },
-  {
-    id: "medical",
-    name: "Medical & Clinical",
-    badge: "Pro",
-    description: "Myocardial infarction, hypertension, erythrocyte, tachycardia, auscultation, differential diagnosis.",
-    entries: [
-      { pattern: "heart attack", replacement: "myocardial infarction" },
-      { pattern: "high blood pressure", replacement: "hypertension" },
-      { pattern: "rapid heartbeat", replacement: "tachycardia" },
-      { pattern: "red blood cells", replacement: "erythrocytes" },
-      { pattern: "diff diagnosis", replacement: "differential diagnosis" },
     ],
   },
   {
@@ -96,6 +118,7 @@ export function DictionaryManager() {
   const [pattern, setPattern] = useState("");
   const [replacement, setReplacement] = useState("");
   const [installingPackId, setInstallingPackId] = useState<string | null>(null);
+  const [repoImporterOpen, setRepoImporterOpen] = useState(false);
   const { tier, startTrial } = usePlan();
 
   const count = entries.data?.length ?? 0;
@@ -191,25 +214,41 @@ export function DictionaryManager() {
         )}
       </div>
 
+      <RepoImporterModal
+        isOpen={repoImporterOpen}
+        onClose={() => setRepoImporterOpen(false)}
+        onImported={() => entries.reload()}
+      />
+
       {/* Domain-Specific Vocabulary Packs */}
       <div className="hairline rounded-card bg-surface p-3.5 flex flex-col gap-2.5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <BookOpen className="size-3.5 text-text-secondary" />
             <span className="text-caption font-semibold text-text-primary">
-              Domain-Specific Vocabulary Packs
+              Developer & Domain Vocabulary Packs
             </span>
           </div>
-          {!hasDomainPackAccess && (
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={startTrial}
-              className="inline-flex items-center gap-1 text-[11px] font-mono text-text-secondary hover:text-text-primary"
+              onClick={() => setRepoImporterOpen(true)}
+              className="inline-flex items-center gap-1 rounded-input bg-sunken hover:bg-sunken-strong px-2 py-1 text-[11px] font-medium text-text-primary transition-colors"
             >
-              <Sparkles className="size-3 text-emerald-400" />
-              Pro Feature · Start Trial
+              <Code className="size-3 text-text-secondary" />
+              <span>Import from Codebase…</span>
             </button>
-          )}
+            {!hasDomainPackAccess && (
+              <button
+                type="button"
+                onClick={startTrial}
+                className="inline-flex items-center gap-1 text-[11px] font-mono text-text-secondary hover:text-text-primary"
+              >
+                <Sparkles className="size-3 text-emerald-400" />
+                Pro Feature · Start Trial
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

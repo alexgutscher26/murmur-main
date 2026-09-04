@@ -244,36 +244,371 @@ pub fn strip_fillers(text: &str, language: Option<&LanguageCode>) -> String {
     normalise_whitespace(&out)
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CaseStyle {
+    Camel,
+    Pascal,
+    Snake,
+    ScreamingSnake,
+    Kebab,
+    Backticks,
+}
+
+const CASE_DIRECTIVES: &[(&str, CaseStyle)] = &[
+    ("screaming snake case", CaseStyle::ScreamingSnake),
+    ("constant case", CaseStyle::ScreamingSnake),
+    ("camel case", CaseStyle::Camel),
+    ("pascal case", CaseStyle::Pascal),
+    ("snake case", CaseStyle::Snake),
+    ("kebab case", CaseStyle::Kebab),
+    ("dash case", CaseStyle::Kebab),
+    ("in backticks", CaseStyle::Backticks),
+    ("inline code", CaseStyle::Backticks),
+    ("backticks", CaseStyle::Backticks),
+];
+
 /**
- * WHAT:  Reformats spoken Markdown commands into markdown syntax.
+ * WHAT:  Transforms spoken code styling directives into formatted identifiers.
+ * WHY:   "camel case user profile controller" -> "userProfileController"
+ *        "snake case session timeout ms"      -> "session_timeout_ms"
+ *        "constant case max buffer size"       -> "MAX_BUFFER_SIZE"
+ *        "backticks cargo check --lib"        -> "`cargo check --lib`"
+ */
+pub fn format_code_casing(text: &str) -> String {
+    let mut out = text.to_string();
+    for (directive, style) in CASE_DIRECTIVES {
+        out = apply_case_style(&out, directive, *style);
+    }
+    out
+}
+
+fn apply_case_style(text: &str, directive: &str, style: CaseStyle) -> String {
+    let lower = text.to_lowercase();
+    let mut result = String::with_capacity(text.len());
+    let mut cursor = 0usize;
+
+    while let Some(pos) = lower[cursor..].find(directive) {
+        let match_start = cursor + pos;
+        let match_end = match_start + directive.len();
+
+        let before_ok = match_start == 0
+            || !text[..match_start]
+                .chars()
+                .last()
+                .map(|c| c.is_alphanumeric())
+                .unwrap_or(false);
+        if !before_ok {
+            result.push_str(&text[cursor..match_end]);
+            cursor = match_end;
+            continue;
+        }
+
+        let after_chars = text[match_end..].chars();
+        let after_whitespace = match_end == text.len()
+            || after_chars.clone().next().map(|c| c.is_whitespace()).unwrap_or(false);
+        if !after_whitespace {
+            result.push_str(&text[cursor..match_end]);
+            cursor = match_end;
+            continue;
+        }
+
+        result.push_str(&text[cursor..match_start]);
+
+        let remainder = &text[match_end..];
+        let mut words = Vec::new();
+        let mut consumed_bytes = 0usize;
+        let mut trailing_punct = String::new();
+
+        for (word_idx, word) in remainder.split_whitespace().enumerate() {
+            if word_idx >= 6 {
+                break;
+            }
+            let has_punct = word.ends_with(|c: char| {
+                matches!(c, ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}')
+            });
+            let clean_word = word.trim_end_matches(|c: char| {
+                matches!(c, ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}')
+            });
+
+            if !clean_word.is_empty() {
+                words.push(clean_word);
+            }
+
+            if has_punct {
+                trailing_punct = word
+                    .chars()
+                    .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':' | '\u{2014}'))
+                    .collect();
+            }
+
+            let word_pos = remainder[consumed_bytes..].find(word).unwrap_or(0);
+            consumed_bytes += word_pos + word.len();
+
+            if has_punct {
+                break;
+            }
+        }
+
+        if words.is_empty() {
+            result.push_str(&text[match_start..match_end]);
+            cursor = match_end;
+        } else {
+            let transformed = transform_words(&words, style);
+            result.push_str(&transformed);
+            result.push_str(&trailing_punct);
+            cursor = match_end + consumed_bytes;
+        }
+    }
+
+    result.push_str(&text[cursor..]);
+    result
+}
+
+fn transform_words(words: &[&str], style: CaseStyle) -> String {
+    match style {
+        CaseStyle::Camel => {
+            let mut res = String::new();
+            for (i, w) in words.iter().enumerate() {
+                let clean: String = w.chars().filter(|c| c.is_alphanumeric() || *c == '_').collect();
+                if clean.is_empty() {
+                    continue;
+                }
+                if i == 0 {
+                    res.push_str(&clean.to_lowercase());
+                } else {
+                    let mut chars = clean.chars();
+                    if let Some(first) = chars.next() {
+                        res.extend(first.to_uppercase());
+                        res.push_str(&chars.as_str().to_lowercase());
+                    }
+                }
+            }
+            res
+        }
+        CaseStyle::Pascal => {
+            let mut res = String::new();
+            for w in words {
+                let clean: String = w.chars().filter(|c| c.is_alphanumeric() || *c == '_').collect();
+                if clean.is_empty() {
+                    continue;
+                }
+                let mut chars = clean.chars();
+                if let Some(first) = chars.next() {
+                    res.extend(first.to_uppercase());
+                    res.push_str(&chars.as_str().to_lowercase());
+                }
+            }
+            res
+        }
+        CaseStyle::Snake => {
+            let parts: Vec<String> = words
+                .iter()
+                .map(|w| {
+                    w.chars()
+                        .filter(|c| c.is_alphanumeric() || *c == '_')
+                        .collect::<String>()
+                        .to_lowercase()
+                })
+                .filter(|s| !s.is_empty())
+                .collect();
+            parts.join("_")
+        }
+        CaseStyle::ScreamingSnake => {
+            let parts: Vec<String> = words
+                .iter()
+                .map(|w| {
+                    w.chars()
+                        .filter(|c| c.is_alphanumeric() || *c == '_')
+                        .collect::<String>()
+                        .to_uppercase()
+                })
+                .filter(|s| !s.is_empty())
+                .collect();
+            parts.join("_")
+        }
+        CaseStyle::Kebab => {
+            let parts: Vec<String> = words
+                .iter()
+                .map(|w| {
+                    w.chars()
+                        .filter(|c| c.is_alphanumeric() || *c == '-')
+                        .collect::<String>()
+                        .to_lowercase()
+                })
+                .filter(|s| !s.is_empty())
+                .collect();
+            parts.join("-")
+        }
+        CaseStyle::Backticks => {
+            let inner = words.join(" ");
+            format!("`{inner}`")
+        }
+    }
+}
+
+/**
+ * WHAT:  Reformats spoken Markdown and GitHub commands into markdown syntax.
  * WHY:   "heading level 1 ..." -> "# ..."
- *        "heading level 2 ..." -> "## ..."
  *        "bullet point ..."    -> "- ..."
+ *        "todo item ..."       -> "- [ ] ..."
+ *        "steps to reproduce"  -> "### Steps to Reproduce\n1. "
  */
 pub fn format_markdown_mode(text: &str) -> String {
     let mut out = text.to_string();
+    // Headers
     out = replace_whole_words(&out, "heading level 1", "\n# ", false);
     out = replace_whole_words(&out, "heading level 2", "\n## ", false);
     out = replace_whole_words(&out, "heading level 3", "\n### ", false);
     out = replace_whole_words(&out, "header 1", "\n# ", false);
     out = replace_whole_words(&out, "header 2", "\n## ", false);
     out = replace_whole_words(&out, "header 3", "\n### ", false);
+    // Lists & Checklists
     out = replace_whole_words(&out, "bullet point", "\n- ", false);
     out = replace_whole_words(&out, "dash point", "\n- ", false);
+    out = replace_whole_words(&out, "todo item", "\n- [ ] ", false);
+    out = replace_whole_words(&out, "checklist item", "\n- [ ] ", false);
+    // GitHub / Issue / PR Macros
+    out = replace_whole_words(&out, "issue title", "\n# Issue: ", false);
+    out = replace_whole_words(&out, "steps to reproduce", "\n### Steps to Reproduce:\n1. ", false);
+    out = replace_whole_words(&out, "reproduction steps", "\n### Steps to Reproduce:\n1. ", false);
+    out = replace_whole_words(&out, "expected behavior", "\n### Expected Behavior\n", false);
+    out = replace_whole_words(&out, "actual behavior", "\n### Actual Behavior\n", false);
+    out = replace_whole_words(&out, "acceptance criteria", "\n### Acceptance Criteria:\n- [ ] ", false);
+    out = replace_whole_words(&out, "pull request description", "\n## Description\n\n## Changes\n- ", false);
+    out = replace_whole_words(&out, "pr description", "\n## Description\n\n## Changes\n- ", false);
+    out = replace_whole_words(&out, "pr summary", "\n## Summary\n\n", false);
+    // Code blocks
+    out = replace_whole_words(&out, "code block python", "\n```python\n\n```\n", false);
+    out = replace_whole_words(&out, "code block rust", "\n```rust\n\n```\n", false);
+    out = replace_whole_words(&out, "code block typescript", "\n```typescript\n\n```\n", false);
+    out = replace_whole_words(&out, "code block javascript", "\n```javascript\n\n```\n", false);
+    out = replace_whole_words(&out, "code block json", "\n```json\n\n```\n", false);
+    out = replace_whole_words(&out, "code block sql", "\n```sql\n\n```\n", false);
+    out = replace_whole_words(&out, "code block bash", "\n```bash\n\n```\n", false);
+    out = replace_whole_words(&out, "code block shell", "\n```bash\n\n```\n", false);
+    out = replace_whole_words(&out, "code block html", "\n```html\n\n```\n", false);
+    out = replace_whole_words(&out, "code block css", "\n```css\n\n```\n", false);
+    out = replace_whole_words(&out, "code block", "\n```\n\n```\n", false);
     out
 }
 
 const COMMON_NAMED_ENTITIES: &[(&str, &str)] = &[
+    // Apple & OS
     ("iphone", "iPhone"),
     ("ipad", "iPad"),
     ("macos", "macOS"),
     ("ios", "iOS"),
+    // AI & Companies
     ("openai", "OpenAI"),
-    ("github", "GitHub"),
     ("chatgpt", "ChatGPT"),
+    ("anthropic", "Anthropic"),
+    ("claude", "Claude"),
+    ("whisper cpp", "whisper.cpp"),
+    ("whisper.cpp", "whisper.cpp"),
+    // Developer Tools & Editors
+    ("github", "GitHub"),
+    ("gitlab", "GitLab"),
+    ("bitbucket", "Bitbucket"),
     ("vscode", "VS Code"),
+    ("vs code", "VS Code"),
+    ("neovim", "Neovim"),
+    ("homebrew", "Homebrew"),
+    ("directml", "DirectML"),
+    ("directx", "DirectX"),
+    // Languages & Runtimes
     ("typescript", "TypeScript"),
     ("javascript", "JavaScript"),
+    ("rust", "Rust"),
+    ("golang", "Go"),
+    ("python", "Python"),
+    ("webassembly", "WebAssembly"),
+    ("wasm", "Wasm"),
+    ("html", "HTML"),
+    ("html5", "HTML5"),
+    ("css", "CSS"),
+    ("css3", "CSS3"),
+    ("sql", "SQL"),
+    // Frameworks & Libraries
+    ("react", "React"),
+    ("next js", "Next.js"),
+    ("nextjs", "Next.js"),
+    ("vue js", "Vue.js"),
+    ("vuejs", "Vue.js"),
+    ("sveltekit", "SvelteKit"),
+    ("svelte kit", "SvelteKit"),
+    ("tailwind css", "Tailwind CSS"),
+    ("tailwindcss", "Tailwind CSS"),
+    ("node js", "Node.js"),
+    ("nodejs", "Node.js"),
+    ("bun", "Bun"),
+    ("vite", "Vite"),
+    ("webpack", "Webpack"),
+    ("turborepo", "Turborepo"),
+    ("fastapi", "FastAPI"),
+    ("fast api", "FastAPI"),
+    ("pytorch", "PyTorch"),
+    ("tensorflow", "TensorFlow"),
+    ("django", "Django"),
+    ("flask", "Flask"),
+    ("express js", "Express.js"),
+    ("expressjs", "Express.js"),
+    ("hono", "Hono"),
+    ("prisma", "Prisma"),
+    ("drizzle orm", "Drizzle ORM"),
+    ("drizzle", "Drizzle"),
+    ("zod", "Zod"),
+    ("zustand", "Zustand"),
+    ("redux", "Redux"),
+    ("tanstack", "TanStack"),
+    ("trpc", "tRPC"),
+    ("graphql", "GraphQL"),
+    ("tauri", "Tauri"),
+    // Databases & Cloud
+    ("postgresql", "PostgreSQL"),
+    ("postgres", "PostgreSQL"),
+    ("sqlite", "SQLite"),
+    ("redis", "Redis"),
+    ("mongodb", "MongoDB"),
+    ("mongo db", "MongoDB"),
+    ("supabase", "Supabase"),
+    ("neon db", "Neon DB"),
+    ("docker", "Docker"),
+    ("kubernetes", "Kubernetes"),
+    ("k8s", "Kubernetes"),
+    ("terraform", "Terraform"),
+    ("github actions", "GitHub Actions"),
+    ("ci cd", "CI/CD"),
+    ("aws", "AWS"),
+    ("gcp", "GCP"),
+    ("azure", "Azure"),
+    ("vercel", "Vercel"),
+    ("cloudflare", "Cloudflare"),
+    // Formats, Protocols & Web
+    ("json", "JSON"),
+    ("yaml", "YAML"),
+    ("toml", "TOML"),
+    ("uuid", "UUID"),
+    ("oauth", "OAuth"),
+    ("jwt", "JWT"),
+    ("https", "HTTPS"),
+    ("http", "HTTP"),
+    ("dns", "DNS"),
+    ("ssh", "SSH"),
+    ("websocket", "WebSocket"),
+    ("websockets", "WebSockets"),
+    ("grpc", "gRPC"),
+    ("rest api", "REST API"),
+    ("sdk", "SDK"),
+    ("cli", "CLI"),
+    ("api", "API"),
+    ("url", "URL"),
+    ("uri", "URI"),
+    ("pr", "PR"),
+    ("ui", "UI"),
+    ("ux", "UX"),
+    ("ram", "RAM"),
+    ("cpu", "CPU"),
+    ("gpu", "GPU"),
 ];
 
 pub fn normalize_named_entities(text: &str) -> String {
@@ -900,6 +1235,45 @@ mod tests {
         let text = "um like actually este euh";
         assert_eq!(strip_fillers(text, Some(&esperanto)), text);
         assert_eq!(strip_fillers(text, None), text);
+    }
+
+    // ── code casing & developer formatting ───────────────────────────────
+
+    #[test]
+    fn code_casing_directives_format_identifiers_accurately() {
+        assert_eq!(
+            format_code_casing("create a camel case user profile controller for auth"),
+            "create a userProfileController for auth"
+        );
+        assert_eq!(
+            format_code_casing("define pascal case app state context in state"),
+            "define AppStateContext in state"
+        );
+        assert_eq!(
+            format_code_casing("use snake case session token id here"),
+            "use session_token_id here"
+        );
+        assert_eq!(
+            format_code_casing("set constant case max retry attempts in config"),
+            "set MAX_RETRY_ATTEMPTS in config"
+        );
+        assert_eq!(
+            format_code_casing("add kebab case btn primary outline class"),
+            "add btn-primary-outline class"
+        );
+        assert_eq!(
+            format_code_casing("run backticks bun run tauri dev in terminal"),
+            "run `bun run tauri dev` in terminal"
+        );
+    }
+
+    #[test]
+    fn markdown_and_github_macros_expand() {
+        let text = "issue title login failure steps to reproduce 1. open app expected behavior should work";
+        let out = format_markdown_mode(text);
+        assert!(out.contains("# Issue: login failure"));
+        assert!(out.contains("### Steps to Reproduce:\n1. "));
+        assert!(out.contains("### Expected Behavior"));
     }
 
     // ── dictionary ───────────────────────────────────────────────────────
