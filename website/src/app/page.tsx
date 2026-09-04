@@ -4,6 +4,7 @@ import { AppGridMarquee } from "@/components/AppGridMarquee";
 import { TaglineReveal } from "@/components/TaglineReveal";
 import { InteractivePlayground } from "@/components/InteractivePlayground";
 import { LatencyBenchmarks } from "@/components/LatencyBenchmarks";
+import { ToneStyleEngine } from "@/components/ToneStyleEngine";
 import { ContextEngineSection } from "@/components/ContextEngineSection";
 import { CustomizationShowcase } from "@/components/CustomizationShowcase";
 import { FeatureBento } from "@/components/FeatureBento";
@@ -36,6 +37,9 @@ export default function Home() {
 
       {/* Dated, Reproducible Latency Benchmarks */}
       <LatencyBenchmarks />
+
+      {/* Adaptive Tone & Style Engine: Make Murmur Sound Like You */}
+      <ToneStyleEngine />
 
       {/* Context Engine (App-Aware Formatting) */}
       <ContextEngineSection />

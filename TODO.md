@@ -223,6 +223,7 @@
 ## Power-User Customization & Vocabulary Ownership
 
 - [x] [FEAT] Smart per-app context formatting engine (Slack, Cursor, Notion, Gmail).
+- [x] [FEAT] Adaptive Tone & Style Engine ("Make Murmur sound like you") — Interactive persona switcher for Formal, Casual, Very Casual, Concise, and Developer syntax styles.
 - [ ] [FEAT] Voice-triggered text-expander snippets & macros — Speak trigger words (e.g. "bug template", "status update") to instantly insert structured markdown schemas.
 - [ ] [FEAT] Portable dictionary export/import (`.json` / `.csv`) — "Your vocabulary is an asset you own—not a training signal for someone else's model."
 - [ ] [FEAT] Project & workspace-scoped dictionaries — Auto-load `.murmur/dictionary.json` from the active git repository or workspace folder.
