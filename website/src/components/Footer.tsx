@@ -40,6 +40,12 @@ export function Footer() {
             <span className="font-mono font-bold text-white uppercase tracking-wider text-[11px] mb-1">
               Product
             </span>
+            <Link href="/developers" className="text-white/60 hover:text-white transition-colors">
+              Developers & IDEs
+            </Link>
+            <Link href="/creators" className="text-white/60 hover:text-white transition-colors">
+              Content Creators
+            </Link>
             <Link href="/#features" className="text-white/60 hover:text-white transition-colors">
               Jobs & Features
             </Link>

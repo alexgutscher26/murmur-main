@@ -21,6 +21,36 @@ use crate::registry::CapabilityKey;
 use crate::services;
 use crate::types::DeviceInfo;
 
+pub const CURRENT_API_VERSION: u32 = 1;
+pub const MIN_COMPATIBLE_API_VERSION: u32 = 1;
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: ApiVersionInfo, get_api_version, CURRENT_API_VERSION
+ * WHAT:  API versioning and contract compatibility report.
+ * WHY:   Prevents silent frontend/backend drift during live updates or mismatched releases.
+ */
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize, specta::Type)]
+pub struct ApiVersionInfo {
+    pub api_version: u32,
+    pub app_version: String,
+    pub min_compatible_version: u32,
+}
+
+const API_VERSION: CommandSpec = CommandSpec::new("get_api_version", CapabilityKey::Onboarding).reports();
+
+#[tauri::command]
+#[specta::specta]
+pub async fn get_api_version(state: State<'_, AppState>) -> Result<ApiVersionInfo, AppError> {
+    execute(&state, API_VERSION, (), |_ctx, ()| async move {
+        Ok(ApiVersionInfo {
+            api_version: CURRENT_API_VERSION,
+            app_version: env!("CARGO_PKG_VERSION").to_string(),
+            min_compatible_version: MIN_COMPATIBLE_API_VERSION,
+        })
+    })
+    .await
+}
+
 // PartialEq so the permission watcher can emit only on CHANGE rather than
 // pushing an identical report every second. See bootstrap::watch_permissions.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize, specta::Type)]

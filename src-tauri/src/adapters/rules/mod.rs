@@ -23,7 +23,13 @@
  * WHERE: Implements the TextEnhancer port; called by pipeline/deliver.rs.
  */
 
+pub mod corrections;
+pub mod dictionary;
+pub mod fillers;
+pub mod punctuation;
+pub mod spoken;
 pub mod text;
+pub mod whitespace;
 
 use crate::error::AppResult;
 use crate::ports::enhancer::{EnhanceContext, TextEnhancer};
@@ -51,22 +57,23 @@ impl TextEnhancer for RuleEnhancer {
         let language = context.language.as_ref();
 
         // 1. Normalise first — see the module WHY for why the order is fixed.
-        let mut out = text::normalise_whitespace(raw);
+        let mut out = whitespace::normalise_whitespace(raw);
 
         if out.is_empty() {
             return Ok(out);
         }
 
-        // 2. Spoken formatting: inserts punctuation, newlines, code casing, and markdown blocks.
+        // 2. Spoken formatting: inserts punctuation, newlines, code casing, file tags, and markdown blocks.
         if context.expand_spoken_commands {
-            out = text::expand_spoken_commands(&out, language);
-            out = text::format_code_casing(&out);
-            out = text::format_markdown_mode(&out);
+            out = spoken::expand_spoken_commands(&out, language);
+            out = spoken::format_code_casing(&out);
+            out = spoken::format_file_tagging(&out);
+            out = spoken::format_markdown_mode(&out);
         }
 
         // 3. Fillers, before the dictionary can try to match across one.
         if context.strip_fillers {
-            out = text::strip_fillers(&out, language);
+            out = fillers::strip_fillers(&out, language);
         }
 
         /*
@@ -77,34 +84,34 @@ impl TextEnhancer for RuleEnhancer {
          * rather than a phrase that is about to be replaced.
          */
         if context.apply_corrections {
-            out = text::apply_spoken_corrections(&out, language);
+            out = corrections::apply_spoken_corrections(&out, language);
         }
 
         // 4. The user's vocabulary. Always on — it is never a downgrade.
         if !context.dictionary.is_empty() {
-            out = text::apply_dictionary(&out, &context.dictionary);
+            out = dictionary::apply_dictionary(&out, &context.dictionary);
         }
 
         // 5. Chunk seams and genuine stutters. Always on: a doubled word at a
         //    seam is an artefact of our own chunking, not something the user said.
-        out = text::dedupe_stutters(&out);
+        out = whitespace::dedupe_stutters(&out);
 
         // 6. Spacing and quote characters.
         if context.normalise_punctuation {
-            out = text::normalise_punctuation(&out);
+            out = punctuation::normalise_punctuation(&out);
         }
 
         // 7. Casing, which needs sentence boundaries to already exist.
         if context.capitalise_sentences {
-            out = text::capitalise_sentences(&out);
+            out = punctuation::capitalise_sentences(&out);
         }
 
         // 8. The terminal stop, last, so nothing capitalises after it.
         if context.normalise_punctuation {
-            out = text::ensure_terminal_punctuation(&out);
+            out = punctuation::ensure_terminal_punctuation(&out);
         }
 
-        Ok(text::normalise_whitespace(&out))
+        Ok(whitespace::normalise_whitespace(&out))
     }
 }
 

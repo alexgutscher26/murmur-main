@@ -150,11 +150,14 @@
 
 ## Developer Beachhead & Code-Aware Dictation
 
+- [x] [FEAT] Context-aware AI IDE file & folder tagging — Spoken file directives (`tag file <path>`, `tag folder <path>`, `at file <path>`, `context file <path>`) automatically formats `@src/components/Button.tsx`, `@package.json`, `@Cargo.toml` for Cursor, Windsurf, Claude Code, and Copilot.
+- [x] [FEAT] Developer voice snippets & macro library — Voice shortcuts for `pr checklist`, `environment setup`, `internal api docs`, `naming conventions`, `onboarding instructions`, and `release notes`.
 - [x] [FEAT] Code casing voice directives — Convert spoken voice cues into programming casing styles (`camelCase`, `PascalCase`, `snake_case`, `SCREAMING_SNAKE_CASE`, `kebab-case`, inline backticks).
 - [x] [FEAT] GitHub Issue, PR & Markdown voice macros — Dictate markdown scaffolding (`issue title`, `steps to reproduce`, `expected behavior`, `acceptance criteria`, `pr description`, `todo item`, `code block <lang>`).
-- [x] [FEAT] Developer technical vocabulary pack — Expanded named entity normalization with 60+ frameworks, databases, and languages (`Next.js`, `TypeScript`, `PostgreSQL`, `FastAPI`, `PyTorch`, `Docker`, `Kubernetes`, `Tauri`, etc.).
+- [x] [FEAT] Developer technical vocabulary pack — Expanded named entity normalization with 80+ frameworks, databases, and languages (`Cursor`, `Windsurf`, `Claude Code`, `Ollama`, `LangChain`, `Supabase`, `Neon`, `vLLM`, `Next.js`, `TypeScript`, `PostgreSQL`, `FastAPI`, `PyTorch`, `Docker`, `Kubernetes`, `Tauri`, etc.).
 - [x] [FEAT] 1-Click Codebase & Repository Symbol Importer — Parse `package.json`, `Cargo.toml`, and source code to batch-import project identifiers, functions, and types into local dictionary.
 - [x] [FEAT] Developer domain packs — React/Web, Backend/Rust/Python, and Git/Cloud/DevOps 1-click domain dictionary presets in Settings.
+- [x] [FEAT] Dedicated Developer Hub (`/developers`) — Interactive web landing page with live voice simulator, IDE integration specs, and on-device privacy comparison vs Wispr Flow.
 
 ---
 
@@ -225,6 +228,8 @@
 - [x] [FEAT] Smart per-app context formatting engine (Slack, Cursor, Notion, Gmail).
 - [x] [FEAT] Adaptive Tone & Style Engine ("Make Murmur sound like you") — Interactive persona switcher for Formal, Casual, Very Casual, Concise, and Developer syntax styles.
 - [x] [FEAT] Voice-triggered text-expander snippets & macros — Speak trigger words (e.g. "bug template", "status update", "pr template", "meeting notes") to instantly insert structured markdown schemas.
+- [x] [FEAT] Creator & scriptwriting voice macros — YouTube video script outlines, 3-part viral hook frameworks, Substack newsletter drafts, social captions, podcast show notes, and 60s sponsor ad reads.
+- [x] [FEAT] Dedicated Content Creators Hub (`/creators` & `/content-creators`) — Interactive creator voice playground, creator app workflow integration (Notion, Google Docs, Descript, Final Cut, Obsidian), and unreleased script IP privacy comparison vs Wispr Flow.
 - [ ] [FEAT] Portable dictionary export/import (`.json` / `.csv`) — "Your vocabulary is an asset you own—not a training signal for someone else's model."
 - [ ] [FEAT] Project & workspace-scoped dictionaries — Auto-load `.murmur/dictionary.json` from the active git repository or workspace folder.
 - [ ] [FEAT] Local AI pipeline chaining — Dictate -> local lightweight LLM (llama.cpp) summarize/reformat -> paste to active cursor.
@@ -259,12 +264,12 @@
 - [x] [BUG] modifier_tap.rs uses static mut with mutable references — Refactored into safe Mutex<SharedState>, fully Rust 2024 compliant with zero static_mut_refs warnings.
 - [x] [BUG] PillMetrics.exit_ms and exit_travel are dead code — Wired up animation accessor functions (pill_exit_ms, pill_exit_travel, pill_width_compact) in tray.rs.
 - [x] [BUG] Updater endpoint 404 on dev builds — Added TAURI_UPDATER_DISABLE=1 and debug mode checks in bootstrap.rs and updates.rs to prevent 404 endpoint errors on dev launches.
-- [BUG] Session orphan recovery runs before audio device is available — find_orphans at startup can try to finalize a session before CPAL initializes. Add a device readiness check before running recovery.
-- [TECH DEBT] bootstrap.rs is 2000+ lines — Extract window sizing, tray construction, hotkey registration, and engine warm-up into separate bootstrap/ submodules.
-- [TECH DEBT] registry/mod.rs is 727 lines — The capability and setting definitions should be split into per-capability files under registry/capabilities/.
-- [TECH DEBT] adapters/rules/text.rs is 39 KB — The filler, correction, and punctuation logic should be split into separate files under adapters/rules/.
-- [TECH DEBT] No API versioning on IPC commands — If the Tauri frontend and backend get out of sync during an update, commands silently fail. Add an api_version field to all IPC responses.
-- [TECH DEBT] tauri.conf.json resources: [] — Emptied to fix Windows build. Re-add model bundling support using Tauri's $APPDATA resolver so packaged releases can ship with a bundled tiny model.
+- [x] [BUG] Session orphan recovery runs before audio device is available — Added audio device readiness check before querying and recovering orphan sessions at startup in bootstrap/recovery.rs.
+- [x] [TECH DEBT] bootstrap.rs is 2000+ lines — Modularized bootstrap.rs into clean submodules: bootstrap/windows.rs, bootstrap/hotkeys.rs, bootstrap/engine.rs, bootstrap/recovery.rs, bootstrap/updates.rs, and bootstrap/mod.rs.
+- [x] [TECH DEBT] registry/mod.rs is 727 lines — Modularized capability and setting declarations into per-capability submodules under registry/capabilities/.
+- [x] [TECH DEBT] adapters/rules/text.rs is 39 KB — Split the filler, correction, punctuation, whitespace, dictionary, and spoken command logic into dedicated modular files under adapters/rules/ with a clean re-export and test facade in text.rs.
+- [x] [TECH DEBT] No API versioning on IPC commands — Added API versioning contracts (CURRENT_API_VERSION, MIN_COMPATIBLE_API_VERSION, ApiVersionInfo) and registered get_api_version IPC command with Specta bindings to prevent frontend/backend drift.
+- [x] [TECH DEBT] tauri.conf.json resources: [] — Enhanced model bundling support with multi-directory fallback resolver checking Tauri resource directory and APPDATA models path so releases can bundle models cleanly.
 
 ---
 

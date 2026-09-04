@@ -14,6 +14,8 @@ export function Navbar() {
   const isSubPage = pathname !== "/";
   const isPricingPage = pathname === "/pricing";
   const isPrivacyPage = pathname === "/privacy";
+  const isDevelopersPage = pathname === "/developers";
+  const isCreatorsPage = pathname === "/creators";
   const isBlogPage = pathname.startsWith("/blog");
 
   const navLinks = [
@@ -49,7 +51,11 @@ export function Navbar() {
         <div className="hidden md:flex items-center gap-1 bg-[#1f1f1f] border border-[#313131] rounded-full px-2 py-1">
           {navLinks.map((link) => {
             const isActive =
-              link.id === "pricing"
+              link.id === "developers"
+                ? isDevelopersPage
+                : link.id === "creators"
+                ? isCreatorsPage
+                : link.id === "pricing"
                 ? isPricingPage
                 : link.id === "privacy"
                 ? isPrivacyPage

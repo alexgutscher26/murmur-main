@@ -79,6 +79,7 @@ pub fn specta_builder() -> Builder<tauri::Wry> {
             commands::models::download_model,
             commands::models::delete_model,
             // System
+            commands::system::get_api_version,
             commands::system::check_permissions,
             commands::system::request_permission,
             commands::system::open_privacy_pane,

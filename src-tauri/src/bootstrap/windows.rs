@@ -1,0 +1,402 @@
+/*!
+ * SOURCE OF TRUTH KEYWORDS: bootstrap_windows, window_vibrancy, attach_sidebar,
+ *   attach_rail, place_rail, keep_rail_centred, keep_windows_alive, track_pill_drag,
+ *   let_the_pill_float_over_everything, show_first_window, show_dashboard_on_launch
+ * WHAT:  Window geometry, vibrancy, attachment, and positioning logic.
+ * WHERE: Consumed by bootstrap/mod.rs and tray.rs.
+ */
+
+use tauri::{AppHandle, Manager};
+
+use crate::db::Database;
+use crate::error::AppResult;
+use crate::registry::keys;
+use crate::services;
+use crate::types::SettingValue;
+
+pub const DASHBOARD_WINDOW: &str = "dashboard";
+pub const PILL_WINDOW: &str = "pill";
+pub const SIDEBAR_WINDOW: &str = "sidebar";
+pub const ONBOARDING_WINDOW: &str = "onboarding";
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: keep_windows_alive, CloseRequested, prevent_close,
+ *   hide_on_close
+ * WHAT:  Makes closing a window HIDE it rather than destroy it.
+ * WHY:   Tauri destroys a window when it is closed, and a destroyed window
+ *        cannot be shown again — `get_webview_window` returns None from then
+ *        on. So closing the dashboard did not merely put it away: it removed
+ *        the app's ONLY window permanently, and the tray item that exists to
+ *        reopen it silently did nothing for the rest of the session. Dictation
+ *        kept working, which made it look like the window had broken rather
+ *        than gone.
+ * WHERE: Installed once during setup, for every window a user can close.
+ */
+pub fn keep_windows_alive(app: &AppHandle) {
+    for label in [DASHBOARD_WINDOW, ONBOARDING_WINDOW] {
+        let Some(window) = app.get_webview_window(label) else {
+            continue;
+        };
+        let handle = window.clone();
+        window.on_window_event(move |event| {
+            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+                api.prevent_close();
+                if let Err(err) = handle.hide() {
+                    tracing::warn!(error = %err, "could not hide the window on close");
+                }
+                tracing::debug!(
+                    window = handle.label(),
+                    "window hidden rather than destroyed"
+                );
+            }
+        });
+    }
+}
+
+pub fn track_pill_drag(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window(PILL_WINDOW) {
+        let app_handle = app.clone();
+        window.on_window_event(move |event| {
+            if let tauri::WindowEvent::Moved(pos) = event {
+                crate::tray::record_pill_drag_position(&app_handle, pos.x, pos.y);
+            }
+        });
+    }
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: apply_window_vibrancy, NSVisualEffectMaterial,
+ *   glass, vibrancy, frosted
+ * WHAT:  Installs the native NSVisualEffectView behind each window.
+ * WHY:   THIS IS WHAT MAKES THE GLASS. Every window is declared
+ *        `transparent: true` and the web layer paints a transparent body, on
+ *        the understanding that a native vibrancy view sits behind it.
+ * WHERE: Called once per window during setup.
+ */
+pub fn apply_window_vibrancy(app: &AppHandle) {
+    #[cfg(target_os = "macos")]
+    {
+        use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
+
+        let window_radius = crate::tray::design_token("--radius-window");
+        for (label, material, radius) in [
+            (
+                PILL_WINDOW,
+                NSVisualEffectMaterial::HudWindow,
+                Some(crate::tray::pill_radius()),
+            ),
+            (
+                SIDEBAR_WINDOW,
+                NSVisualEffectMaterial::Sidebar,
+                Some(window_radius),
+            ),
+            (
+                DASHBOARD_WINDOW,
+                NSVisualEffectMaterial::Sidebar,
+                Some(window_radius),
+            ),
+            (
+                ONBOARDING_WINDOW,
+                NSVisualEffectMaterial::Popover,
+                Some(window_radius),
+            ),
+        ] {
+            let Some(window) = app.get_webview_window(label) else {
+                continue;
+            };
+            match apply_vibrancy(&window, material, Some(NSVisualEffectState::Active), radius) {
+                Ok(()) => tracing::debug!(window = label, "vibrancy applied"),
+                Err(err) => {
+                    tracing::warn!(window = label, error = %err, "could not apply vibrancy")
+                }
+            }
+        }
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    let _ = app;
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: show_first_window
+ * WHAT:  Opens onboarding on a fresh install, and nothing at all afterwards.
+ * WHY:   Murmur is invisible until summoned — that is the product.
+ * WHERE: The last step of setup.
+ */
+pub fn show_first_window(app: &AppHandle, db: &Database) -> AppResult<()> {
+    let complete = matches!(
+        services::settings::get_setting(db, keys::ONBOARDING_COMPLETE)
+            .ok()
+            .flatten(),
+        Some(SettingValue::Bool(true))
+    );
+
+    if complete {
+        return Ok(());
+    }
+
+    if let Some(window) = app.get_webview_window(ONBOARDING_WINDOW) {
+        #[cfg(target_os = "macos")]
+        let _ = app.show();
+
+        let _ = window.show();
+        let _ = window.set_focus();
+        tracing::info!("onboarding opened");
+    }
+    Ok(())
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: show_dashboard_on_launch, MURMUR_SHOW_DASHBOARD
+ * WHAT:  Opens the dashboard at launch when the environment asks for it.
+ * WHERE: Read once at the end of setup.
+ */
+pub fn show_dashboard_on_launch(app: &AppHandle) {
+    if std::env::var("MURMUR_SHOW_DASHBOARD").is_err() {
+        return;
+    }
+    tracing::info!("MURMUR_SHOW_DASHBOARD set — opening the dashboard");
+    crate::tray::show_dashboard(app);
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: let_the_pill_float_over_everything, spaces
+ * WHAT:  Makes the pill visible over full-screen apps and on every Space.
+ * WHERE: Called once by setup, after the windows exist.
+ */
+pub fn let_the_pill_float_over_everything(app: &AppHandle) {
+    #[cfg(target_os = "macos")]
+    {
+        use objc2::rc::Retained;
+        use objc2_app_kit::{NSWindow, NSWindowCollectionBehavior};
+
+        let Some(pill) = app.get_webview_window(PILL_WINDOW) else {
+            return;
+        };
+        let Ok(handle) = pill.ns_window() else {
+            return;
+        };
+
+        // SAFETY: the handle is Tauri's NSWindow for a window that exists, and
+        // this runs on the main thread during setup.
+        unsafe {
+            let Some(window) = Retained::retain(handle as *mut NSWindow) else {
+                return;
+            };
+
+            window.setCollectionBehavior(
+                NSWindowCollectionBehavior::CanJoinAllSpaces
+                    | NSWindowCollectionBehavior::FullScreenAuxiliary
+                    | NSWindowCollectionBehavior::Stationary
+                    | NSWindowCollectionBehavior::IgnoresCycle,
+            );
+
+            window.setLevel(25);
+        }
+
+        tracing::info!("the pill will follow the user into full-screen apps");
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    let _ = app;
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: attach_sidebar, addChildWindow, detached_rail
+ * WHAT:  Sizes the navigation rail, places it to the left of the dashboard.
+ * WHERE: Called once by setup, after the windows exist.
+ */
+pub fn attach_sidebar(app: &AppHandle) {
+    let (Some(rail), Some(dashboard)) = (
+        app.get_webview_window(SIDEBAR_WINDOW),
+        app.get_webview_window(DASHBOARD_WINDOW),
+    ) else {
+        tracing::warn!("the rail or the dashboard is missing; leaving them unattached");
+        return;
+    };
+
+    let (width, height) = rail_size_points();
+    let nav_items = crate::registry::CAPABILITIES
+        .iter()
+        .filter(|capability| capability.nav.is_some())
+        .count();
+
+    if let Err(err) = rail.set_size(tauri::LogicalSize::new(width, height)) {
+        tracing::warn!(error = %err, "could not size the rail");
+    }
+
+    let _ = dashboard;
+    tracing::info!(
+        nav_items,
+        width,
+        height,
+        "rail sized from the design tokens"
+    );
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: attach_rail, addChildWindow_orders_it_in
+ * WHAT:  Makes the rail a child of the dashboard, once, the first time the
+ *        dashboard is actually on screen.
+ * WHERE: Called by tray::show_dashboard, after place_rail.
+ */
+pub fn attach_rail(app: &AppHandle) {
+    use std::sync::atomic::{AtomicBool, Ordering};
+    static ATTACHED: AtomicBool = AtomicBool::new(false);
+    if ATTACHED.swap(true, Ordering::SeqCst) {
+        return;
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        use objc2::rc::Retained;
+        use objc2_app_kit::{NSWindow, NSWindowOrderingMode};
+
+        let (Some(rail), Some(dashboard)) = (
+            app.get_webview_window(SIDEBAR_WINDOW),
+            app.get_webview_window(DASHBOARD_WINDOW),
+        ) else {
+            return;
+        };
+
+        let (Ok(child), Ok(parent)) = (rail.ns_window(), dashboard.ns_window()) else {
+            return;
+        };
+
+        // SAFETY: both handles come from Tauri for windows that exist, and this
+        // runs on the main thread from a Tauri event.
+        unsafe {
+            let child = child as *mut NSWindow;
+            let parent = parent as *mut NSWindow;
+            let (Some(child), Some(parent)) = (Retained::retain(child), Retained::retain(parent))
+            else {
+                return;
+            };
+            parent.addChildWindow_ordered(&child, NSWindowOrderingMode::Above);
+        }
+
+        tracing::info!("rail attached to the dashboard");
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    let _ = app;
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: keep_rail_centred, resize
+ * WHAT:  Re-centres the rail when the dashboard changes height.
+ * WHERE: Registered once by setup.
+ */
+pub fn keep_rail_centred(app: &AppHandle) {
+    use std::sync::Mutex;
+    static LAST_SIZE: Mutex<Option<(u32, u32)>> = Mutex::new(None);
+
+    let handle = app.clone();
+    if let Some(dashboard) = app.get_webview_window(DASHBOARD_WINDOW) {
+        dashboard.on_window_event(move |event| {
+            let tauri::WindowEvent::Resized(size) = event else {
+                return;
+            };
+            let now = (size.width, size.height);
+
+            let changed = match LAST_SIZE.lock() {
+                Ok(mut last) => {
+                    let changed = *last != Some(now);
+                    if changed {
+                        *last = Some(now);
+                    }
+                    changed
+                }
+                Err(_) => false,
+            };
+
+            if changed {
+                place_rail(&handle);
+            }
+        });
+    }
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: rail_size_points, never_measure_the_window
+ * WHAT:  The rail's size in POINTS, derived from the design tokens and the
+ *        number of nav entries.
+ * WHERE: attach_sidebar sizes the window with it; place_rail places with it.
+ */
+pub fn rail_size_points() -> (f64, f64) {
+    use crate::tray::design_token;
+
+    let nav_items = crate::registry::CAPABILITIES
+        .iter()
+        .filter(|capability| capability.nav.is_some())
+        .count() as f64;
+
+    let padding = design_token("--rail-padding");
+    let height = 2.0 * padding
+        + design_token("--mark-size-md")
+        + design_token("--rail-mark-gap")
+        + nav_items * design_token("--rail-item-size")
+        + (nav_items - 1.0).max(0.0) * design_token("--rail-item-gap");
+
+    (design_token("--rail-width"), height)
+}
+
+pub fn place_rail(app: &AppHandle) {
+    let (Some(rail), Some(dashboard)) = (
+        app.get_webview_window(SIDEBAR_WINDOW),
+        app.get_webview_window(DASHBOARD_WINDOW),
+    ) else {
+        return;
+    };
+
+    #[cfg(target_os = "macos")]
+    {
+        use objc2::rc::Retained;
+        use objc2_app_kit::NSWindow;
+
+        let (Ok(child), Ok(parent)) = (rail.ns_window(), dashboard.ns_window()) else {
+            return;
+        };
+
+        // SAFETY: both handles come from Tauri for live windows, and this runs
+        // on the main thread from a Tauri event.
+        unsafe {
+            let child = child as *mut NSWindow;
+            let parent = parent as *mut NSWindow;
+            let (Some(child), Some(parent)) = (Retained::retain(child), Retained::retain(parent))
+            else {
+                return;
+            };
+
+            let (rail_w, rail_h) = rail_size_points();
+            let gap = crate::tray::design_token("--rail-detach-gap");
+
+            // Size in points too, so the frame we place is the frame we sized.
+            let mut frame = child.frame();
+            frame.size.width = rail_w;
+            frame.size.height = rail_h;
+
+            let host = parent.frame();
+            frame.origin.x = host.origin.x - rail_w - gap;
+            frame.origin.y = host.origin.y + (host.size.height - rail_h) / 2.0;
+
+            child.setFrame_display(frame, true);
+
+            tracing::info!(
+                x = frame.origin.x,
+                y = frame.origin.y,
+                w = rail_w,
+                h = rail_h,
+                host_x = host.origin.x,
+                host_y = host.origin.y,
+                host_h = host.size.height,
+                "rail placed beside the dashboard"
+            );
+        }
+    }
+
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = (rail, dashboard);
+    }
+}
