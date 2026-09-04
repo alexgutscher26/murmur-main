@@ -29,7 +29,7 @@ import { usePlan, canUseContextEngine } from "@/lib/plan";
 
 /** Enough history to see the apps someone actually dictates into. */
 const CANDIDATE_SCAN = 200;
-const FIELD_CLASS = "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body text-text-primary";
+const FIELD_CLASS = "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80";
 
 const POPULAR_APP_PRESETS = [
   { bundle_id: "com.microsoft.VSCode", name: "VS Code" },

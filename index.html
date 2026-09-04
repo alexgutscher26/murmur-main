@@ -13,6 +13,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Murmur</title>
+    <!-- Apply stored theme before first paint to prevent flash of wrong theme.
+         Mirrors the logic in src/lib/theme.ts — must stay in sync. -->
+    <script>
+      (function () {
+        var t = localStorage.getItem("murmur_theme_preference");
+        var isDark = t === "dark" || (t !== "light" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (t === "dark" || t === "light") {
+          document.documentElement.setAttribute("data-theme", t);
+        }
+        if (isDark) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

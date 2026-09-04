@@ -10,6 +10,7 @@ pub mod dictation;
 pub mod dictionary;
 pub mod helpers;
 pub mod history;
+pub mod insights;
 pub mod models;
 pub mod onboarding;
 pub mod settings;
@@ -26,6 +27,7 @@ pub fn build_capabilities() -> Vec<Capability> {
         billing::billing_capability(),
         history::history_capability(),
         stats::stats_capability(),
+        insights::insights_capability(),
         dictionary::dictionary_capability(),
         onboarding::onboarding_capability(),
         updates::updates_capability(),

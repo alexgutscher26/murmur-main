@@ -264,7 +264,8 @@
   }
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+:root.dark {
   color-scheme: dark;
   --surface-glass: rgba(24, 22, 20, 0.94);
   --surface-elevated: rgba(36, 32, 29, 0.96);

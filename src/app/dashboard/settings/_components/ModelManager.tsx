@@ -135,20 +135,20 @@ function ModelSummary({
   return (
     <div className="min-w-0 flex-1">
       <div className="flex items-center gap-2">
-        <p className="text-body text-text-primary">{descriptor.display_name}</p>
+        <p className="text-sm font-medium text-stone-900 dark:text-white">{descriptor.display_name}</p>
         {isProModel && (
-          <span className="inline-flex items-center gap-1 rounded bg-sunken px-1.5 py-0.5 text-[10px] font-semibold text-text-primary hairline">
+          <span className="inline-flex items-center gap-1 rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold text-stone-800 dark:bg-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700">
             <Sparkles className="size-2.5" />
             PRO
           </span>
         )}
         {isLocked && (
-          <span className="text-[10px] text-text-tertiary font-mono">
+          <span className="text-[10px] text-stone-400 dark:text-stone-500 font-mono">
             (14-day trial available)
           </span>
         )}
       </div>
-      <p className="text-caption text-text-secondary">{descriptor.description}</p>
+      <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{descriptor.description}</p>
 
       {downloading ? (
         <ProgressBar
@@ -164,7 +164,7 @@ function ModelSummary({
           }
         />
       ) : (
-        <p className="text-caption tabular-nums text-text-tertiary">
+        <p className="text-xs tabular-nums text-stone-400 dark:text-stone-500 mt-1">
           {formatBytes(descriptor.size_bytes)} · {descriptor.approx_ram_mb} MB memory ·{" "}
           {state.kind === "FAILED" ? state.message : STATE_LABEL[state.kind]}
         </p>

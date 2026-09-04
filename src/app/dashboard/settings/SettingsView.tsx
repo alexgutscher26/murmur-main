@@ -28,7 +28,7 @@ import { useSettings } from "../use-settings";
 import { formatBytes } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useTheme, type ThemeChoice } from "@/lib/theme";
-import { ErrorSurface, ScrollArea, SettingControl, Skeleton, EmptyState } from "@/components/global";
+import { ErrorSurface, SettingControl, Skeleton, EmptyState } from "@/components/global";
 import type { SettingOption } from "@/components/global";
 import { PermissionNotice } from "./_components/PermissionNotice";
 import { ModelManager } from "./_components/ModelManager";
@@ -133,31 +133,44 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
 
   if (!settings.data) {
     return (
-      <ScrollArea contentClassName="px-[var(--page-padding-x)]">
+      <div className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-6">
         <Skeleton rows={8} />
-      </ScrollArea>
+      </div>
     );
   }
 
   return (
-    <ScrollArea contentClassName="flex flex-col gap-6 px-[var(--page-padding-x)] pb-8">
+    <div
+      data-scroll-area
+      className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-6 space-y-6"
+    >
       {writeError ? <ErrorSurface size="compact" error={writeError} /> : null}
+
+      {/* ── Page Header ────────────────────────────────────────────── */}
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
+          Settings
+        </h1>
+        <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+          Manage your speech models, audio input, keyboard shortcuts, and app preferences.
+        </p>
+      </div>
 
       {/* Real-time Settings Search Bar */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-text-tertiary" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 dark:text-stone-500" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search settings, models, shortcuts, or hotkeys..."
-          className="hairline w-full h-9 rounded-input bg-surface pl-9 pr-8 text-body text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-1 focus:ring-text-primary transition-all"
+          className="w-full h-9 rounded-xl border border-stone-200/80 bg-stone-50/80 pl-9 pr-8 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400 dark:border-stone-800 dark:bg-stone-900/50 dark:text-white dark:placeholder:text-stone-500 transition-all"
         />
         {searchQuery && (
           <button
             type="button"
             onClick={() => setSearchQuery("")}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-primary p-0.5 rounded-full"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 dark:hover:text-stone-300 p-0.5 rounded-full"
           >
             <X className="size-3.5" />
           </button>
@@ -227,9 +240,9 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
           })}
 
           {/* Per-App Profiles Section */}
-          <section className="flex flex-col gap-1">
-            <h2 className="text-heading text-text-primary">Per-app profiles</h2>
-            <p className="text-caption text-text-secondary">
+          <section className="flex flex-col gap-1 pt-4">
+            <h2 className="text-base font-semibold text-stone-900 dark:text-white">Per-app profiles</h2>
+            <p className="text-xs text-stone-500 dark:text-stone-400">
               Settings that apply only while a particular app is in front. Anything a profile does not override keeps
               following the global setting.
             </p>
@@ -243,7 +256,7 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
           </section>
         </>
       )}
-    </ScrollArea>
+    </div>
   );
 }
 
@@ -308,20 +321,20 @@ function SettingsSection({
         />
       ) : null}
 
-      <h2 className="text-heading text-text-primary">{title}</h2>
+      <h2 className="text-base font-semibold text-stone-900 dark:text-white mt-3 mb-1">{title}</h2>
 
       <PermissionNotice permissions={blocking} />
 
       {/* Explicit Theme Switcher in General Section */}
       {title === "General" && (
-        <div className="flex items-center justify-between py-3 hairline-b">
+        <div className="flex items-center justify-between py-3 border-b border-stone-200/60 dark:border-stone-800/80">
           <div className="min-w-0 flex-1">
-            <p className="text-body text-text-primary">Interface theme</p>
-            <p className="text-caption text-text-secondary">
+            <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Interface theme</p>
+            <p className="text-xs text-stone-500 dark:text-stone-400">
               Follow system appearance or force light or dark mode.
             </p>
           </div>
-          <div className="hairline flex items-center gap-1 rounded-input bg-sunken p-0.5">
+          <div className="flex items-center gap-1 rounded-xl border border-stone-200/80 bg-stone-100/80 p-0.5 dark:border-stone-800 dark:bg-stone-900">
             {(
               [
                 { id: "system", label: "System", icon: <Monitor className="size-3.5" /> },
@@ -334,10 +347,10 @@ function SettingsSection({
                 type="button"
                 onClick={() => setTheme(opt.id)}
                 className={cn(
-                  "flex items-center gap-1 px-2.5 py-1 rounded-input text-caption font-medium transition-all",
+                  "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
                   theme === opt.id
-                    ? "bg-elevated text-text-primary shadow-sm"
-                    : "text-text-secondary hover:text-text-primary"
+                    ? "bg-white text-stone-900 shadow-xs dark:bg-stone-800 dark:text-white"
+                    : "text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
                 )}
               >
                 {opt.icon}
@@ -360,25 +373,25 @@ function SettingsSection({
 
       {hasBaselineWpm ? (
         <>
-          <div className="flex items-center justify-between py-3 hairline-b">
+          <div className="flex items-center justify-between py-3 border-b border-stone-200/60 dark:border-stone-800/80">
             <div className="min-w-0 flex-1">
-              <p className="text-body text-text-primary">Calibrate typing speed</p>
-              <p className="text-caption text-text-secondary">
+              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Calibrate typing speed</p>
+              <p className="text-xs text-stone-500 dark:text-stone-400">
                 Measure your speech pace or take a typing test to accurately benchmark your baseline speed.
               </p>
             </div>
             <button
               type="button"
               onClick={() => setShowCalibration(true)}
-              className="hairline h-8 shrink-0 rounded-input bg-sunken px-3 text-body text-text-primary transition-colors hover:bg-sunken-strong"
+              className="h-8 shrink-0 rounded-xl border border-stone-200/80 bg-stone-100 px-3 text-xs font-medium text-stone-800 transition-colors hover:bg-stone-200/80 dark:border-stone-800 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
             >
               Calibrate speed…
             </button>
           </div>
-          <div className="flex items-center justify-between py-3 hairline-b">
+          <div className="flex items-center justify-between py-3 border-b border-stone-200/60 dark:border-stone-800/80">
             <div className="min-w-0 flex-1">
-              <p className="text-body text-text-primary">First-run setup</p>
-              <p className="text-caption text-text-secondary">
+              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">First-run setup</p>
+              <p className="text-xs text-stone-500 dark:text-stone-400">
                 Redo microphone permissions, audio calibration, and the dictation hotkey test.
               </p>
             </div>
@@ -387,7 +400,7 @@ function SettingsSection({
               onClick={() => {
                 void unwrapCommand(commands.openOnboardingWindow);
               }}
-              className="hairline h-8 shrink-0 rounded-input bg-sunken px-3 text-body text-text-primary transition-colors hover:bg-sunken-strong"
+              className="h-8 shrink-0 rounded-xl border border-stone-200/80 bg-stone-100 px-3 text-xs font-medium text-stone-800 transition-colors hover:bg-stone-200/80 dark:border-stone-800 dark:bg-stone-800/80 dark:text-stone-200 dark:hover:bg-stone-700"
             >
               Run setup again…
             </button>

@@ -6,7 +6,7 @@
 
 use super::helpers::{advanced, choice, default_hotkey, dynamic_choice, metric, number, text, toggle};
 use crate::ports::permissions::OsPermission;
-use crate::registry::capability::{Capability, CapabilityKey, HotkeyDef, SettingDef, SettingSection};
+use crate::registry::capability::{Capability, CapabilityKey, HotkeyDef, NavDef, SettingDef, SettingSection};
 use crate::registry::keys;
 use crate::types::settings::ChoiceSource;
 use crate::types::{EngineFeature, HotkeyBinding, KeyModifier, LatencyStage, SettingKind, SettingValue};
@@ -18,7 +18,12 @@ pub fn dictation_capability() -> Capability {
         description: text("Press a hotkey, talk, press it again — your words are pasted where you were typing."),
         requires: vec![OsPermission::Microphone],
         engine_needs: vec![EngineFeature::Streaming],
-        nav: None,
+        nav: Some(NavDef {
+            label: text("Dictation"),
+            route: text("dictation"),
+            icon: text("Mic"),
+            order: 5,
+        }),
         hotkey: Some(HotkeyDef {
             id: text("dictation.toggle"),
             label: text("Start / stop dictation"),

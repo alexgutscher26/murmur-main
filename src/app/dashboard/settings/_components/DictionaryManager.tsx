@@ -21,7 +21,7 @@ const MATCH_LABEL: Readonly<Record<MatchKind, string>> = {
 };
 
 const MATCH_KINDS: readonly MatchKind[] = ["WORD", "WORD_CASE_SENSITIVE", "SUBSTRING"];
-const FIELD_CLASS = "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body text-text-primary";
+const FIELD_CLASS = "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80";
 
 interface DomainPack {
   id: string;

@@ -26,6 +26,8 @@
 @import "tailwindcss";
 @import "./tokens.css";
 
+@variant dark (&:where([data-theme="dark"], [data-theme="dark"] *, .dark, .dark *));
+
 @theme inline {
   --color-glass: var(--surface-glass);
   --color-elevated: var(--surface-elevated);

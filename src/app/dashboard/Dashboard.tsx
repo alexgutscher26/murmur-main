@@ -1,34 +1,55 @@
 /**
- * SOURCE OF TRUTH KEYWORDS: Dashboard, getRegistry, navItems, useHashRoute,
+ * SOURCE OF TRUTH KEYWORDS: Dashboard, WhisperFlowShell, navItems, useHashRoute,
  *   dictationHotkey, StatsView, HistoryView, SettingsView, ShortcutsModal, ChangelogModal
- * WHAT:  The dashboard shell: fetches the registry once, builds the sidebar from
- *        its nav entries, renders the view for the current route, and hosts
- *        the global keyboard shortcuts and in-app changelog modals.
- * WHY:   One get_registry for the whole window. Integrates keyboard shortcut
- *        navigation (Cmd+1..4, '?') and release notes without adding external dependencies.
- * WHERE: Mounted by src/entries/dashboard.tsx. Views live in ./stats, ./history,
- *        ./settings, and ./billing.
+ * WHAT:  The dashboard shell completely redesigned to match Whisper Flow:
+ *        - Window controls bar with sidebar toggle, user avatar, bell, min/max/close
+ *        - Expanded left sidebar (Flow branding, navigation items, words remaining
+ *          quota card, team invite, free month, settings with badge, help)
+ *        - Spacious rounded white canvas card hosting active views
+ * WHERE: Mounted by src/entries/dashboard.tsx.
  */
 
 import { useEffect, useMemo, useState } from "react";
-import { Sparkles, Keyboard } from "lucide-react";
-import { commands, type HotkeyBinding, type NavDef, type RegistrySnapshot, type SettingValue } from "@/lib/bindings";
-import { useCommand } from "@/lib/ipc";
+import {
+  Bell,
+  BookOpen,
+  CircleDot,
+  FileText,
+  Gift,
+  HelpCircle,
+  Mic,
+  Minus,
+  PanelLeft,
+  Scissors,
+  Settings,
+  Square,
+  Type,
+  User,
+  Users,
+  WandSparkles,
+  X,
+  Gauge,
+  Check,
+} from "lucide-react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import {
+  commands,
+  type HotkeyBinding,
+  type NavDef,
+  type RegistrySnapshot,
+  type SettingValue,
+} from "@/lib/bindings";
+import { useCommand, unwrapCommand } from "@/lib/ipc";
 import { useSettings } from "./use-settings";
 import {
-  EmptyState,
   ErrorBoundary,
   ErrorSurface,
   Skeleton,
   ScrollArea,
   ShortcutsModal,
   ChangelogModal,
-  Mark,
 } from "@/components/global";
-import { iconFor } from "@/lib/icons";
 import { cn } from "@/lib/utils";
-import { PageShell } from "./_components/PageShell";
-import { UpdateNotice } from "./_components/UpdateNotice";
 import { BillingView } from "./billing";
 import { navigateTo, useHashRoute } from "./use-hash-route";
 import { dictationModeFrom, type DictationMode } from "@/lib/dictation-mode";
@@ -38,6 +59,7 @@ import { useWindowBoundsPersistence } from "@/lib/window-state";
 import { StatsView } from "./stats/StatsView";
 import { HistoryView } from "./history/HistoryView";
 import { SettingsView } from "./settings/SettingsView";
+import { InsightsView } from "./insights/InsightsView";
 
 /**
  * WHAT:  The user's dictation hotkey — their override if they have one, the
@@ -50,7 +72,9 @@ function dictationHotkey(
   for (const capability of registry.capabilities) {
     const hotkey = capability.hotkey;
     if (!hotkey) continue;
-    const override = hotkey.setting_key ? values?.[hotkey.setting_key] : undefined;
+    const override = hotkey.setting_key
+      ? values?.[hotkey.setting_key]
+      : undefined;
     return override?.type === "HOTKEY" ? override.value : hotkey.default;
   }
   return null;
@@ -62,8 +86,10 @@ export function Dashboard() {
   const settings = useSettings();
   const { route, section } = useHashRoute();
 
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useTauriEvent(navSelectedChannel, (payload) => navigateTo(payload.route));
 
@@ -71,7 +97,8 @@ export function Dashboard() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      const isInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
+      const isInput =
+        target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
 
       if (!isInput && e.key === "?") {
         e.preventDefault();
@@ -81,16 +108,16 @@ export function Dashboard() {
       if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) {
         if (e.key === "1") {
           e.preventDefault();
-          navigateTo("stats");
+          navigateTo("dictation");
         } else if (e.key === "2") {
           e.preventDefault();
-          navigateTo("history");
+          navigateTo("insights");
         } else if (e.key === "3") {
           e.preventDefault();
-          navigateTo("settings");
+          navigateTo("history");
         } else if (e.key === "4") {
           e.preventDefault();
-          navigateTo("billing");
+          navigateTo("settings");
         }
       }
     };
@@ -98,6 +125,35 @@ export function Dashboard() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleMinimize = () => {
+    try {
+      void getCurrentWindow().minimize();
+    } catch {
+      // ignore outside tauri
+    }
+  };
+
+  const handleMaximize = () => {
+    try {
+      void getCurrentWindow().toggleMaximize();
+    } catch {
+      // ignore outside tauri
+    }
+  };
+
+  const handleClose = () => {
+    try {
+      void getCurrentWindow().close();
+    } catch {
+      // ignore outside tauri
+    }
+  };
 
   const navItems = useMemo<NavDef[]>(() => {
     const items = (registry.data?.capabilities ?? [])
@@ -107,81 +163,339 @@ export function Dashboard() {
   }, [registry.data]);
 
   const metrics = useMemo(
-    () => (registry.data?.capabilities ?? []).flatMap((capability) => capability.metrics),
+    () =>
+      (registry.data?.capabilities ?? []).flatMap(
+        (capability) => capability.metrics,
+      ),
     [registry.data],
   );
 
+  // Active route fallback to "dictation" (or "stats")
+  const activeRoute =
+    route === "stats"
+      ? "dictation"
+      : navItems.some((item) => item.route === route)
+        ? route
+        : "dictation";
+
   if (registry.error) {
     return (
-      <main className="flex h-full items-center justify-center">
+      <main className="flex h-screen items-center justify-center bg-[#f4f2ee] dark:bg-[#141210]">
         <ErrorSurface error={registry.error} onRetry={registry.reload} />
       </main>
     );
   }
 
-  const activeRoute = navItems.some((item) => item.route === route)
-    ? route
-    : (navItems[0]?.route ?? "");
-
-  const activeTitle = navItems.find((item) => item.route === activeRoute)?.label ?? "";
-
-  const headerActions = (
-    <div className="flex items-center gap-1.5">
-      <button
-        type="button"
-        onClick={() => setShowChangelog(true)}
-        className="hairline flex items-center gap-1.5 h-7 rounded-full bg-sunken px-2.5 text-[11px] font-medium text-text-secondary hover:bg-sunken-strong hover:text-text-primary transition-colors"
-        title="What's New in Murmur"
-      >
-        <Sparkles className="size-3 text-text-primary" />
-        <span>What's new</span>
-      </button>
-
-      <button
-        type="button"
-        onClick={() => setShowShortcuts(true)}
-        className="hairline flex items-center gap-1 h-7 rounded-full bg-sunken px-2.5 text-[11px] font-medium text-text-secondary hover:bg-sunken-strong hover:text-text-primary transition-colors"
-        title="Keyboard Shortcuts (?)"
-      >
-        <Keyboard className="size-3" />
-        <span className="font-mono">?</span>
-      </button>
-    </div>
-  );
-
   return (
-    <main className="flex h-full w-full bg-[var(--surface-opaque)] text-[var(--text-primary)]">
-      {/* Navigation Sidebar */}
-      <aside className="flex w-16 shrink-0 flex-col items-center border-r border-hairline bg-sunken/40 py-4">
-        <Mark label="Murmur" className="mb-6 shrink-0" />
-        <nav aria-label="Sections" className="flex flex-col items-center gap-2">
-          {navItems.map((item) => {
-            const Icon = iconFor(item.icon);
-            const isActive = item.route === activeRoute;
-            return (
-              <button
-                key={item.route}
-                type="button"
-                onClick={() => navigateTo(item.route)}
-                title={item.label}
-                aria-label={item.label}
-                aria-current={isActive ? "page" : undefined}
-                className={cn(
-                  "flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-input transition-colors",
-                  isActive
-                    ? "bg-sunken-strong text-text-primary shadow-sm"
-                    : "text-text-secondary hover:bg-sunken hover:text-text-primary",
-                )}
-              >
-                <Icon className="size-4 shrink-0" aria-hidden="true" />
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#f4f2ee] text-stone-900 select-none dark:bg-[#141210] dark:text-stone-100">
+      {/* ── Top Window Bar (Traffic-light / Window Controls) ─────────────── */}
+      <header
+        data-tauri-drag-region
+        className="flex h-10 shrink-0 items-center justify-between px-3"
+      >
+        {/* Top Left: Sidebar collapse toggle + User profile */}
+        <div data-tauri-drag-region={false} className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setSidebarCollapsed((v) => !v)}
+            title="Toggle sidebar"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
+          >
+            <PanelLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => showToast("Alex's Personal Account")}
+            title="Alex Gutscher"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
+          >
+            <User className="h-4 w-4" />
+          </button>
+        </div>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <PageShell title={activeTitle} actions={headerActions}>
+        {/* Top Right: Notifications + Window controls */}
+        <div data-tauri-drag-region={false} className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setShowChangelog(true)}
+            title="Notifications & Updates"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
+          >
+            <Bell className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={handleMinimize}
+            title="Minimize"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
+          >
+            <Minus className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={handleMaximize}
+            title="Maximize"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
+          >
+            <Square className="h-3 w-3" />
+          </button>
+          <button
+            type="button"
+            onClick={handleClose}
+            title="Close"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-red-500 hover:text-white dark:text-stone-400 dark:hover:bg-red-600 transition-colors"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </header>
+
+      {/* ── Main App Shell Body (Sidebar + Content Canvas) ────────────────── */}
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        {/* ── Left Sidebar ───────────────────────────────────────────────── */}
+        <aside
+          className={cn(
+            "flex flex-col justify-between py-2 transition-all duration-200 shrink-0",
+            sidebarCollapsed ? "w-14 px-2" : "w-56 px-4",
+          )}
+        >
+          {/* Top Branding & Main Navigation */}
+          <div className="flex flex-col min-h-0">
+            {/* Logo */}
+            <div className="flex items-center gap-2 px-2 py-3 mb-2">
+              <div className="flex items-center gap-[2.5px] h-4">
+                <div className="w-[3px] h-3 bg-stone-900 dark:bg-white rounded-full" />
+                <div className="w-[3px] h-5 bg-stone-900 dark:bg-white rounded-full" />
+                <div className="w-[3px] h-3.5 bg-stone-900 dark:bg-white rounded-full" />
+                <div className="w-[3px] h-2 bg-stone-900 dark:bg-white rounded-full" />
+              </div>
+              {!sidebarCollapsed && (
+                <span className="font-bold text-base tracking-tight text-stone-900 dark:text-white">
+                  Flow
+                </span>
+              )}
+            </div>
+
+            {/* Navigation items */}
+            <nav className="flex flex-col gap-0.5">
+              {/* Dictation (Primary Home) */}
+              <button
+                type="button"
+                onClick={() => navigateTo("dictation")}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
+                  activeRoute === "dictation"
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
+                )}
+                title="Dictation"
+              >
+                <Mic className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Dictation</span>}
+              </button>
+
+              {/* Notetaker */}
+              <button
+                type="button"
+                onClick={() => navigateTo("notetaker")}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
+                  activeRoute === "notetaker"
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
+                )}
+                title="Notetaker"
+              >
+                <CircleDot className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Notetaker</span>}
+              </button>
+
+              {/* Insights */}
+              <button
+                type="button"
+                onClick={() => navigateTo("insights")}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
+                  activeRoute === "insights"
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
+                )}
+                title="Insights"
+              >
+                <Gauge className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Insights</span>}
+              </button>
+
+              {/* Dictionary */}
+              <button
+                type="button"
+                onClick={() => navigateTo("dictionary")}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
+                  activeRoute === "dictionary"
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
+                )}
+                title="Dictionary"
+              >
+                <BookOpen className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Dictionary</span>}
+              </button>
+
+              {/* Snippets */}
+              <button
+                type="button"
+                onClick={() => navigateTo("snippets")}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
+                  activeRoute === "snippets"
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
+                )}
+                title="Snippets"
+              >
+                <Scissors className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Snippets</span>}
+              </button>
+
+              {/* Style */}
+              <button
+                type="button"
+                onClick={() => navigateTo("style")}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
+                  activeRoute === "style"
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
+                )}
+                title="Style"
+              >
+                <Type className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Style</span>}
+              </button>
+
+              {/* Transforms */}
+              <button
+                type="button"
+                onClick={() => navigateTo("transforms")}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
+                  activeRoute === "transforms"
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
+                )}
+                title="Transforms"
+              >
+                <WandSparkles className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Transforms</span>}
+              </button>
+
+              {/* Scratchpad */}
+              <button
+                type="button"
+                onClick={() => navigateTo("scratchpad")}
+                className={cn(
+                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
+                  activeRoute === "scratchpad"
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
+                )}
+                title="Scratchpad"
+              >
+                <FileText className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Scratchpad</span>}
+              </button>
+            </nav>
+          </div>
+
+          {/* Middle/Bottom Sidebar: Quota Card + Secondary Links */}
+          <div className="flex flex-col gap-1">
+            {/* Words remaining quota card */}
+            {!sidebarCollapsed && (
+              <div className="rounded-2xl border border-purple-200/60 bg-[#f8f4fb] p-3.5 dark:border-purple-900/40 dark:bg-purple-950/20 mb-2">
+                <div className="text-xs font-bold text-purple-700 dark:text-purple-300">
+                  1,966 words remaining
+                </div>
+                <p className="mt-1 text-[11px] leading-relaxed text-stone-500 dark:text-stone-400">
+                  You get 2,000 words per week. Upgrade for unlimited access.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => navigateTo("billing")}
+                  className="mt-2.5 w-full rounded-xl bg-stone-900 py-1.5 text-center text-xs font-semibold text-white shadow-xs hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-colors"
+                >
+                  Upgrade to Pro
+                </button>
+              </div>
+            )}
+
+            {/* Secondary navigation */}
+            <div className="flex flex-col gap-0.5">
+              <button
+                type="button"
+                onClick={() => {
+                  void unwrapCommand(() =>
+                    commands.copyText({ text: "https://useflow.ai/invite/alex" }),
+                  ).then(() => showToast("Invite link copied to clipboard!"));
+                }}
+                className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors"
+                title="Invite your team"
+              >
+                <Users className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Invite your team</span>}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  void unwrapCommand(() =>
+                    commands.copyText({ text: "FLOW-FREE-MONTH" }),
+                  ).then(() => showToast("Referral code copied!"));
+                }}
+                className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors"
+                title="Get a free month"
+              >
+                <Gift className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Get a free month</span>}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigateTo("settings")}
+                className={cn(
+                  "flex items-center justify-between rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors",
+                  activeRoute === "settings"
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
+                )}
+                title="Settings"
+              >
+                <div className="flex items-center gap-3">
+                  <Settings className="h-4 w-4 shrink-0" />
+                  {!sidebarCollapsed && <span>Settings</span>}
+                </div>
+                {!sidebarCollapsed && (
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
+                    1
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowShortcuts(true)}
+                className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors"
+                title="Help"
+              >
+                <HelpCircle className="h-4 w-4 shrink-0" />
+                {!sidebarCollapsed && <span>Help</span>}
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        {/* ── Main Canvas (Rounded Card) ─────────────────────────────────── */}
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[26px] border border-stone-200/70 bg-white shadow-xs dark:border-stone-800/80 dark:bg-[#1b1917] text-stone-900 dark:text-stone-100 m-1 mr-3 mb-3">
           <ErrorBoundary
             key={activeRoute}
             fallback={({ error, reset }) => (
@@ -207,19 +521,32 @@ export function Dashboard() {
                 mode={dictationModeFrom(settings.data)}
               />
             ) : (
-              <ScrollArea contentClassName="px-[var(--page-padding-x)] pb-8">
-                <Skeleton rows={4} />
+              <ScrollArea contentClassName="p-8">
+                <Skeleton rows={6} />
               </ScrollArea>
             )}
           </ErrorBoundary>
-        </PageShell>
-        <UpdateNotice />
+        </main>
       </div>
 
-      {/* Global Modals */}
-      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
-      <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} />
-    </main>
+      {/* ── Toast Feedback Notification ──────────────────────────────────── */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-8 z-50 flex items-center gap-2 rounded-xl bg-stone-900 px-4 py-2.5 text-xs font-medium text-white shadow-lg dark:bg-stone-100 dark:text-stone-900 animate-in fade-in slide-in-from-bottom-2">
+          <Check className="h-4 w-4 text-emerald-400 dark:text-emerald-600" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* ── Global Modals ────────────────────────────────────────────────── */}
+      <ShortcutsModal
+        isOpen={showShortcuts}
+        onClose={() => setShowShortcuts(false)}
+      />
+      <ChangelogModal
+        isOpen={showChangelog}
+        onClose={() => setShowChangelog(false)}
+      />
+    </div>
   );
 }
 
@@ -240,20 +567,80 @@ function View({
   mode: DictationMode;
 }) {
   switch (route) {
+    case "dictation":
     case "stats":
       return <StatsView metrics={metrics} hotkey={hotkey} mode={mode} />;
+    case "insights":
+      return <InsightsView hotkey={hotkey} mode={mode} />;
     case "history":
       return <HistoryView hotkey={hotkey} mode={mode} />;
     case "settings":
       return <SettingsView registry={registry} section={section} />;
     case "billing":
       return <BillingView />;
-    default:
+    case "notetaker":
       return (
-        <EmptyState
-          headline="Nothing here yet"
-          description="This section of Murmur has not been built."
-        />
+        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+          <CircleDot className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
+          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
+            Notetaker
+          </h2>
+          <p className="mt-1 text-sm text-stone-500 max-w-sm">
+            Automatic meeting notes, speaker attribution, and real-time summaries.
+          </p>
+        </div>
       );
+    case "dictionary":
+      return <SettingsView registry={registry} section="dictionary" />;
+    case "snippets":
+      return (
+        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+          <Scissors className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
+          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
+            Snippets
+          </h2>
+          <p className="mt-1 text-sm text-stone-500 max-w-sm">
+            Voice-triggered expansions for canned responses, email signatures, and code.
+          </p>
+        </div>
+      );
+    case "style":
+      return (
+        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+          <Type className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
+          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
+            Style & Tone
+          </h2>
+          <p className="mt-1 text-sm text-stone-500 max-w-sm">
+            Tune formality, casing, punctuation density, and vocabulary filters.
+          </p>
+        </div>
+      );
+    case "transforms":
+      return (
+        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+          <WandSparkles className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
+          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
+            AI Transforms
+          </h2>
+          <p className="mt-1 text-sm text-stone-500 max-w-sm">
+            Convert spoken voice into structured JSON, bulleted tasks, or polished prose.
+          </p>
+        </div>
+      );
+    case "scratchpad":
+      return (
+        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+          <FileText className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
+          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
+            Scratchpad
+          </h2>
+          <p className="mt-1 text-sm text-stone-500 max-w-sm">
+            A continuous freeform scratchpad buffer for dictating uninterrupted thoughts.
+          </p>
+        </div>
+      );
+    default:
+      return <StatsView metrics={metrics} hotkey={hotkey} mode={mode} />;
   }
 }

@@ -54,10 +54,10 @@ export function SelectControl({ setting }: { setting: SelectSetting }) {
         disabled={setting.disabled}
         value={setting.value}
         onChange={(e) => setting.onChange(e.target.value)}
-        className="hairline h-8 appearance-none rounded-input bg-sunken pl-3 pr-8 text-body text-text-primary focus:outline-none focus:ring-1 focus:ring-text-primary disabled:opacity-50 cursor-default"
+        className="hairline h-8 appearance-none rounded-input bg-sunken pl-3 pr-8 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80 focus:outline-none focus:ring-1 focus:ring-text-primary disabled:opacity-50 cursor-default"
       >
         {setting.options.map((option) => (
-          <option key={option.value} value={option.value} disabled={option.disabled}>
+          <option key={option.value} value={option.value} disabled={option.disabled} className="text-stone-900 bg-white dark:text-white dark:bg-stone-900">
             {option.label}
           </option>
         ))}
@@ -79,9 +79,9 @@ export function NumberControl({ setting }: { setting: NumberSetting }) {
         step={setting.step}
         value={setting.value ?? ""}
         onChange={(e) => setting.onChange(parseFloat(e.target.value) || 0)}
-        className="hairline h-8 w-20 rounded-input bg-sunken px-2 text-right font-mono text-body text-text-primary focus:outline-none focus:ring-1 focus:ring-text-primary disabled:opacity-50"
+        className="hairline h-8 w-20 rounded-input bg-sunken px-2 text-right font-mono text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80 focus:outline-none focus:ring-1 focus:ring-text-primary disabled:opacity-50"
       />
-      {setting.unit && <span className="text-caption text-text-secondary">{setting.unit}</span>}
+      {setting.unit && <span className="text-caption text-text-secondary text-stone-500 dark:text-stone-400">{setting.unit}</span>}
     </div>
   );
 }
@@ -95,7 +95,7 @@ export function TextControl({ setting }: { setting: TextSetting }) {
       value={setting.value}
       placeholder={setting.placeholder}
       onChange={(e) => setting.onChange(e.target.value)}
-      className="hairline h-8 min-w-48 rounded-input bg-sunken px-2.5 text-body text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-1 focus:ring-text-primary disabled:opacity-50"
+      className="hairline h-8 min-w-48 rounded-input bg-sunken px-2.5 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-1 focus:ring-text-primary disabled:opacity-50"
     />
   );
 }

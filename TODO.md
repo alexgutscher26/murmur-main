@@ -251,7 +251,7 @@
 - [x] [UX] Settings search — A search bar at the top of the Settings view that filters the setting list in real-time.
 - [x] [UX] Dark / light / system theme — Add an explicit theme override in General settings.
 - [x] [UX] Onboarding re-run — A "Run setup again" button in General settings to redo the microphone and hotkey test without reinstalling.
-- [x] [UX] Dashboard window remember position/size — Persist the last dashboard window bounds and restore on next open.
+- [x] [UX] Fixed normal app window size (1000x660) — Enforce standard desktop dimensions on launch and refresh, prevent ballooning.
 - [x] [UX] Tooltips on all advanced settings — Every advanced setting in the registry has a description; surface it as a hover tooltip next to the label.
 - [ ] [FEAT] Session tagging — Let users tag sessions with labels ("meeting", "code review", "email") and filter history by tag. Tags stored as a many-to-many session_tags table in SQLite.
 - [ ] [FEAT] Session favorites / pinning — Star a session to pin it at the top of the history view and exclude it from bulk delete and retention purge.

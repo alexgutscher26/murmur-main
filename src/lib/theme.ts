@@ -25,12 +25,28 @@ export function applyTheme(theme: ThemeChoice) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
 
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
   if (theme === "system") {
     root.removeAttribute("data-theme");
   } else {
     root.setAttribute("data-theme", theme);
   }
+
+  root.classList.toggle("dark", isDark);
 }
+
+/**
+ * Apply the stored theme immediately at module import time so the correct
+ * data-theme attribute is on <html> before the first React render, regardless
+ * of which tab is active. Without this, the theme only applied when
+ * SettingsSection (which owns useTheme) happened to mount.
+ */
+applyTheme(getStoredTheme());
 
 export function useTheme() {
   const [theme, setThemeState] = useState<ThemeChoice>(() => getStoredTheme());
