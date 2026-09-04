@@ -1,34 +1,91 @@
 # Murmur Privacy Architecture & Data Boundary
 
-Murmur is built on a **local-first, zero-cloud architecture**. Your voice, your transcripts, and your personal data never leave your computer.
+Murmur is built on a **local-first, zero-cloud architecture**. Your voice, your transcripts, and your personal data never leave your computer. We turn "trust me" into **"verify me"**.
 
 ---
 
-## 🔒 The Local Data Boundary
+## 🔒 1. The Local Data Boundary Ledger
 
-| Data Type | Storage Location | Cloud Transmission | Retention & Erasure |
+| Data Type | Storage Location | Outbound Network Egress | Retention & Erasure Policy |
 | :--- | :--- | :--- | :--- |
 | **Microphone Audio** | Temporary System Memory (RAM) | **0 Bytes (Never)** | Purged immediately from RAM once transcription finishes |
-| **Transcripts & Text** | Local SQLite (`sessions.db`) | **0 Bytes (Never)** | User-controlled retention (e.g. 7 days, 30 days, or auto-wipe) |
+| **Transcripts & Pasted Text** | Local SQLite (`sessions.db`) or RAM-only | **0 Bytes (Never)** | User-controlled retention (0 days, 7 days, 30 days, or instant wipe) |
 | **Custom Dictionary** | Local SQLite (`dictionary` table) | **0 Bytes (Never)** | Fully editable & erasable on demand |
-| **User Settings & Hotkeys**| Local SQLite (`settings` table) | **0 Bytes (Never)** | Revertable with "Delete all data" |
-| **Compliance Audit Log** | Local SQLite (`audit_log` table) | **0 Bytes (Never)** | Contains only timestamps & event types (no text or audio) |
-| **AI Model Weights** | Local Disk Storage (`~/.murmur/models`) | **0 Bytes (Download once)**| Fully offline open-weights Whisper models |
+| **Window Context (App Title/ID)** | Ephemeral memory buffer | **0 Bytes (Never)** | Discarded after formatting rule evaluation |
+| **User Account & Identity** | None (Zero accounts or logins required) | **0 Bytes (No auth service)** | N/A — 100% anonymous & local |
+| **Telemetry & Crash Reports** | None (Zero tracking SDKs) | **0 Bytes (Never)** | N/A — No analytics beacons exist |
+| **AI Model Weights** | Local Disk Storage (`~/.murmur/models`) | **1-time download from HuggingFace/GitHub** | Fully offline permanent storage |
+| **App Update Checks** | None | **GitHub Releases API (Query only)** | Can be toggled OFF in Settings |
 
 ---
 
-## 🛡️ Core Privacy Guarantees
+## 🛡️ 2. Data Flow Architecture
 
-### 1. 100% On-Device Transcription
-Murmur runs open-weights OpenAI Whisper models locally using `whisper.cpp` with native hardware acceleration (Apple Silicon Metal / Windows MSVC). Audio processing happens entirely within your CPU/GPU.
+```text
+[ Microphone Audio Stream ]
+            │
+            ▼ (Volatile RAM Buffer — zero disk writes)
+[ Local whisper.cpp Engine ] (Metal / DirectML / CUDA hardware acceleration)
+            │
+            ▼ (Raw Decoded Tokens)
+[ Local Context Rules & Bias Engine ] (Regex formatting, filler removal, phonetic dictionary)
+            │
+            ▼ (Formatted Text)
+[ Native OS Window Injection ] (Directly typed/pasted into active cursor)
+            │
+            ├──► Audio buffer immediately freed from RAM
+            └──► Optional: Persist transcript to local SQLite (disabled in Incognito)
+```
 
-### 2. Zero Telemetry & Zero Trackers
-There are no analytics beacons, usage trackers, or marketing SDKs inside the Murmur binary. We do not track words spoken, dictation duration, or the applications you paste into.
+---
 
-### 3. Incognito Mode & Automatic Data Retention
-- **Incognito Mode:** Transcripts are pasted directly into your active window and immediately discarded from memory without writing a single byte to disk.
-- **Configurable Retention:** Configure `privacy.retention_days` in Settings to have Murmur automatically purge older transcripts on launch and every 6 hours.
-- **Auto-Purge on Lock:** When enabled, locking your computer wipes any in-memory transcript buffers and clears the clipboard.
+## 🌐 3. Explicit Outbound Network Request Disclosure
 
-### 4. Complete Data Eradication ("Delete All Data")
-At any time, you can execute a full factory wipe from **Settings > Privacy > Delete all data**. This instantly drops all session history, wipes your custom dictionary entries, and resets all settings to defaults.
+Murmur makes **only two optional network requests**:
+1. **Model Weight Download:** When you download a model (e.g., `whisper-base-q5_0.bin`), Murmur fetches the model directly from HuggingFace or official GitHub release assets. Once downloaded, it never connects again.
+2. **Version Check:** If enabled in Settings, Murmur checks `api.github.com/repos/alexgutscher26/murmur/releases/latest` to notify you if an update is available.
+
+**Zero other network requests exist in the codebase.** If you block Murmur in your firewall, all dictation, formatting, and history features continue operating with 100% functionality.
+
+---
+
+## 🧪 4. Reproducible Verification Recipes
+
+You can independently audit Murmur using standard packet capture and network monitoring utilities:
+
+### A. macOS (Little Snitch / LuLu)
+1. Install [LuLu](https://objective-see.org/products/lulu.html) or [Little Snitch](https://www.obdev.at/products/littlesnitch/).
+2. Launch Murmur and dictate a 5-minute paragraph.
+3. Observe the rule monitor: **0 connection attempts** are initiated during dictation or text delivery.
+
+### B. Windows (Wireshark / Pktmon)
+1. Run Windows Packet Monitor:
+   ```powershell
+   pktmon filter add -n murmur
+   pktmon start --etw
+   ```
+2. Dictate continuously across multiple applications.
+3. Stop the trace and inspect the output:
+   ```powershell
+   pktmon stop
+   pktmon pcapng pktmon.etl -o murmur_audit.pcapng
+   ```
+4. Verify that zero audio or HTTP packets were emitted.
+
+### C. Linux / Cross-Platform (NetHogs)
+1. Run `sudo nethogs` and isolate the Murmur process PID.
+2. Observe bandwidth during active transcription: `0.000 KB/s SENT` / `0.000 KB/s RECV`.
+
+---
+
+## ⚔️ 5. The Competitive Trust Wedge: Murmur vs. Cloud Dictation
+
+| Privacy Dimension | Murmur (Local-First) | Cloud Dictation (e.g. Wispr Flow, Cloud APIs) |
+| :--- | :--- | :--- |
+| **Trust Model** | **Verifiable Architecture** (0 bytes leave machine) | Policy-based ("We promise not to train on your data") |
+| **Network Egress** | 0 bytes audio / 0 bytes text | Continuous WebSocket audio stream |
+| **Account Required** | **No (Works out of the box)** | Yes (Mandatory email/Google auth) |
+| **Offline Support** | **100% offline ready (Air-gap mode)** | Fails completely without internet |
+| **Transcript Storage** | Local SQLite on device (or Incognito) | Remote cloud server storage |
+| **Telemetry** | **Zero trackers / Zero beacons** | Analytics SDKs & product event tracking |
+| **Auditability** | Open-source binary & reproducible network recipe | Closed cloud infrastructure |

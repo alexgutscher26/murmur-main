@@ -3,9 +3,21 @@
 > Organized by area. Items are roughly priority-ordered within each section.
 > Prefix legend: [BUG] · [PERF] · [FEAT] · [DX] · [UX] · [INFRA] · [WIN] · [SEC]
 
+## Core Reliability & Habit Formation (Activation & Daily Habit)
+
+- [x] [UX] 5-minute "first wow" onboarding flow: mic permissions -> model weight download -> first in-app dictation test without opening external editors.
+- [x] [WIN] Push-to-talk reliability: dedicated low-latency keyboard hook with modifier tap/hold detection (Alt+Space / Option+Space).
+- [x] [WIN] Non-conflicting shortcut handler: suppress system menu conflict (WM_SYSCOMMAND SC_KEYMENU) when target focus is Win32.
+- [x] [UX] Safe microphone status: live audio level visualization in floating pill + instant silence warning.
+- [x] [UX] Fast audio error recovery: auto-reopen stream on device switch within 500ms before failing session.
+- [x] [FEAT] Low-end hardware presets: downloadable Tiny & Base Q5_0 quantizations for budget laptops without dedicated GPUs.
+- [ ] [FEAT] Interruption & backtracking correction: detect voice backtracks ("no wait", "scratch that") and scrub previous segment in memory before injection.
+- [ ] [UX] First-run interactive dictation tutorial: guided step-by-step practice dictating a messy thought into a clean formatted email or commit.
+
 ---
 
 ## Windows-Specific
+
 
 - [x] [BUG] [WIN] Text injection fails in elevated-privilege apps (e.g. Task Manager, regedit). SendInput is blocked by UIPI when the target process runs at a higher integrity level. Need UAC elevation detection and a graceful fallback message.
 - [x] [BUG] [WIN] Clipboard not restored when target app does a fast Ctrl+V itself — arboard sets the clipboard, a race with the target app's own paste listener can clear it before Ctrl+V fires. Investigate using SetClipboardData with a delayed-render owner.
@@ -181,6 +193,42 @@
 - [DX] Settings schema version — Add a schema_version row to the settings table so old settings can be migrated or deprecated cleanly across app versions.
 - [DX] IPC contract tests — Auto-generate TypeScript types from the specta bindings and add a test that the generated bindings.ts matches the Rust side on every build.
 - [INFRA] Plugin architecture — Extract delivery methods (clipboard, accessibility, keyboard) and enhancement rules into a plugin trait so third-party developers can add delivery backends without forking the core.
+
+---
+
+## Privacy & Auditable Security
+
+- [x] [SEC] Public plain-English Privacy Architecture page with data boundary flow, outbound network disclosures, and audit recipes.
+- [x] [SEC] Explicit outbound network statement: only optional model downloads and GitHub release checks.
+- [x] [SEC] Zero account architecture — fully operational out of the box with 0 accounts, 0 logins, and 0 tokens.
+- [x] [SEC] Zero telemetry by default — no tracking SDKs, no beacons, no word counts or app analytics transmitted.
+- [x] [SEC] Incognito mode & local retention policies (0-day auto-purge, instant full database wipe).
+- [ ] [SEC] In-app "Air-Gap / Hardware Isolation Mode" hard kill-switch that closes any sockets and disables all outbound networking in the binary.
+- [ ] [SEC] SQLite database encryption at rest using OS Keychain / Windows DPAPI master keys.
+- [ ] [SEC] Reproducible network demo video & third-party security verification badge on landing page.
+
+---
+
+## Latency & Performance Benchmarks
+
+- [x] [PERF] Published dated, reproducible latency comparison matrix on website (speech end -> insertion tail latency).
+- [ ] [PERF] Automated CI latency & WER benchmark harness — Cargo bench target measuring insertion latency, sustained WPM, and technical WER on a fixed 500-sample audio dataset.
+- [ ] [PERF] Per-device resource profiling dashboard — Live telemetry in settings showing CPU/GPU VRAM footprint and Real-Time Factor (RTF) across M-series & DirectML.
+- [ ] [PERF] Always-ready warm background worker — Maintain warm Whisper VRAM state with zero idle CPU burn for sub-5ms session wakeups.
+- [ ] [PERF] Laptop battery efficiency mode — Dynamically downshift decode thread pool on battery power to preserve <1.2% / hour discharge rate.
+- [ ] [PERF] Low-bandwidth / offline verification guide — Documented test suite confirming identical sub-200ms latency in air-gapped / airplane mode.
+
+---
+
+## Power-User Customization & Vocabulary Ownership
+
+- [x] [FEAT] Smart per-app context formatting engine (Slack, Cursor, Notion, Gmail).
+- [ ] [FEAT] Voice-triggered text-expander snippets & macros — Speak trigger words (e.g. "bug template", "status update") to instantly insert structured markdown schemas.
+- [ ] [FEAT] Portable dictionary export/import (`.json` / `.csv`) — "Your vocabulary is an asset you own—not a training signal for someone else's model."
+- [ ] [FEAT] Project & workspace-scoped dictionaries — Auto-load `.murmur/dictionary.json` from the active git repository or workspace folder.
+- [ ] [FEAT] Local AI pipeline chaining — Dictate -> local lightweight LLM (llama.cpp) summarize/reformat -> paste to active cursor.
+- [ ] [FEAT] Developer-first keyboard command palette — Fast shortcut-driven dictionary management and model switching without mouse interaction.
+- [ ] [FEAT] Bring-Your-Own-Model (BYOM) loader — Allow power users to load custom fine-tuned GGUF / whisper.cpp model weights.
 
 ---
 
