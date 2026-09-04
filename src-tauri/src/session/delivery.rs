@@ -73,6 +73,8 @@ pub struct PendingDelivery {
      */
     pub heard_nothing_at_all: bool,
     pub peak_amplitude: f32,
+    /// Number of chunk decode jobs still in flight for this session.
+    pub in_flight: usize,
 }
 
 /// A recording with everything decoded, queued for its turn to be delivered.
@@ -117,6 +119,7 @@ async fn deliver(ctx: &SessionContext, pending: PendingDelivery) {
         finalize_started,
         heard_nothing_at_all,
         peak_amplitude,
+        in_flight: _,
     } = pending;
 
     let raw = {

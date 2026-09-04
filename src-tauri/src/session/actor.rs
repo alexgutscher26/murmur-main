@@ -132,6 +132,9 @@ pub struct SessionActor {
     /// Taken by `run`, which spawns the worker. See the note on `new` for why
     /// it is not spawned at construction.
     delivery_rx: Option<mpsc::Receiver<FinishedRecording>>,
+
+    /// Number of chunk decodes currently submitted to the worker for the active session.
+    in_flight: usize,
 }
 
 impl SessionActor {
@@ -162,9 +165,8 @@ impl SessionActor {
         let (deliveries, delivery_rx) = mpsc::channel(DELIVERY_QUEUE_DEPTH);
 
         Self {
-            delivery_rx: Some(delivery_rx),
-            pending: std::collections::HashMap::new(),
-            deliveries,
+            ctx,
+            worker,
             machine: SessionMachine::new(settings.cancel_countdown_ms),
             chunker: Chunker::new(),
             assembler: Assembler::new(),
@@ -178,8 +180,10 @@ impl SessionActor {
             finalize_started: None,
             detected_language: None,
             settings,
-            worker,
-            ctx,
+            pending: std::collections::HashMap::new(),
+            deliveries,
+            delivery_rx: Some(delivery_rx),
+            in_flight: 0,
         }
     }
 
@@ -469,6 +473,7 @@ impl SessionActor {
         self.assembler.clear();
         self.started_at = None;
         self.cancel_deadline = None;
+        self.in_flight = 0;
         let _ = self.latency.take_samples();
 
         if let Err(err) = services::sessions::delete_session(&self.ctx.db, &session_id) {
@@ -482,7 +487,9 @@ impl SessionActor {
                 if let Some(chunk) = self.chunker.push(&samples) {
                     let request = self.transcribe_request();
                     if let Some(session_id) = self.machine.session_id().cloned() {
-                        self.worker.submit(chunk, request, session_id);
+                        if self.worker.submit(chunk, request, session_id) {
+                            self.in_flight += 1;
+                        }
                     }
                 }
             }
@@ -542,8 +549,15 @@ impl SessionActor {
             Some(pending) => {
                 let _timer = pending.latency.stage_timer(LatencyStage::Assemble);
                 pending.assembler.push_segments(&decode.segments);
+                pending.in_flight = pending.in_flight.saturating_sub(1);
+                if pending.in_flight == 0 {
+                    if let Some(pending) = self.pending.remove(&decode.session_id) {
+                        self.finish(pending).await;
+                    }
+                }
             }
             None if Some(&decode.session_id) == self.machine.session_id() => {
+                self.in_flight = self.in_flight.saturating_sub(1);
                 let _timer = self.latency.stage_timer(LatencyStage::Assemble);
                 self.assembler.push_segments(&decode.segments);
                 let text = self.assembler.finish();
@@ -562,12 +576,6 @@ impl SessionActor {
                     "dropping a decode for a session that is no longer collecting"
                 );
                 return;
-            }
-        }
-
-        if matches!(decode.kind, ChunkKind::Tail) {
-            if let Some(pending) = self.pending.remove(&decode.session_id) {
-                self.finish(pending).await;
             }
         }
     }
@@ -594,6 +602,8 @@ impl SessionActor {
         let heard_nothing_at_all = self.chunker.heard_nothing_at_all();
         let peak_amplitude = self.chunker.peak_amplitude();
         let tail = self.chunker.close_tail();
+        let mut in_flight = self.in_flight;
+        self.in_flight = 0;
 
         /*
          * SOURCE OF TRUTH KEYWORDS: request_before_take, tail_language
@@ -607,7 +617,7 @@ impl SessionActor {
          */
         let request = self.transcribe_request();
 
-        let pending = PendingDelivery {
+        let mut pending = PendingDelivery {
             session_id: session_id.clone(),
             assembler: std::mem::take(&mut self.assembler),
             settings: self.settings.clone(),
@@ -617,6 +627,7 @@ impl SessionActor {
             finalize_started: self.finalize_started.take(),
             heard_nothing_at_all,
             peak_amplitude,
+            in_flight: 0,
         };
 
         // A fresh recorder for the next recording. Sharing one across
@@ -625,23 +636,25 @@ impl SessionActor {
         // missing, which is worse because they still look like measurements.
         self.latency = Arc::new(LatencyRecorder::new());
 
-        let Some(tail) = tail else {
+        let deadline = Duration::from_millis(pending.settings.finalize_timeout_ms);
+
+        if let Some(tail) = tail {
+            if self.worker.submit_tail(tail, request, deadline, session_id.clone()) {
+                in_flight += 1;
+            } else {
+                tracing::warn!("the tail could not be queued; delivering what we have");
+            }
+        }
+
+        if in_flight == 0 {
             // Nothing left to decode: either silence, or everything already
             // went out as interior chunks. It is finished as it stands.
             self.finish(pending).await;
             return;
-        };
-
-        let deadline = Duration::from_millis(pending.settings.finalize_timeout_ms);
-        self.pending.insert(session_id.clone(), pending);
-
-        if !self.worker.submit_tail(tail, request, deadline, session_id.clone()) {
-            tracing::warn!("the tail could not be queued; delivering what we have");
-            if let Some(pending) = self.pending.remove(&session_id) {
-                self.finish(pending).await;
-            }
-            return;
         }
+
+        pending.in_flight = in_flight;
+        self.pending.insert(session_id.clone(), pending);
 
         /*
          * The tail may never come back — a decode can hang, and this queue
