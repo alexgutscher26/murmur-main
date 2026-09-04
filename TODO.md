@@ -232,6 +232,27 @@
 
 ---
 
+## High-Intent SEO & Trust-Earning Content
+
+- [x] [SEO] Generated 10 high-intent programmatic comparison & use-case pages (`/wispr-flow-alternative`, `/private-dictation-app`, `/offline-voice-to-text-for-mac`, `/offline-voice-to-text-for-windows`, `/local-whisper-dictation`, `/voice-dictation-for-developers`, `/hipaa-friendly-local-dictation`, `/dictation-for-lawyers`, `/dictation-without-cloud-upload`, `/best-private-ai-dictation`).
+- [x] [SEO] Added JSON-LD Schema markup (`SoftwareApplication` & `FAQPage`) and canonical meta tags across all comparison routes.
+- [x] [CONTENT] Published 6 trust-earning technical articles addressing buyer anxieties, legal privilege risks, developer privacy, and hardware benchmarks.
+- [ ] [MARKETING] Record and publish short outcome-driven demonstration clips for X, LinkedIn, Reddit, and Product Hunt: "Dictating a full GitHub issue in Airplane Mode with 0 bytes sent."
+
+---
+
+## Sustainable Commercialization & Product Virality
+
+- [x] [BIZ] Hybrid pricing model: Free Starter + $49 Core Lifetime perpetual license + $8/mo / $49/yr Pro tier + $119 Privacy Professional tier.
+- [x] [BIZ] Student and Open Source Developer 50% discount program ($29 Core Lifetime).
+- [x] [BIZ] Switcher acquisition offer: 40% off first year / $20 off Lifetime for users migrating from Wispr Flow or Superwhisper.
+- [x] [VIRALITY] Shareable custom vocabulary and voice-command packs (`.murmur/pack.json`) with community pack directory.
+- [ ] [VIRALITY] In-app post-activation referral trigger: prompt users with personal referral invite only after 50 successful dictations (never during onboarding).
+- [ ] [VIRALITY] "Made with local dictation" exportable badge templates for GitHub issues, PRs, and documentation.
+- [ ] [SEC] Privacy Professional tamper-evident local audit logger & OS Keychain encrypted configuration export.
+
+---
+
 ## Known Bugs & Tech Debt
 
 - [BUG] modifier_tap.rs uses static mut with mutable references — Three warn(static_mut_refs) warnings exist. Refactor DETECTOR_STATE, DETECTOR_CALLBACK, and HOOK_HANDLE into a Mutex<Option<...>> or OnceLock to be Rust 2024 compliant and sound.
