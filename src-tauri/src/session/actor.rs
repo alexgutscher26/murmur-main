@@ -35,7 +35,7 @@ use crate::ports::permissions::{OsPermission, PermissionState};
 use crate::services;
 use crate::telemetry::{now_ms, LatencyRecorder};
 use crate::types::{
-    ChunkKind, LanguageCode, LanguageHint, LatencyStage, SessionId, SessionState,
+    LanguageCode, LanguageHint, LatencyStage, SessionId, SessionState,
 };
 
 use super::delivery::{FinishedRecording, PendingDelivery};
