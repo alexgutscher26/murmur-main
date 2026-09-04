@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Mic, Copy, Check, Volume2, Cpu, Activity } from "lucide-react";
 
 interface Scenario {
   id: string;
@@ -18,7 +19,7 @@ const SCENARIOS: Scenario[] = [
   {
     id: "tech",
     title: "Backend Refactor Note",
-    category: "Coding and Architecture",
+    category: "Coding & Architecture",
     rawSpoken:
       "we need to refactor the payment gateway to use exponential backoff with jitter and add an idempotent key to prevent double charging on stripe webhooks",
     fillerWords: ["um", "like"],
@@ -26,7 +27,7 @@ const SCENARIOS: Scenario[] = [
       "We need to refactor the payment gateway to use exponential backoff with jitter and add an idempotent key to prevent double charging on Stripe webhooks.",
     smartFormatted: `// Architecture Decision: Payment Gateway Resiliency
 1. Implement exponential backoff with Full Jitter algorithm
-2. Enforce Idempotency Key headers on all Stripe webhook handlers
+2. Enforce Idempotency-Key headers on all Stripe webhook handlers
 3. Guarantee zero duplicate billing during network timeouts`,
     latency: 184,
     wordCount: 29,
@@ -34,7 +35,7 @@ const SCENARIOS: Scenario[] = [
   {
     id: "standup",
     title: "Daily Standup Update",
-    category: "Team Chat and Slack",
+    category: "Team Chat & Slack",
     rawSpoken:
       "yesterday I finished the directml windows integration and today I am going to write tests for the audio resampler no blockers on my end",
     fillerWords: ["uh", "guys"],
@@ -49,8 +50,8 @@ const SCENARIOS: Scenario[] = [
   },
   {
     id: "medical",
-    title: "Clinical and Technical Note",
-    category: "Medical and Technical Jargon",
+    title: "Clinical & Technical Note",
+    category: "Medical Jargon",
     rawSpoken:
       "patient presents with acute benign paroxysmal positional vertigo recommend epley maneuver and vestibular rehabilitation therapy discontinue meclizine",
     fillerWords: [],
@@ -58,7 +59,7 @@ const SCENARIOS: Scenario[] = [
       "Patient presents with acute benign paroxysmal positional vertigo. Recommend Epley maneuver and vestibular rehabilitation therapy. Discontinue meclizine.",
     smartFormatted: `DIAGNOSIS: Acute Benign Paroxysmal Positional Vertigo (BPPV)
 PLAN:
-1. Perform in office Epley canalith repositioning maneuver
+1. Perform in-office Epley canalith repositioning maneuver
 2. Referral to Vestibular Rehabilitation Therapy (VRT)
 3. Discontinue Meclizine`,
     latency: 208,
@@ -67,7 +68,7 @@ PLAN:
   {
     id: "strategy",
     title: "Q4 Roadmap Strategy",
-    category: "Product and Docs",
+    category: "Product & Docs",
     rawSpoken:
       "our main focus for q four is shipping the local whisper turbo model cutting battery drain on macos and releasing the enterprise offline installer",
     fillerWords: ["um"],
@@ -75,9 +76,9 @@ PLAN:
       "Our main focus for Q4 is shipping the local Whisper Turbo model, cutting battery drain on macOS, and releasing the enterprise offline installer.",
     smartFormatted: `### Q4 Strategic Priorities
 
-• Whisper Large Turbo: Faster decode speeds with sub 200ms latency
+• Whisper Large Turbo: Faster decode speeds with sub-200ms latency
 • Zero Battery Drain: Asynchronous Metal and DirectML inference optimizations
-• Enterprise Offline Installer: Air gapped MSIX and PKG packages for regulated teams`,
+• Enterprise Offline Installer: Air-gapped MSIX and PKG packages for regulated teams`,
     latency: 174,
     wordCount: 23,
   },
@@ -98,11 +99,11 @@ export function InteractivePlayground() {
     if (isPlaying || isLiveMic) {
       interval = setInterval(() => {
         setAudioLevels(
-          Array.from({ length: 12 }, () => Math.floor(Math.random() * 55) + 12)
+          Array.from({ length: 16 }, () => Math.floor(Math.random() * 55) + 12)
         );
-      }, 90);
+      }, 80);
     } else {
-      setAudioLevels([10, 14, 18, 22, 18, 14, 10, 14, 18, 14, 10, 14]);
+      setAudioLevels([10, 14, 18, 22, 18, 14, 10, 14, 18, 14, 10, 14, 16, 12, 14, 10]);
     }
     return () => clearInterval(interval);
   }, [isPlaying, isLiveMic]);
@@ -124,7 +125,7 @@ export function InteractivePlayground() {
         setDisplayedText(targetText);
         setIsPlaying(false);
       }
-    }, 15);
+    }, 12);
   };
 
   const toggleLiveMic = () => {
@@ -189,29 +190,34 @@ export function InteractivePlayground() {
   };
 
   return (
-    <section id="playground" className="py-24 bg-[#000000] border-t border-[#313131]">
-      <div className="max-w-4xl mx-auto px-4">
+    <section id="playground" className="py-24 relative overflow-hidden border-t border-white/[0.06]">
+      <div className="max-w-5xl mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center max-w-[680px] mx-auto mb-14">
-          <span className="text-xs font-mono font-semibold uppercase tracking-widest text-white/50 block mb-2">
-            Interactive Voice Laboratory
-          </span>
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-4">
+            <Activity className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-zinc-400">
+              Interactive Voice Laboratory
+            </span>
+          </div>
           <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-4">
             Test Murmur in your browser.
           </h2>
-          <p className="text-white/70 text-base sm:text-lg">
-            Experience how Murmur turns speech into formatted text while removing filler words with zero cloud latency.
+          <p className="text-zinc-400 text-base sm:text-lg">
+            Experience how Murmur turns unstructured messy speech into formatted writing while stripping filler words with zero cloud latency.
           </p>
         </div>
 
-        {/* Playground Grid (B3: Nested radius) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Playground Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Left Column: Preset Scenarios (5 cols) */}
           <div className="lg:col-span-5 flex flex-col gap-4">
-            <div className="p-4 rounded-2xl bg-[#181818] border border-[#313131]">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-white">Voice Scenarios</span>
-                <span className="text-xs font-mono text-white/50">Click to listen</span>
+            <div className="p-5 rounded-2xl bg-[#0e0e11]/80 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+              <div className="flex items-center justify-between mb-3.5">
+                <span className="text-xs font-bold text-white uppercase font-mono tracking-wider">
+                  Select Scenario
+                </span>
+                <span className="text-[11px] font-mono text-zinc-500">Instant decode</span>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -221,21 +227,21 @@ export function InteractivePlayground() {
                     <button
                       key={scenario.id}
                       onClick={() => handleScenarioSelect(scenario)}
-                      className={`w-full p-3 rounded-lg border text-left transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+                      className={`w-full p-3.5 rounded-xl border text-left transition-all duration-300 ${
                         isSelected
-                          ? "bg-[#272727] border-white/40 text-white"
-                          : "bg-[#1f1f1f] border-[#313131] text-white/70 hover:text-white hover:bg-[#272727]"
+                          ? "bg-white/[0.08] border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)] text-white"
+                          : "bg-white/[0.02] border-white/[0.06] text-zinc-400 hover:text-white hover:bg-white/[0.04]"
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-semibold text-white">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-semibold text-zinc-200">
                           {scenario.title}
                         </span>
-                        <span className="text-xs font-mono text-white/60">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
                           {scenario.latency}ms
                         </span>
                       </div>
-                      <p className="text-xs text-white/50 truncate mt-0.5 font-mono">
+                      <p className="text-[11px] text-zinc-500 truncate font-mono">
                         {scenario.rawSpoken}
                       </p>
                     </button>
@@ -244,69 +250,73 @@ export function InteractivePlayground() {
               </div>
 
               {/* Real Mic Trigger */}
-              <div className="mt-4 pt-3 border-t border-[#313131]">
+              <div className="mt-4 pt-4 border-t border-white/[0.06]">
                 <button
                   onClick={toggleLiveMic}
-                  className={`w-full py-2 px-3 rounded-lg text-sm font-semibold transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+                  className={`w-full py-2.5 px-3 rounded-xl text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
                     isLiveMic
-                      ? "bg-white text-black font-bold"
-                      : "bg-[#1f1f1f] hover:bg-[#272727] text-white border border-[#313131]"
+                      ? "bg-emerald-400 text-black font-bold shadow-[0_0_20px_#10b981]"
+                      : "bg-white/[0.04] hover:bg-white/[0.08] text-zinc-200 border border-white/[0.08]"
                   }`}
                 >
-                  {isLiveMic ? "Stop microphone recording" : "Test with your microphone"}
+                  <Mic className={`w-3.5 h-3.5 ${isLiveMic ? "text-black animate-pulse" : "text-emerald-400"}`} />
+                  <span>{isLiveMic ? "Stop Microphone" : "Test Live with Microphone"}</span>
                 </button>
               </div>
             </div>
 
             {/* Telemetry Stats Box */}
-            <div className="p-4 rounded-2xl bg-[#181818] border border-[#313131]">
-              <span className="text-xs font-mono uppercase tracking-wider text-white/50 font-semibold block mb-3">
-                Local system telemetry
-              </span>
+            <div className="p-5 rounded-2xl bg-[#0e0e11]/80 backdrop-blur-xl border border-white/[0.08]">
+              <div className="flex items-center gap-2 mb-3">
+                <Cpu className="w-3.5 h-3.5 text-emerald-400" />
+                <span className="text-xs font-mono uppercase tracking-wider text-zinc-400 font-semibold">
+                  Local System Telemetry
+                </span>
+              </div>
               <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <div className="p-2.5 rounded-lg bg-[#1f1f1f] border border-[#313131]">
-                  <span className="text-white/50 block text-[10px]">Latency</span>
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-zinc-500 block text-[10px]">Processing Latency</span>
                   <span className="font-bold text-white text-sm">{activeScenario.latency} ms</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#1f1f1f] border border-[#313131]">
-                  <span className="text-white/50 block text-[10px]">Cloud upload</span>
-                  <span className="font-bold text-white text-sm">0 bytes</span>
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-zinc-500 block text-[10px]">Cloud Egress</span>
+                  <span className="font-bold text-emerald-400 text-sm">0 bytes</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#1f1f1f] border border-[#313131]">
-                  <span className="text-white/50 block text-[10px]">Memory footprint</span>
-                  <span className="font-bold text-white text-sm">42.8 MB</span>
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-zinc-500 block text-[10px]">VRAM Footprint</span>
+                  <span className="font-bold text-white text-sm">~380 MB</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#1f1f1f] border border-[#313131]">
-                  <span className="text-white/50 block text-[10px]">Subscription</span>
-                  <span className="font-bold text-white text-sm">$0.00 free</span>
+                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-zinc-500 block text-[10px]">Software Cost</span>
+                  <span className="font-bold text-emerald-400 text-sm">Free (MIT)</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Right Column: Output Viewer (7 cols) */}
-          <div className="lg:col-span-7 p-5 sm:p-6 rounded-2xl bg-[#181818] border border-[#313131] flex flex-col justify-between">
+          <div className="lg:col-span-7 p-6 rounded-2xl bg-[#0e0e11]/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between">
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-[#313131] flex-wrap gap-2">
+              <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] flex-wrap gap-2">
                 <div>
                   <h3 className="text-sm font-bold text-white">
-                    {isLiveMic ? "Live Microphone Feed" : activeScenario.title}
+                    {isLiveMic ? "Live Audio Stream" : activeScenario.title}
                   </h3>
-                  <span className="text-xs font-mono text-white/50">
-                    {isLiveMic ? "Streaming recognition" : activeScenario.category}
+                  <span className="text-xs font-mono text-zinc-500">
+                    {isLiveMic ? "In-browser speech recognition" : activeScenario.category}
                   </span>
                 </div>
 
                 {!isLiveMic && (
-                  <div className="flex items-center gap-1 bg-[#1f1f1f] p-1 rounded-lg border border-[#313131]">
+                  <div className="flex items-center gap-1 bg-black/50 p-1 rounded-xl border border-white/[0.08]">
                     <button
                       onClick={() => {
                         setMode("clean");
                         setDisplayedText(activeScenario.cleanTranscription);
                       }}
-                      className={`text-xs px-2.5 py-1 rounded transition-colors ${
-                        mode === "clean" ? "bg-white text-black font-semibold" : "text-white/60 hover:text-white"
+                      className={`text-xs px-3 py-1 rounded-lg transition-all ${
+                        mode === "clean" ? "bg-white text-black font-semibold shadow-sm" : "text-zinc-400 hover:text-white"
                       }`}
                     >
                       Clean text
@@ -316,8 +326,8 @@ export function InteractivePlayground() {
                         setMode("formatted");
                         setDisplayedText(activeScenario.smartFormatted);
                       }}
-                      className={`text-xs px-2.5 py-1 rounded transition-colors ${
-                        mode === "formatted" ? "bg-white text-black font-semibold" : "text-white/60 hover:text-white"
+                      className={`text-xs px-3 py-1 rounded-lg transition-all ${
+                        mode === "formatted" ? "bg-white text-black font-semibold shadow-sm" : "text-zinc-400 hover:text-white"
                       }`}
                     >
                       Smart format
@@ -327,52 +337,63 @@ export function InteractivePlayground() {
               </div>
 
               {/* Sound Wave Bars */}
-              <div className="my-4 p-3 rounded-lg bg-[#131209] border border-[#313131] flex items-center justify-between">
-                <div className="flex items-center gap-1.5 h-6">
+              <div className="my-4 p-3.5 rounded-xl bg-[#060608] border border-white/[0.06] flex items-center justify-between">
+                <div className="flex items-center gap-1 h-6">
                   {audioLevels.map((lvl, idx) => (
                     <span
                       key={idx}
-                      className="w-1 rounded-full bg-white transition-all duration-75"
+                      className="w-1 rounded-full bg-gradient-to-t from-emerald-500 to-emerald-300 transition-all duration-75"
                       style={{ height: `${Math.max(4, lvl / 2)}px` }}
                     />
                   ))}
                 </div>
-                <span className="text-xs font-mono text-white/60">
-                  16 kHz WASAPI and CoreAudio
+                <span className="text-[11px] font-mono text-zinc-500 flex items-center gap-1.5">
+                  <Volume2 className="w-3.5 h-3.5 text-zinc-400" />
+                  16 kHz Audio Stream · GPU VAD
                 </span>
               </div>
 
               {/* Raw Spoken Voice */}
               {!isLiveMic && (
-                <div className="mb-3 p-3 rounded-lg bg-[#1f1f1f] border border-[#313131]">
-                  <span className="text-[10px] font-mono uppercase text-white/50 block mb-0.5 font-semibold">
-                    Spoken input text
+                <div className="mb-3.5 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                  <span className="text-[10px] font-mono uppercase text-emerald-400 block mb-1 font-bold">
+                    Spoken Audio Input
                   </span>
-                  <p className="text-xs text-white/70 font-mono">
-                    &quot;{activeScenario.rawSpoken}&quot;
+                  <p className="text-xs text-zinc-300 font-mono leading-relaxed">
+                    &ldquo;{activeScenario.rawSpoken}&rdquo;
                   </p>
                 </div>
               )}
 
               {/* Output Box */}
-              <div className="p-4 rounded-lg bg-[#131209] border border-[#313131] font-mono text-xs sm:text-sm text-white/90 min-h-[160px] whitespace-pre-wrap leading-relaxed">
+              <div className="p-5 rounded-xl bg-[#060608] border border-white/[0.08] font-mono text-xs sm:text-sm text-zinc-100 min-h-[180px] whitespace-pre-wrap leading-relaxed shadow-inner">
                 {isLiveMic ? liveTranscript : displayedText}
                 {isPlaying && (
-                  <span className="inline-block w-2 h-4 bg-white ml-1 animate-pulse" />
+                  <span className="inline-block w-2 h-4 bg-emerald-400 ml-1 animate-pulse shadow-[0_0_8px_#10b981]" />
                 )}
               </div>
             </div>
 
             {/* Bottom Actions */}
-            <div className="mt-4 pt-4 border-t border-[#313131] flex items-center justify-between">
-              <span className="text-xs font-mono text-white/50">
+            <div className="mt-4 pt-4 border-t border-white/[0.08] flex items-center justify-between">
+              <span className="text-xs font-mono text-zinc-500">
                 Pasted directly into active cursor position
               </span>
               <button
                 onClick={handleCopy}
-                className="text-xs font-semibold text-white bg-[#272727] hover:bg-[#313131] border border-[#313131] px-3 py-1.5 rounded-lg transition-colors"
+                className="text-xs font-semibold text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] px-4 py-2 rounded-xl transition-all flex items-center gap-1.5"
               >
-                {isCopied ? "Copied" : "Copy text"}
+                {isCopied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 text-zinc-400" />
+                    <span>Copy Text</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

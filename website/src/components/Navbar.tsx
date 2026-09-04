@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mark } from "./Mark";
 import { GithubIcon } from "./GithubIcon";
+import { ArrowUpRight } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -20,35 +21,38 @@ export function Navbar() {
 
   const navLinks = [
     { id: "features", name: "Features", href: isSubPage ? "/#features" : "#features" },
+    { id: "playground", name: "Lab", href: isSubPage ? "/#playground" : "#playground" },
+    { id: "benchmarks", name: "Benchmarks", href: isSubPage ? "/#benchmarks" : "#benchmarks" },
     { id: "comparison", name: "Comparison", href: isSubPage ? "/#comparison" : "#comparison" },
-    { id: "privacy", name: "Privacy Proof", href: "/privacy" },
-    { id: "blog", name: "Blog", href: "/blog" },
     { id: "pricing", name: "Pricing", href: "/pricing" },
+    { id: "privacy", name: "Privacy", href: "/privacy" },
     { id: "faq", name: "FAQ", href: isSubPage ? "/#faq" : "#faq" },
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4">
-      {/* Fluid Island Nav (B7) */}
-      <nav className="mt-6 mx-auto w-max max-w-[95vw] rounded-full bg-[#181818]/90 backdrop-blur-xl border border-[#313131] px-3 py-2 flex items-center gap-3 sm:gap-6 shadow-[0_12px_32px_rgba(0,0,0,0.6)] transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]">
+    <header className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
+      {/* Floating Glass Island */}
+      <nav className="mt-5 mx-auto w-full max-w-5xl rounded-full bg-[#0a0a0c]/75 backdrop-blur-2xl border border-white/[0.08] px-3 sm:px-4 py-2 flex items-center justify-between shadow-[0_12px_40px_rgba(0,0,0,0.6),inset_0_1px_0_0_rgba(255,255,255,0.1)] pointer-events-auto transition-all duration-500">
         {/* Brand Link */}
         <Link
           href="/"
-          className="flex items-center gap-2.5 pl-2 pr-1 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2 rounded-full"
+          className="flex items-center gap-2.5 pl-1.5 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-400 rounded-full"
         >
-          <div className="p-1 rounded-lg bg-[#272727] border border-[#313131] group-hover:border-white/40 transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)]">
+          <div className="p-1.5 rounded-xl bg-white/[0.05] border border-white/[0.08] group-hover:border-emerald-500/40 group-hover:bg-emerald-500/10 transition-all duration-300">
             <Mark size="sm" animated={true} />
           </div>
-          <span className="font-semibold text-sm tracking-tight text-white flex items-center gap-2">
-            Murmur
-            <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-[#272727] text-white/70 border border-[#313131]">
-              v0.1.0
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-sm tracking-tight text-white group-hover:text-emerald-400 transition-colors">
+              Murmur
             </span>
-          </span>
+            <span className="hidden sm:inline-flex text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
+              v0.1.0 · Local AI
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Nav Links */}
-        <div className="hidden md:flex items-center gap-1 bg-[#1f1f1f] border border-[#313131] rounded-full px-2 py-1">
+        <div className="hidden lg:flex items-center gap-0.5 bg-white/[0.03] border border-white/[0.06] rounded-full p-1">
           {navLinks.map((link) => {
             const isActive =
               link.id === "developers"
@@ -66,10 +70,10 @@ export function Navbar() {
               <Link
                 key={link.id}
                 href={link.href}
-                className={`text-sm font-medium px-3 py-1 rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
+                className={`text-xs font-medium px-3.5 py-1.5 rounded-full transition-all duration-200 relative ${
                   isActive
-                    ? "bg-white text-black font-semibold shadow-sm"
-                    : "text-white/70 hover:text-white hover:bg-[#272727]"
+                    ? "text-black bg-white font-semibold shadow-sm"
+                    : "text-zinc-400 hover:text-white hover:bg-white/[0.06]"
                 }`}
               >
                 {link.name}
@@ -79,17 +83,17 @@ export function Navbar() {
         </div>
 
         {/* Action Buttons */}
-        <div className="hidden sm:flex items-center gap-2">
+        <div className="flex items-center gap-2">
           {/* GitHub Star */}
           <a
             href="https://github.com/webprodigies/murmur"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white bg-[#1f1f1f] hover:bg-[#272727] border border-[#313131] px-3 py-2 rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+            className="hidden sm:inline-flex items-center gap-2 text-xs font-semibold text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] px-3 py-1.5 rounded-full transition-all duration-200"
           >
-            <GithubIcon className="w-4 h-4 text-white" />
+            <GithubIcon className="w-3.5 h-3.5 text-zinc-400 group-hover:text-white" />
             <span>GitHub</span>
-            <span className="text-xs font-mono px-1.5 py-0.5 rounded-full bg-[#272727] text-white/90">
+            <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-white/[0.08] text-zinc-300">
               4.8k
             </span>
           </a>
@@ -97,94 +101,88 @@ export function Navbar() {
           {/* Primary CTA button */}
           <Link
             href="/#download"
-            className="flex items-center gap-2 text-sm font-semibold text-black bg-white hover:bg-white/90 px-3 py-2 rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-black bg-gradient-to-b from-white to-zinc-200 hover:from-white hover:to-white px-4 py-2 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.25)] hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             <span>Download</span>
+            <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5]" />
           </Link>
-        </div>
 
-        {/* Mobile Hamburger Morph (B7) */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden relative w-9 h-9 flex items-center justify-center rounded-full bg-[#1f1f1f] border border-[#313131] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
-          aria-label="Toggle navigation menu"
-        >
-          <div className="w-4 h-3.5 relative flex flex-col justify-between">
-            <span
-              className={`w-full h-0.5 bg-white rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] origin-center ${
-                mobileMenuOpen ? "rotate-45 absolute top-1.5" : ""
-              }`}
-            />
-            <span
-              className={`w-full h-0.5 bg-white rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${
-                mobileMenuOpen ? "opacity-0" : "opacity-100"
-              }`}
-            />
-            <span
-              className={`w-full h-0.5 bg-white rounded-full transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] origin-center ${
-                mobileMenuOpen ? "-rotate-45 absolute top-1.5" : ""
-              }`}
-            />
-          </div>
-        </button>
+          {/* Mobile Hamburger Toggle */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden relative w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.05] border border-white/[0.08] text-zinc-400 hover:text-white"
+            aria-label="Toggle navigation menu"
+          >
+            <div className="w-4 h-3.5 relative flex flex-col justify-between">
+              <span
+                className={`w-full h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${
+                  mobileMenuOpen ? "rotate-45 absolute top-1.5" : ""
+                }`}
+              />
+              <span
+                className={`w-full h-0.5 bg-current rounded-full transition-all duration-300 ${
+                  mobileMenuOpen ? "opacity-0" : "opacity-100"
+                }`}
+              />
+              <span
+                className={`w-full h-0.5 bg-current rounded-full transition-all duration-300 origin-center ${
+                  mobileMenuOpen ? "-rotate-45 absolute top-1.5" : ""
+                }`}
+              />
+            </div>
+          </button>
+        </div>
       </nav>
 
-      {/* Screen-filling Mobile Modal Expansion (B7) */}
+      {/* Screen-filling Mobile Modal */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed inset-0 z-40 backdrop-blur-3xl bg-black/90 flex flex-col justify-center px-8 md:hidden"
+            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            animate={{ opacity: 1, backdropFilter: "blur(24px)" }}
+            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 bg-black/85 flex flex-col justify-center px-8 lg:hidden pointer-events-auto"
           >
-            <div className="flex flex-col gap-4 max-w-sm mx-auto w-full">
+            <div className="flex flex-col gap-3 max-w-sm mx-auto w-full">
               {navLinks.map((link, idx) => (
                 <motion.div
                   key={link.id}
-                  initial={{ y: 24, opacity: 0 }}
+                  initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: 24, opacity: 0 }}
-                  transition={{
-                    duration: 0.6,
-                    delay: 0.05 * idx,
-                    ease: [0.32, 0.72, 0, 1],
-                  }}
+                  exit={{ y: 20, opacity: 0 }}
+                  transition={{ duration: 0.3, delay: 0.04 * idx }}
                 >
                   <Link
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="text-2xl font-bold text-white hover:text-white/70 py-2 border-b border-[#272727] transition-colors block"
+                    className="text-xl font-semibold text-zinc-300 hover:text-white py-2.5 border-b border-white/[0.06] transition-colors flex items-center justify-between"
                   >
-                    {link.name}
+                    <span>{link.name}</span>
+                    <ArrowUpRight className="w-4 h-4 text-zinc-500" />
                   </Link>
                 </motion.div>
               ))}
 
               <motion.div
-                initial={{ y: 24, opacity: 0 }}
+                initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 24, opacity: 0 }}
-                transition={{
-                  duration: 0.6,
-                  delay: 0.35,
-                  ease: [0.32, 0.72, 0, 1],
-                }}
-                className="flex flex-col gap-3 mt-6"
+                exit={{ y: 20, opacity: 0 }}
+                transition={{ duration: 0.3, delay: 0.3 }}
+                className="flex flex-col gap-2.5 mt-6"
               >
                 <Link
                   href="/#download"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center text-base font-semibold text-black bg-white py-3 px-4 rounded-full"
+                  className="w-full text-center text-sm font-semibold text-black bg-white py-3 px-4 rounded-full shadow-lg"
                 >
-                  Download Murmur
+                  Download Free for Mac & Windows
                 </Link>
                 <a
                   href="https://github.com/webprodigies/murmur"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full text-center text-base font-semibold text-white bg-[#181818] border border-[#313131] py-3 px-4 rounded-full"
+                  className="w-full text-center text-sm font-semibold text-white bg-white/[0.06] border border-white/[0.1] py-3 px-4 rounded-full"
                 >
                   Star on GitHub (4.8k)
                 </a>

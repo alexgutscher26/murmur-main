@@ -19,7 +19,7 @@ import { Footer } from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main id="main-content" className="min-h-screen bg-[#000000] text-white selection:bg-white/20 selection:text-white overflow-x-hidden">
+    <main id="main-content" className="min-h-screen bg-[#050505] text-white selection:bg-emerald-500/25 selection:text-emerald-200 overflow-x-hidden">
       {/* Fluid Island Pill Navbar */}
       <Navbar />
 

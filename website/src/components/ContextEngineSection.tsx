@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Layers, Terminal, MessageSquare, FileText, Mail, Check } from "lucide-react";
 
 interface ContextApp {
   id: string;
   name: string;
   category: string;
+  icon: typeof MessageSquare;
   outputDescription: string;
   formattedOutput: string;
 }
@@ -14,20 +16,22 @@ interface ContextApp {
 const CONTEXT_APPS: ContextApp[] = [
   {
     id: "slack",
-    name: "Slack and Discord",
+    name: "Slack & Discord",
     category: "Team Chat",
+    icon: MessageSquare,
     outputDescription: "Casual structure with bullet points and mentions",
     formattedOutput: `Hey Mark. Just merged the auth token rotation fix to main.
 
 • Token invalidation grace period is set to 15 mins
-• Unit and integration tests are all green
+• Unit & integration tests are all green
 
-Could you give staging a quick sanity check? Thanks.`,
+Could you give staging a quick sanity check? Thanks!`,
   },
   {
     id: "cursor",
-    name: "Cursor and VS Code",
-    category: "Code and Commits",
+    name: "Cursor & VS Code",
+    category: "Code & Commits",
+    icon: Terminal,
     outputDescription: "CamelCase syntax and conventional commit message",
     formattedOutput: `/**
  * Fixes auth token rotation by invalidating stale refresh tokens
@@ -37,8 +41,9 @@ git commit -m "fix(auth): enforce refresh token rotation and revoke stale sessio
   },
   {
     id: "notion",
-    name: "Notion and Linear",
+    name: "Notion & Linear",
     category: "Product Management",
+    icon: FileText,
     outputDescription: "Markdown checklists, subheaders, and assignees",
     formattedOutput: `### Release Checklist: Auth Token Rotation
 
@@ -48,9 +53,10 @@ git commit -m "fix(auth): enforce refresh token rotation and revoke stale sessio
   },
   {
     id: "gmail",
-    name: "Mail and Docs",
+    name: "Mail & Docs",
     category: "Professional Writing",
-    outputDescription: "Polite salutation, clear paragraphs, and signoff",
+    icon: Mail,
+    outputDescription: "Polite salutation, clear paragraphs, and sign-off",
     formattedOutput: `Hi Mark,
 
 I wanted to provide a quick update regarding the auth token rotation fix. The changes have been successfully merged into our main branch.
@@ -69,54 +75,61 @@ export function ContextEngineSection() {
     "hey mark we just merged the auth token rotation fix to main let me know if staging looks good thanks";
 
   return (
-    <section id="context" className="py-24 bg-[#000000] border-t border-[#313131]">
-      <div className="max-w-4xl mx-auto px-4">
+    <section id="context" className="py-24 relative overflow-hidden border-t border-white/[0.06]">
+      <div className="max-w-5xl mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center max-w-[680px] mx-auto mb-14">
-          <span className="text-xs font-mono font-semibold uppercase tracking-widest text-white/50 block mb-2">
-            Smart Context Engine
-          </span>
+        <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-4">
+            <Layers className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-zinc-400">
+              Smart Context Engine
+            </span>
+          </div>
           <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-4">
             One voice input. Formatted for every app.
           </h2>
-          <p className="text-white/70 text-base sm:text-lg">
+          <p className="text-zinc-400 text-base sm:text-lg">
             Murmur senses the frontmost active window and shapes tone, punctuation, and layout to fit the medium.
           </p>
         </div>
 
-        {/* Comparison Box (B3: Nested radius) */}
-        <div className="p-5 sm:p-8 rounded-2xl bg-[#181818] border border-[#313131]">
+        {/* Comparison Box */}
+        <div className="p-6 sm:p-8 rounded-2xl bg-[#0e0e11]/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_16px_48px_rgba(0,0,0,0.5)]">
           {/* Universal Raw Voice Input Bar */}
-          <div className="p-4 rounded-lg bg-[#1f1f1f] border border-[#313131] mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <span className="text-xs font-mono uppercase tracking-wider text-white/50 font-semibold block mb-0.5">
-                Exact spoken words
+              <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold block mb-1">
+                Raw Spoken Speech (Single Take)
               </span>
-              <p className="text-xs sm:text-sm font-mono text-white/90">
-                &quot;{rawSpokenVoice}&quot;
+              <p className="text-xs sm:text-sm font-mono text-zinc-200">
+                &ldquo;{rawSpokenVoice}&rdquo;
               </p>
             </div>
-            <span className="text-xs font-mono text-white/50 self-start sm:self-auto bg-[#272727] px-2.5 py-1 rounded-full border border-[#313131]">
+            <span className="text-[11px] font-mono text-zinc-400 self-start sm:self-auto bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.08]">
               Whisper detected: EN
             </span>
           </div>
 
           {/* App Switcher Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-6">
             {CONTEXT_APPS.map((app) => {
               const isSelected = selectedApp.id === app.id;
+              const Icon = app.icon;
               return (
                 <button
                   key={app.id}
                   onClick={() => setSelectedApp(app)}
-                  className={`p-3 rounded-lg border text-left transition-all duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+                  className={`p-3.5 rounded-xl border text-left transition-all duration-300 ${
                     isSelected
-                      ? "bg-white text-black font-semibold border-white"
-                      : "bg-[#1f1f1f] text-white/70 border-[#313131] hover:text-white hover:bg-[#272727]"
+                      ? "bg-white text-black font-semibold border-white shadow-lg scale-[1.01]"
+                      : "bg-white/[0.02] text-zinc-400 border-white/[0.06] hover:text-white hover:bg-white/[0.05]"
                   }`}
                 >
-                  <span className="text-xs font-bold block">{app.name}</span>
-                  <span className={`text-[10px] font-mono block ${isSelected ? "text-black/70" : "text-white/50"}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-black" : "text-emerald-400"}`} />
+                    <span className="text-xs font-bold block">{app.name}</span>
+                  </div>
+                  <span className={`text-[10px] font-mono block ${isSelected ? "text-zinc-700" : "text-zinc-500"}`}>
                     {app.category}
                   </span>
                 </button>
@@ -125,24 +138,25 @@ export function ContextEngineSection() {
           </div>
 
           {/* Result Box */}
-          <div className="rounded-lg bg-[#131209] border border-[#313131] overflow-hidden">
-            <div className="bg-[#1f1f1f] px-4 py-2.5 border-b border-[#313131] flex items-center justify-between">
-              <span className="text-xs font-mono text-white/80 font-semibold">
-                Formatted output for {selectedApp.name}
+          <div className="rounded-xl bg-[#060608] border border-white/[0.08] overflow-hidden shadow-inner">
+            <div className="bg-white/[0.03] px-5 py-3 border-b border-white/[0.06] flex items-center justify-between flex-wrap gap-2">
+              <span className="text-xs font-mono text-zinc-200 font-semibold flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-emerald-400" />
+                Formatted Output for {selectedApp.name}
               </span>
-              <span className="text-[11px] font-mono text-white/50">
+              <span className="text-[11px] font-mono text-zinc-500">
                 {selectedApp.outputDescription}
               </span>
             </div>
 
-            <div className="p-5 font-mono text-xs sm:text-sm text-white/90 whitespace-pre-wrap leading-relaxed min-h-[140px]">
+            <div className="p-6 font-mono text-xs sm:text-sm text-zinc-100 whitespace-pre-wrap leading-relaxed min-h-[160px]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={selectedApp.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.15 }}
                 >
                   {selectedApp.formattedOutput}
                 </motion.div>
