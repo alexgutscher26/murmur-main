@@ -545,16 +545,12 @@ impl SessionActor {
          * onto another's. The user would read that as the model mishearing, and
          * no amount of looking at the model would find it.
          */
+        let mut finished_pending = None;
         match self.pending.get_mut(&decode.session_id) {
             Some(pending) => {
                 let _timer = pending.latency.stage_timer(LatencyStage::Assemble);
                 pending.assembler.push_segments(&decode.segments);
                 pending.in_flight = pending.in_flight.saturating_sub(1);
-                if pending.in_flight == 0 {
-                    if let Some(pending) = self.pending.remove(&decode.session_id) {
-                        self.finish(pending).await;
-                    }
-                }
             }
             None if Some(&decode.session_id) == self.machine.session_id() => {
                 self.in_flight = self.in_flight.saturating_sub(1);
@@ -577,6 +573,16 @@ impl SessionActor {
                 );
                 return;
             }
+        }
+
+        if let Some(pending) = self.pending.get(&decode.session_id) {
+            if pending.in_flight == 0 {
+                finished_pending = self.pending.remove(&decode.session_id);
+            }
+        }
+
+        if let Some(pending) = finished_pending {
+            self.finish(pending).await;
         }
     }
 
