@@ -467,7 +467,41 @@ pub fn format_markdown_mode(text: &str) -> String {
     out = replace_whole_words(&out, "dash point", "\n- ", false);
     out = replace_whole_words(&out, "todo item", "\n- [ ] ", false);
     out = replace_whole_words(&out, "checklist item", "\n- [ ] ", false);
-    // GitHub / Issue / PR Macros
+    // GitHub / Issue / PR Macros & Voice Snippet Templates
+    out = replace_whole_words(&out, "insert bug template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false);
+    out = replace_whole_words(&out, "bug report template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false);
+    out = replace_whole_words(&out, "bug template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false);
+    
+    out = replace_whole_words(&out, "insert status update", "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n", false);
+    out = replace_whole_words(&out, "standup update", "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n", false);
+    out = replace_whole_words(&out, "daily standup", "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n", false);
+    out = replace_whole_words(&out, "status update", "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n", false);
+
+    out = replace_whole_words(&out, "insert pull request template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
+    out = replace_whole_words(&out, "pull request template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
+    out = replace_whole_words(&out, "insert pr template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
+    out = replace_whole_words(&out, "pr template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
+
+    out = replace_whole_words(&out, "insert meeting notes", "\n### 📝 Meeting Notes\n**Date:** \n**Attendees:** \n**Objective:** \n\n**Key Discussion Points:**\n- \n\n**Action Items:**\n- [ ] \n", false);
+    out = replace_whole_words(&out, "meeting notes template", "\n### 📝 Meeting Notes\n**Date:** \n**Attendees:** \n**Objective:** \n\n**Key Discussion Points:**\n- \n\n**Action Items:**\n- [ ] \n", false);
+    out = replace_whole_words(&out, "meeting notes", "\n### 📝 Meeting Notes\n**Date:** \n**Attendees:** \n**Objective:** \n\n**Key Discussion Points:**\n- \n\n**Action Items:**\n- [ ] \n", false);
+
+    out = replace_whole_words(&out, "feature spec template", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false);
+    out = replace_whole_words(&out, "rfc template", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false);
+    out = replace_whole_words(&out, "feature spec", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false);
+
+    out = replace_whole_words(&out, "release notes template", "\n### 📦 Release Notes\n**Added:**\n- \n\n**Fixed:**\n- \n\n**Changed:**\n- \n", false);
+    out = replace_whole_words(&out, "changelog template", "\n### 📦 Release Notes\n**Added:**\n- \n\n**Fixed:**\n- \n\n**Changed:**\n- \n", false);
+
+    out = replace_whole_words(&out, "todo list template", "\n### 🎯 Action Items\n- [ ] \n- [ ] \n- [ ] \n", false);
+    out = replace_whole_words(&out, "task checklist", "\n### 🎯 Action Items\n- [ ] \n- [ ] \n- [ ] \n", false);
+
+    out = replace_whole_words(&out, "insert badge template", "\n[![Made with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://murmur.app)\n", false);
+    out = replace_whole_words(&out, "made with murmur badge", "\n[![Made with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://murmur.app)\n", false);
+    out = replace_whole_words(&out, "badge template", "\n[![Made with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://murmur.app)\n", false);
+    out = replace_whole_words(&out, "dictated with murmur", "\n_Dictated privately on-device with [Murmur](https://murmur.app)_\n", false);
+    out = replace_whole_words(&out, "made with local dictation", "\n_Dictated privately on-device with [Murmur](https://murmur.app)_\n", false);
+
     out = replace_whole_words(&out, "issue title", "\n# Issue: ", false);
     out = replace_whole_words(&out, "steps to reproduce", "\n### Steps to Reproduce:\n1. ", false);
     out = replace_whole_words(&out, "reproduction steps", "\n### Steps to Reproduce:\n1. ", false);
@@ -1388,6 +1422,28 @@ mod tests {
         assert_eq!(dedupe_stutters(""), "");
         assert_eq!(capitalise_sentences(""), "");
         assert_eq!(ensure_terminal_punctuation(""), "");
+    }
+
+    #[test]
+    fn spoken_snippets_and_templates_expand_properly() {
+        let bug = format_markdown_mode("insert bug template");
+        assert!(bug.contains("### 🐛 Bug Report"));
+        assert!(bug.contains("Steps to Reproduce:"));
+
+        let standup = format_markdown_mode("status update");
+        assert!(standup.contains("### 📋 Status Update"));
+        assert!(standup.contains("**Yesterday:**"));
+        assert!(standup.contains("**Blockers:**"));
+
+        let pr = format_markdown_mode("pr template");
+        assert!(pr.contains("### 🚀 Pull Request"));
+        assert!(pr.contains("Testing Checklist:"));
+
+        let badge = format_markdown_mode("badge template");
+        assert!(badge.contains("https://img.shields.io/badge/dictated%20with-Murmur-5865F2"));
+
+        let footer = format_markdown_mode("dictated with murmur");
+        assert!(footer.contains("_Dictated privately on-device with [Murmur](https://murmur.app)_"));
     }
 }
 

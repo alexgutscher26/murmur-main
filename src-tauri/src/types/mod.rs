@@ -27,7 +27,8 @@ pub use engine::{
     ModelDescriptor, ModelId, ModelState,
 };
 pub use metrics::{
-    ActivityDay, LanguageCount, LatencyStage, LatencySummary, MetricSample, StatsSummary,
+    ActivityDay, LanguageCount, LatencyStage, LatencySummary, MetricSample, ReferralStatus,
+    StatsSummary,
 };
 pub use session::{
     DeliveryKind, RecordingMode, SessionId, SessionOutcome, SessionState, SessionSummary,

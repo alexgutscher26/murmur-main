@@ -110,7 +110,11 @@ const CHECK: CommandSpec = CommandSpec::new("check_for_update", CapabilityKey::U
  * WHERE: check_for_update below, and bootstrap::start_update_checks.
  */
 pub(crate) async fn look_for_update(state: &AppState) -> Result<UpdateCheck, AppError> {
-    if !updates_enabled(&state.db) {
+    if !updates_enabled(&state.db)
+        || std::env::var("TAURI_UPDATER_DISABLE")
+            .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+            .unwrap_or(false)
+    {
         return Ok(UpdateCheck::Disabled);
     }
 

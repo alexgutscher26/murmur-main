@@ -260,7 +260,15 @@ pub fn setup(app: &AppHandle) -> AppResult<()> {
     track_pill_drag(app);
     report_permissions(&ports);
     start_retention_sweep(state.clone());
-    start_update_checks(state.clone());
+    if std::env::var("TAURI_UPDATER_DISABLE")
+        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+        .unwrap_or(false)
+        || (cfg!(debug_assertions) && std::env::var("TAURI_UPDATER_FORCE").is_err())
+    {
+        tracing::debug!("updater checks disabled in development / debug mode (TAURI_UPDATER_DISABLE)");
+    } else {
+        start_update_checks(state.clone());
+    }
     /*
      * SOURCE OF TRUTH KEYWORDS: hotkey_failure_is_not_fatal
      * Logged, never propagated. A hotkey that will not register is a degraded
@@ -496,6 +504,14 @@ fn start_update_checks(state: AppState) {
     use crate::ipc::commands::updates::{look_for_update, UpdateCheck};
     use crate::ipc::events::UpdateAvailable;
     use tauri_specta::Event;
+
+    if std::env::var("TAURI_UPDATER_DISABLE")
+        .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
+        .unwrap_or(false)
+    {
+        tracing::debug!("TAURI_UPDATER_DISABLE is set; skipping automatic update checks");
+        return;
+    }
 
     tauri::async_runtime::spawn(async move {
         let mut ticker = tokio::time::interval(UPDATE_CHECK_INTERVAL);

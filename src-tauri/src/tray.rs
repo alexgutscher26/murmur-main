@@ -452,12 +452,9 @@ struct PillMetrics {
     /// How long the window takes to leave, and how far it travels doing it.
     /// Read from the tokens like every other pill dimension so the motion and
     /// the design remain one fact rather than two that agree today.
-    #[allow(dead_code)]
     exit_ms: f64,
-    #[allow(dead_code)]
     exit_travel: f64,
     width: f64,
-    #[allow(dead_code)]
     width_compact: f64,
     height: f64,
     /**
@@ -493,6 +490,21 @@ impl PillMetrics {
 /// shape rather than the window's rectangle.
 pub fn pill_radius() -> f64 {
     PILL.radius
+}
+
+/// How long the exit animation takes in milliseconds.
+pub fn pill_exit_ms() -> f64 {
+    PILL.exit_ms
+}
+
+/// How far the pill travels during the exit transition in pixels.
+pub fn pill_exit_travel() -> f64 {
+    PILL.exit_travel
+}
+
+/// The compact width of the pill indicator.
+pub fn pill_width_compact() -> f64 {
+    PILL.width_compact
 }
 
 fn get_active_monitor(app: &AppHandle) -> Option<tauri::Monitor> {

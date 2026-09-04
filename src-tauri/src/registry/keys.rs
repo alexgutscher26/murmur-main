@@ -53,4 +53,8 @@ pub const BASELINE_WPM: &str = "general.baseline_wpm";
 pub const PILL_OPACITY: &str = "ui.pill_opacity";
 pub const PILL_COMPACT: &str = "ui.pill_compact";
 pub const CHECK_UPDATES: &str = "general.check_updates";
+pub const UPDATE_CHANNEL: &str = "general.update_channel";
 pub const ONBOARDING_COMPLETE: &str = "general.onboarding_complete";
+pub const REFERRAL_PROMPT_DISMISSED: &str = "virality.referral_prompt_dismissed";
+pub const REFERRAL_CODE: &str = "virality.referral_code";
+

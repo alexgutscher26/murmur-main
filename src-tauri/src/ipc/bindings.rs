@@ -62,6 +62,8 @@ pub fn specta_builder() -> Builder<tauri::Wry> {
             commands::profiles::delete_app_profile,
             // Stats
             commands::stats::get_stats,
+            commands::stats::get_referral_status,
+            commands::stats::dismiss_referral_prompt,
             // Dictionary
             commands::dictionary::list_dictionary,
             commands::dictionary::create_dictionary_entry,

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { BadgeGenerator } from "@/components/BadgeGenerator";
 
 type BillingCycle = "lifetime" | "annual" | "monthly";
 
@@ -399,6 +400,9 @@ export default function PricingPage() {
             <span className="font-mono text-emerald-400 text-[11px]">Zero spam · Triggered post-activation</span>
           </div>
         </div>
+
+        {/* Badge & Macro Generator */}
+        <BadgeGenerator />
 
         {/* FAQs */}
         <div className="max-w-3xl w-full text-left mb-16">

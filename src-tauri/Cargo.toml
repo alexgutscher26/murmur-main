@@ -74,6 +74,7 @@ tauri-plugin-notification = "2"
 # file, and the second one's startup sweep marks the first one's LIVE session
 # orphaned before its own hotkey registration fails. See lib.rs.
 tauri-plugin-single-instance = "2"
+qbsdiff = "1.4.4"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 whisper-rs = { version = "0.16.0", features = ["metal"] }

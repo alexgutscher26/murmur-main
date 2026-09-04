@@ -480,6 +480,17 @@ fn build_capabilities() -> Vec<Capability> {
                     SettingSection::General,
                     true,
                 ),
+                choice(
+                    keys::UPDATE_CHANNEL,
+                    "Update channel",
+                    "Select which update channel Murmur checks for new desktop releases.",
+                    SettingSection::General,
+                    &[
+                        ("stable", "Stable", "Official thoroughly tested production releases."),
+                        ("beta", "Beta", "Pre-release builds with early access to new models and features."),
+                    ],
+                    "stable",
+                ),
             ],
         },
         /*

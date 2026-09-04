@@ -19,7 +19,8 @@ use rusqlite::Row;
 
 use crate::db::Database;
 use crate::error::AppResult;
-use crate::types::{ActivityDay, LanguageCount, SessionOutcome};
+use crate::registry::keys;
+use crate::types::{ActivityDay, LanguageCount, ReferralStatus, SessionOutcome, SettingValue};
 
 /**
  * SOURCE OF TRUTH KEYWORDS: Totals
@@ -151,6 +152,74 @@ pub fn distinct_active_days(db: &Database, limit: i64) -> AppResult<Vec<String>>
     })
 }
 
+/**
+ * SOURCE OF TRUTH KEYWORDS: referral_status, dismiss_referral_prompt
+ * WHAT:  Checks post-activation referral eligibility and returns referral link.
+ * WHY:   We only prompt users for referrals AFTER 50 successful delivered dictations
+ *        and only when onboarding is complete. Never during onboarding.
+ * WHERE: Called by ipc/commands/stats.rs.
+ */
+pub fn referral_status(db: &Database) -> AppResult<ReferralStatus> {
+    let tot = totals(db)?;
+    let dismissed = crate::services::settings::get_setting(db, keys::REFERRAL_PROMPT_DISMISSED)?
+        .map(|v| match v {
+            SettingValue::Bool(b) => b,
+            _ => false,
+        })
+        .unwrap_or(false);
+
+    let onboarding_done = crate::services::settings::get_setting(db, keys::ONBOARDING_COMPLETE)?
+        .map(|v| match v {
+            SettingValue::Bool(b) => b,
+            _ => false,
+        })
+        .unwrap_or(false);
+
+    let now = crate::telemetry::now_ms();
+    let referral_code = match crate::services::settings::get_setting(db, keys::REFERRAL_CODE)? {
+        Some(SettingValue::Text(code)) if !code.is_empty() => code,
+        _ => {
+            let alphabet = b"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+            let mut code = String::from("MURMUR-");
+            let now_u = now as usize;
+            for i in 0..6 {
+                let idx = (now_u.wrapping_add(i * 37 + (tot.session_count as usize * 17))) % alphabet.len();
+                code.push(alphabet[idx] as char);
+            }
+            let _ = crate::services::settings::set_setting(
+                db,
+                keys::REFERRAL_CODE,
+                &SettingValue::Text(code.clone()),
+                now,
+            );
+            code
+        }
+    };
+
+    let threshold = 50;
+    let eligible = onboarding_done && tot.session_count >= threshold && !dismissed;
+    let referral_url = format!("https://murmur.app/invite?ref={referral_code}");
+
+    Ok(ReferralStatus {
+        eligible,
+        session_count: tot.session_count,
+        threshold,
+        referral_code,
+        referral_url,
+        prompt_dismissed: dismissed,
+    })
+}
+
+pub fn dismiss_referral_prompt(db: &Database) -> AppResult<()> {
+    let now = crate::telemetry::now_ms();
+    crate::services::settings::set_setting(
+        db,
+        keys::REFERRAL_PROMPT_DISMISSED,
+        &SettingValue::Bool(true),
+        now,
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -232,6 +301,43 @@ mod tests {
         assert_eq!(activity.len(), 1, "two sessions a minute apart are one day");
         assert_eq!(activity[0].session_count, 2);
         assert_eq!(activity[0].word_count, 10);
+        Ok(())
+    }
+
+    #[test]
+    fn referral_eligibility_enforces_activation_threshold() -> AppResult<()> {
+        let db = Database::open_in_memory()?;
+
+        // 1. Initial state: not eligible (< 50 sessions and onboarding not marked complete)
+        let status = referral_status(&db)?;
+        assert!(!status.eligible);
+        assert_eq!(status.session_count, 0);
+        assert_eq!(status.threshold, 50);
+
+        // 2. Mark onboarding complete, but sessions < 50
+        crate::services::settings::set_setting(
+            &db,
+            keys::ONBOARDING_COMPLETE,
+            &SettingValue::Bool(true),
+            1_000,
+        )?;
+        let status = referral_status(&db)?;
+        assert!(!status.eligible);
+
+        // 3. Deliver 50 sessions
+        for i in 0..50 {
+            deliver(&db, &format!("sess_{i}"), 1_000 + i * 100, 10)?;
+        }
+        let status = referral_status(&db)?;
+        assert!(status.eligible);
+        assert_eq!(status.session_count, 50);
+        assert!(status.referral_url.contains("https://murmur.app/invite?ref=MURMUR-"));
+
+        // 4. Dismiss referral prompt
+        dismiss_referral_prompt(&db)?;
+        let status = referral_status(&db)?;
+        assert!(!status.eligible);
+        assert!(status.prompt_dismissed);
         Ok(())
     }
 }

@@ -27,8 +27,32 @@ const YEAR_MS: i64 = 365 * 24 * 60 * 60 * 1000;
 const LATENCY_WINDOW: i64 = 200;
 
 const GET: CommandSpec = CommandSpec::new("get_stats", CapabilityKey::Stats);
+const GET_REFERRAL: CommandSpec = CommandSpec::new("get_referral_status", CapabilityKey::Stats);
+const DISMISS_REFERRAL: CommandSpec = CommandSpec::new("dismiss_referral_prompt", CapabilityKey::Stats);
 
 use crate::registry::CapabilityKey;
+
+#[tauri::command]
+#[specta::specta]
+pub async fn get_referral_status(
+    state: State<'_, AppState>,
+) -> Result<crate::types::ReferralStatus, AppError> {
+    execute(&state, GET_REFERRAL, (), |ctx, ()| async move {
+        let db = ctx.db();
+        stats::referral_status(db).map_err(Into::into)
+    })
+    .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn dismiss_referral_prompt(state: State<'_, AppState>) -> Result<(), AppError> {
+    execute(&state, DISMISS_REFERRAL, (), |ctx, ()| async move {
+        let db = ctx.db();
+        stats::dismiss_referral_prompt(db).map_err(Into::into)
+    })
+    .await
+}
 
 #[tauri::command]
 #[specta::specta]

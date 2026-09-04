@@ -1,0 +1,19 @@
+# Created using wingetcreate 1.6.5.0
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+
+PackageIdentifier: WebProdigies.Murmur
+PackageVersion: 0.1.0
+InstallerType: nullsoft
+Scope: user
+InstallModes:
+  - silent
+  - interactive
+UpgradeBehavior: install
+Installers:
+  - Architecture: x64
+    InstallerType: nullsoft
+    InstallerUrl: https://github.com/webprodigies/murmur/releases/download/v0.1.0/murmur_0.1.0_x64-setup.exe
+    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    ProductCode: Murmur
+ManifestType: installer
+ManifestVersion: 1.6.0

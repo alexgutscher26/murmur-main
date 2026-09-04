@@ -130,3 +130,21 @@ pub struct LanguageCount {
     #[specta(type = TsNumber)]
     pub session_count: i64,
 }
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: ReferralStatus
+ * WHAT:  Post-activation referral state and deterministic referral code.
+ * WHY:   Triggered only after 50 successful delivered dictations, never during onboarding.
+ * WHERE: Produced by services/stats.rs; consumed by get_referral_status IPC.
+ */
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+pub struct ReferralStatus {
+    pub eligible: bool,
+    #[specta(type = TsNumber)]
+    pub session_count: i64,
+    #[specta(type = TsNumber)]
+    pub threshold: i64,
+    pub referral_code: String,
+    pub referral_url: String,
+    pub prompt_dismissed: bool,
+}
