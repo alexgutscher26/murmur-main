@@ -25,6 +25,7 @@ use crate::types::{CaptureMode, LanguageCode, SettingValue};
 /// Guard against a stored value that would make the app unusable.
 const MIN_COUNTDOWN_MS: u64 = 1_000;
 const MAX_COUNTDOWN_MS: u64 = 30_000;
+const MIN_FINALIZE_TIMEOUT_MS: u64 = 5_000;
 
 #[derive(Debug, Clone)]
 pub struct SessionSettings {
@@ -118,8 +119,9 @@ impl SessionSettings {
                 .clamp(MIN_COUNTDOWN_MS as f64, MAX_COUNTDOWN_MS as f64)
                 as u64,
             discard_on_escape: read_bool(stored, keys::DISCARD_ON_ESCAPE).unwrap_or(false),
-            finalize_timeout_ms: read_number(stored, keys::FINALIZE_TIMEOUT_MS).unwrap_or(15_000.0)
-                as u64,
+            finalize_timeout_ms: read_number(stored, keys::FINALIZE_TIMEOUT_MS)
+                .unwrap_or(15_000.0)
+                .max(MIN_FINALIZE_TIMEOUT_MS as f64) as u64,
             auto_paste: read_bool(stored, keys::AUTO_PASTE).unwrap_or(true),
             restore_clipboard: read_bool(stored, keys::RESTORE_CLIPBOARD).unwrap_or(true),
             paste_delay_ms: read_number(stored, keys::PASTE_DELAY_MS).unwrap_or(40.0).max(0.0)
