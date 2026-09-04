@@ -1,9 +1,48 @@
 # Murmur — Feature & Improvement Backlog
 
 > Organized by area. Items are roughly priority-ordered within each section.
-> Prefix legend: [BUG] · [PERF] · [FEAT] · [DX] · [UX] · [INFRA] · [WIN] · [SEC]
+> Prefix legend: [BUG] · [PERF] · [FEAT] · [DX] · [UX] · [INFRA] · [WIN] · [SEC] · [BIZ] · [SEO] · [CONTENT] · [MARKETING] · [VIRALITY]
+>
+> Status: `[x]` done · `[ ]` open · `[~]` in-progress · `[!]` blocked
+
+---
+
+## Table of Contents
+
+1. [Core Reliability & Habit Formation](#core-reliability--habit-formation-activation--daily-habit)
+2. [Windows-Specific](#windows-specific)
+3. [Audio Capture & VAD](#audio-capture--vad)
+4. [Transcription Engine](#transcription-engine)
+5. [Text Enhancement & Post-Processing](#text-enhancement--post-processing)
+6. [Clipboard & Delivery](#clipboard--delivery)
+7. [UI — Pill](#ui--pill)
+8. [UI — Dashboard / Settings](#ui--dashboard--settings)
+9. [Hotkeys](#hotkeys)
+10. [Privacy & Security](#privacy--security)
+11. [Privacy & Auditable Security](#privacy--auditable-security)
+12. [Developer Beachhead & Code-Aware Dictation](#developer-beachhead--code-aware-dictation)
+13. [Internationalization & Languages](#internationalization--languages)
+14. [Updates & Distribution](#updates--distribution)
+15. [Architecture & Reliability](#architecture--reliability)
+16. [Latency & Performance Benchmarks](#latency--performance-benchmarks)
+17. [Power-User Customization & Vocabulary Ownership](#power-user-customization--vocabulary-ownership)
+18. [High-Intent SEO & Trust-Earning Content](#high-intent-seo--trust-earning-content)
+19. [Sustainable Commercialization & Product Virality](#sustainable-commercialization--product-virality)
+20. [Analytics & Stats](#analytics--stats)
+21. [Integrations](#integrations)
+22. [Known Bugs & Tech Debt](#known-bugs--tech-debt)
+23. [Accessibility](#accessibility)
+24. [Testing & Quality Assurance](#testing--quality-assurance)
+25. [Documentation](#documentation)
+26. [Community & Ecosystem](#community--ecosystem)
+27. [Mobile & Cross-Platform](#mobile--cross-platform)
+28. [AI & Machine Learning Roadmap](#ai--machine-learning-roadmap)
+
+---
 
 ## Core Reliability & Habit Formation (Activation & Daily Habit)
+
+> Goal: ensure every user has a "first wow" within 5 minutes and builds a daily dictation habit within 7 days.
 
 - [x] [UX] 5-minute "first wow" onboarding flow: mic permissions -> model weight download -> first in-app dictation test without opening external editors.
 - [x] [WIN] Push-to-talk reliability: dedicated low-latency keyboard hook with modifier tap/hold detection (Alt+Space / Option+Space).
@@ -12,12 +51,34 @@
 - [x] [UX] Fast audio error recovery: auto-reopen stream on device switch within 500ms before failing session.
 - [x] [FEAT] Low-end hardware presets: downloadable Tiny & Base Q5_0 quantizations for budget laptops without dedicated GPUs.
 - [ ] [FEAT] Interruption & backtracking correction: detect voice backtracks ("no wait", "scratch that") and scrub previous segment in memory before injection.
+  - Detect phrase variants: "no wait", "scratch that", "delete that", "undo", "never mind", "cancel that", "forget it"
+  - Identify the segment boundary and remove only the corrected span, not the whole transcript
+  - Re-arm automatically after the cancel command so the user can continue
+  - Show a brief pill flash ("Removed last segment") as confirmation
 - [ ] [UX] First-run interactive dictation tutorial: guided step-by-step practice dictating a messy thought into a clean formatted email or commit.
+  - Step 1: speak a short messy sentence (fillers allowed)
+  - Step 2: show before/after transformation with the post-processing rules
+  - Step 3: demonstrate paste into a dummy text field inside the onboarding window
+  - Step 4: show the history entry and the WPM summary
+  - Skip button that marks tutorial complete and never shows again
+- [ ] [UX] Habit-formation streak tracker: show a daily streak counter in the dashboard header as a low-pressure retention nudge.
+  - Only count days with at least 3 successful sessions or 100 words dictated
+  - Milestone badges at 7, 30, 90, and 365 days
+  - Streak calculated from session timestamps in SQLite — no external dependency
+- [ ] [UX] Re-engagement prompt: if 3+ days pass with zero sessions, show a soft notification with a one-tap re-activation shortcut.
+  - Show as Windows toast, not an in-app modal
+  - Respect system Do Not Disturb state
+  - Max one prompt per 7-day idle window to avoid spam
+- [ ] [FEAT] Adaptive onboarding re-entry points: if user skips onboarding mid-way, resume from the last completed step rather than restarting.
+  - Persist onboarding step index in registry
+  - Show a "Resume Setup" card in the dashboard for users with incomplete onboarding
+- [ ] [PERF] Sub-100ms hotkey-to-recording latency: profile and reduce the gap between keydown event and first audio sample captured to under 100ms.
+  - Instrument with `tracing::span!` from keydown in the keyboard hook to first AudioData event
+  - Target: p99 under 100ms on a mid-range 2022 laptop without GPU
 
 ---
 
 ## Windows-Specific
-
 
 - [x] [BUG] [WIN] Text injection fails in elevated-privilege apps (e.g. Task Manager, regedit). SendInput is blocked by UIPI when the target process runs at a higher integrity level. Need UAC elevation detection and a graceful fallback message.
 - [x] [BUG] [WIN] Clipboard not restored when target app does a fast Ctrl+V itself — arboard sets the clipboard, a race with the target app's own paste listener can clear it before Ctrl+V fires. Investigate using SetClipboardData with a delayed-render owner.
@@ -32,6 +93,19 @@
 - [x] [WIN] [INFRA] Fix pnpm tauri build on Windows — [EPERM] on node_modules/.bin/tauri.EXE unlink fails when Bun lockfile-cached binary is in use. Investigate switching to bun tauri build exclusively or adding a pre-build script that kills stale handles.
 - [x] [WIN] [PERF] WASAPI exclusive-mode capture — Current CPAL setup uses shared mode (WASAPI shared), which adds ~10 ms of audio latency. Exclusive-mode gives sub-millisecond capture latency at the cost of stealing the device; expose as an advanced setting.
 - [x] [WIN] [PERF] Promote [profile.dev.package."*"] opt-level = 3 to the project README so other Windows contributors don't hit 20-second Whisper decode times in debug builds.
+- [ ] [WIN] [FEAT] Raw Input hook for mouse push-to-talk — Register WM_INPUT on a hidden HWND so mouse button 4/5 can trigger dictation even when a game or fullscreen app has mouse focus captured.
+  - Use RegisterRawInputDevices with HID_USAGE_PAGE_GENERIC and HID_USAGE_GENERIC_MOUSE
+  - Parse RI_MOUSE_BUTTON_4_DOWN / RI_MOUSE_BUTTON_5_DOWN from RAWMOUSE.usButtonFlags
+  - Forward to the same session actor event as keyboard push-to-talk
+- [ ] [WIN] [FEAT] Dark mode tray icon variants — Ship two tray icon assets (light and dark) and switch based on SystemUsesLightTheme registry key.
+  - Poll the registry on WM_SETTINGCHANGE with lParam == L"ImmersiveColorSet" to detect theme switches at runtime without restarting
+- [ ] [WIN] [PERF] Low-latency audio path via WASAPI event-driven mode — Switch from the current callback-polling model to IAudioClient::SetEventHandle + a dedicated high-priority thread (SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)) to reduce jitter below 2ms.
+- [ ] [WIN] [UX] Per-monitor DPI awareness v2 — Declare PerMonitorV2 in the app manifest so the pill and dashboard scale correctly when dragged across mixed-DPI displays (e.g. laptop 200% + external 100%).
+- [ ] [WIN] [BUG] Tray icon disappears after Explorer crash — Register a TaskbarCreated message handler (RegisterWindowMessage(L"TaskbarCreated")) and re-add the tray icon when Explorer restarts.
+- [ ] [WIN] [SEC] Memory-safe clipboard clear on lock — On WM_WTSSESSION_CHANGE with WTS_SESSION_LOCK, zero out the clipboard if it contains a Murmur-set value using EmptyClipboard() followed by CloseClipboard().
+- [ ] [WIN] [INFRA] ARM64 Windows build — Add an aarch64-pc-windows-msvc target to the release CI matrix for Snapdragon X Elite / Surface Pro devices.
+  - Validate whisper.cpp compiles with MSVC on ARM64 (requires CMake flag -DWHISPER_BLAS=OFF and possible NEON SIMD adjustments)
+  - Add a GitHub Actions runner with windows-arm64 runner label once available, or use cross-compilation from x86_64 with QEMU
 
 ---
 
@@ -48,6 +122,21 @@
 - [x] [UX] Waveform visualizer in the pill — Show a live audio waveform during recording using CaptureEvent::Level data already emitted so the user can see the mic is picking up their voice.
 - [x] [UX] Silence warning — If peak_amplitude == 0.0 for more than 1 second, show a brief "No microphone signal detected" error inside the pill rather than silently failing.
 - [x] [UX] Auto-detect mono vs stereo — If the user's mic sends stereo, down-mix to mono before feeding Whisper to avoid stereo-channel phasing artifacts.
+- [ ] [FEAT] Noise gate with adaptive threshold — Automatically learn the ambient noise floor during the first 500ms of each session and apply a dynamic gate so whispers do not get clipped.
+  - Use an exponential moving average over CaptureEvent::Level values
+  - Gate threshold = noise_floor_ema * 1.5 (configurable multiplier in advanced settings)
+  - Show gate threshold on the audio level meter as a faint horizontal line
+- [ ] [FEAT] Push-to-talk recording limit — Add a configurable max_recording_seconds cap (default 120s) after which recording auto-finalizes to prevent accidentally leaving the mic open.
+  - Show a countdown in the pill during the last 10 seconds
+  - Play a soft chime at the auto-stop point
+  - Make the cap configurable from 30s to unlimited in advanced settings
+- [ ] [FEAT] Audio playback for quality review — After each session, allow the user to re-listen to their own recording (opt-in, stored locally, auto-purged per retention policy).
+  - Requires a new opt-in "Save audio recordings" setting (off by default, clearly labeled as local-only)
+  - Store as Opus at 16kHz mono in the session data directory
+  - Delete audio file when the session is deleted or on retention purge
+- [ ] [PERF] Ring-buffer audio pre-roll — Maintain a 500ms circular buffer before the hotkey fires so the first word (often captured while the mic is still opening) is not cut off.
+- [ ] [PERF] Parallel VAD + accumulation — Run VAD on a separate thread from audio accumulation so the VAD decision does not block the capture callback and add latency.
+- [ ] [BUG] Double-open mic on rapid hotkey press — If the user presses and releases the hotkey faster than the CPAL stream opens (~80ms), the session may arm twice. Add a mutex guard around the arming transition in the session state machine.
 
 ---
 
@@ -64,6 +153,18 @@
 - [x] [PERF] Persistent WhisperState across sessions — Currently states.acquire() creates a new state for each chunk. Reusing a single persistent state (resetting it between chunks) would save ~5 ms per chunk on allocation overhead.
 - [x] [PERF] Thread count auto-tuning — decode_thread_count() is currently a fixed heuristic. Measure transcription speed during the prepare() warmup across 1-N threads and pick the fastest count automatically.
 - [x] [BUG] Hallucination filter misses multi-sentence hallucinations — The blocklist drops a segment only when it is the entire segment text. Whisper sometimes emits "[BLANK_AUDIO] Thank you. [BLANK_AUDIO]" as one segment; the prefix/suffix noise bypasses the exact-match check. Add a strip-and-retry path.
+- [ ] [FEAT] Whisper large-v3-turbo-q3_K_M quantization — Add a 3-bit quantization option for the large-v3-turbo model giving ~40% smaller footprint (~280MB) suitable for 8GB RAM devices, with a "Compressed" badge in the model picker.
+- [ ] [FEAT] Custom vocabulary / hotword biasing — Pass a hotwords prompt to whisper.cpp's whisper_full_params.initial_prompt to bias toward user-defined technical terms, names, and brand words.
+  - Read from the user's active dictionary and format as a comma-separated string
+  - Cap at 224 tokens (whisper's context limit) and prefer high-frequency dictionary terms
+  - Re-generate the prompt string when the dictionary changes without reloading the model
+- [ ] [FEAT] Confidence-based word coloring — In the history detail view, shade low-confidence words (<0.7 probability) in amber so users can spot likely transcription errors at a glance.
+- [ ] [FEAT] Language-pinned decode mode — Allow users to hard-pin the decode language in settings, bypassing auto-detect. This reduces p99 decode latency by ~15ms on short utterances where language detection adds overhead.
+- [ ] [PERF] GGML memory-mapped model loading — Use mmap = true in whisper.cpp so the OS handles page-in lazily; this reduces cold-start model load from ~1.5s to ~300ms on SSDs by avoiding a full heap copy.
+- [ ] [PERF] Encoder/decoder split threading — Pin the Whisper encoder to performance cores and the decoder to efficiency cores using Windows thread affinity masks, measured against the auto-tuning benchmark.
+- [ ] [BUG] Model selector shows stale download progress after network error — The download progress bar stays at a non-zero value if the download errors out. Reset download_progress to 0 and show the error state in the model card on failure.
+- [ ] [BUG] Empty segment after long silence — When the user holds the hotkey for >5s without speaking, Whisper decodes the silence and emits an empty or hallucination-only segment that passes through to delivery. Add a minimum-words guard (>=1 non-noise word) before triggering delivery.
+- [ ] [DX] Model benchmarking CLI — A murmur-bench binary that accepts a WAV file and prints decode time, RTF, and WER against a reference transcript. Used by contributors to validate model changes without running the full app.
 
 ---
 
@@ -79,6 +180,16 @@
 - [x] [FEAT] Named entity normalization — Detect proper nouns from the user's dictionary and apply their canonical capitalization (e.g. always correct "iphone" to "iPhone", "openai" to "OpenAI").
 - [x] [FEAT] Correction learning — When the user edits a Murmur-typed string immediately after paste detected via accessibility APIs, record the before/after pair and auto-add it to the corrections dictionary.
 - [x] [UX] Inline correction UI — After pasting, show a 3-second floating undo button ("Undo dictation") that restores the pre-paste clipboard content and removes the typed text.
+- [ ] [FEAT] Smart sentence-boundary capitalization — Detect sentence boundaries based on pause duration (VAD silence > 400ms) and capitalize the first word of the new sentence automatically, even mid-session.
+- [ ] [FEAT] Abbreviation expansion — "eg" to "e.g.", "ie" to "i.e.", "etc" to "etc.", "vs" to "vs.", with a per-language list. User-configurable opt-out per abbreviation.
+- [ ] [FEAT] Number normalization — "forty two" to "42", "third" to "3rd", "one thousand" to "1,000". Handle ordinals, cardinals, and currency ("twenty dollars" to "$20").
+- [ ] [FEAT] URL / path normalization — "https colon slash slash github dot com" to https://github.com. Detect and canonicalize spoken URLs, file paths, and email addresses.
+- [ ] [FEAT] Code identifier casing pipeline — In code mode, detect compound words and apply the active casing style: "user profile component" to UserProfileComponent (PascalCase) or user_profile_component (snake_case).
+- [ ] [FEAT] Post-processing rule priority ordering — Let users drag-and-drop the order in which enhancement rules execute. Persist order in registry as an ordered list of rule IDs.
+- [ ] [FEAT] Rule preview sandbox — A text area in settings where users can paste raw transcript text and see how each enabled rule transforms it in real time, rule-by-rule, with a diff view.
+- [ ] [FEAT] Profanity filter (opt-in) — Optional bleep/asterisk replacement of profanity, configurable per app profile (e.g. enable in Slack, disable in personal notes).
+- [ ] [PERF] Rules pipeline caching — Cache the compiled regex patterns for filler words, corrections, and punctuation rules across sessions so they are not recompiled on every chunk.
+- [ ] [BUG] LLM post-processing doubles certain punctuation — When both the Whisper model and the LLM post-processor add a period at the end of a sentence, the output has "word..". Fix by stripping trailing punctuation from the ASR output before feeding it to the LLM.
 
 ---
 
@@ -91,6 +202,15 @@
 - [x] [FEAT] Queue mode — A setting where transcription results are queued and delivered only when the user presses a separate "flush" hotkey, allowing multi-sentence dictation without interrupting typing.
 - [x] [FEAT] Draft mode — Instead of pasting immediately, accumulate multiple recording sessions into a draft buffer. Show a floating mini-window with the accumulated draft and a "Send" button.
 - [x] [UX] Paste delay calibration wizard — Detect the current system responsiveness and auto-suggest an optimal paste_delay_ms. Some apps (terminal emulators, Electron apps) need higher delays.
+- [ ] [FEAT] Smart paste delay — Measure how long the frontmost app takes to respond to Ctrl+V during the onboarding calibration wizard and record a per-app paste_delay_ms override in the app profiles table.
+- [ ] [FEAT] Delivery method: OLE Drag-and-Drop — As a fourth-tier fallback, simulate an OLE drag from a synthetic source into the focused element, which some sandboxed apps allow even when clipboard and SendInput are blocked.
+- [ ] [FEAT] Clipboard history suppression on Windows 11 — Prevent the transcript from appearing in the Windows 11 clipboard history panel (Win+V).
+  - Gate behind a "Suppress clipboard history" advanced setting (default: on)
+  - Show a UI note explaining that this only prevents Windows clipboard history, not third-party managers
+- [ ] [FEAT] Paste confirmation sound — A short, pleasant chime when delivery succeeds, distinct from the recording start/stop sounds. Configurable volume and on/off toggle.
+- [ ] [FEAT] Auto-retry on delivery failure — If the UIA delivery confirmation step fails, automatically retry once with a 200ms delay before surfacing the error toast.
+- [ ] [BUG] Draft mode does not persist across app restarts — The draft buffer lives only in memory. If the app crashes or is restarted, the accumulated draft is lost. Persist draft content to a dedicated `drafts` table in SQLite.
+- [ ] [PERF] Unicode SendInput batching — Current character-by-character SendInput fires one INPUT struct per character. Batch up to 32 characters per SendInput call to reduce syscall overhead.
 
 ---
 
@@ -105,6 +225,15 @@
 - [x] [UX] Pill size / compact mode — Offer a compact (icon-only) pill mode for minimal visual interruption.
 - [x] [UX] Multi-display awareness — Show the pill on the same display as the frontmost window, not always the primary display.
 - [x] [UX] Accessibility: screen reader announcements — Post a live region update via UIA when recording starts/stops so screen reader users get audio feedback.
+- [ ] [FEAT] Pill right-click context menu — Right-clicking the pill during or after recording should show: "Copy transcript", "Open history", "Settings", "Dismiss". Implement as a native HMENU on Windows.
+- [ ] [FEAT] Pill transcript scroll — When partial transcript text overflows the pill width, show a ticker-style horizontally scrolling text rather than truncation with ellipsis.
+- [ ] [FEAT] Pill language indicator — When the session detects a non-default language, show a two-letter language code badge (e.g. "ES", "FR") in the pill corner.
+- [ ] [FEAT] Pill recording timer — Show elapsed recording time in the pill so users can gauge how long they've been speaking.
+- [ ] [UX] Pill haptic feedback (Windows) — If the device has a haptic actuator (Surface, modern laptops), send a light tap via Windows.Devices.Haptics on recording start and stop.
+- [ ] [UX] Pill edge snapping — When dragged to within 20px of a screen edge, snap the pill to the edge and lock it there. Persist the edge preference alongside the position.
+- [ ] [UX] Pill keyboard navigation — The pill should be fully focusable and operable via keyboard: Tab to reach it, Space to toggle recording, Escape to cancel, Enter to confirm. Never trap focus.
+- [ ] [PERF] Pill render batching — The pill reacts to every CaptureEvent::Level event (60+ per second). Debounce redraws to 30fps to reduce GPU load on integrated graphics.
+- [ ] [BUG] Pill disappears behind fullscreen apps — The pill's always_on_top flag does not work against DirectX exclusive-fullscreen windows. Investigate using SetWindowPos with HWND_TOPMOST inside a WM_ACTIVATE handler to re-assert top-most status when fullscreen apps steal exclusive mode.
 
 ---
 
@@ -124,6 +253,18 @@
 - [x] [UX] Onboarding re-run — A "Run setup again" button in General settings to redo the microphone and hotkey test without reinstalling.
 - [x] [UX] Dashboard window remember position/size — Persist the last dashboard window bounds and restore on next open.
 - [x] [UX] Tooltips on all advanced settings — Every advanced setting in the registry has a description; surface it as a hover tooltip next to the label.
+- [ ] [FEAT] Session tagging — Let users tag sessions with labels ("meeting", "code review", "email") and filter history by tag. Tags stored as a many-to-many session_tags table in SQLite.
+- [ ] [FEAT] Session favorites / pinning — Star a session to pin it at the top of the history view and exclude it from bulk delete and retention purge.
+- [ ] [FEAT] History timeline view — An alternative calendar heatmap view of the history showing dictation activity by day. Click a day to see sessions from that day.
+- [ ] [FEAT] Clipboard snapshot in history — When a session is delivered via clipboard, store a snapshot of the final delivered text separately from the raw transcript so the user can diff them.
+- [ ] [FEAT] Quick re-dictate from history — A "Re-use" button on each history item that copies the final text back to the clipboard and pastes it into the current frontmost app.
+- [ ] [FEAT] Session detail word timeline — Clicking into a session shows each word on a horizontal timeline with its timestamp offset from session start, color-coded by confidence.
+- [ ] [FEAT] Keyboard-driven history navigation — Full arrow-key navigation in the history list, with Enter to expand a session and Delete/Backspace to delete the selected session, without mouse interaction.
+- [ ] [UX] Onboarding progress sidebar — Show a persistent sidebar checklist during multi-step setup so users always know how many steps remain and can jump back to a completed step.
+- [ ] [UX] Settings reset to defaults — A "Reset to defaults" button per section so users can undo a bad advanced settings change without wiping everything.
+- [ ] [UX] In-app update notification badge — When a new version is available, show a badge on the dashboard header update icon rather than a blocking modal. The modal appears only when the user clicks the badge.
+- [ ] [UX] Command palette (Cmd/Ctrl+K) — A fuzzy-searchable command palette accessible from anywhere in the dashboard for navigation, actions ("Export history", "Calibrate WPM", "Open model manager"), and settings jumps.
+- [ ] [PERF] Virtual list for history — The history view renders all sessions in the DOM. Switch to a windowed virtual list to keep the DOM small for users with 10,000+ sessions.
 
 ---
 
@@ -136,6 +277,14 @@
 - [x] [FEAT] Double-tap hotkey mode — Double-tapping the hotkey within 300 ms activates a "high-priority" session that skips the queue and pastes immediately.
 - [x] [FEAT] Hotkey-to-command mapping — Allow additional hotkeys to trigger specific commands: e.g. Alt+Shift+Space = open dashboard, Alt+Escape = cancel and clear.
 - [x] [BUG] [WIN] HOTKEY_HELD AtomicBool is process-global — If the app is ever extended to support multiple simultaneous recording modes (e.g. per-app sessions), a single global flag will not be correct. Refactor to a per-session or per-binding held-state tracker.
+- [ ] [FEAT] Tap-to-toggle mode — An alternative to push-to-talk where a single tap starts recording and a second tap stops it. Configurable alongside push-to-talk in settings.
+  - Show a visual toggle indicator in the tray icon and pill when in toggle mode vs PTT mode
+  - Add a max session duration guard in toggle mode (default 5 minutes) to prevent runaway recordings
+- [ ] [FEAT] Chord hotkeys — Support two-key chords (e.g. Ctrl+K, D for "dictate") for power users who want more ergonomic bindings that avoid system conflicts.
+- [ ] [FEAT] Hotkey profile presets — Ship preset hotkey configurations: Minimal (Alt+Space only), Power User (four bindings), Gaming (mouse-only), Accessibility (single large key).
+- [ ] [FEAT] Hotkey usage heatmap — Show a small keyboard graphic in the hotkey settings panel with usage counts per binding so users know which ones they actually use.
+- [ ] [BUG] Hotkey stops working after fast user switch — Windows fast user switching can cause RegisterHotKey to fail silently when the session resumes. Detect resume via WM_WTSSESSION_CHANGE with WTS_SESSION_UNLOCK and re-register all hotkeys.
+- [ ] [BUG] Per-app hotkey override triggers for wrong window — The frontmost app detection for per-app overrides reads the active window at hotkey time. In some Alt+Tab scenarios, the HWND is still the previous window for ~50ms. Add a 30ms stabilization delay before reading the active window process name.
 
 ---
 
@@ -147,55 +296,23 @@
 - [x] [FEAT] Audit log — Write an append-only log separate from the sessions table recording session timestamps, durations, and delivery outcomes but never the transcript text for enterprise compliance.
 - [x] [FEAT] Remote wipe / data clear — A "Delete all data" option in settings that drops all sessions, dictionary entries, and resets all settings to defaults in one step.
 - [x] [UX] Privacy policy in onboarding — Link to a local privacy.md during onboarding that explains exactly what data stays on device.
-
-## Developer Beachhead & Code-Aware Dictation
-
-- [x] [FEAT] Context-aware AI IDE file & folder tagging — Spoken file directives (`tag file <path>`, `tag folder <path>`, `at file <path>`, `context file <path>`) automatically formats `@src/components/Button.tsx`, `@package.json`, `@Cargo.toml` for Cursor, Windsurf, Claude Code, and Copilot.
-- [x] [FEAT] Developer voice snippets & macro library — Voice shortcuts for `pr checklist`, `environment setup`, `internal api docs`, `naming conventions`, `onboarding instructions`, and `release notes`.
-- [x] [FEAT] Code casing voice directives — Convert spoken voice cues into programming casing styles (`camelCase`, `PascalCase`, `snake_case`, `SCREAMING_SNAKE_CASE`, `kebab-case`, inline backticks).
-- [x] [FEAT] GitHub Issue, PR & Markdown voice macros — Dictate markdown scaffolding (`issue title`, `steps to reproduce`, `expected behavior`, `acceptance criteria`, `pr description`, `todo item`, `code block <lang>`).
-- [x] [FEAT] Developer technical vocabulary pack — Expanded named entity normalization with 80+ frameworks, databases, and languages (`Cursor`, `Windsurf`, `Claude Code`, `Ollama`, `LangChain`, `Supabase`, `Neon`, `vLLM`, `Next.js`, `TypeScript`, `PostgreSQL`, `FastAPI`, `PyTorch`, `Docker`, `Kubernetes`, `Tauri`, etc.).
-- [x] [FEAT] 1-Click Codebase & Repository Symbol Importer — Parse `package.json`, `Cargo.toml`, and source code to batch-import project identifiers, functions, and types into local dictionary.
-- [x] [FEAT] Developer domain packs — React/Web, Backend/Rust/Python, and Git/Cloud/DevOps 1-click domain dictionary presets in Settings.
-- [x] [FEAT] Dedicated Developer Hub (`/developers`) — Interactive web landing page with live voice simulator, IDE integration specs, and on-device privacy comparison vs Wispr Flow.
-
----
-
-## Internationalization & Languages
-
-- [FEAT] UI localization — Externalize all UI strings to a locales/\*.json structure and ship with English, Spanish, French, German, Japanese, and Simplified Chinese to start.
-- [FEAT] Right-to-left layout support — For Arabic and Hebrew transcription, flip the pill and history view layout to RTL.
-- [FEAT] Language auto-detection confidence display — Show the detected language and its confidence score in the History view per session.
-- [FEAT] Multilingual session — Allow Whisper language = None (auto-detect) and pin the detected language from the first interior chunk to subsequent chunks via the existing detected_language pinning mechanism.
-- [x] [FEAT] Language-specific filler word lists — The STRIP_FILLERS rule currently only handles English fillers ("um", "uh", "like"). Add curated lists for each supported language.
-- [FEAT] Romanization mode — For CJK input, add an option to output pinyin/romaji alongside or instead of the native script.
-
----
-
-## Updates & Distribution
-
-- [x] [FEAT] Delta updates — Binary diffing service (`bsdiff` / `bspatch` via `qbsdiff`) with SHA-256 verification and automated delta generator script (`scripts/generate_delta.py`) saving 90-95% download bandwidth on patch updates.
-- [x] [FEAT] Update channel selection — Added `general.update_channel` ("stable" | "beta") setting in registry and updater service.
-- [FEAT] Offline update bundle — Allow the user to manually point the updater at a local .msi/.exe file for air-gapped enterprise deployments.
-- [INFRA] Signed Windows installer — The current build produces an unsigned NSIS installer. Obtain a code signing certificate and integrate signtool.exe into the CI build pipeline.
-- [INFRA] GitHub Actions Windows build — Add a windows-latest runner to the CI matrix that builds, signs, and uploads the Windows bundle as a release artifact.
-- [x] [INFRA] Winget package — Official multi-YAML manifests (`WebProdigies.Murmur`) under `winget/manifests/` and automated generator script (`scripts/generate_winget_manifest.py`) for `winget install murmur`.
-- [INFRA] Chocolatey package — Publish a Chocolatey package for enterprise environments.
-
----
-
-## Architecture & Reliability
-
-- [INFRA] Crash reporter — Integrate sentry-rust or a local crash dump writer using MiniDumpWriteDump to capture panics and unhandled errors with a stack trace. Gate behind a user opt-in during onboarding.
-- [INFRA] Health-check endpoint — Expose a local HTTP endpoint (e.g. localhost:PORT/health) so OS-level monitoring scripts can verify Murmur is alive without the GUI.
-- [INFRA] Structured logging with log rotation — The current tracing-appender setup writes to a single log file. Add rolling file appender with size-based rotation and keep only the last 5 files.
-- [INFRA] Metrics export — Emit session latency, word count, and decode time metrics to a local Prometheus-compatible endpoint for power users who run local monitoring stacks.
-- [DX] Integration test harness for Windows — The e2e tests in session/e2e_tests.rs mock audio. Add a real-audio integration test that captures from a virtual audio device (VB-Audio Cable or similar) on CI.
-- [DX] Benchmark suite — A cargo bench target that runs Whisper on a fixed audio fixture and reports decode time. Gate CI failures on a regression threshold (e.g. +-15% from baseline).
-- [DX] Database migration framework — Currently SQLite schema changes require manual version bumps. Add a migration runner (e.g. rusqlite_migration) that applies numbered .sql files at startup.
-- [DX] Settings schema version — Add a schema_version row to the settings table so old settings can be migrated or deprecated cleanly across app versions.
-- [DX] IPC contract tests — Auto-generate TypeScript types from the specta bindings and add a test that the generated bindings.ts matches the Rust side on every build.
-- [INFRA] Plugin architecture — Extract delivery methods (clipboard, accessibility, keyboard) and enhancement rules into a plugin trait so third-party developers can add delivery backends without forking the core.
+- [ ] [SEC] In-app "Air-Gap / Hardware Isolation Mode" hard kill-switch that closes any sockets and disables all outbound networking in the binary.
+  - Bind reqwest client to a no-proxy, local-only adapter when the mode is active
+  - Block the GitHub release check and CDN model manifest fetch entirely
+  - Show a persistent "Air-Gapped" badge in the dashboard header when the mode is active
+  - Persist the setting so it survives app restarts
+- [ ] [SEC] SQLite database encryption at rest using OS Keychain / Windows DPAPI master keys.
+  - Generate a 256-bit AES key on first launch
+  - Store the key in Windows Credential Manager (CredWrite with CRED_TYPE_GENERIC)
+  - Open the SQLite database with SQLCipher using the retrieved key
+  - If the key is missing or corrupted, delete and re-create the database (data loss warning shown to user)
+- [ ] [SEC] Reproducible network demo video & third-party security verification badge on landing page.
+- [ ] [SEC] Memory scrubbing for in-flight transcripts — After a session is delivered and the in-memory buffer is released, overwrite the allocation with zeros using the `zeroize` crate before drop to prevent transcript leakage via process memory dumps.
+- [ ] [SEC] Code signing for all release binaries — Sign the Windows installer (.exe), the MSIX bundle, and the macOS DMG. Integrate `signtool.exe` and `codesign` into CI.
+- [ ] [SEC] Dependency audit automation — Add `cargo audit` and `npm audit` to the CI pipeline and fail the build on any CRITICAL or HIGH severity vulnerability.
+- [ ] [SEC] Clipboard data classification — Before setting the clipboard, classify the content with a local PII detector (names, phone numbers, SSNs, credit card patterns) and warn the user if the transcript appears to contain sensitive data.
+- [ ] [SEC] Process isolation for model inference — Run the Whisper inference in a separate sandboxed process with restricted access to the file system and network so a compromised model file cannot exfiltrate data.
+- [ ] [DX] Security threat model document — Write a `docs/SECURITY.md` that enumerates the trust boundaries, data flows, and mitigations (clipboard interception, memory dumping, UIPI bypass, network interception) so security researchers understand the attack surface.
 
 ---
 
@@ -212,14 +329,136 @@
 
 ---
 
+## Developer Beachhead & Code-Aware Dictation
+
+- [x] [FEAT] Context-aware AI IDE file & folder tagging — Spoken file directives (`tag file <path>`, `tag folder <path>`, `at file <path>`, `context file <path>`) automatically formats `@src/components/Button.tsx`, `@package.json`, `@Cargo.toml` for Cursor, Windsurf, Claude Code, and Copilot.
+- [x] [FEAT] Developer voice snippets & macro library — Voice shortcuts for `pr checklist`, `environment setup`, `internal api docs`, `naming conventions`, `onboarding instructions`, and `release notes`.
+- [x] [FEAT] Code casing voice directives — Convert spoken voice cues into programming casing styles (`camelCase`, `PascalCase`, `snake_case`, `SCREAMING_SNAKE_CASE`, `kebab-case`, inline backticks).
+- [x] [FEAT] GitHub Issue, PR & Markdown voice macros — Dictate markdown scaffolding (`issue title`, `steps to reproduce`, `expected behavior`, `acceptance criteria`, `pr description`, `todo item`, `code block <lang>`).
+- [x] [FEAT] Developer technical vocabulary pack — Expanded named entity normalization with 80+ frameworks, databases, and languages (`Cursor`, `Windsurf`, `Claude Code`, `Ollama`, `LangChain`, `Supabase`, `Neon`, `vLLM`, `Next.js`, `TypeScript`, `PostgreSQL`, `FastAPI`, `PyTorch`, `Docker`, `Kubernetes`, `Tauri`, etc.).
+- [x] [FEAT] 1-Click Codebase & Repository Symbol Importer — Parse `package.json`, `Cargo.toml`, and source code to batch-import project identifiers, functions, and types into local dictionary.
+- [x] [FEAT] Developer domain packs — React/Web, Backend/Rust/Python, and Git/Cloud/DevOps 1-click domain dictionary presets in Settings.
+- [x] [FEAT] Dedicated Developer Hub (`/developers`) — Interactive web landing page with live voice simulator, IDE integration specs, and on-device privacy comparison vs Wispr Flow.
+- [ ] [FEAT] Git commit message voice dictation mode — A dedicated "git commit" mode that formats output as a conventional commit (`feat(scope): description`) with scope, type, and body spoken naturally.
+  - Recognize type keywords: feat, fix, chore, docs, refactor, test, style, perf, ci, build
+  - Auto-lowercase and trim the subject to 72 characters
+  - Insert `\n\n` between subject and body when a second sentence is detected
+- [ ] [FEAT] Terminal command dictation mode — A mode that formats output as a shell command: `git push origin main`, `docker compose up -d`, `cargo test --release`. Suppresses capitalization and punctuation.
+  - Auto-detect common CLI patterns: `git ...`, `npm/bun/pnpm ...`, `cargo ...`, `docker ...`, `kubectl ...`
+  - Strip trailing period that would break shell commands
+  - Show command preview in pill before delivery with a 2s confirmation window
+- [ ] [FEAT] Code comment voice mode — Recognize JSDoc, Rustdoc, and Python docstring conventions by spoken triggers.
+- [ ] [FEAT] Variable name suggester — Speak "variable for user email address" and get three casing variants shown in the pill as clickable chips. Click one to insert.
+- [ ] [FEAT] Test name generator — Speak "test that login fails with wrong password" and output `it("should fail login with wrong password", ...)` or the Rust `#[test] fn login_fails_with_wrong_password()` equivalent depending on the active app profile.
+- [ ] [FEAT] Regex dictation mode — Speak "regex for email pattern" and insert a canonical regex. Maintain a curated library of 50 common regex patterns addressable by spoken name.
+- [ ] [FEAT] IDE extension for VS Code — Show Murmur recording status in the status bar, start/stop dictation from the command palette, and insert transcript at the active editor cursor position via `vscode.TextEditor.edit` without clipboard round-trip.
+- [ ] [FEAT] Cursor / Windsurf AI composer integration — When dictating inside the Cursor AI composer input, detect the composer window via UIA and inject via `IValueProvider::SetValue` rather than clipboard for reliability.
+- [ ] [DX] Developer SDK / local WebSocket API — Document the local WebSocket API with TypeScript types and a 10-line example showing a third-party app receiving real-time transcripts.
+
+---
+
+## Internationalization & Languages
+
+- [ ] [FEAT] UI localization — Externalize all UI strings to a `locales/*.json` structure and ship with English, Spanish, French, German, Japanese, and Simplified Chinese to start.
+  - Use `i18next` for the React frontend
+  - Generate type-safe translation key types via `i18next-parser`
+  - Auto-detect system locale on first launch and default to the closest supported language
+  - Fall back to English for missing keys with a console warning in dev mode
+- [ ] [FEAT] Right-to-left layout support — For Arabic and Hebrew transcription, flip the pill and history view layout to RTL.
+  - Use CSS `direction: rtl` and `text-align: start` throughout
+  - Mirror pill position to the right side of the screen by default for RTL locales
+  - Test with Hebrew (he) and Arabic (ar) Whisper language codes
+- [ ] [FEAT] Language auto-detection confidence display — Show the detected language and its confidence score in the History view per session.
+- [ ] [FEAT] Multilingual session — Allow Whisper `language = None` (auto-detect) and pin the detected language from the first interior chunk to subsequent chunks via the existing `detected_language` pinning mechanism.
+- [x] [FEAT] Language-specific filler word lists — The STRIP_FILLERS rule currently only handles English fillers ("um", "uh", "like"). Add curated lists for each supported language.
+- [ ] [FEAT] Romanization mode — For CJK input, add an option to output pinyin/romaji alongside or instead of the native script.
+- [ ] [FEAT] Regional dialect support — Allow sub-locale selection for languages with strong regional variants (e.g., Brazilian Portuguese vs. European Portuguese, Simplified vs. Traditional Chinese).
+- [ ] [FEAT] Locale-aware number formatting — When number normalization is active, format numbers according to the user's locale (e.g., 1,000.50 in en-US vs. 1.000,50 in de-DE).
+- [ ] [FEAT] Locale-aware date/time dictation — "Today at three PM" to ISO timestamp or natural format based on locale. Configurable format template.
+- [ ] [DX] Translation contribution guide — A `docs/TRANSLATIONS.md` explaining how community contributors can add a new locale, test their strings, and submit a PR.
+
+---
+
+## Updates & Distribution
+
+- [x] [FEAT] Delta updates — Binary diffing service (`bsdiff` / `bspatch` via `qbsdiff`) with SHA-256 verification and automated delta generator script (`scripts/generate_delta.py`) saving 90-95% download bandwidth on patch updates.
+- [x] [FEAT] Update channel selection — Added `general.update_channel` ("stable" | "beta") setting in registry and updater service.
+- [ ] [FEAT] Offline update bundle — Allow the user to manually point the updater at a local .msi/.exe file for air-gapped enterprise deployments.
+  - File picker in General > Updates > "Install from file"
+  - Validate signature before applying — reject unsigned bundles even in offline mode
+  - Show installed version and the version from the bundle before confirming
+- [ ] [INFRA] Signed Windows installer — The current build produces an unsigned NSIS installer. Obtain a code signing certificate and integrate `signtool.exe` into the CI build pipeline.
+  - Use an EV code signing certificate (eliminates SmartScreen warning immediately)
+  - Sign both the NSIS `.exe` and the MSIX bundle
+  - Store the certificate in GitHub Actions secrets
+- [ ] [INFRA] GitHub Actions Windows build — Add a `windows-latest` runner to the CI matrix that builds, signs, and uploads the Windows bundle as a release artifact.
+  - Build both `x86_64-pc-windows-msvc` and `aarch64-pc-windows-msvc` targets
+  - Run `cargo clippy` and `cargo test` in the matrix before packaging
+  - Upload artifacts to the GitHub release as `.exe`, `.msi`, and `.msix`
+- [x] [INFRA] Winget package — Official multi-YAML manifests (`WebProdigies.Murmur`) under `winget/manifests/` and automated generator script (`scripts/generate_winget_manifest.py`) for `winget install murmur`.
+- [ ] [INFRA] Chocolatey package — Publish a Chocolatey package for enterprise environments.
+  - Create `nuspec` manifest and install/uninstall PowerShell scripts
+  - Submit to the Chocolatey Community Repository
+  - Add Chocolatey badge to README
+- [ ] [INFRA] Homebrew Cask (macOS) — Publish a Homebrew Cask formula so macOS users can `brew install --cask murmur`.
+- [ ] [FEAT] In-app beta program enrollment — A one-click "Join Beta" option in General > Updates that switches the update channel to beta and shows a brief explanation of what beta means.
+- [ ] [FEAT] Release notes in-app — When an update is downloaded and ready to install, show a formatted "What's new" panel parsed from the GitHub release body.
+
+---
+
+## Architecture & Reliability
+
+- [ ] [INFRA] Crash reporter — Integrate `sentry-rust` or a local crash dump writer using `MiniDumpWriteDump` to capture panics and unhandled errors with a stack trace. Gate behind a user opt-in during onboarding.
+  - If sentry-rust: use a self-hosted Sentry instance (no data leaves user control unless they opt in explicitly)
+  - If local dump: write to `%APPDATA%\Murmur\crashes\` and offer to email/open the dump file from the next launch dialog
+- [ ] [INFRA] Health-check endpoint — Expose a local HTTP endpoint (e.g. `localhost:PORT/health`) so OS-level monitoring scripts can verify Murmur is alive without the GUI.
+  - Returns JSON `{ "status": "ok", "version": "0.1.0", "uptime_seconds": 3600, "sessions_today": 12 }`
+  - Bind only to `127.0.0.1` — never expose externally
+  - Port is randomized at first launch and stored in registry to avoid collisions
+- [ ] [INFRA] Structured logging with log rotation — The current `tracing-appender` setup writes to a single log file. Add rolling file appender with size-based rotation and keep only the last 5 files.
+  - Max file size: 10MB before rotation
+  - Files named `murmur.log`, `murmur.log.1`, ... `murmur.log.5`
+  - On startup, delete any rotated files older than 14 days
+- [ ] [INFRA] Metrics export — Emit session latency, word count, and decode time metrics to a local Prometheus-compatible endpoint for power users who run local monitoring stacks.
+- [ ] [DX] Integration test harness for Windows — The e2e tests in `session/e2e_tests.rs` mock audio. Add a real-audio integration test that captures from a virtual audio device (VB-Audio Cable or similar) on CI.
+- [ ] [DX] Benchmark suite — A `cargo bench` target that runs Whisper on a fixed audio fixture and reports decode time. Gate CI failures on a regression threshold (e.g. +-15% from baseline).
+- [ ] [DX] Database migration framework — Currently SQLite schema changes require manual version bumps. Add a migration runner (e.g. `rusqlite_migration`) that applies numbered `.sql` files at startup.
+  - Migrations live in `src-tauri/src/migrations/`
+  - Each migration is a file named `0001_initial.sql`, `0002_add_tags.sql`, etc.
+  - The runner checks `PRAGMA user_version` and applies all missing migrations in order
+  - Rollback is not supported; a failed migration panics with a clear error message pointing to the failing file
+- [ ] [DX] Settings schema version — Add a `schema_version` row to the settings table so old settings can be migrated or deprecated cleanly across app versions.
+- [ ] [DX] IPC contract tests — Auto-generate TypeScript types from the specta bindings and add a test that the generated `bindings.ts` matches the Rust side on every build.
+- [ ] [INFRA] Plugin architecture — Extract delivery methods (clipboard, accessibility, keyboard) and enhancement rules into a plugin trait so third-party developers can add delivery backends without forking the core.
+  - Define a `DeliveryPlugin` trait with `fn can_deliver(&self, target: &AppTarget) -> bool` and `fn deliver(&self, text: &str, target: &AppTarget) -> Result<()>`
+  - Ship three built-in plugins: `ClipboardDelivery`, `SendInputDelivery`, `UIAutomationDelivery`
+  - Load plugins from `%APPDATA%\Murmur\plugins\` at startup
+- [ ] [INFRA] Graceful shutdown — On SIGTERM or window close, wait for any in-flight session to complete delivery before exiting. Current behavior drops the session if the user quits mid-dictation.
+- [ ] [DX] Error code registry — Assign a unique error code to every `AppError` variant (e.g. `MRM-1001` for `AudioDeviceLost`) and document them in `docs/ERROR_CODES.md` so users can search for solutions.
+
+---
+
 ## Latency & Performance Benchmarks
 
 - [x] [PERF] Published dated, reproducible latency comparison matrix on website (speech end -> insertion tail latency).
 - [ ] [PERF] Automated CI latency & WER benchmark harness — Cargo bench target measuring insertion latency, sustained WPM, and technical WER on a fixed 500-sample audio dataset.
+  - Dataset: 500 samples from LibriSpeech `test-clean` at 16kHz mono
+  - Metrics: mean/p50/p99 decode latency, real-time factor (RTF), WER vs. reference transcripts
+  - Store baseline in `benchmarks/baseline.json`; fail CI if any metric regresses by >15%
 - [ ] [PERF] Per-device resource profiling dashboard — Live telemetry in settings showing CPU/GPU VRAM footprint and Real-Time Factor (RTF) across M-series & DirectML.
+  - Sample CPU % and memory MB every 500ms during a session using `sysinfo` crate
+  - Show a live sparkline graph in the Performance section of Settings
+  - Color-code: green (<30% CPU, <2GB RAM), yellow (<60% CPU, <4GB RAM), red (above thresholds)
 - [ ] [PERF] Always-ready warm background worker — Maintain warm Whisper VRAM state with zero idle CPU burn for sub-5ms session wakeups.
 - [ ] [PERF] Laptop battery efficiency mode — Dynamically downshift decode thread pool on battery power to preserve <1.2% / hour discharge rate.
+  - Detect battery state via `windows::Devices::Power::Battery::AggregateReport`
+  - On battery: cap decode threads to `max(1, physical_cores / 2)` and disable streaming decode
+  - On AC power: restore full thread count automatically
 - [ ] [PERF] Low-bandwidth / offline verification guide — Documented test suite confirming identical sub-200ms latency in air-gapped / airplane mode.
+- [ ] [PERF] Memory usage regression gate — Add a `memory_usage_mb` assertion to the benchmark suite. Fail if peak resident memory during a 60-second session exceeds 800MB on the `small` model.
+- [ ] [PERF] Cold start optimization — Profile and reduce time-to-ready (from app launch to first hotkey response). Target: under 3 seconds on a mid-range 2022 laptop SSD.
+  - Measure with `tracing::span!` wrapping each bootstrap phase
+  - Lazy-load non-critical bootstrap steps (update check, session recovery) after the hotkey is armed
 
 ---
 
@@ -231,10 +470,27 @@
 - [x] [FEAT] Creator & scriptwriting voice macros — YouTube video script outlines, 3-part viral hook frameworks, Substack newsletter drafts, social captions, podcast show notes, and 60s sponsor ad reads.
 - [x] [FEAT] Dedicated Content Creators Hub (`/creators` & `/content-creators`) — Interactive creator voice playground, creator app workflow integration (Notion, Google Docs, Descript, Final Cut, Obsidian), and unreleased script IP privacy comparison vs Wispr Flow.
 - [ ] [FEAT] Portable dictionary export/import (`.json` / `.csv`) — "Your vocabulary is an asset you own—not a training signal for someone else's model."
+  - Export: one entry per line, CSV format `trigger,replacement,type,enabled`
+  - Import: validate schema, deduplicate against existing entries, show a preview diff before confirming
+  - Support drag-and-drop import from file manager
 - [ ] [FEAT] Project & workspace-scoped dictionaries — Auto-load `.murmur/dictionary.json` from the active git repository or workspace folder.
+  - Watch for working directory changes via shell integration or file watcher
+  - Merge project dictionary with global dictionary, with project entries taking priority
+  - Show which dictionary is active in the pill via a small "Project" badge
 - [ ] [FEAT] Local AI pipeline chaining — Dictate -> local lightweight LLM (llama.cpp) summarize/reformat -> paste to active cursor.
+  - Support `llama.cpp` server mode on `localhost:8080` as the LLM backend
+  - Allow user to paste any OpenAI-compatible endpoint (for Ollama or LM Studio)
+  - Chain runs async: show "Enhancing..." in the pill while waiting for the LLM response
 - [ ] [FEAT] Developer-first keyboard command palette — Fast shortcut-driven dictionary management and model switching without mouse interaction.
 - [ ] [FEAT] Bring-Your-Own-Model (BYOM) loader — Allow power users to load custom fine-tuned GGUF / whisper.cpp model weights.
+  - File picker accepting `.bin` files in whisper.cpp GGUF format
+  - Validate the file header magic bytes before accepting
+  - Show the model file size, parameter count (from header), and a "Custom" badge in the model picker
+  - Warn that custom models are not covered by Murmur support
+- [ ] [FEAT] Dictionary versioning & changelog — Track changes to the user dictionary over time (word added, modified, deleted) with timestamps, so users can undo accidental bulk imports.
+- [ ] [FEAT] Shared team dictionary (Pro tier) — A team admin can publish a shared dictionary via a signed JSON URL that team members subscribe to. Dictionary entries are merged read-only (cannot be deleted by individual users).
+- [ ] [FEAT] Voice macro conditional logic — A simple condition syntax in macros: "if app == Slack then use casual tone else use formal tone". Evaluated at inject time.
+- [ ] [FEAT] Smart abbreviation learning — After 5 manual corrections of the same word, auto-suggest adding it to the substitutions dictionary with a one-click "Remember this" toast.
 
 ---
 
@@ -244,6 +500,16 @@
 - [x] [SEO] Added JSON-LD Schema markup (`SoftwareApplication` & `FAQPage`) and canonical meta tags across all comparison routes.
 - [x] [CONTENT] Published 6 trust-earning technical articles addressing buyer anxieties, legal privilege risks, developer privacy, and hardware benchmarks.
 - [ ] [MARKETING] Record and publish short outcome-driven demonstration clips for X, LinkedIn, Reddit, and Product Hunt: "Dictating a full GitHub issue in Airplane Mode with 0 bytes sent."
+- [ ] [SEO] Add `/dictation-for-medical-professionals` and `/hipaa-voice-notes` landing pages targeting healthcare vertical.
+  - Include a disclaimer (Murmur is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims)
+  - Emphasize local processing, no cloud upload, configurable retention policy
+  - FAQ: "Does Murmur store my patient notes?", "Does Murmur sell data to healthcare analytics vendors?"
+- [ ] [SEO] Schema markup for `Review` and `AggregateRating` — Collect 10+ user reviews and add structured data to the homepage for rich snippet star ratings in Google search.
+- [ ] [CONTENT] "How I reduced meeting note time by 80% with local dictation" — a narrative technical blog post with a reproducible workflow using Murmur + Notion.
+- [ ] [CONTENT] Benchmark article: "Murmur vs. Wispr Flow vs. Superwhisper — 2026 latency & accuracy comparison" with reproducible test methodology published on GitHub.
+- [ ] [CONTENT] Privacy deep-dive: "Where does your voice data go in popular dictation apps?" — comparative analysis (Otter.ai, Dragon, Whisper via OpenAI API vs. Murmur local).
+- [ ] [MARKETING] Product Hunt launch — Prepare PH listing assets: tagline, description (260 chars), 3 product screenshots, 1 demo GIF, Maker bio, first-comment talking points, and a 25% launch-day coupon code.
+- [ ] [MARKETING] Reddit AMA and community posts — Engage r/productivity, r/MachineLearning, r/selfhosted, r/rust with transparent posts about the local-first architecture and open-source model choice.
 
 ---
 
@@ -256,37 +522,178 @@
 - [x] [VIRALITY] In-app post-activation referral trigger: prompt users with personal referral invite only after 50 successful dictations (never during onboarding).
 - [x] [VIRALITY] "Made with local dictation" exportable badge templates for GitHub issues, PRs, and documentation.
 - [ ] [SEC] Privacy Professional tamper-evident local audit logger & OS Keychain encrypted configuration export.
-
----
-
-## Known Bugs & Tech Debt
-
-- [x] [BUG] modifier_tap.rs uses static mut with mutable references — Refactored into safe Mutex<SharedState>, fully Rust 2024 compliant with zero static_mut_refs warnings.
-- [x] [BUG] PillMetrics.exit_ms and exit_travel are dead code — Wired up animation accessor functions (pill_exit_ms, pill_exit_travel, pill_width_compact) in tray.rs.
-- [x] [BUG] Updater endpoint 404 on dev builds — Added TAURI_UPDATER_DISABLE=1 and debug mode checks in bootstrap.rs and updates.rs to prevent 404 endpoint errors on dev launches.
-- [x] [BUG] Session orphan recovery runs before audio device is available — Added audio device readiness check before querying and recovering orphan sessions at startup in bootstrap/recovery.rs.
-- [x] [TECH DEBT] bootstrap.rs is 2000+ lines — Modularized bootstrap.rs into clean submodules: bootstrap/windows.rs, bootstrap/hotkeys.rs, bootstrap/engine.rs, bootstrap/recovery.rs, bootstrap/updates.rs, and bootstrap/mod.rs.
-- [x] [TECH DEBT] registry/mod.rs is 727 lines — Modularized capability and setting declarations into per-capability submodules under registry/capabilities/.
-- [x] [TECH DEBT] adapters/rules/text.rs is 39 KB — Split the filler, correction, punctuation, whitespace, dictionary, and spoken command logic into dedicated modular files under adapters/rules/ with a clean re-export and test facade in text.rs.
-- [x] [TECH DEBT] No API versioning on IPC commands — Added API versioning contracts (CURRENT_API_VERSION, MIN_COMPATIBLE_API_VERSION, ApiVersionInfo) and registered get_api_version IPC command with Specta bindings to prevent frontend/backend drift.
-- [x] [TECH DEBT] tauri.conf.json resources: [] — Enhanced model bundling support with multi-directory fallback resolver checking Tauri resource directory and APPDATA models path so releases can bundle models cleanly.
+- [ ] [BIZ] Enterprise self-hosted license — A volume license key (offline-verifiable, no phone-home) that unlocks centralized IT policy enforcement, fleet-level dictionary sync via shared network path, and usage reporting exports for compliance.
+- [ ] [BIZ] Reseller / MSP partner program — A partner portal where managed service providers can purchase seats in bulk at a 30% discount and manage their clients' licenses under a unified dashboard.
+- [ ] [BIZ] Affiliate program — A referral link system with 30% recurring commission for content creators, YouTubers, and productivity bloggers who refer paying customers.
+- [ ] [VIRALITY] Community voice pack directory — A curated, versioned registry at `packs.murmur.app` (or a GitHub repo) listing community-contributed domain packs (medical, legal, coding, creative writing) with one-click install.
+- [ ] [VIRALITY] "Murmur Power User" certification — A shareable badge awarded after 10,000 dictated words and a quiz on advanced features. Meant for community recognition and LinkedIn sharing.
+- [ ] [BIZ] Annual subscription auto-renew reminder — Email users 30 and 7 days before their annual subscription renews with a "Lock in current pricing" offer for multi-year prepayment.
+- [ ] [BIZ] Churned user win-back flow — If a Pro subscriber cancels, wait 30 days then send a single re-engagement email with 3 months free to try again.
 
 ---
 
 ## Analytics & Stats
 
-- [FEAT] Daily/weekly summary notification — Optionally show a Windows toast at end-of-day: "You dictated 1,240 words today across 14 sessions, saving ~8 minutes of typing."
-- [FEAT] WPM vs typing speed comparison — Compare the user's dictation WPM against their BASELINE_WPM to show how much faster they speak than type.
-- [FEAT] App breakdown stats — In the stats dashboard, show which apps received the most dictated words (already tracked via app_bundle_id on each session).
-- [FEAT] Error rate tracking — Track how often sessions end in Failed, Orphaned, or Cancelled states and surface them in the stats view as a reliability metric.
-- [FEAT] Latency percentile dashboard — Show p50/p90/p99 of TailDecode and TotalFinalize latencies from the services/metrics.rs data in the stats view.
+- [ ] [FEAT] Daily/weekly summary notification — Optionally show a Windows toast at end-of-day: "You dictated 1,240 words today across 14 sessions, saving ~8 minutes of typing."
+  - Calculate "time saved" as `word_count / BASELINE_WPM * 60` seconds
+  - Show at 6 PM local time (configurable) only on days with at least 1 session
+  - Respect system Do Not Disturb
+- [ ] [FEAT] WPM vs typing speed comparison — Compare the user's dictation WPM against their `BASELINE_WPM` to show how much faster they speak than type.
+  - Show as a ratio card: "You speak 3.2x faster than you type"
+  - Update the ratio after each WPM calibration
+- [ ] [FEAT] App breakdown stats — In the stats dashboard, show which apps received the most dictated words (already tracked via `app_bundle_id` on each session).
+  - Bar chart sorted by word count descending
+  - Group sessions by `app_bundle_id` and sum `word_count`
+  - Show app icon alongside the app name using the Windows icon extraction API
+- [ ] [FEAT] Error rate tracking — Track how often sessions end in `Failed`, `Orphaned`, or `Cancelled` states and surface them in the stats view as a reliability metric.
+  - Error rate = (failed + orphaned) / total sessions, rolling 7-day window
+  - Show a "Reliability" gauge: green (>95%), yellow (90-95%), red (<90%)
+  - Link to the log file from the gauge for debugging
+- [ ] [FEAT] Latency percentile dashboard — Show p50/p90/p99 of `TailDecode` and `TotalFinalize` latencies from the `services/metrics.rs` data in the stats view.
+- [ ] [FEAT] Vocabulary growth chart — Track the number of unique words in the user's dictionary over time and show a growth trend line in the stats dashboard.
+- [ ] [FEAT] Peak dictation hours heatmap — Show a 7-day x 24-hour heatmap of session count to help users understand when they dictate most.
+- [ ] [FEAT] Correction frequency report — Show which words the user corrects most often (from the correction learning system) as a ranked list, with a "Add to substitutions" shortcut next to each.
+- [ ] [FEAT] Language distribution pie chart — For multilingual users, show a breakdown of sessions by detected language.
+- [ ] [FEAT] CSV/JSON stats export — Let users export all aggregated stats data (not raw transcripts) to a file for personal analysis in Excel or Python.
 
 ---
 
 ## Integrations
 
-- [FEAT] Browser extension — A Chrome/Edge extension that lets the dictation pill appear inside browser text fields (contenteditable, textarea) without the clipboard round-trip, using the extension's input event injection API.
-- [FEAT] VS Code extension — Trigger Murmur from VS Code's command palette and have the transcript inserted at the cursor via the VS Code extension API (editor.edit).
-- [FEAT] REST / WebSocket API — Expose a local WebSocket server so third-party apps can subscribe to transcript events in real time (e.g. for streaming captions on OBS).
-- [FEAT] AutoHotkey / PowerShell trigger — Document and expose a named pipe or local socket that external scripts can write to in order to start/stop sessions programmatically.
-- [FEAT] Whisper API compatibility layer — Expose a local HTTP endpoint that accepts audio files and returns transcripts in the OpenAI Whisper API format, so existing tools (Raycast, Obsidian plugins) can use Murmur as a local Whisper backend.
+- [ ] [FEAT] Browser extension — A Chrome/Edge extension that lets the dictation pill appear inside browser text fields without the clipboard round-trip, using the extension's input event injection API.
+  - Extension communicates with the Murmur desktop app via the native messaging host API
+  - The extension registers a background service worker that listens for transcript events from the native host
+  - Inject text using `InputEvent` with `inputType: "insertText"` for maximum compatibility
+  - Show a small Murmur icon in focused text fields as a visual affordance
+- [ ] [FEAT] VS Code extension — Trigger Murmur from VS Code's command palette and have the transcript inserted at the cursor via the VS Code extension API (`editor.edit`).
+  - Commands: `murmur.startDictation`, `murmur.stopDictation`, `murmur.cancelDictation`
+  - Show a status bar item that pulses during recording
+  - Subscribe to transcript events from the local WebSocket API
+- [ ] [FEAT] REST / WebSocket API — Expose a local WebSocket server so third-party apps can subscribe to transcript events in real time (e.g. for streaming captions on OBS).
+  - Endpoint: `ws://127.0.0.1:{port}/events`
+  - Events: `session_started`, `partial_transcript`, `session_completed`, `session_cancelled`
+  - Authentication: a session token stored in registry, required in the `Authorization: Bearer` header on upgrade
+  - Document with an OpenAPI 3.1 spec and a 10-line JavaScript client example
+- [ ] [FEAT] AutoHotkey / PowerShell trigger — Document and expose a named pipe or local socket that external scripts can write to in order to start/stop sessions programmatically.
+  - Named pipe: `\\.\pipe\MurmurControl`
+  - Protocol: line-delimited JSON commands `{ "command": "start_session" }` / `{ "command": "stop_session" }`
+  - Document in `docs/SCRIPTING.md` with 5 AutoHotkey v2 examples
+- [ ] [FEAT] Whisper API compatibility layer — Expose a local HTTP endpoint that accepts audio files and returns transcripts in the OpenAI Whisper API format, so existing tools (Raycast, Obsidian plugins) can use Murmur as a local Whisper backend.
+  - Endpoint: `POST http://127.0.0.1:{port}/v1/audio/transcriptions`
+  - Accept: `multipart/form-data` with `file` and optional `language`, `model`, `response_format` fields
+  - Return: OpenAI-compatible JSON `{ "text": "..." }` or verbose JSON with word timestamps
+  - Rate limit: 10 concurrent requests max to prevent VRAM exhaustion
+- [ ] [FEAT] Obsidian plugin — A community Obsidian plugin that starts Murmur dictation from a ribbon icon or command palette and inserts the final transcript at the active cursor in the current note.
+- [ ] [FEAT] Notion integration (webhook-based) — After a session, optionally POST the transcript to a user-configured Notion page via the Notion API. Authentication via a user-provided Notion integration token stored in Windows Credential Manager.
+- [ ] [FEAT] Raycast extension (macOS) — A Raycast extension that surfaces a "Dictate with Murmur" command and shows the 5 most recent transcripts in a Raycast list view.
+- [ ] [FEAT] OBS WebSocket caption overlay — When the local WebSocket API is active, provide a ready-to-import OBS source preset that displays the live partial transcript as a caption overlay during streams or recordings.
+
+---
+
+## Known Bugs & Tech Debt
+
+- [x] [BUG] `modifier_tap.rs` uses `static mut` with mutable references — Refactored into safe `Mutex<SharedState>`, fully Rust 2024 compliant with zero `static_mut_refs` warnings.
+- [x] [BUG] `PillMetrics.exit_ms` and `exit_travel` are dead code — Wired up animation accessor functions (`pill_exit_ms`, `pill_exit_travel`, `pill_width_compact`) in `tray.rs`.
+- [x] [BUG] Updater endpoint 404 on dev builds — Added `TAURI_UPDATER_DISABLE=1` and debug mode checks in `bootstrap.rs` and `updates.rs` to prevent 404 endpoint errors on dev launches.
+- [x] [BUG] Session orphan recovery runs before audio device is available — Added audio device readiness check before querying and recovering orphan sessions at startup in `bootstrap/recovery.rs`.
+- [x] [TECH DEBT] `bootstrap.rs` is 2000+ lines — Modularized `bootstrap.rs` into clean submodules: `bootstrap/windows.rs`, `bootstrap/hotkeys.rs`, `bootstrap/engine.rs`, `bootstrap/recovery.rs`, `bootstrap/updates.rs`, and `bootstrap/mod.rs`.
+- [x] [TECH DEBT] `registry/mod.rs` is 727 lines — Modularized capability and setting declarations into per-capability submodules under `registry/capabilities/`.
+- [x] [TECH DEBT] `adapters/rules/text.rs` is 39 KB — Split the filler, correction, punctuation, whitespace, dictionary, and spoken command logic into dedicated modular files under `adapters/rules/` with a clean re-export and test facade in `text.rs`.
+- [x] [TECH DEBT] No API versioning on IPC commands — Added API versioning contracts (`CURRENT_API_VERSION`, `MIN_COMPATIBLE_API_VERSION`, `ApiVersionInfo`) and registered `get_api_version` IPC command with Specta bindings to prevent frontend/backend drift.
+- [x] [TECH DEBT] `tauri.conf.json` `resources: []` — Enhanced model bundling support with multi-directory fallback resolver checking Tauri resource directory and APPDATA models path so releases can bundle models cleanly.
+- [ ] [BUG] Tray tooltip shows stale WPM after a session with zero words — The `last_session_wpm` value in the tray tooltip is not reset when a session is cancelled or produces an empty transcript. Guard with `word_count > 0` before updating the WPM display.
+- [ ] [BUG] Settings page scroll position resets on every route navigation — The settings route unmounts and remounts on each tab switch, losing scroll position. Lift the scroll container outside the tab router or use a scroll restoration hook.
+- [ ] [BUG] History FTS search returns duplicate results when a session matches in both `raw_text` and `final_text` — The FTS5 virtual table joins against the sessions table without `DISTINCT`. Add `GROUP BY sessions.id` or use `SELECT DISTINCT` in `search_sessions`.
+- [ ] [TECH DEBT] IPC command handlers have inconsistent error logging — Some handlers log the error before returning it, some log after, some not at all. Standardize: the command factory should be the sole logger for all command-level errors.
+- [ ] [TECH DEBT] `services/sessions.rs` is approaching 500 lines — Pre-emptively split into `services/sessions/crud.rs`, `services/sessions/search.rs`, `services/sessions/stats.rs` before it hits the 400-line single-responsibility limit.
+- [ ] [TECH DEBT] No integration tests for the IPC command factory — The factory's validation, permission preflight, and reentrancy guard logic is only covered by unit tests on the factory itself. Add integration tests that call commands end-to-end through a test app handle.
+- [ ] [TECH DEBT] Hardcoded color values in `pill.html` — The pill HTML uses inline rgba color values that do not respect the app's design token system. Replace with CSS custom properties matching the design system tokens from `docs/04-DESIGN-SYSTEM.md`.
+- [ ] [DX] Pre-commit hook for SOT keyword checks — Add a `pre-commit` hook that runs `pnpm sot:validate` and fails if any Rust file over 50 lines is missing a `SOURCE OF TRUTH KEYWORDS` header.
+- [ ] [DX] `cargo-deny` for supply chain security — Add `deny.toml` with `licenses` and `bans` sections to block GPL-incompatible dependencies and known-bad crate versions from entering the build.
+
+---
+
+## Accessibility
+
+> Goal: WCAG 2.1 AA compliance across all in-app UI. The pill must be operable with keyboard and screen reader only.
+
+- [ ] [UX] Full keyboard navigation in the dashboard — Every interactive element (button, input, tab, list item) must be reachable and operable without a mouse. Tab order must be logical and visible with a clear focus ring.
+- [ ] [UX] High-contrast mode support — Test the dashboard and pill in Windows High Contrast mode (Aquatic, Desert, Dusk, Night Sky) and fix any elements that become invisible or unreadable.
+- [ ] [UX] Screen reader session announcements — When a session starts, announce "Murmur recording started". When it ends, announce "Transcript delivered: [N] words". Use `aria-live="assertive"` for recording events and `aria-live="polite"` for delivery.
+- [ ] [UX] Focus trap in modals — The settings modal, update dialog, and onboarding overlay must trap focus so Tab never escapes to the background content behind the overlay.
+- [ ] [UX] Color-independent status indicators — All status indicators (mic level, delivery status, error states) must have a non-color cue (icon, text, or pattern) in addition to color so colorblind users get the same information.
+- [ ] [UX] Minimum tap target size — All clickable elements in the pill and dashboard must be at least 44x44px to support motor-impaired users.
+- [ ] [UX] Motion reduction support — Respect `prefers-reduced-motion` media query. When set, disable all CSS transitions and animations and replace with instant state changes.
+- [ ] [UX] Zoom support — Ensure the dashboard layout does not break at 200% browser zoom or Windows display scaling up to 300%.
+- [ ] [DX] Automated accessibility audit in CI — Add `axe-core` (via Playwright) to the CI pipeline to catch regressions in ARIA roles, focus management, and color contrast automatically on every PR.
+
+---
+
+## Testing & Quality Assurance
+
+- [ ] [DX] End-to-end test suite with Playwright — Cover the critical user flows: onboarding, model download, first dictation, history search, settings export/import, and update installation.
+  - Use Playwright's tauri driver or the local WebSocket API to drive dictation events from test scripts
+  - Run on `windows-latest` and `macos-latest` GitHub Actions runners
+- [ ] [DX] Property-based tests for text enhancement rules — Use `proptest` or `quickcheck` to fuzz the filler removal, punctuation normalization, and spoken command expansion rules with random inputs to catch edge cases.
+- [ ] [DX] Golden file tests for the rules pipeline — Maintain a `tests/golden/` directory of input transcripts and expected outputs for each rule. These double as regression tests and documentation.
+- [ ] [DX] Load test for the IPC command factory — Simulate 100 concurrent IPC calls to the transcription pipeline and verify that the reentrancy guard correctly serializes sessions and that memory does not grow unboundedly.
+- [ ] [DX] Model download failure simulation — A test mode that injects HTTP errors (timeout, 404, partial download) into the model downloader to verify resume, retry, and error UI behavior.
+- [ ] [DX] Audio fixture library — A curated set of WAV files (clear speech, noisy speech, silence, multi-speaker, non-English, code dictation) used as inputs across all audio pipeline tests.
+- [ ] [DX] Snapshot tests for the dashboard UI — Use Storybook or Playwright screenshot tests to capture a pixel snapshot of each dashboard view and fail if the snapshot changes unexpectedly.
+- [ ] [DX] Mutation testing — Run `cargo-mutants` on the session state machine and text enhancement rules to measure test effectiveness and identify untested branches.
+
+---
+
+## Documentation
+
+- [ ] [DX] Architecture overview diagram — A Mermaid diagram in `docs/01-ARCHITECTURE.md` showing the full data flow from hotkey press to text injection, including all actors, ports, adapters, and services.
+- [ ] [DX] `docs/00-START-HERE.md` — A new contributor guide explaining the layered architecture, SOT keyword system, how to find things with `pnpm sot`, and the 5-step workflow for adding a new feature (registry -> command -> service -> UI -> test).
+- [ ] [DX] API reference for the WebSocket / REST API — An OpenAPI 3.1 spec in `docs/api/openapi.yaml` generated from the Rust types via a custom build step, with a rendered HTML version at `docs/api/index.html`.
+- [ ] [DX] Contributing guide (`CONTRIBUTING.md`) — Setup instructions (Rust toolchain, Bun, system dependencies), code style rules (referencing CLAUDE.md), PR process, and how to run the test suite locally.
+- [ ] [DX] Security policy (`SECURITY.md`) — How to responsibly disclose vulnerabilities, the PGP key for encrypted reports, the expected response timeline, and a summary of the threat model.
+- [ ] [DX] `docs/04-DESIGN-SYSTEM.md` completeness audit — Verify every design token used in the codebase is documented in the design system file, and every documented token is actually used. Remove orphaned tokens.
+- [ ] [DX] Changelog automation — A GitHub Actions workflow that drafts the `CHANGELOG.md` entry for each release by categorizing `git log` entries since the last tag into Added, Changed, Fixed, and Removed sections.
+- [ ] [DX] In-app help docs — A searchable in-app help panel (accessible via `?`) that renders markdown from `docs/` at build time so users can look up features without opening a browser.
+
+---
+
+## Community & Ecosystem
+
+- [ ] [COMMUNITY] Discord server — A public Discord community for Murmur users and contributors with channels for `#announcements`, `#feature-requests`, `#bug-reports`, `#showcase` (share your voice packs), and `#dev` (contributor discussion).
+- [ ] [COMMUNITY] Community voice pack directory — A GitHub repository (`murmur-community/packs`) where contributors can PR their domain-specific voice packs (medical, legal, coding, creative writing) following a schema and review process.
+- [ ] [COMMUNITY] Public feature roadmap — A public GitHub project board or `ROADMAP.md` showing the current quarter's planned features, in-progress items, and the next quarter's backlog, updated monthly.
+- [ ] [COMMUNITY] User feedback widget — A subtle in-app thumbs-up/thumbs-down feedback button visible after each session (never during) that stores the rating locally and batches it for optional opt-in submission.
+- [ ] [COMMUNITY] Open beta program — A public beta channel where users can opt in to pre-release builds, with a dedicated `#beta-feedback` Discord channel and a structured feedback form linked from each beta release.
+- [ ] [COMMUNITY] Contributor recognition — A `CONTRIBUTORS.md` file automatically updated by CI after each merged PR, listing contributors alphabetically with their contributions. Linked from the README and the About page in the dashboard.
+- [ ] [DX] GitHub issue templates — Structured templates for Bug Report, Feature Request, and Security Vulnerability with required fields (reproduction steps, expected vs. actual behavior, system info, Murmur version).
+- [ ] [DX] GitHub PR template — A PR checklist template requiring: description of change, testing done, screenshots (for UI changes), and confirmation that SOT headers are present in new files.
+
+---
+
+## Mobile & Cross-Platform
+
+> Long-term aspirational items. Not targeted for 2026.
+
+- [ ] [FEAT] macOS ARM64 (Apple Silicon) release — Official `aarch64-apple-darwin` build with Metal acceleration enabled by default. Requires CI runner with Apple Silicon (GitHub `macos-14` runner).
+- [ ] [FEAT] Linux support (experimental) — An `x86_64-unknown-linux-gnu` AppImage build. Audio capture via PipeWire / ALSA. Text injection via `xdotool` or `ydotool` for Wayland.
+- [ ] [FEAT] Android companion app (voice capture only) — A minimal Android app that captures audio and streams it to the desktop Murmur app via local Wi-Fi for dictation while away from the keyboard.
+- [ ] [FEAT] iOS companion app — Same as Android: audio capture over local network, no cloud.
+- [ ] [FEAT] iPad split-screen optimization — When running the companion app in iPad split-screen, show the pill in the companion app's view rather than the desktop.
+
+---
+
+## AI & Machine Learning Roadmap
+
+> Next-generation capabilities. Requires research and validation before specification.
+
+- [ ] [RESEARCH] On-device speaker identification — Explore a lightweight speaker embedding model (e.g. SpeakerNet, EcapaTDNN at <20MB) that can distinguish between 2-5 enrolled speakers without cloud processing.
+- [ ] [RESEARCH] Continual learning from corrections — Investigate whether whisper.cpp supports fine-tuning from correction pairs, or whether a lightweight adapter (LoRA) layer can be trained incrementally on-device with <100 examples.
+- [ ] [RESEARCH] Emotion-aware post-processing — Detect the emotional tone of the dictation (excited, tired, frustrated) from prosody features and adjust the enhancement style accordingly (e.g. add exclamation points for excited speech).
+- [ ] [RESEARCH] Active noise cancellation pre-filter — Evaluate a real-time ANC model (e.g. RNNoise at 90KB) as a pre-filter before the VAD and Whisper encoder to improve WER in noisy environments by 10-20%.
+- [ ] [RESEARCH] Personalized vocabulary fine-tuning — After the user has 500+ sessions, evaluate whether a vocabulary-biased prompt or a LoRA adapter trained on their correction pairs meaningfully reduces WER on their speech pattern.
+- [ ] [FEAT] Multimodal context injection — Allow users to screenshot the current screen and pass it as context to the LLM post-processing pass, so the LLM can infer intent from the visual context (e.g. if a code file is visible, prefer code formatting).
+- [ ] [FEAT] Voice cloning protection — Detect if the input audio is a synthetic voice clone (using a lightweight spoofing detection model) and refuse to transcribe it, protecting against replay attacks on voice-triggered systems.
+
+---
+
+*Last updated: 2026-09-04. Items without dates are open-ended backlog.*
