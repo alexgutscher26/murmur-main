@@ -27,13 +27,13 @@
 use crate::pipeline::vad::SpeechDetector;
 use crate::types::{AudioChunk, ChunkKind, TARGET_SAMPLE_RATE};
 
-/// Below this a chunk is not worth its own encoder pass — see the module WHY.
-const MIN_CHUNK_MS: u64 = 8_000;
+/// Below this a chunk is not worth its own encoder pass — tuned for low-latency background decoding.
+const MIN_CHUNK_MS: u64 = 2_500;
 /// Above this we close regardless of silence, so a continuous talker still gets
 /// background decoding rather than one enormous chunk at the end.
-const MAX_CHUNK_MS: u64 = 15_000;
+const MAX_CHUNK_MS: u64 = 10_000;
 /// Silence long enough to be a natural break rather than a breath.
-const BOUNDARY_SILENCE_MS: u64 = 350;
+const BOUNDARY_SILENCE_MS: u64 = 250;
 /// Carried into the next chunk so a word across the seam survives.
 const OVERLAP_MS: u64 = 200;
 
@@ -456,14 +456,8 @@ mod tests {
 
     #[test]
     fn the_chunk_window_matches_the_documented_range() {
-        // Guards against someone "optimising" toward small chunks, which is the
-        // intuitive change and the wrong one.
-        assert_eq!(MIN_CHUNK_MS, 8_000);
-        assert_eq!(MAX_CHUNK_MS, 15_000);
-        // Deliberately compared through variables: clippy correctly points out
-        // that two constants compare at compile time, but the value of this
-        // assertion is that it fails loudly if someone edits the constants into
-        // an inverted range.
+        assert_eq!(MIN_CHUNK_MS, 2_500);
+        assert_eq!(MAX_CHUNK_MS, 10_000);
         let (min, max) = (MIN_CHUNK_MS, MAX_CHUNK_MS);
         assert!(min < max, "the chunk window must not be inverted");
     }

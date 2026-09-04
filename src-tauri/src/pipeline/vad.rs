@@ -91,10 +91,6 @@ pub struct SpeechDetector {
     detector: Box<Detector>,
     /// Configurable sensitivity threshold (0.0 to 1.0). Default: 0.5.
     threshold: f32,
-    /// Estimated ambient background noise RMS floor.
-    ambient_noise_rms: f32,
-    /// Samples processed during the initial 1-second calibration window.
-    calibration_samples: usize,
     /// Samples of continuous silence immediately preceding the write head.
     silence_samples: usize,
     /// Voiced samples accumulated in the current chunk, counted only after
@@ -113,8 +109,6 @@ impl SpeechDetector {
         Self {
             detector: Detector::default_boxed(),
             threshold: SPEECH_THRESHOLD,
-            ambient_noise_rms: 0.0,
-            calibration_samples: 0,
             silence_samples: 0,
             voiced_samples: 0,
             onset_run: 0,
@@ -129,10 +123,9 @@ impl SpeechDetector {
     }
 
     /**
-     * WHAT:  Feeds samples through the detector, updating the silence run and noise floor.
+     * WHAT:  Feeds samples through the detector, updating the silence run and voice activity state.
      * WHY:   Accepts an arbitrary-length buffer and internally splits it into
-     *        the exact 256-sample frames the detector demands. Calibrates ambient
-     *        noise floor during the first 1-second of recording to suppress room tone.
+     *        the exact 256-sample frames the detector demands.
      * WHERE: Called by the chunker for every buffer of captured audio.
      */
     pub fn push(&mut self, samples: &[f32]) -> VadVerdict {
@@ -149,22 +142,8 @@ impl SpeechDetector {
             let frame = &self.remainder[consumed..consumed + VAD_FRAME_SAMPLES];
             consumed += VAD_FRAME_SAMPLES;
 
-            // Frame RMS energy
-            let frame_rms = (frame.iter().map(|&s| s * s).sum::<f32>() / frame.len() as f32).sqrt();
-
-            // Calibrate 1-second background noise floor baseline at session start
-            if self.calibration_samples < TARGET_SAMPLE_RATE as usize {
-                self.calibration_samples += VAD_FRAME_SAMPLES;
-                if self.ambient_noise_rms == 0.0 {
-                    self.ambient_noise_rms = frame_rms;
-                } else {
-                    self.ambient_noise_rms = (self.ambient_noise_rms * 0.9) + (frame_rms * 0.1);
-                }
-            }
-
             let score = self.detector.predict_f32(frame);
-            // Must exceed threshold and have energy above ambient noise baseline
-            let is_voice = score >= self.threshold && (self.ambient_noise_rms == 0.0 || frame_rms > self.ambient_noise_rms * 1.15);
+            let is_voice = score >= self.threshold;
 
             if is_voice {
                 self.silence_samples = 0;

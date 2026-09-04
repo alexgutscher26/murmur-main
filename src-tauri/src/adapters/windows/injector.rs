@@ -146,7 +146,7 @@ impl<P: PermissionProvider> WindowsInjector<P> {
         ];
 
         let sent1 = unsafe { SendInput(&paste_down, std::mem::size_of::<INPUT>() as i32) };
-        std::thread::sleep(Duration::from_millis(15));
+        std::thread::sleep(Duration::from_millis(5));
         let sent2 = unsafe { SendInput(&paste_up, std::mem::size_of::<INPUT>() as i32) };
 
         if sent1 != paste_down.len() as u32 || sent2 != paste_up.len() as u32 {

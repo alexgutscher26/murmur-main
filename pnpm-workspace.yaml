@@ -3,4 +3,6 @@ packages:
   - "website"
 
 allowBuilds:
-  - esbuild
+  '0': esbuild
+  esbuild: false
+  unrs-resolver: false
