@@ -82,9 +82,6 @@ jobs:
       - name: Generated bindings are current
         run: git diff --exit-code -- src/lib/bindings.ts
 
-      - name: Install Bun
-        uses: oven-sh/setup-bun@v2
-      
   frontend:
     name: Frontend — typecheck and build
     runs-on: macos-14
@@ -128,6 +125,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: src-tauri
+
+      - uses: oven-sh/setup-bun@v2
 
       - run: pnpm install --frozen-lockfile
 
