@@ -336,7 +336,7 @@ export function Dashboard() {
 
             {/* Secondary navigation */}
             <div className="flex flex-col gap-0.5">
-              <button
+              {/* <button
                 type="button"
                 onClick={() => {
                   void unwrapCommand(() =>
@@ -348,9 +348,9 @@ export function Dashboard() {
               >
                 <Users className="h-4 w-4 shrink-0" />
                 {!sidebarCollapsed && <span>Invite your team</span>}
-              </button>
+              </button> */}
 
-              <button
+              {/* <button
                 type="button"
                 onClick={() => {
                   void unwrapCommand(() =>
@@ -362,7 +362,7 @@ export function Dashboard() {
               >
                 <Gift className="h-4 w-4 shrink-0" />
                 {!sidebarCollapsed && <span>Get a free month</span>}
-              </button>
+              </button> */}
 
               <button
                 type="button"
