@@ -1,9 +1,9 @@
 /**
- * SOURCE OF TRUTH KEYWORDS: Dashboard, WhisperFlowShell, navItems, useHashRoute,
+ * SOURCE OF TRUTH KEYWORDS: Dashboard, MurmurShell, navItems, useHashRoute,
  *   dictationHotkey, StatsView, HistoryView, SettingsView, ShortcutsModal, ChangelogModal
- * WHAT:  The dashboard shell completely redesigned to match Whisper Flow:
+ * WHAT:  The dashboard shell redesigned with rich modern aesthetics:
  *        - Window bar with sidebar toggle, user avatar, bell
- *        - Expanded left sidebar (Flow branding, navigation items, words remaining
+ *        - Expanded left sidebar (Murmur branding, navigation items, words remaining
  *          quota card, team invite, free month, settings with badge, help)
  *        - Spacious rounded white canvas card hosting active views
  * WHERE: Mounted by src/entries/dashboard.tsx.
@@ -256,7 +256,7 @@ export function Dashboard() {
               </div>
               {!sidebarCollapsed && (
                 <span className="font-bold text-base tracking-tight text-stone-900 dark:text-white">
-                  Flow
+                  Murmur
                 </span>
               )}
             </div>
@@ -404,7 +404,7 @@ export function Dashboard() {
                 type="button"
                 onClick={() => {
                   void unwrapCommand(() =>
-                    commands.copyText({ text: "https://useflow.ai/invite/alex" }),
+                    commands.copyText({ text: "https://murmur.app/invite/alex" }),
                   ).then(() => showToast("Invite link copied to clipboard!"));
                 }}
                 className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors"
@@ -418,7 +418,7 @@ export function Dashboard() {
                 type="button"
                 onClick={() => {
                   void unwrapCommand(() =>
-                    commands.copyText({ text: "FLOW-FREE-MONTH" }),
+                    commands.copyText({ text: "MURMUR-FREE-MONTH" }),
                   ).then(() => showToast("Referral code copied!"));
                 }}
                 className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors"

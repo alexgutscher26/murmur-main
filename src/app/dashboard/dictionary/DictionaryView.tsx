@@ -1,10 +1,10 @@
 /**
- * SOURCE OF TRUTH KEYWORDS: DictionaryView, CustomVocabulary, FlowSpellsTheWayYouDo,
+ * SOURCE OF TRUTH KEYWORDS: DictionaryView, CustomVocabulary, MurmurSpellsTheWayYouDo,
  *   DictionaryEntry, AddWordModal, EditWordModal
- * WHAT:  Dedicated Whisper Flow Dictionary view:
+ * WHAT:  Dedicated Murmur Dictionary view:
  *        - Top bar with title "Dictionary" and "Add new" button
  *        - Tabs for "All", "Personal", and "Shared with team" with search, sort, and refresh
- *        - Ambient bokeh hero banner: "Flow spells the way you do." with sample tags
+ *        - Ambient bokeh hero banner: "Murmur spells the way you do." with sample tags
  *        - Clean, responsive vocabulary card list with AI sparkle icons and hover actions
  *        - Full CRUD support synced to Murmur's SQLite dictionary backend
  * WHERE: Rendered by Dashboard.tsx on route === "dictionary".
@@ -24,6 +24,9 @@ import {
   Users,
   User,
   Info,
+  BookOpen,
+  Code,
+  Sparkles,
 } from "lucide-react";
 import {
   commands,
@@ -33,8 +36,108 @@ import {
 import { unwrapCommand, useCommand } from "@/lib/ipc";
 import { cn } from "@/lib/utils";
 import { Skeleton, ErrorSurface } from "@/components/global";
+import { usePlan, getDictionaryWordLimit, canUseDomainPacks } from "@/lib/plan";
+import { RepoImporterModal } from "../settings/_components/RepoImporterModal";
 
-// ─── Initial Demo Words (matching Whisper Flow UI screenshot) ───────────────
+// ─── Domain Vocabulary Packs ────────────────────────────────────────────────
+
+export interface DomainPack {
+  id: string;
+  name: string;
+  badge: string;
+  badgeType: "developer" | "pro";
+  description: string;
+  entries: { pattern: string; replacement: string }[];
+}
+
+export const DOMAIN_PACKS: readonly DomainPack[] = [
+  {
+    id: "frontend-react",
+    name: "React, Next.js & Web",
+    badge: "Developer",
+    badgeType: "developer",
+    description: "Next.js, TypeScript, Tailwind CSS, Zustand, TanStack Query, tRPC, Vite, useEffect, useState.",
+    entries: [
+      { pattern: "next js", replacement: "Next.js" },
+      { pattern: "type script", replacement: "TypeScript" },
+      { pattern: "tailwind css", replacement: "Tailwind CSS" },
+      { pattern: "zoo stand", replacement: "Zustand" },
+      { pattern: "tan stack query", replacement: "TanStack Query" },
+      { pattern: "t r p c", replacement: "tRPC" },
+      { pattern: "use effect", replacement: "useEffect" },
+      { pattern: "use state", replacement: "useState" },
+      { pattern: "use callback", replacement: "useCallback" },
+      { pattern: "use memo", replacement: "useMemo" },
+    ],
+  },
+  {
+    id: "backend-systems",
+    name: "Backend, Python & Rust",
+    badge: "Developer",
+    badgeType: "developer",
+    description: "FastAPI, PyTorch, PostgreSQL, SQLite, Prisma, Docker, Tokio, Cargo, Serde, async/await.",
+    entries: [
+      { pattern: "fast a p i", replacement: "FastAPI" },
+      { pattern: "pie torch", replacement: "PyTorch" },
+      { pattern: "post gres", replacement: "PostgreSQL" },
+      { pattern: "sequel lite", replacement: "SQLite" },
+      { pattern: "prisma", replacement: "Prisma" },
+      { pattern: "tokyo", replacement: "Tokio" },
+      { pattern: "cube nettes", replacement: "Kubernetes" },
+      { pattern: "a sync", replacement: "async" },
+      { pattern: "a wait", replacement: "await" },
+    ],
+  },
+  {
+    id: "cloud-devops",
+    name: "Git, DevOps & Cloud",
+    badge: "Developer",
+    badgeType: "developer",
+    description: "GitHub Actions, CI/CD, Terraform, Cloudflare Workers, AWS, Kubernetes, pull request, merge conflict.",
+    entries: [
+      { pattern: "git hub actions", replacement: "GitHub Actions" },
+      { pattern: "c i c d", replacement: "CI/CD" },
+      { pattern: "terra form", replacement: "Terraform" },
+      { pattern: "cloud flare workers", replacement: "Cloudflare Workers" },
+      { pattern: "pull request", replacement: "PR" },
+      { pattern: "a p i endpoint", replacement: "API endpoint" },
+      { pattern: "web hook", replacement: "webhook" },
+    ],
+  },
+  {
+    id: "legal",
+    name: "Legal & Compliance",
+    badge: "Pro",
+    badgeType: "pro",
+    description: "Force majeure, indemnification, jurisdiction, GDPR, HIPAA, affidavit, subpoena, non-disclosure.",
+    entries: [
+      { pattern: "force major", replacement: "force majeure" },
+      { pattern: "g d p r", replacement: "GDPR" },
+      { pattern: "hipaa", replacement: "HIPAA" },
+      { pattern: "n d a", replacement: "NDA" },
+      { pattern: "affidavit", replacement: "affidavit" },
+      { pattern: "indemnification", replacement: "indemnification" },
+      { pattern: "sub poena", replacement: "subpoena" },
+    ],
+  },
+  {
+    id: "sales",
+    name: "Sales & Executive",
+    badge: "Pro",
+    badgeType: "pro",
+    description: "ARR, MRR, churn rate, SLA, pipeline velocity, CAC, LTV, quarterly touchpoints.",
+    entries: [
+      { pattern: "a r r", replacement: "ARR" },
+      { pattern: "m r r", replacement: "MRR" },
+      { pattern: "s l a", replacement: "SLA" },
+      { pattern: "c a c", replacement: "CAC" },
+      { pattern: "l t v", replacement: "LTV" },
+      { pattern: "touch points", replacement: "touchpoints" },
+    ],
+  },
+];
+
+// ─── Initial Demo Words ──────────────────────────────────────────────────────
 
 interface WordMetadata {
   sparkle?: boolean;
@@ -52,7 +155,7 @@ const SEED_TERMS = [
   { pattern: "etsy", replacement: "etsy", sparkle: true, scope: "personal" as const },
 ];
 
-const SUGGESTED_CHIPS = ["Wispr Flow", "Samir", "Sara", "Karol", "Spyder"];
+const SUGGESTED_CHIPS = ["Murmur", "Samir", "Sara", "Karol", "Spyder"];
 
 const SEED_FALLBACK: DictionaryEntry[] = SEED_TERMS.map((term, index) => ({
   id: -(index + 1),
@@ -110,12 +213,23 @@ function GoldenSparkleIcon({ className }: { className?: string }) {
 
 export function DictionaryView() {
   const entries = useCommand(commands.listDictionary, []);
-  const [activeTab, setActiveTab] = useState<"all" | "personal" | "team">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "personal" | "team" | "packs">("all");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortMode, setSortMode] = useState<"default" | "az" | "za" | "starred">("default");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Plan tier word limits & domain pack access (Starter: 25 words, Pro: unlimited)
+  const { tier, startTrial } = usePlan();
+  const count = entries.data?.length ?? 0;
+  const limit = getDictionaryWordLimit(tier);
+  const isLimitReached = count >= limit;
+  const hasDomainPackAccess = canUseDomainPacks(tier);
+
+  // Importer & Domain pack installation states
+  const [repoImporterOpen, setRepoImporterOpen] = useState(false);
+  const [installingPackId, setInstallingPackId] = useState<string | null>(null);
 
   const [bannerDismissed, setBannerDismissed] = useState<boolean>(() => {
     try {
@@ -136,6 +250,55 @@ export function DictionaryView() {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2400);
   }, []);
+
+  const installPack = useCallback(
+    async (pack: DomainPack) => {
+      if (!hasDomainPackAccess) {
+        startTrial();
+        return;
+      }
+      setInstallingPackId(pack.id);
+      try {
+        const newMeta = { ...meta };
+        let addedCount = 0;
+        for (const item of pack.entries) {
+          try {
+            await unwrapCommand(() =>
+              commands.createDictionaryEntry({
+                pattern: item.pattern,
+                replacement: item.replacement,
+                match_kind: "WORD",
+              }),
+            );
+            newMeta[item.replacement] = {
+              sparkle: true,
+              scope: "personal",
+              starred: false,
+            };
+            addedCount++;
+          } catch {
+            // ignore duplicate terms
+          }
+        }
+        saveLocalMeta(newMeta);
+        setMeta(newMeta);
+        showToast(`Installed "${pack.name}" (${addedCount} terms)`);
+        entries.reload();
+      } finally {
+        setInstallingPackId(null);
+      }
+    },
+    [hasDomainPackAccess, startTrial, meta, entries, showToast],
+  );
+
+  const isPackInstalled = useCallback(
+    (pack: DomainPack) => {
+      if (!entries.data || entries.data.length === 0) return false;
+      const dictWords = new Set(entries.data.map((e) => e.replacement.toLowerCase()));
+      return pack.entries.every((e) => dictWords.has(e.replacement.toLowerCase()));
+    },
+    [entries.data],
+  );
 
   // Auto-seed initial terms if dictionary is completely empty on first launch
   useEffect(() => {
@@ -227,6 +390,12 @@ export function DictionaryView() {
   };
 
   const handleQuickAddChip = async (chip: string) => {
+    if (isLimitReached) {
+      showToast("Word limit reached. Upgrade to Pro for unlimited words.");
+      startTrial();
+      return;
+    }
+
     const existing = (entries.data ?? []).some(
       (e) => e.replacement.toLowerCase() === chip.toLowerCase() || e.pattern.toLowerCase() === chip.toLowerCase()
     );
@@ -346,21 +515,73 @@ export function DictionaryView() {
 
       <div className="mx-auto w-full max-w-4xl flex flex-col gap-5">
         {/* ── Top Header Row ───────────────────────────────────────────── */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
-            Dictionary
-          </h1>
-          <button
-            type="button"
-            onClick={() => {
-              setPrefilledTerm("");
-              setAddModalOpen(true);
-            }}
-            className="flex items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-all active:scale-[0.98]"
-          >
-            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
-            <span>Add new</span>
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
+              Dictionary
+            </h1>
+            <div className="flex items-center gap-1.5 rounded-full border border-stone-200/80 bg-stone-50 px-2.5 py-1 text-[11px] font-mono text-stone-600 dark:border-stone-800 dark:bg-stone-900/60 dark:text-stone-300">
+              <span>Words:</span>
+              <strong className="text-stone-900 dark:text-white">{count}</strong>
+              <span>/</span>
+              <span>{limit === Infinity ? "Unlimited (Pro)" : `${limit} (Starter)`}</span>
+            </div>
+            {isLimitReached && (
+              <button
+                type="button"
+                onClick={startTrial}
+                className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 transition-colors"
+              >
+                <Sparkles className="size-3 text-amber-500" />
+                <span>Unlock Pro</span>
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setRepoImporterOpen(true)}
+              title="Import symbols and dependencies from a codebase"
+              className="flex items-center gap-1.5 rounded-xl border border-stone-200/80 bg-stone-50/80 px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-800 dark:bg-stone-900/80 dark:text-stone-300 dark:hover:bg-stone-800 transition-all active:scale-[0.98]"
+            >
+              <Code className="h-3.5 w-3.5 text-stone-500 dark:text-stone-400" />
+              <span>Import Codebase…</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab(activeTab === "packs" ? "all" : "packs")}
+              className={cn(
+                "flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all active:scale-[0.98]",
+                activeTab === "packs"
+                  ? "border-amber-500/50 bg-amber-500/15 text-amber-800 dark:text-amber-200 shadow-xs"
+                  : "border-stone-200/80 bg-stone-50/80 text-stone-700 hover:bg-stone-100 dark:border-stone-800 dark:bg-stone-900/80 dark:text-stone-300 dark:hover:bg-stone-800"
+              )}
+            >
+              <BookOpen className="h-3.5 w-3.5 text-stone-500 dark:text-stone-400" />
+              <span>Vocabulary Packs</span>
+              <span className="rounded-full bg-stone-200/70 dark:bg-stone-800 px-1.5 py-0.2 text-[10px] font-mono">
+                {DOMAIN_PACKS.length}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (isLimitReached) {
+                  startTrial();
+                  return;
+                }
+                setPrefilledTerm("");
+                setAddModalOpen(true);
+              }}
+              className="flex items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-all active:scale-[0.98]"
+            >
+              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+              <span>Add new</span>
+            </button>
+          </div>
         </div>
 
         {/* ── Tabs & Filter/Action Toolbar ─────────────────────────────── */}
@@ -412,6 +633,25 @@ export function DictionaryView() {
               >
                 Shared with team
                 {activeTab === "team" && (
+                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-stone-900 dark:bg-white rounded-full" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab("packs")}
+                className={cn(
+                  "pb-2.5 text-xs font-medium transition-colors relative flex items-center gap-1.5",
+                  activeTab === "packs"
+                    ? "text-stone-900 dark:text-white font-semibold"
+                    : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"
+                )}
+              >
+                <span>Vocabulary Packs</span>
+                <span className="rounded-full bg-stone-100 dark:bg-stone-800 px-1.5 py-0.2 text-[10px] font-mono text-stone-600 dark:text-stone-300">
+                  {DOMAIN_PACKS.length}
+                </span>
+                {activeTab === "packs" && (
                   <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-stone-900 dark:bg-white rounded-full" />
                 )}
               </button>
@@ -483,206 +723,366 @@ export function DictionaryView() {
           )}
         </div>
 
-        {/* ── Ambient Bokeh Hero Banner ─────────────────────────────────── */}
-        {!bannerDismissed && (
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#4d3326] via-[#332219] to-[#1c120c] p-7 shadow-sm transition-all animate-in fade-in slide-in-from-top-2 border border-[#5d4032]/40">
-            {/* Ambient Background Glows */}
-            <div className="pointer-events-none absolute -right-12 -top-12 h-64 w-64 rounded-full bg-amber-600/20 blur-3xl" />
-            <div className="pointer-events-none absolute -left-12 -bottom-12 h-48 w-48 rounded-full bg-orange-700/15 blur-2xl" />
-
-            {/* Dismiss Button */}
-            <button
-              type="button"
-              onClick={handleDismissBanner}
-              title="Dismiss banner"
-              className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-stone-300 hover:bg-white/20 hover:text-white transition-colors"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
-
-            {/* Banner Headline in Serif */}
-            <h2 className="font-serif text-2xl md:text-3xl font-normal text-stone-100 tracking-tight">
-              Flow spells the way <span className="italic font-serif">you</span> do.
-            </h2>
-
-            {/* Banner Description */}
-            <p className="mt-2.5 max-w-2xl text-xs leading-relaxed text-stone-300/90">
-              Flow learns your unique words and names — automatically or manually.{" "}
-              <strong className="font-semibold text-white">
-                Add personal terms, company jargon, client names, or industry-specific lingo.
-              </strong>{" "}
-              Share them with your team so everyone stays on the same page.
-            </p>
-
-            {/* Action Chips */}
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setPrefilledTerm("");
-                  setAddModalOpen(true);
-                }}
-                className="flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-stone-900 shadow-xs hover:bg-stone-100 transition-colors active:scale-95"
-              >
-                <span>Add new word</span>
-              </button>
-
-              {SUGGESTED_CHIPS.map((chip) => (
-                <button
-                  key={chip}
-                  type="button"
-                  onClick={() => handleQuickAddChip(chip)}
-                  title={`Add "${chip}" to dictionary`}
-                  className="rounded-full border border-white/10 bg-white/15 px-3.5 py-1.5 text-xs font-medium text-stone-200 backdrop-blur-sm hover:bg-white/25 hover:text-white transition-all active:scale-95"
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Small collapsed banner pill if dismissed */}
-        {bannerDismissed && (
-          <div className="flex items-center justify-between px-1 text-xs text-stone-400 dark:text-stone-500">
-            <span className="text-[11px]">
-              {displayedEntries.length} custom vocabulary term{displayedEntries.length === 1 ? "" : "s"}
-            </span>
-            <button
-              type="button"
-              onClick={handleRestoreBanner}
-              className="flex items-center gap-1 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
-            >
-              <Info className="h-3 w-3" />
-              <span>Show dictionary guide</span>
-            </button>
-          </div>
-        )}
-
-        {/* ── Dictionary Items Card List ────────────────────────────────── */}
-        <div className="overflow-hidden rounded-2xl border border-stone-200/80 bg-white dark:border-stone-800/80 dark:bg-[#161412] shadow-xs divide-y divide-stone-100 dark:divide-stone-800/50">
-          {entries.loading && displayedEntries.length === 0 ? (
-            <div className="p-6 space-y-4">
-              <Skeleton className="h-6 w-1/3" />
-              <Skeleton className="h-6 w-1/2" />
-              <Skeleton className="h-6 w-1/4" />
-            </div>
-          ) : displayedEntries.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-12 text-center">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-stone-400 mb-3">
-                <Search className="h-5 w-5" />
+        {/* ── Tab Content: Vocabulary Packs vs Dictionary Word List ──── */}
+        {activeTab === "packs" ? (
+          <div className="flex flex-col gap-4 animate-in fade-in slide-in-from-top-1">
+            {/* Domain Packs Header & Pro Banner */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-stone-200/80 bg-stone-50/60 p-5 dark:border-stone-800/80 dark:bg-stone-900/40">
+              <div>
+                <h3 className="text-base font-semibold text-stone-900 dark:text-white flex items-center gap-2">
+                  <BookOpen className="size-4 text-stone-600 dark:text-stone-300" />
+                  <span>Curated Developer & Domain Vocabulary Packs</span>
+                </h3>
+                <p className="mt-1 text-xs text-stone-500 dark:text-stone-400 max-w-xl leading-relaxed">
+                  1-click install specialized vocabulary sets for web frameworks, backend systems, DevOps pipelines, legal contracts, and SaaS metrics.
+                </p>
               </div>
-              <h3 className="text-sm font-semibold text-stone-800 dark:text-stone-200">
-                {searchQuery
-                  ? "No terms match your search"
-                  : activeTab === "team"
-                  ? "No team shared words yet"
-                  : "No words in dictionary"}
-              </h3>
-              <p className="mt-1 text-xs text-stone-500 dark:text-stone-400 max-w-sm">
-                {searchQuery
-                  ? `Clear your query "${searchQuery}" or add this term as a new replacement.`
-                  : activeTab === "team"
-                  ? "Share custom jargon and acronyms with your entire team so everyone stays aligned."
-                  : "Add your first unique term, name, or company jargon above."}
-              </p>
+
+              {!hasDomainPackAccess && (
+                <button
+                  type="button"
+                  onClick={startTrial}
+                  className="shrink-0 inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:from-amber-600 hover:to-orange-600 transition-all active:scale-95"
+                >
+                  <Sparkles className="size-3.5" />
+                  <span>Start Pro Trial for Packs</span>
+                </button>
+              )}
+            </div>
+
+            {/* Grid of Domain Packs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              {DOMAIN_PACKS.map((pack) => {
+                const installed = isPackInstalled(pack);
+                const isInstalling = installingPackId === pack.id;
+
+                return (
+                  <div
+                    key={pack.id}
+                    className="flex flex-col justify-between rounded-2xl border border-stone-200/80 bg-white p-4.5 dark:border-stone-800/80 dark:bg-[#161412] shadow-xs hover:shadow-sm transition-all"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-semibold text-stone-900 dark:text-white">
+                            {pack.name}
+                          </h4>
+                          <span
+                            className={cn(
+                              "rounded-full px-2 py-0.5 text-[10px] font-mono font-medium",
+                              pack.badgeType === "pro"
+                                ? "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60"
+                                : "bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900/50"
+                            )}
+                          >
+                            {pack.badge}
+                          </span>
+                        </div>
+                        <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] font-mono text-stone-500 dark:bg-stone-800 dark:text-stone-400">
+                          {pack.entries.length} terms
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-stone-500 dark:text-stone-400 leading-relaxed">
+                        {pack.description}
+                      </p>
+
+                      {/* Term chips preview */}
+                      <div className="mt-3 flex flex-wrap gap-1.5">
+                        {pack.entries.map((item) => (
+                          <span
+                            key={item.replacement}
+                            className="rounded-md border border-stone-200/60 bg-stone-50/80 px-2 py-0.5 text-[10px] font-mono text-stone-700 dark:border-stone-800 dark:bg-stone-900/60 dark:text-stone-300"
+                          >
+                            {item.replacement}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-stone-100 dark:border-stone-800/60 flex items-center justify-between">
+                      <span className="text-[11px] text-stone-400 dark:text-stone-500">
+                        {installed ? "All terms installed" : `${pack.entries.length} replacements`}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => void installPack(pack)}
+                        disabled={installed || isInstalling}
+                        className={cn(
+                          "flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all active:scale-95",
+                          installed
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 cursor-default"
+                            : hasDomainPackAccess
+                            ? "bg-stone-900 text-white hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white shadow-xs"
+                            : "border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+                        )}
+                      >
+                        {installed ? (
+                          <>
+                            <Check className="size-3.5 stroke-[2.5]" />
+                            <span>Installed</span>
+                          </>
+                        ) : isInstalling ? (
+                          <>
+                            <RotateCw className="size-3.5 animate-spin" />
+                            <span>Installing…</span>
+                          </>
+                        ) : hasDomainPackAccess ? (
+                          <>
+                            <Plus className="size-3.5 stroke-[2.5]" />
+                            <span>Add Pack</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="size-3.5 text-amber-600 dark:text-amber-400" />
+                            <span>Unlock with Pro</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* ── Ambient Bokeh Hero Banner ─────────────────────────────────── */}
+            {!bannerDismissed && (
+              <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#4d3326] via-[#332219] to-[#1c120c] p-7 shadow-sm transition-all animate-in fade-in slide-in-from-top-2 border border-[#5d4032]/40">
+                {/* Ambient Background Glows */}
+                <div className="pointer-events-none absolute -right-12 -top-12 h-64 w-64 rounded-full bg-amber-600/20 blur-3xl" />
+                <div className="pointer-events-none absolute -left-12 -bottom-12 h-48 w-48 rounded-full bg-orange-700/15 blur-2xl" />
+
+                {/* Dismiss Button */}
+                <button
+                  type="button"
+                  onClick={handleDismissBanner}
+                  title="Dismiss banner"
+                  className="absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-stone-300 hover:bg-white/20 hover:text-white transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+
+                {/* Banner Headline in Serif */}
+                <h2 className="font-serif text-2xl md:text-3xl font-normal text-stone-100 tracking-tight">
+                  Murmur spells the way <span className="italic font-serif">you</span> do.
+                </h2>
+
+                {/* Banner Description */}
+                <p className="mt-2.5 max-w-2xl text-xs leading-relaxed text-stone-300/90">
+                  Murmur learns your unique words and names — automatically or manually.{" "}
+                  <strong className="font-semibold text-white">
+                    Add personal terms, company jargon, client names, or industry-specific lingo.
+                  </strong>{" "}
+                  Share them with your team so everyone stays on the same page.
+                </p>
+
+                {/* Action Chips */}
+                <div className="mt-5 flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isLimitReached) {
+                        startTrial();
+                        return;
+                      }
+                      setPrefilledTerm("");
+                      setAddModalOpen(true);
+                    }}
+                    className="flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-stone-900 shadow-xs hover:bg-stone-100 transition-colors active:scale-95"
+                  >
+                    <span>Add new word</span>
+                  </button>
+
+                  {SUGGESTED_CHIPS.map((chip) => (
+                    <button
+                      key={chip}
+                      type="button"
+                      onClick={() => handleQuickAddChip(chip)}
+                      title={`Add "${chip}" to dictionary`}
+                      className="rounded-full border border-white/10 bg-white/15 px-3.5 py-1.5 text-xs font-medium text-stone-200 backdrop-blur-sm hover:bg-white/25 hover:text-white transition-all active:scale-95"
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Quick Vocabulary Packs Promotion Bar */}
+            <div className="flex items-center justify-between rounded-xl border border-stone-200/70 bg-stone-50/70 px-4 py-2.5 text-xs dark:border-stone-800/70 dark:bg-stone-900/40">
+              <div className="flex items-center gap-2 text-stone-600 dark:text-stone-300">
+                <BookOpen className="size-3.5 text-stone-400" />
+                <span>Looking for curated web stacks, Rust, DevOps, or legal packs?</span>
+              </div>
               <button
                 type="button"
-                onClick={() => {
-                  setPrefilledTerm(searchQuery);
-                  setAddModalOpen(true);
-                }}
-                className="mt-4 flex items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-colors"
+                onClick={() => setActiveTab("packs")}
+                className="font-medium text-stone-900 dark:text-white underline hover:opacity-80 transition-opacity"
               >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Add new word</span>
+                Browse {DOMAIN_PACKS.length} Domain Packs →
               </button>
             </div>
-          ) : (
-            displayedEntries.map((entry) => {
-              const term = entry.replacement || entry.pattern;
-              const itemMeta = meta[entry.replacement] || meta[entry.pattern] || {};
-              // Sparkle is true if marked in metadata, or pattern/replacement matches tech names
-              const hasSparkle = itemMeta.sparkle ?? (
-                entry.pattern.toLowerCase() === "supabase" ||
-                entry.pattern.toLowerCase() === "expo" ||
-                entry.pattern.toLowerCase() === "stackauth" ||
-                entry.pattern.toLowerCase() === "questhow" ||
-                entry.pattern.toLowerCase() === "etsy"
-              );
-              const isStarred = !!itemMeta.starred;
 
-              return (
-                <div
-                  key={entry.id}
-                  className="group flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-stone-50/80 dark:hover:bg-stone-800/40"
+            {/* Small collapsed banner pill if dismissed */}
+            {bannerDismissed && (
+              <div className="flex items-center justify-between px-1 text-xs text-stone-400 dark:text-stone-500">
+                <span className="text-[11px]">
+                  {displayedEntries.length} custom vocabulary term{displayedEntries.length === 1 ? "" : "s"}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRestoreBanner}
+                  className="flex items-center gap-1 hover:text-stone-600 dark:hover:text-stone-300 transition-colors"
                 >
-                  {/* Left: Term text + Sparkle icon */}
-                  <div className="flex items-center gap-2 min-w-0 pr-4">
-                    <span className="text-xs font-medium text-stone-800 dark:text-stone-200 select-text truncate">
-                      {term}
-                    </span>
-                    {hasSparkle && (
-                      <GoldenSparkleIcon className="h-3.5 w-3.5 drop-shadow-xs" />
-                    )}
-                    {entry.pattern !== entry.replacement && (
-                      <span className="text-[10px] text-stone-400 dark:text-stone-500 font-mono">
-                        (heard as: {entry.pattern})
-                      </span>
-                    )}
-                    {itemMeta.scope === "team" && (
-                      <span className="rounded-md bg-stone-100 dark:bg-stone-800 px-1.5 py-0.5 text-[10px] text-stone-500 font-medium flex items-center gap-1">
-                        <Users className="h-2.5 w-2.5" />
-                        Team
-                      </span>
-                    )}
-                  </div>
+                  <Info className="h-3 w-3" />
+                  <span>Show dictionary guide</span>
+                </button>
+              </div>
+            )}
 
-                  {/* Right: Hover action icons (Edit, Delete, Star) */}
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-                    <button
-                      type="button"
-                      onClick={() => setEditingEntry(entry)}
-                      title="Edit word"
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-200/60 hover:text-stone-800 dark:hover:bg-stone-700/60 dark:hover:text-stone-200 transition-colors"
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(entry)}
-                      title="Delete word"
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40 dark:hover:text-red-400 transition-colors"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => toggleStar(term)}
-                      title={isStarred ? "Remove star" : "Star word"}
-                      className={cn(
-                        "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
-                        isStarred
-                          ? "text-amber-500 hover:text-amber-600"
-                          : "text-stone-400 hover:bg-stone-200/60 hover:text-amber-500 dark:hover:bg-stone-700/60"
-                      )}
-                    >
-                      <Star
-                        className={cn(
-                          "h-3.5 w-3.5",
-                          isStarred && "fill-amber-400 text-amber-500"
-                        )}
-                      />
-                    </button>
-                  </div>
+            {/* ── Dictionary Items Card List ────────────────────────────────── */}
+            <div className="overflow-hidden rounded-2xl border border-stone-200/80 bg-white dark:border-stone-800/80 dark:bg-[#161412] shadow-xs divide-y divide-stone-100 dark:divide-stone-800/50">
+              {entries.loading && displayedEntries.length === 0 ? (
+                <div className="p-6 space-y-4">
+                  <Skeleton className="h-6 w-1/3" />
+                  <Skeleton className="h-6 w-1/2" />
+                  <Skeleton className="h-6 w-1/4" />
                 </div>
-              );
-            })
-          )}
-        </div>
+              ) : displayedEntries.length === 0 ? (
+                <div className="flex flex-col items-center justify-center p-12 text-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-stone-100 dark:bg-stone-800 text-stone-400 mb-3">
+                    <Search className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-stone-800 dark:text-stone-200">
+                    {searchQuery
+                      ? "No terms match your search"
+                      : activeTab === "team"
+                      ? "No team shared words yet"
+                      : "No words in dictionary"}
+                  </h3>
+                  <p className="mt-1 text-xs text-stone-500 dark:text-stone-400 max-w-sm">
+                    {searchQuery
+                      ? `Clear your query "${searchQuery}" or add this term as a new replacement.`
+                      : activeTab === "team"
+                      ? "Share custom jargon and acronyms with your entire team so everyone stays aligned."
+                      : "Add your first unique term, name, or company jargon above."}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isLimitReached) {
+                        startTrial();
+                        return;
+                      }
+                      setPrefilledTerm(searchQuery);
+                      setAddModalOpen(true);
+                    }}
+                    className="mt-4 flex items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-colors"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    <span>Add new word</span>
+                  </button>
+                </div>
+              ) : (
+                displayedEntries.map((entry) => {
+                  const term = entry.replacement || entry.pattern;
+                  const itemMeta = meta[entry.replacement] || meta[entry.pattern] || {};
+                  // Sparkle is true if marked in metadata, or pattern/replacement matches tech names
+                  const hasSparkle = itemMeta.sparkle ?? (
+                    entry.pattern.toLowerCase() === "supabase" ||
+                    entry.pattern.toLowerCase() === "expo" ||
+                    entry.pattern.toLowerCase() === "stackauth" ||
+                    entry.pattern.toLowerCase() === "questhow" ||
+                    entry.pattern.toLowerCase() === "etsy"
+                  );
+                  const isStarred = !!itemMeta.starred;
+
+                  return (
+                    <div
+                      key={entry.id}
+                      className="group flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-stone-50/80 dark:hover:bg-stone-800/40"
+                    >
+                      {/* Left: Term text + Sparkle icon */}
+                      <div className="flex items-center gap-2 min-w-0 pr-4">
+                        <span className="text-xs font-medium text-stone-800 dark:text-stone-200 select-text truncate">
+                          {term}
+                        </span>
+                        {hasSparkle && (
+                          <GoldenSparkleIcon className="h-3.5 w-3.5 drop-shadow-xs" />
+                        )}
+                        {entry.pattern !== entry.replacement && (
+                          <span className="text-[10px] text-stone-400 dark:text-stone-500 font-mono">
+                            (heard as: {entry.pattern})
+                          </span>
+                        )}
+                        {itemMeta.scope === "team" && (
+                          <span className="rounded-md bg-stone-100 dark:bg-stone-800 px-1.5 py-0.5 text-[10px] text-stone-500 font-medium flex items-center gap-1">
+                            <Users className="h-2.5 w-2.5" />
+                            Team
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Right: Hover action icons (Edit, Delete, Star) */}
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                        <button
+                          type="button"
+                          onClick={() => setEditingEntry(entry)}
+                          title="Edit word"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-200/60 hover:text-stone-800 dark:hover:bg-stone-700/60 dark:hover:text-stone-200 transition-colors"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(entry)}
+                          title="Delete word"
+                          className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/40 dark:hover:text-red-400 transition-colors"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => toggleStar(term)}
+                          title={isStarred ? "Remove star" : "Star word"}
+                          className={cn(
+                            "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
+                            isStarred
+                              ? "text-amber-500 hover:text-amber-600"
+                              : "text-stone-400 hover:bg-stone-200/60 hover:text-amber-500 dark:hover:bg-stone-700/60"
+                          )}
+                        >
+                          <Star
+                            className={cn(
+                              "h-3.5 w-3.5",
+                              isStarred && "fill-amber-400 text-amber-500"
+                            )}
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </>
+        )}
       </div>
+
+      {/* ── Codebase Repo Importer Modal ───────────────────────────────── */}
+      <RepoImporterModal
+        isOpen={repoImporterOpen}
+        onClose={() => setRepoImporterOpen(false)}
+        onImported={() => {
+          entries.reload();
+          showToast("Imported symbols from repository into dictionary!");
+        }}
+      />
 
       {/* ── Add Word Modal ────────────────────────────────────────────── */}
       {addModalOpen && (
@@ -690,11 +1090,17 @@ export function DictionaryView() {
           title="Add Word to Dictionary"
           submitLabel="Add word"
           initialTerm={prefilledTerm}
+          isLimitReached={isLimitReached}
+          onUpgrade={startTrial}
           onClose={() => {
             setAddModalOpen(false);
             setPrefilledTerm("");
           }}
           onSave={async ({ word, heardAs, matchKind, isSparkle, scope }) => {
+            if (isLimitReached) {
+              startTrial();
+              return;
+            }
             await unwrapCommand(() =>
               commands.createDictionaryEntry({
                 pattern: heardAs || word,
@@ -769,6 +1175,8 @@ interface WordModalProps {
   initialMatchKind?: MatchKind;
   initialSparkle?: boolean;
   initialScope?: "personal" | "team";
+  isLimitReached?: boolean;
+  onUpgrade?: () => void;
   onClose: () => void;
   onSave: (data: {
     word: string;
@@ -787,6 +1195,8 @@ function WordModal({
   initialMatchKind = "WORD",
   initialSparkle = true,
   initialScope = "personal",
+  isLimitReached = false,
+  onUpgrade,
   onClose,
   onSave,
 }: WordModalProps) {
@@ -844,6 +1254,24 @@ function WordModal({
             </div>
           )}
 
+          {isLimitReached && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-800 dark:text-amber-300 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Sparkles className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                <span className="truncate">Starter plan limited to 25 custom words.</span>
+              </div>
+              {onUpgrade && (
+                <button
+                  type="button"
+                  onClick={onUpgrade}
+                  className="shrink-0 rounded-lg bg-amber-600 px-2.5 py-1 font-semibold text-white hover:bg-amber-700 transition-colors"
+                >
+                  Upgrade to Pro
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Word Field */}
           <div>
             <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1">
@@ -853,7 +1281,7 @@ function WordModal({
               type="text"
               value={word}
               onChange={(e) => setWord(e.target.value)}
-              placeholder="e.g. Supabase, Alex Gutscher, Wispr Flow"
+              placeholder="e.g. Supabase, Alex Gutscher, Murmur"
               autoFocus
               className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
             />
@@ -952,7 +1380,7 @@ function WordModal({
             </button>
             <button
               type="submit"
-              disabled={isSaving}
+              disabled={isSaving || isLimitReached}
               className="flex items-center gap-1.5 rounded-xl bg-stone-900 px-4 py-1.5 text-xs font-semibold text-white hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-colors disabled:opacity-50"
             >
               {isSaving && <RotateCw className="h-3.5 w-3.5 animate-spin" />}

@@ -33,18 +33,17 @@ import { ErrorSurface, SettingControl, Skeleton, EmptyState } from "@/components
 import type { SettingOption } from "@/components/global";
 import { PermissionNotice } from "./_components/PermissionNotice";
 import { ModelManager } from "./_components/ModelManager";
-import { DictionaryManager } from "./_components/DictionaryManager";
 import { AppProfiles } from "./_components/AppProfiles";
 import { SettingsBackup } from "./_components/SettingsBackup";
 import { WpmCalibrationWizard } from "../_components/WpmCalibrationWizard";
 import { toControlSetting, type DynamicOptions } from "./to-setting-def";
+import { navigateTo } from "../use-hash-route";
 
 /** Presentation order and wording */
 const SECTION_ORDER: readonly SettingSection[] = [
   "RECORDING",
   "TRANSCRIPTION",
   "OUTPUT",
-  "VOCABULARY",
   "PRIVACY",
   "GENERAL",
 ];
@@ -76,6 +75,10 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
 
   useLayoutEffect(() => {
     if (section && containerRef.current) {
+      if (section.toLowerCase() === "dictionary" || section.toLowerCase() === "vocabulary") {
+        navigateTo("dictionary");
+        return;
+      }
       const target = containerRef.current.querySelector(`[data-section="${section.toLowerCase()}"]`);
       if (target) {
         target.scrollIntoView({ behavior: "smooth" });
@@ -275,11 +278,10 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
 }
 
 /** Panels that are not settings but belong inside a section. */
-type SectionPanel = "MODELS_PANEL" | "DICTIONARY_PANEL" | "PRIVACY_PANEL";
+type SectionPanel = "MODELS_PANEL" | "PRIVACY_PANEL";
 
 const EXTRAS: Partial<Record<SettingSection, SectionPanel>> = {
   TRANSCRIPTION: "MODELS_PANEL",
-  VOCABULARY: "DICTIONARY_PANEL",
   PRIVACY: "PRIVACY_PANEL",
 };
 
@@ -431,11 +433,6 @@ function SettingsSection({
       {extra === "MODELS_PANEL" ? (
         <div data-section="models">
           <ModelManager />
-        </div>
-      ) : null}
-      {extra === "DICTIONARY_PANEL" ? (
-        <div data-section="dictionary">
-          <DictionaryManager />
         </div>
       ) : null}
       {extra === "PRIVACY_PANEL" ? <PrivacyControls /> : null}
