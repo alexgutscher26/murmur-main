@@ -15,7 +15,6 @@ import {
   BookOpen,
   CircleDot,
   FileText,
-  Gift,
   HelpCircle,
   Mic,
   PanelLeft,
@@ -23,12 +22,12 @@ import {
   Settings,
   Type,
   User,
-  Users,
   WandSparkles,
   X,
   Gauge,
   Check,
   ArrowRight,
+  ShieldCheck,
 } from "lucide-react";
 import {
   commands,
@@ -37,7 +36,7 @@ import {
   type RegistrySnapshot,
   type SettingValue,
 } from "@/lib/bindings";
-import { useCommand, unwrapCommand } from "@/lib/ipc";
+import { useCommand } from "@/lib/ipc";
 import { useSettings } from "./use-settings";
 import {
   ErrorBoundary,
@@ -98,6 +97,7 @@ export function Dashboard() {
     typeof settings.data?.["general.onboarding_step_index"]?.value === "number"
       ? (settings.data["general.onboarding_step_index"].value as number)
       : 0;
+  const isAirGapped = settings.data?.["privacy.air_gap_mode"]?.value === true;
 
   useTauriEvent(navSelectedChannel, (payload) => navigateTo(payload.route));
 
@@ -217,9 +217,22 @@ export function Dashboard() {
           </button>
         </div>
 
-        {/* Top Center: Habit Streak Tracker */}
-        <div data-tauri-drag-region={false} className="flex items-center">
+        {/* Top Center: Habit Streak Tracker & Air Gap Isolation Badge */}
+        <div data-tauri-drag-region={false} className="flex items-center gap-2.5">
           <StreakHeaderBadge />
+          {isAirGapped && (
+            <div
+              title="Air-Gap / Hardware Isolation Mode Active: All outbound networking and update checks are disabled."
+              className="flex items-center gap-1.5 rounded-full border border-emerald-300/80 bg-emerald-50/90 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800 shadow-xs dark:border-emerald-700/60 dark:bg-emerald-950/50 dark:text-emerald-300"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+              <span>Air-Gapped</span>
+            </div>
+          )}
         </div>
 
         {/* Top Right: Notifications */}

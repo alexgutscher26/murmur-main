@@ -22,12 +22,24 @@ pub fn normalise_punctuation(text: &str) -> String {
                 }
                 out.push(' ');
             }
-            c if matches!(c, '.' | ',' | '!' | '?') => {
+            '.' => {
+                let mut dots = 1;
+                while chars.peek() == Some(&'.') {
+                    chars.next();
+                    dots += 1;
+                }
+                if dots == 1 || dots == 2 {
+                    // Accidental double-period (e.g. ASR + LLM post-processor collision): collapse to single '.'
+                    out.push('.');
+                } else {
+                    // 3 or more dots: preserve ellipsis "..."
+                    out.push_str("...");
+                }
+            }
+            c if matches!(c, ',' | '!' | '?') => {
                 out.push(c);
-                if c != '.' {
-                    while chars.peek() == Some(&c) {
-                        chars.next();
-                    }
+                while chars.peek() == Some(&c) {
+                    chars.next();
                 }
             }
             c => out.push(c),
@@ -38,19 +50,37 @@ pub fn normalise_punctuation(text: &str) -> String {
 }
 
 /**
+ * WHAT: Strips trailing punctuation (periods, exclamation marks, question marks, commas, colons, semicolons, ellipsis)
+ *       from transcript/ASR output before feeding to an LLM post-processor.
+ * WHY:  When both ASR and LLM post-processor append terminal punctuation, doubled punctuation ("word..")
+ *       is produced. Stripping trailing punctuation from the ASR prompt input avoids this collision.
+ */
+pub fn strip_trailing_punctuation(text: &str) -> &str {
+    let trimmed = text.trim_end();
+    trimmed.trim_end_matches(|c: char| matches!(c, '.' | ',' | '!' | '?' | ';' | ':' | '…' | '‽'))
+}
+
+/**
  * WHAT:  Capitalises the first letter of the text and of each new sentence.
  */
 pub fn capitalise_sentences(text: &str) -> String {
     let mut out = String::with_capacity(text.len());
     let mut capitalise_next = true;
+    let chars: Vec<char> = text.chars().collect();
 
-    for ch in text.chars() {
+    for i in 0..chars.len() {
+        let ch = chars[i];
         if capitalise_next && ch.is_alphabetic() {
             out.extend(ch.to_uppercase());
             capitalise_next = false;
         } else {
             out.push(ch);
-            if matches!(ch, '.' | '!' | '?' | '\n') {
+            if ch == '.' {
+                let next_is_alphanumeric = i + 1 < chars.len() && chars[i + 1].is_alphanumeric();
+                if !next_is_alphanumeric {
+                    capitalise_next = true;
+                }
+            } else if matches!(ch, '!' | '?' | '\n') {
                 capitalise_next = true;
             }
         }

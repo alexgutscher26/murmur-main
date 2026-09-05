@@ -71,3 +71,18 @@ pub struct DictionaryEntry {
     #[specta(type = Option<TsNumber>)]
     pub used_at: Option<i64>,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+pub struct DictionaryChangeLogEntry {
+    pub id: DictionaryId,
+    #[specta(type = Option<TsNumber>)]
+    pub entry_id: Option<i64>,
+    pub action: String, // "added" | "updated" | "deleted"
+    pub pattern: String,
+    pub replacement: String,
+    pub match_kind: MatchKind,
+    pub prev_replacement: Option<String>,
+    pub prev_match_kind: Option<MatchKind>,
+    #[specta(type = TsNumber)]
+    pub timestamp: i64,
+}

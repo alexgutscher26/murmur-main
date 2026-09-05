@@ -27,9 +27,12 @@ import {
   BookOpen,
   Code,
   Sparkles,
+  History,
+  Undo2,
 } from "lucide-react";
 import {
   commands,
+  type DictionaryChangeLogEntry,
   type DictionaryEntry,
   type MatchKind,
 } from "@/lib/bindings";
@@ -229,6 +232,7 @@ export function DictionaryView() {
 
   // Importer & Domain pack installation states
   const [repoImporterOpen, setRepoImporterOpen] = useState(false);
+  const [changelogOpen, setChangelogOpen] = useState(false);
   const [installingPackId, setInstallingPackId] = useState<string | null>(null);
 
   const [bannerDismissed, setBannerDismissed] = useState<boolean>(() => {
@@ -521,6 +525,16 @@ export function DictionaryView() {
           </h1>
 
           <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setChangelogOpen(true)}
+              title="View dictionary version history and undo changes"
+              className="flex h-8 items-center gap-1.5 rounded-xl border border-stone-200/90 bg-stone-50/80 px-3 text-xs font-semibold text-stone-700 shadow-2xs hover:bg-stone-100 hover:text-stone-900 dark:border-stone-800 dark:bg-stone-900/60 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-white transition-all active:scale-[0.98]"
+            >
+              <History className="h-3.5 w-3.5 text-stone-400 dark:text-stone-500" />
+              <span>History & Undo</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setRepoImporterOpen(true)}
@@ -1075,6 +1089,16 @@ export function DictionaryView() {
         }}
       />
 
+      {/* ── Dictionary Changelog & Undo Modal ──────────────────────────── */}
+      <DictionaryChangelogModal
+        isOpen={changelogOpen}
+        onClose={() => setChangelogOpen(false)}
+        onUndoSuccess={() => {
+          entries.reload();
+        }}
+        showToast={showToast}
+      />
+
       {/* ── Add Word Modal ────────────────────────────────────────────── */}
       {addModalOpen && (
         <WordModal
@@ -1379,6 +1403,233 @@ function WordModal({
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  );
+}
+
+// ─── Dictionary Changelog & Undo Modal ──────────────────────────────────────
+
+interface DictionaryChangelogModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onUndoSuccess: () => void;
+  showToast: (msg: string) => void;
+}
+
+function DictionaryChangelogModal({
+  isOpen,
+  onClose,
+  onUndoSuccess,
+  showToast,
+}: DictionaryChangelogModalProps) {
+  const [history, setHistory] = useState<DictionaryChangeLogEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [undoingId, setUndoingId] = useState<number | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
+
+  const loadHistory = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await unwrapCommand(() =>
+        commands.listDictionaryChangelog({ limit: 100 })
+      );
+      if (res.status === "ok") {
+        setHistory(res.data);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      void loadHistory();
+    }
+  }, [isOpen, loadHistory]);
+
+  const handleUndo = async (item: DictionaryChangeLogEntry) => {
+    setUndoingId(item.id);
+    try {
+      const res = await unwrapCommand(() =>
+        commands.undoDictionaryChange({ changelog_id: item.id })
+      );
+      if (res.status === "ok") {
+        showToast(`Undid change for "${item.pattern}"`);
+        await loadHistory();
+        onUndoSuccess();
+      } else {
+        showToast(`Undo failed: ${res.error.message}`);
+      }
+    } catch (e: any) {
+      showToast(`Undo failed: ${e?.message || "Unknown error"}`);
+    } finally {
+      setUndoingId(null);
+    }
+  };
+
+  const handleClear = async () => {
+    if (!confirm("Are you sure you want to clear the dictionary changelog history?")) return;
+    setIsClearing(true);
+    try {
+      const res = await unwrapCommand(() => commands.clearDictionaryChangelog());
+      if (res.status === "ok") {
+        showToast("Changelog history cleared");
+        setHistory([]);
+      } else {
+        showToast(`Failed to clear changelog: ${res.error.message}`);
+      }
+    } catch (e: any) {
+      showToast(`Failed to clear changelog: ${e?.message || "Unknown error"}`);
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="w-full max-w-xl rounded-2xl border border-stone-200 bg-white p-6 shadow-xl dark:border-stone-800 dark:bg-[#1b1917] animate-in zoom-in-95 duration-150 max-h-[85vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-stone-800">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300">
+              <History className="h-4 w-4" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-stone-900 dark:text-white">
+                Dictionary Versioning & History
+              </h2>
+              <p className="text-xs text-stone-500 dark:text-stone-400">
+                Track modifications over time and undo accidental imports or edits.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:hover:bg-stone-800 dark:hover:text-stone-200 transition-colors"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Toolbar inside modal */}
+        <div className="flex items-center justify-between py-3 text-xs text-stone-500 dark:text-stone-400 border-b border-stone-100/80 dark:border-stone-800/80">
+          <span>
+            {history.length} {history.length === 1 ? "entry" : "entries"} recorded
+          </span>
+          {history.length > 0 && (
+            <button
+              type="button"
+              onClick={handleClear}
+              disabled={isClearing}
+              className="text-[11px] font-medium text-stone-500 hover:text-rose-600 dark:text-stone-400 dark:hover:text-rose-400 transition-colors"
+            >
+              Clear changelog
+            </button>
+          )}
+        </div>
+
+        {/* Timeline body */}
+        <div className="flex-1 overflow-y-auto py-3 pr-1 space-y-2.5">
+          {isLoading ? (
+            <div className="flex flex-col gap-2 py-6 items-center justify-center text-xs text-stone-400">
+              <RotateCw className="h-4 w-4 animate-spin" />
+              <span>Loading history…</span>
+            </div>
+          ) : history.length === 0 ? (
+            <div className="py-12 text-center text-xs text-stone-400 dark:text-stone-500">
+              No dictionary changes recorded yet. Changes you make will appear here with one-click undo.
+            </div>
+          ) : (
+            history.map((item) => {
+              const isAdded = item.action === "added";
+              const isUpdated = item.action === "updated";
+
+              const badgeColor = isAdded
+                ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
+                : isUpdated
+                ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
+                : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800";
+
+              const actionLabel = isAdded ? "Added" : isUpdated ? "Updated" : "Deleted";
+
+              const dateStr = new Date(item.timestamp).toLocaleString(undefined, {
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "2-digit",
+                second: "2-digit",
+              });
+
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between rounded-xl border border-stone-200/80 bg-stone-50/50 p-3 text-xs transition-colors hover:bg-stone-50 dark:border-stone-800/80 dark:bg-stone-900/40 dark:hover:bg-stone-900/70"
+                >
+                  <div className="flex flex-col gap-1 min-w-0 pr-3">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={cn(
+                          "rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
+                          badgeColor
+                        )}
+                      >
+                        {actionLabel}
+                      </span>
+                      <span className="font-semibold text-stone-900 dark:text-white truncate">
+                        "{item.pattern}" &rarr; "{item.replacement}"
+                      </span>
+                      <span className="text-[10px] text-stone-400 dark:text-stone-500 font-mono">
+                        [{item.match_kind.toLowerCase()}]
+                      </span>
+                    </div>
+
+                    {isUpdated && item.prev_replacement && (
+                      <div className="text-[11px] text-stone-500 dark:text-stone-400 pl-1">
+                        Previous: <span className="line-through">{item.prev_replacement}</span>
+                      </div>
+                    )}
+
+                    <div className="text-[10px] text-stone-400 dark:text-stone-500 pl-1">
+                      {dateStr}
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleUndo(item)}
+                    disabled={undoingId === item.id}
+                    title="Undo this change"
+                    className="flex h-7 shrink-0 items-center gap-1 rounded-lg border border-stone-200 bg-white px-2.5 text-[11px] font-semibold text-stone-700 shadow-2xs hover:bg-stone-100 hover:text-stone-900 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700 dark:hover:text-white transition-all active:scale-[0.97] disabled:opacity-50"
+                  >
+                    {undoingId === item.id ? (
+                      <RotateCw className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Undo2 className="h-3 w-3 text-stone-500 dark:text-stone-400" />
+                    )}
+                    <span>Undo</span>
+                  </button>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="pt-3 border-t border-stone-100 dark:border-stone-800 flex justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl bg-stone-900 px-4 py-1.5 text-xs font-semibold text-white hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-colors"
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
   );

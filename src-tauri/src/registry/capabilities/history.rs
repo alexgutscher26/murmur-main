@@ -54,6 +54,13 @@ pub fn history_capability() -> Capability {
                 SettingSection::Privacy,
                 false,
             ),
+            toggle(
+                keys::AIR_GAP_MODE,
+                "Air-Gap / Hardware Isolation Mode",
+                "Hard kill-switch that closes sockets, isolates networking to loopback, and disables all outbound checks.",
+                SettingSection::Privacy,
+                false,
+            ),
         ],
     }
 }

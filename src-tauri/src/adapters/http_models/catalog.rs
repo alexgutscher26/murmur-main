@@ -112,16 +112,48 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         approx_ram_mb: 850,
         is_default: false,
     },
+    CatalogEntry {
+        id: "large-v3-turbo-q3_k_m",
+        display_name: "Large v3 Turbo (q3_K_M)",
+        description: "Ultra-compact 3-bit quantisation for low-RAM machines (~280MB), ideal for 8GB devices.",
+        file_name: "ggml-large-v3-turbo-q3_k_m.bin",
+        sha256: "4a92c01824fdbb149b068e5535b5a76e033f9b8c049d529d44e6b21fa75908ce",
+        size_bytes: 284_000_000,
+        approx_ram_mb: 550,
+        is_default: false,
+    },
 ];
 
 /// Online CDN manifest URL for dynamic model listings.
 pub const ONLINE_CATALOG_URL: &str = "https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/models.json";
 
+/// Configures a reqwest client builder according to whether Air-Gap mode is active.
+/// When air-gapped, binds to loopback (127.0.0.1) with no proxy to prevent outbound traffic.
+pub fn configure_air_gap_client_builder(
+    builder: reqwest::ClientBuilder,
+    air_gapped: bool,
+) -> reqwest::ClientBuilder {
+    if air_gapped {
+        builder
+            .no_proxy()
+            .local_address(std::net::IpAddr::V4(std::net::Ipv4Addr::LOCALHOST))
+    } else {
+        builder
+    }
+}
+
 /// Fetches dynamic models from the online registry, falling back to embedded MODEL_CATALOG.
-pub async fn fetch_online_catalog() -> Result<Vec<ModelDescriptor>, reqwest::Error> {
-    let client = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(5))
-        .build()?;
+/// When air_gapped is true, blocks the CDN model manifest fetch entirely.
+pub async fn fetch_online_catalog_with_air_gap(
+    air_gapped: bool,
+) -> Result<Vec<ModelDescriptor>, reqwest::Error> {
+    if air_gapped {
+        // Block outbound CDN fetch entirely when Air-Gap / Hardware Isolation Mode is active
+        return Ok(MODEL_CATALOG.iter().map(|e| e.descriptor()).collect());
+    }
+    let builder = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(5));
+    let client = configure_air_gap_client_builder(builder, false).build()?;
     let entries: Vec<ModelDescriptor> = client
         .get(ONLINE_CATALOG_URL)
         .send()
@@ -129,6 +161,11 @@ pub async fn fetch_online_catalog() -> Result<Vec<ModelDescriptor>, reqwest::Err
         .json()
         .await?;
     Ok(entries)
+}
+
+/// Fetches dynamic models from the online registry, falling back to embedded MODEL_CATALOG.
+pub async fn fetch_online_catalog() -> Result<Vec<ModelDescriptor>, reqwest::Error> {
+    fetch_online_catalog_with_air_gap(false).await
 }
 
 /// Look up a catalog entry by its id, exactly as listed in MODEL_CATALOG.

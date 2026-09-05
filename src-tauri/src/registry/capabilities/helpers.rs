@@ -35,6 +35,30 @@ pub fn toggle(
     }
 }
 
+pub fn string_setting(
+    key: &str,
+    label: &str,
+    description: &str,
+    section: SettingSection,
+    placeholder: Option<&str>,
+    default: &str,
+) -> SettingDef {
+    SettingDef {
+        key: text(key),
+        label: text(label),
+        description: text(description),
+        section,
+        kind: SettingKind::Text {
+            placeholder: placeholder.map(text),
+            max_len: None,
+        },
+        default: SettingValue::Text(text(default)),
+        requires_engine: vec![],
+        requires_permission: vec![],
+        advanced: false,
+    }
+}
+
 pub fn number(
     key: &str,
     label: &str,

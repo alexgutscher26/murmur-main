@@ -55,6 +55,9 @@ export const commands = {
 	createDictionaryEntry: (input: CreateDictionaryEntryInput) => typedError<DictionaryId, AppError>(__TAURI_INVOKE("create_dictionary_entry", { input })),
 	updateDictionaryEntry: (input: UpdateDictionaryEntryInput) => typedError<null, AppError>(__TAURI_INVOKE("update_dictionary_entry", { input })),
 	deleteDictionaryEntry: (input: DeleteDictionaryEntryInput) => typedError<null, AppError>(__TAURI_INVOKE("delete_dictionary_entry", { input })),
+	listDictionaryChangelog: (input: ListDictionaryChangelogInput) => typedError<DictionaryChangeLogEntry[], AppError>(__TAURI_INVOKE("list_dictionary_changelog", { input })),
+	undoDictionaryChange: (input: UndoDictionaryChangeInput) => typedError<null, AppError>(__TAURI_INVOKE("undo_dictionary_change", { input })),
+	clearDictionaryChangelog: () => typedError<null, AppError>(__TAURI_INVOKE("clear_dictionary_changelog")),
 	getEngineCapabilities: () => typedError<EngineCapabilities, AppError>(__TAURI_INVOKE("get_engine_capabilities")),
 	listLanguages: () => typedError<LanguageOption[], AppError>(__TAURI_INVOKE("list_languages")),
 	copyText: (input: CopyTextInput) => typedError<null, AppError>(__TAURI_INVOKE("copy_text", { input })),
@@ -300,6 +303,18 @@ export type DeviceInfo = {
 	channels: number,
 };
 
+export type DictionaryChangeLogEntry = {
+	id: DictionaryId,
+	entry_id: number | null,
+	action: string,
+	pattern: string,
+	replacement: string,
+	match_kind: MatchKind,
+	prev_replacement: string | null,
+	prev_match_kind: MatchKind | null,
+	timestamp: number,
+};
+
 export type DictionaryEntry = {
 	id: DictionaryId,
 	/**  What the model tends to produce. */
@@ -542,6 +557,10 @@ export type LatencySummary = {
 	p50_ms: number | null,
 	p95_ms: number | null,
 	sample_count: number,
+};
+
+export type ListDictionaryChangelogInput = {
+	limit: number | null,
 };
 
 export type ListHistoryInput = {
@@ -1059,6 +1078,10 @@ export type StatsSummary = {
 export type TranscriptDelivered = {
 	word_count: number,
 	delivery: DeliveryKind,
+};
+
+export type UndoDictionaryChangeInput = {
+	changelog_id: number,
 };
 
 /**

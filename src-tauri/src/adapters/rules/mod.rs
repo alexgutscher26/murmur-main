@@ -23,12 +23,15 @@
  * WHERE: Implements the TextEnhancer port; called by pipeline/deliver.rs.
  */
 
+pub mod abbreviations;
 pub mod corrections;
 pub mod dictionary;
 pub mod fillers;
+pub mod numbers;
 pub mod punctuation;
 pub mod spoken;
 pub mod text;
+pub mod urls_and_paths;
 pub mod whitespace;
 
 use crate::error::AppResult;
@@ -63,12 +66,23 @@ impl TextEnhancer for RuleEnhancer {
             return Ok(out);
         }
 
-        // 2. Spoken formatting: inserts punctuation, newlines, code casing, file tags, and markdown blocks.
+        // 2. URLs, email addresses, and filesystem paths (runs before spoken punctuation to catch 'colon slash slash').
+        if context.normalise_urls_and_paths {
+            out = urls_and_paths::normalize_urls_and_paths(&out);
+        }
+
+        // 2b. Spoken formatting: inserts punctuation, newlines, code casing, file tags, and markdown blocks.
         if context.expand_spoken_commands {
             out = spoken::expand_spoken_commands(&out, language);
             out = spoken::format_code_casing(&out);
             out = spoken::format_file_tagging(&out);
             out = spoken::format_markdown_mode(&out);
+        }
+
+        // 2c. Code mode identifier casing pipeline: compound words -> active casing style.
+        if context.code_mode {
+            let style = spoken::CaseStyle::parse_style(&context.code_casing_style);
+            out = spoken::apply_code_mode_casing(&out, style);
         }
 
         // 3. Fillers, before the dictionary can try to match across one.
@@ -101,9 +115,20 @@ impl TextEnhancer for RuleEnhancer {
             out = punctuation::normalise_punctuation(&out);
         }
 
+        // 6b. Number normalization: cardinals ("forty two" -> 42), ordinals ("third" -> 3rd), currency ("twenty dollars" -> $20).
+        if context.normalise_numbers {
+            out = numbers::normalize_numbers(&out, language);
+        }
+
         // 7. Casing, which needs sentence boundaries to already exist.
         if context.capitalise_sentences {
             out = punctuation::capitalise_sentences(&out);
+        }
+
+        // 7b. Abbreviations: expand Latin and spoken abbreviations (eg -> e.g., ie -> i.e., etc -> etc.).
+        // Executed after casing so internal periods in abbreviations do not cause spurious sentence capitalization.
+        if context.expand_abbreviations {
+            out = abbreviations::expand_abbreviations(&out, language, &context.disabled_abbreviations);
         }
 
         // 8. The terminal stop, last, so nothing capitalises after it.
@@ -129,6 +154,12 @@ mod tests {
             normalise_punctuation: true,
             capitalise_sentences: true,
             apply_corrections: true,
+            expand_abbreviations: true,
+            disabled_abbreviations: vec![],
+            normalise_numbers: true,
+            normalise_urls_and_paths: true,
+            code_mode: false,
+            code_casing_style: "camel".into(),
         }
     }
 
@@ -140,6 +171,16 @@ mod tests {
         let out = enhancer.enhance(raw, &context()).expect("enhance");
 
         assert_eq!(out, "So i was thinking we should ship it, today.");
+    }
+
+    #[test]
+    fn the_full_pass_expands_abbreviations() {
+        let enhancer = RuleEnhancer::new();
+        let raw = "we should buy fruits comma eg apples and oranges etc";
+
+        let out = enhancer.enhance(raw, &context()).expect("enhance");
+
+        assert_eq!(out, "We should buy fruits, e.g. apples and oranges etc.");
     }
 
     #[test]
@@ -172,6 +213,12 @@ mod tests {
             normalise_punctuation: false,
             capitalise_sentences: false,
             apply_corrections: false,
+            expand_abbreviations: false,
+            disabled_abbreviations: vec![],
+            normalise_numbers: false,
+            normalise_urls_and_paths: false,
+            code_mode: false,
+            code_casing_style: "camel".into(),
         };
 
         let raw = "um hello comma world";
@@ -180,6 +227,27 @@ mod tests {
         // Only whitespace normalisation and seam de-duplication remain, and
         // neither should have changed anything here.
         assert_eq!(out, raw);
+    }
+
+    #[test]
+    fn the_full_pass_normalizes_numbers_and_urls() {
+        let enhancer = RuleEnhancer::new();
+        let raw = "that costs twenty dollars on the third floor comma visit https colon slash slash github dot com";
+
+        let out = enhancer.enhance(raw, &context()).expect("enhance");
+        assert_eq!(out, "That costs $20 on the 3rd floor, visit https://github.com.");
+    }
+
+    #[test]
+    fn the_full_pass_applies_code_mode_casing() {
+        let enhancer = RuleEnhancer::new();
+        let mut ctx = context();
+        ctx.code_mode = true;
+        ctx.code_casing_style = "pascal".into();
+        let raw = "define user profile component in react";
+
+        let out = enhancer.enhance(raw, &ctx).expect("enhance");
+        assert_eq!(out, "Define UserProfileComponent in react.");
     }
 
     #[test]

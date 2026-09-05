@@ -91,6 +91,7 @@ export function ModelManager() {
           model.descriptor.id.includes("turbo") ||
           model.descriptor.id.includes("large") ||
           model.descriptor.id.includes("medium");
+        const isCompressed = model.descriptor.id.includes("q3_");
         const isLocked = isProModel && !canUseTurboModel(tier);
 
         return (
@@ -99,6 +100,7 @@ export function ModelManager() {
               model={model}
               progress={progress[model.descriptor.id]}
               isProModel={isProModel}
+              isCompressed={isCompressed}
               isLocked={isLocked}
             />
             <ModelAction
@@ -119,11 +121,13 @@ function ModelSummary({
   model,
   progress,
   isProModel,
+  isCompressed,
   isLocked,
 }: {
   model: ModelReport;
   progress: DownloadProgress | undefined;
   isProModel: boolean;
+  isCompressed?: boolean;
   isLocked: boolean;
 }) {
   const { descriptor, state } = model;
@@ -136,6 +140,11 @@ function ModelSummary({
     <div className="min-w-0 flex-1">
       <div className="flex items-center gap-2">
         <p className="text-sm font-medium text-stone-900 dark:text-white">{descriptor.display_name}</p>
+        {isCompressed && (
+          <span className="inline-flex items-center rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            Compressed
+          </span>
+        )}
         {isProModel && (
           <span className="inline-flex items-center gap-1 rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold text-stone-800 dark:bg-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700">
             <Sparkles className="size-2.5" />

@@ -40,12 +40,19 @@ pub const NORMALISE_PUNCTUATION: &str = "enhance.normalise_punctuation";
 pub const STRIP_FILLERS: &str = "enhance.strip_fillers";
 pub const SPOKEN_COMMANDS: &str = "enhance.spoken_commands";
 pub const APPLY_CORRECTIONS: &str = "enhance.apply_corrections";
+pub const EXPAND_ABBREVIATIONS: &str = "enhance.expand_abbreviations";
+pub const DISABLED_ABBREVIATIONS: &str = "enhance.disabled_abbreviations";
+pub const NORMALISE_NUMBERS: &str = "enhance.normalise_numbers";
+pub const NORMALISE_URLS_AND_PATHS: &str = "enhance.normalise_urls_and_paths";
+pub const CODE_MODE: &str = "enhance.code_mode";
+pub const CODE_CASING_STYLE: &str = "enhance.code_casing_style";
 
 // ── Privacy ──────────────────────────────────────────────────────────────
 pub const RETENTION_DAYS: &str = "privacy.retention_days";
 pub const ENCRYPTION_AT_REST: &str = "privacy.encryption_at_rest";
 pub const PURGE_ON_LOCK: &str = "privacy.purge_on_lock";
 pub const INCOGNITO_MODE: &str = "privacy.incognito_mode";
+pub const AIR_GAP_MODE: &str = "privacy.air_gap_mode";
 
 // ── General ──────────────────────────────────────────────────────────────
 pub const LAUNCH_AT_LOGIN: &str = "general.launch_at_login";

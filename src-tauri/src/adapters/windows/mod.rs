@@ -11,6 +11,7 @@ pub mod credentials;
 pub mod injector;
 pub mod modifier_tap;
 pub mod permissions;
+pub mod raw_input;
 pub mod sound;
 pub mod toast;
 
@@ -18,6 +19,7 @@ pub use credentials::WindowsCredentialStore;
 pub use injector::WindowsInjector;
 pub use modifier_tap::{watch_modifier_tap, ModifierTap, TAPS_REQUIRED};
 pub use permissions::WindowsPermissions;
+pub use raw_input::{start_mouse_raw_input, MouseRawInputHandle, MouseTriggerButton};
 pub use sound::{play_feedback, FeedbackSound};
 pub use toast::WindowsToast;
 

@@ -95,6 +95,12 @@ pub async fn download_model(
     input: ModelIdInput,
 ) -> Result<String, AppError> {
     execute(&state, DOWNLOAD, input, |ctx, input| async move {
+        if crate::services::settings::is_air_gap_active(ctx.db()) {
+            return Err(AppError::new(
+                crate::error::ErrorCode::ModelDownloadFailed,
+                "Outbound networking is blocked because Air-Gap Mode is active.",
+            ));
+        }
         let path = ctx.ports().models.ensure(&input.model_id).await?;
         let engine = ctx.ports().engine.clone();
         tokio::task::spawn_blocking(move || engine.prepare())

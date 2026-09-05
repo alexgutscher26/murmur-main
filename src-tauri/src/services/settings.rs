@@ -38,6 +38,15 @@ pub fn get_setting(db: &Database, key: &str) -> AppResult<Option<SettingValue>> 
     })
 }
 
+/// Returns true if Air-Gap / Hardware Isolation Mode is enabled.
+pub fn is_air_gap_active(db: &Database) -> bool {
+    get_setting(db, crate::registry::keys::AIR_GAP_MODE)
+        .ok()
+        .flatten()
+        .map(|v| matches!(v, SettingValue::Bool(true)))
+        .unwrap_or(false)
+}
+
 pub fn set_setting(
     db: &Database,
     key: &str,

@@ -18,6 +18,7 @@ use crate::ipc::factory::{execute, CommandSpec, Validate};
 use crate::registry::CapabilityKey;
 use crate::services::dictionary;
 use crate::telemetry::now_ms;
+use crate::types::numeric::TsNumber;
 use crate::types::{DictionaryEntry, DictionaryId, MatchKind};
 
 /// Long enough for a product name, short enough that it cannot be a paragraph.
@@ -142,6 +143,74 @@ pub async fn delete_dictionary_entry(
 ) -> Result<(), AppError> {
     execute(&state, DELETE, input, |ctx, input| async move {
         dictionary::delete_entry(ctx.db(), &input.id)
+    })
+    .await
+}
+
+#[derive(Debug, serde::Deserialize, specta::Type)]
+pub struct ListDictionaryChangelogInput {
+    #[specta(type = Option<TsNumber>)]
+    pub limit: Option<i64>,
+}
+
+impl Validate for ListDictionaryChangelogInput {
+    fn validate(&self) -> Result<(), String> {
+        Ok(())
+    }
+}
+
+const LIST_CHANGELOG: CommandSpec =
+    CommandSpec::new("list_dictionary_changelog", CapabilityKey::Dictionary);
+
+#[tauri::command]
+#[specta::specta]
+pub async fn list_dictionary_changelog(
+    state: State<'_, AppState>,
+    input: ListDictionaryChangelogInput,
+) -> Result<Vec<crate::types::DictionaryChangeLogEntry>, AppError> {
+    execute(&state, LIST_CHANGELOG, input, |ctx, input| async move {
+        dictionary::list_changelog(ctx.db(), input.limit.unwrap_or(100))
+    })
+    .await
+}
+
+#[derive(Debug, serde::Deserialize, specta::Type)]
+pub struct UndoDictionaryChangeInput {
+    #[specta(type = TsNumber)]
+    pub changelog_id: i64,
+}
+
+impl Validate for UndoDictionaryChangeInput {
+    fn validate(&self) -> Result<(), String> {
+        Ok(())
+    }
+}
+
+const UNDO_CHANGE: CommandSpec =
+    CommandSpec::new("undo_dictionary_change", CapabilityKey::Dictionary).exclusive();
+
+#[tauri::command]
+#[specta::specta]
+pub async fn undo_dictionary_change(
+    state: State<'_, AppState>,
+    input: UndoDictionaryChangeInput,
+) -> Result<(), AppError> {
+    execute(&state, UNDO_CHANGE, input, |ctx, input| async move {
+        dictionary::undo_change(ctx.db(), input.changelog_id)
+    })
+    .await
+}
+
+const CLEAR_CHANGELOG: CommandSpec =
+    CommandSpec::new("clear_dictionary_changelog", CapabilityKey::Dictionary).exclusive();
+
+#[tauri::command]
+#[specta::specta]
+pub async fn clear_dictionary_changelog(
+    state: State<'_, AppState>,
+) -> Result<(), AppError> {
+    execute(&state, CLEAR_CHANGELOG, (), |ctx, ()| async move {
+        dictionary::clear_changelog(ctx.db())
     })
     .await
 }

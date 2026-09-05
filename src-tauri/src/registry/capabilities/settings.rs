@@ -4,7 +4,9 @@
  * WHERE: Consumed by registry/capabilities/mod.rs.
  */
 
-use super::helpers::{advanced, choice, metric, needs_permission, number, text, toggle};
+use super::helpers::{
+    advanced, choice, metric, needs_permission, number, string_setting, text, toggle,
+};
 use crate::ports::permissions::OsPermission;
 use crate::registry::capability::{Capability, CapabilityKey, NavDef, SettingSection};
 use crate::registry::keys;
@@ -103,6 +105,56 @@ pub fn settings_capability() -> Capability {
                 "When you correct yourself out loud — \u{201c}Tuesday, sorry, I meant Wednesday\u{201d} — keep only the correction. It matches spoken phrases like \u{201c}I meant\u{201d} and \u{201c}make that\u{201d}; it does not rewrite your wording.",
                 SettingSection::Output,
                 false,
+            ),
+            toggle(
+                keys::EXPAND_ABBREVIATIONS,
+                "Expand common abbreviations",
+                "Expand spoken Latin and common abbreviations (e.g. “eg” → “e.g.”, “ie” → “i.e.”, “etc” → “etc.”, “vs” → “vs.”).",
+                SettingSection::Output,
+                true,
+            ),
+            advanced(string_setting(
+                keys::DISABLED_ABBREVIATIONS,
+                "Disabled abbreviations",
+                "Comma-separated list or JSON array of abbreviations to leave unexpanded (e.g. “eg, vs”).",
+                SettingSection::Output,
+                Some("eg, vs"),
+                "",
+            )),
+            toggle(
+                keys::NORMALISE_NUMBERS,
+                "Normalize numbers and currency",
+                "Convert spoken numbers, ordinals, and currency into digits and symbols (e.g. “forty two” → 42, “third” → 3rd, “twenty dollars” → $20).",
+                SettingSection::Output,
+                true,
+            ),
+            toggle(
+                keys::NORMALISE_URLS_AND_PATHS,
+                "Normalize URLs, emails and paths",
+                "Format spoken web links, email addresses, and filesystem paths (e.g. “https colon slash slash github dot com” → https://github.com).",
+                SettingSection::Output,
+                true,
+            ),
+            toggle(
+                keys::CODE_MODE,
+                "Code mode identifier casing",
+                "Automatically detect compound words and format them into the active code casing style.",
+                SettingSection::Output,
+                false,
+            ),
+            choice(
+                keys::CODE_CASING_STYLE,
+                "Code casing style",
+                "Target identifier style used when code mode is active.",
+                SettingSection::Output,
+                &[
+                    ("camel", "camelCase", "Lower camel case (e.g. userProfileComponent)."),
+                    ("pascal", "PascalCase", "Upper camel case (e.g. UserProfileComponent)."),
+                    ("snake", "snake_case", "Underscore separated lowercase (e.g. user_profile_component)."),
+                    ("screaming_snake", "CONSTANT_CASE", "All uppercase underscore separated (e.g. USER_PROFILE_COMPONENT)."),
+                    ("kebab", "kebab-case", "Dash separated lowercase (e.g. user-profile-component)."),
+                ],
+                "camel",
             ),
             toggle(
                 keys::LAUNCH_AT_LOGIN,

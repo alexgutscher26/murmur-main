@@ -33,6 +33,7 @@ import { ErrorSurface, SettingControl, Skeleton, EmptyState } from "@/components
 import type { SettingOption } from "@/components/global";
 import { PermissionNotice } from "./_components/PermissionNotice";
 import { ModelManager } from "./_components/ModelManager";
+import { AbbreviationManager } from "./_components/AbbreviationManager";
 import { AppProfiles } from "./_components/AppProfiles";
 import { SettingsBackup } from "./_components/SettingsBackup";
 import { WpmCalibrationWizard } from "../_components/WpmCalibrationWizard";
@@ -93,7 +94,9 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
     }));
     const modelOptions: SettingOption[] = (models.data ?? []).map((model) => ({
       value: model.descriptor.id,
-      label: model.descriptor.display_name,
+      label: model.descriptor.id.includes("q3_")
+        ? `${model.descriptor.display_name} [Compressed]`
+        : model.descriptor.display_name,
       description: `${formatBytes(model.descriptor.size_bytes)} · ${model.descriptor.approx_ram_mb} MB memory`,
       disabled: model.state.kind !== "READY",
     }));
@@ -381,13 +384,28 @@ function SettingsSection({
       )}
 
       {plain.map((def) => (
-        <SettingControl
-          key={def.key}
-          className="hairline-b last:border-b-0"
-          setting={toControlSetting(def, values?.[def.key], dynamic, engine, permissions, (value) =>
-            onWrite(def.key, value),
-          )}
-        />
+        <div key={def.key}>
+          <SettingControl
+            className="hairline-b last:border-b-0"
+            setting={toControlSetting(def, values?.[def.key], dynamic, engine, permissions, (value) =>
+              onWrite(def.key, value),
+            )}
+          />
+          {def.key === "enhance.expand_abbreviations" &&
+            (values?.[def.key]?.type !== "BOOL" || values[def.key].value !== false) && (
+              <div className="py-2.5">
+                <AbbreviationManager
+                  languageCode={
+                    values?.["transcription.language"]?.type === "CHOICE"
+                      ? values["transcription.language"].value
+                      : undefined
+                  }
+                  disabledValue={values?.["enhance.disabled_abbreviations"]}
+                  onUpdateDisabled={(val) => onWrite("enhance.disabled_abbreviations", val)}
+                />
+              </div>
+            )}
+        </div>
       ))}
 
       {hasBaselineWpm ? (

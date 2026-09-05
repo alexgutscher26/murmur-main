@@ -128,11 +128,15 @@ impl HttpModelStore {
      *        574MB re-download and is diagnosed as a network bug.
      * WHERE: adapters/mod.rs::build_model_store.
      */
-    pub fn new(paths: AppPaths, events: Arc<dyn EventSink>) -> AppResult<Self> {
-        let client = reqwest::Client::builder()
+    pub fn new_with_air_gap(
+        paths: AppPaths,
+        events: Arc<dyn EventSink>,
+        air_gapped: bool,
+    ) -> AppResult<Self> {
+        let builder = reqwest::Client::builder()
             .connect_timeout(CONNECT_TIMEOUT)
-            .user_agent(concat!("murmur/", env!("CARGO_PKG_VERSION")))
-            .build()?;
+            .user_agent(concat!("murmur/", env!("CARGO_PKG_VERSION")));
+        let client = super::catalog::configure_air_gap_client_builder(builder, air_gapped).build()?;
 
         Ok(Self {
             paths,
@@ -141,6 +145,10 @@ impl HttpModelStore {
             verified: Mutex::new(HashMap::new()),
             in_flight: Mutex::new(HashMap::new()),
         })
+    }
+
+    pub fn new(paths: AppPaths, events: Arc<dyn EventSink>) -> AppResult<Self> {
+        Self::new_with_air_gap(paths, events, false)
     }
 
     fn entry(&self, id: &ModelId) -> AppResult<&'static CatalogEntry> {
@@ -668,7 +676,10 @@ fn strip_quantisation_suffix(model_id: &str) -> &str {
         Some(pos) => {
             let suffix = &model_id[pos..];
             let bytes = suffix.as_bytes();
-            if suffix.len() == 5 && bytes[1] == b'q' && bytes[3] == b'_' {
+            if (suffix.len() == 5 && bytes[1] == b'q' && bytes[3] == b'_')
+                || suffix.eq_ignore_ascii_case("-q3_k_m")
+                || suffix.eq_ignore_ascii_case("-q3_k")
+            {
                 &model_id[..pos]
             } else {
                 model_id
@@ -901,6 +912,7 @@ mod tests {
     #[test]
     fn quantisation_suffixes_are_stripped_the_way_whisper_cpp_strips_them() {
         assert_eq!(strip_quantisation_suffix("large-v3-turbo-q5_0"), "large-v3-turbo");
+        assert_eq!(strip_quantisation_suffix("large-v3-turbo-q3_k_m"), "large-v3-turbo");
         assert_eq!(strip_quantisation_suffix("small-q5_1"), "small");
         assert_eq!(strip_quantisation_suffix("large-v3-turbo"), "large-v3-turbo");
         assert_eq!(strip_quantisation_suffix("base-english"), "base-english");

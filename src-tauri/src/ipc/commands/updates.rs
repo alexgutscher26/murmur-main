@@ -77,6 +77,10 @@ pub enum UpdateCheck {
  * WHERE: Both commands in this file, before any updater is built.
  */
 fn updates_enabled(db: &Database) -> bool {
+    if settings::is_air_gap_active(db) {
+        return false;
+    }
+
     let stored = settings::get_setting(db, keys::CHECK_UPDATES).ok().flatten();
     let value = stored.or_else(|| {
         registry::setting_def(keys::CHECK_UPDATES).map(|def| def.default.clone())

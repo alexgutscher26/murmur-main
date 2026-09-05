@@ -47,6 +47,12 @@ pub struct SessionSettings {
     pub strip_fillers: bool,
     pub spoken_commands: bool,
     pub apply_corrections: bool,
+    pub expand_abbreviations: bool,
+    pub disabled_abbreviations: Vec<String>,
+    pub normalise_numbers: bool,
+    pub normalise_urls_and_paths: bool,
+    pub code_mode: bool,
+    pub code_casing_style: String,
     pub normalise_punctuation: bool,
     pub capitalise_sentences: bool,
     pub audio_feedback: bool,
@@ -132,6 +138,12 @@ impl SessionSettings {
             strip_fillers: read_bool(stored, keys::STRIP_FILLERS).unwrap_or(false),
             spoken_commands: read_bool(stored, keys::SPOKEN_COMMANDS).unwrap_or(true),
             apply_corrections: read_bool(stored, keys::APPLY_CORRECTIONS).unwrap_or(false),
+            expand_abbreviations: read_bool(stored, keys::EXPAND_ABBREVIATIONS).unwrap_or(true),
+            disabled_abbreviations: read_string_list(stored, keys::DISABLED_ABBREVIATIONS),
+            normalise_numbers: read_bool(stored, keys::NORMALISE_NUMBERS).unwrap_or(true),
+            normalise_urls_and_paths: read_bool(stored, keys::NORMALISE_URLS_AND_PATHS).unwrap_or(true),
+            code_mode: read_bool(stored, keys::CODE_MODE).unwrap_or(false),
+            code_casing_style: read_choice(stored, keys::CODE_CASING_STYLE).unwrap_or_else(|| "camel".into()),
             normalise_punctuation: read_bool(stored, keys::NORMALISE_PUNCTUATION).unwrap_or(true),
             capitalise_sentences: read_bool(stored, keys::CAPITALISE_SENTENCES).unwrap_or(true),
             audio_feedback: read_bool(stored, keys::AUDIO_FEEDBACK).unwrap_or(true),
@@ -153,6 +165,22 @@ fn effective_setting(stored: &Stored, key: &str) -> Option<SettingValue> {
         .get(key)
         .cloned()
         .or_else(|| registry::setting_def(key).map(|def| def.default.clone()))
+}
+
+fn read_string_list(stored: &Stored, key: &str) -> Vec<String> {
+    let raw = match effective_setting(stored, key) {
+        Some(SettingValue::Text(s)) => s,
+        _ => return Vec::new(),
+    };
+    if raw.trim().starts_with('[') {
+        if let Ok(list) = serde_json::from_str::<Vec<String>>(&raw) {
+            return list;
+        }
+    }
+    raw.split(',')
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
+        .collect()
 }
 
 fn read_bool(stored: &Stored, key: &str) -> Option<bool> {

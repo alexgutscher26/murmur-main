@@ -70,6 +70,9 @@ pub fn specta_builder() -> Builder<tauri::Wry> {
             commands::dictionary::create_dictionary_entry,
             commands::dictionary::update_dictionary_entry,
             commands::dictionary::delete_dictionary_entry,
+            commands::dictionary::list_dictionary_changelog,
+            commands::dictionary::undo_dictionary_change,
+            commands::dictionary::clear_dictionary_changelog,
             // Engine capabilities and the language picker
             commands::engine::get_engine_capabilities,
             commands::engine::list_languages,

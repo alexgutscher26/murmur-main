@@ -193,7 +193,10 @@ pub fn strip_quantisation(name: &str) -> &str {
         Some(pos) => {
             let suffix = &name[pos..];
             let bytes = suffix.as_bytes();
-            if suffix.len() == 5 && bytes[1] == b'q' && bytes[3] == b'_' {
+            if (suffix.len() == 5 && bytes[1] == b'q' && bytes[3] == b'_')
+                || suffix.eq_ignore_ascii_case("-q3_k_m")
+                || suffix.eq_ignore_ascii_case("-q3_k")
+            {
                 &name[..pos]
             } else {
                 name
@@ -212,6 +215,7 @@ mod tests {
         // The bug this guards: an encoder installed under the quantised name is
         // never opened, and nothing reports the failure.
         assert_eq!(strip_quantisation("large-v3-turbo-q5_0"), "large-v3-turbo");
+        assert_eq!(strip_quantisation("large-v3-turbo-q3_k_m"), "large-v3-turbo");
         assert_eq!(strip_quantisation("small-q5_1"), "small");
         // Unquantised names are untouched.
         assert_eq!(strip_quantisation("large-v3-turbo"), "large-v3-turbo");

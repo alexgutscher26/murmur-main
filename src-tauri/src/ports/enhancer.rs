@@ -44,6 +44,12 @@ pub struct EnhanceContext {
      *        is silent, and a silent failure should be opt-in.
      */
     pub apply_corrections: bool,
+    pub expand_abbreviations: bool,
+    pub disabled_abbreviations: Vec<String>,
+    pub normalise_numbers: bool,
+    pub normalise_urls_and_paths: bool,
+    pub code_mode: bool,
+    pub code_casing_style: String,
 }
 
 pub trait TextEnhancer: Send + Sync {

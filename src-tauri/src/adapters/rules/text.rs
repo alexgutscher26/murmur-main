@@ -12,16 +12,22 @@
 #[cfg(test)]
 use crate::types::LanguageCode;
 
+pub use super::abbreviations::{
+    abbreviations_for_language, expand_abbreviations, Abbreviation,
+};
 pub use super::corrections::apply_spoken_corrections;
 pub use super::dictionary::{apply_dictionary, replace_whole_words};
 pub use super::fillers::{fillers_for_language, is_cjk, strip_fillers};
 pub use super::punctuation::{
     capitalise_sentences, ensure_terminal_punctuation, normalise_punctuation,
+    strip_trailing_punctuation,
 };
+pub use super::numbers::normalize_numbers;
 pub use super::spoken::{
-    expand_spoken_commands, format_code_casing, format_file_tagging, format_markdown_mode,
-    normalize_named_entities,
+    apply_code_mode_casing, expand_spoken_commands, format_code_casing, format_file_tagging,
+    format_markdown_mode, normalize_named_entities, CaseStyle,
 };
+pub use super::urls_and_paths::normalize_urls_and_paths;
 pub use super::whitespace::{dedupe_stutters, normalise_whitespace};
 
 #[cfg(test)]
@@ -153,6 +159,26 @@ mod tests {
         assert_eq!(
             format_code_casing("run backticks bun run tauri dev in terminal"),
             "run `bun run tauri dev` in terminal"
+        );
+    }
+
+    #[test]
+    fn code_identifier_casing_pipeline_converts_compound_words() {
+        assert_eq!(
+            apply_code_mode_casing("user profile component", CaseStyle::Pascal),
+            "UserProfileComponent"
+        );
+        assert_eq!(
+            apply_code_mode_casing("user profile component", CaseStyle::Snake),
+            "user_profile_component"
+        );
+        assert_eq!(
+            apply_code_mode_casing("user profile component", CaseStyle::Camel),
+            "userProfileComponent"
+        );
+        assert_eq!(
+            apply_code_mode_casing("create a user profile component in react", CaseStyle::Pascal),
+            "create a UserProfileComponent in react"
         );
     }
 
@@ -315,6 +341,21 @@ mod tests {
     fn an_ellipsis_survives_but_a_doubled_bang_does_not() {
         assert_eq!(normalise_punctuation("wait..."), "wait...");
         assert_eq!(normalise_punctuation("stop!!"), "stop!");
+    }
+
+    #[test]
+    fn double_period_is_collapsed_to_single_period() {
+        assert_eq!(normalise_punctuation("word.."), "word.");
+        assert_eq!(normalise_punctuation("hello.. world"), "hello. world");
+    }
+
+    #[test]
+    fn trailing_punctuation_is_stripped_cleanly() {
+        assert_eq!(strip_trailing_punctuation("word."), "word");
+        assert_eq!(strip_trailing_punctuation("word.."), "word");
+        assert_eq!(strip_trailing_punctuation("wait..."), "wait");
+        assert_eq!(strip_trailing_punctuation("done!   "), "done");
+        assert_eq!(strip_trailing_punctuation("hello, world?"), "hello, world");
     }
 
     #[test]

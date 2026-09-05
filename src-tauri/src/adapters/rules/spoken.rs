@@ -65,6 +65,19 @@ pub enum CaseStyle {
     Backticks,
 }
 
+impl CaseStyle {
+    pub fn parse_style(s: &str) -> Self {
+        match s.to_lowercase().trim() {
+            "pascal" | "pascalcase" | "pascal_case" => CaseStyle::Pascal,
+            "snake" | "snakecase" | "snake_case" => CaseStyle::Snake,
+            "screaming_snake" | "screamingsnake" | "constant" => CaseStyle::ScreamingSnake,
+            "kebab" | "kebabcase" | "kebab_case" => CaseStyle::Kebab,
+            "backticks" | "code" => CaseStyle::Backticks,
+            _ => CaseStyle::Camel,
+        }
+    }
+}
+
 pub const CASE_DIRECTIVES: &[(&str, CaseStyle)] = &[
     ("screaming snake case", CaseStyle::ScreamingSnake),
     ("constant case", CaseStyle::ScreamingSnake),
@@ -76,6 +89,10 @@ pub const CASE_DIRECTIVES: &[(&str, CaseStyle)] = &[
     ("in backticks", CaseStyle::Backticks),
     ("inline code", CaseStyle::Backticks),
     ("backticks", CaseStyle::Backticks),
+];
+
+pub const CODE_CASE_DELIMITERS: &[&str] = &[
+    "for", "in", "here", "class", "with", "at", "to", "from", "then", "into", "on", "as",
 ];
 
 pub fn format_code_casing(text: &str) -> String {
@@ -133,6 +150,11 @@ fn apply_case_style(text: &str, directive: &str, style: CaseStyle) -> String {
             let clean_word = word.trim_end_matches(|c: char| {
                 matches!(c, ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}')
             });
+
+            let clean_lower = clean_word.to_lowercase();
+            if word_idx > 0 && CODE_CASE_DELIMITERS.contains(&clean_lower.as_str()) {
+                break;
+            }
 
             if !clean_word.is_empty() {
                 words.push(clean_word);
@@ -250,6 +272,82 @@ fn transform_words(words: &[&str], style: CaseStyle) -> String {
     }
 }
 
+pub const CODE_BOUNDARY_WORDS: &[&str] = &[
+    "a", "an", "the", "in", "on", "at", "for", "to", "from", "with", "into", "as", "is",
+    "of", "and", "or", "then", "let", "const", "var", "fn", "def", "function", "class",
+    "interface", "type", "import", "export", "return", "if", "else", "while", "be",
+    "define", "declare", "create", "make", "set", "use", "add", "get", "call", "run",
+];
+
+pub fn apply_code_mode_casing(text: &str, style: CaseStyle) -> String {
+    let lines: Vec<&str> = text.split('\n').collect();
+    let mut processed_lines = Vec::with_capacity(lines.len());
+
+    for line in lines {
+        if line.starts_with('#') || line.starts_with("```") || line.starts_with("- [") {
+            processed_lines.push(line.to_string());
+            continue;
+        }
+
+        let words: Vec<&str> = line.split_whitespace().collect();
+        if words.is_empty() {
+            processed_lines.push(line.to_string());
+            continue;
+        }
+
+        let mut out_tokens: Vec<String> = Vec::new();
+        let mut cluster: Vec<&str> = Vec::new();
+        let mut trailing_punct = String::new();
+
+        let flush_cluster = |tokens: &mut Vec<String>, cluster: &mut Vec<&str>, punct: &mut String| {
+            if cluster.is_empty() {
+                return;
+            }
+            if cluster.len() >= 2 {
+                let transformed = transform_words(cluster, style);
+                tokens.push(format!("{transformed}{punct}"));
+            } else {
+                tokens.push(format!("{}{punct}", cluster[0]));
+            }
+            cluster.clear();
+            punct.clear();
+        };
+
+        for w in words {
+            let punct: String = w
+                .chars()
+                .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
+                .collect();
+            let clean = w.trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
+            let lower = clean.to_lowercase();
+
+            let is_boundary = CODE_BOUNDARY_WORDS.contains(&lower.as_str())
+                || clean.starts_with('`')
+                || clean.starts_with('@')
+                || clean.starts_with("http://")
+                || clean.starts_with("https://")
+                || clean.contains('/')
+                || clean.contains('\\');
+
+            if is_boundary {
+                flush_cluster(&mut out_tokens, &mut cluster, &mut trailing_punct);
+                out_tokens.push(w.to_string());
+            } else {
+                cluster.push(clean);
+                if !punct.is_empty() {
+                    trailing_punct = punct;
+                    flush_cluster(&mut out_tokens, &mut cluster, &mut trailing_punct);
+                }
+            }
+        }
+
+        flush_cluster(&mut out_tokens, &mut cluster, &mut trailing_punct);
+        processed_lines.push(out_tokens.join(" "));
+    }
+
+    processed_lines.join("\n")
+}
+
 pub fn format_file_tagging(text: &str) -> String {
     let mut out = text.to_string();
     let directives = &[
@@ -268,6 +366,12 @@ pub fn format_file_tagging(text: &str) -> String {
     }
     out
 }
+
+pub const KNOWN_FILE_EXTENSIONS: &[&str] = &[
+    "ts", "tsx", "js", "jsx", "py", "rs", "go", "json", "md", "toml",
+    "yaml", "yml", "css", "scss", "html", "sql", "env", "c", "cpp",
+    "h", "hpp", "swift", "kt", "dart", "sh", "lock", "prisma",
+];
 
 fn apply_file_tag_directive(text: &str, directive: &str) -> String {
     let lower = text.to_lowercase();
@@ -305,6 +409,7 @@ fn apply_file_tag_directive(text: &str, directive: &str) -> String {
         let mut raw_words = Vec::new();
         let mut consumed_bytes = 0usize;
         let mut trailing_punct = String::new();
+        let mut prev_was_dot = false;
 
         for (word_idx, word) in remainder.split_whitespace().enumerate() {
             if word_idx >= 12 {
@@ -316,6 +421,8 @@ fn apply_file_tag_directive(text: &str, directive: &str) -> String {
             let clean_word = word.trim_end_matches(|c: char| {
                 matches!(c, ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}')
             });
+
+            let is_ext = prev_was_dot && KNOWN_FILE_EXTENSIONS.contains(&clean_word.to_lowercase().as_str());
 
             if !clean_word.is_empty() {
                 raw_words.push(clean_word);
@@ -331,9 +438,11 @@ fn apply_file_tag_directive(text: &str, directive: &str) -> String {
             let word_pos = remainder[consumed_bytes..].find(word).unwrap_or(0);
             consumed_bytes += word_pos + word.len();
 
-            if has_punct {
+            if is_ext || has_punct {
                 break;
             }
+
+            prev_was_dot = clean_word.eq_ignore_ascii_case("dot");
         }
 
         if raw_words.is_empty() {
@@ -496,7 +605,7 @@ pub fn format_markdown_mode(text: &str) -> String {
     out = replace_whole_words(&out, "dictated with murmur", "\n_Dictated privately on-device with [Murmur](https://murmur.app)_\n", false);
     out = replace_whole_words(&out, "made with local dictation", "\n_Dictated privately on-device with [Murmur](https://murmur.app)_\n", false);
 
-    out = replace_whole_words(&out, "issue title", "\n# Issue: ", false);
+    out = replace_whole_words(&out, "issue title", "\n# Issue:", false);
     out = replace_whole_words(&out, "steps to reproduce", "\n### Steps to Reproduce:\n1. ", false);
     out = replace_whole_words(&out, "reproduction steps", "\n### Steps to Reproduce:\n1. ", false);
     out = replace_whole_words(&out, "expected behavior", "\n### Expected Behavior\n", false);

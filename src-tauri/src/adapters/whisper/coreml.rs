@@ -52,12 +52,15 @@ pub fn coreml_encoder_path(model_path: &Path) -> Option<PathBuf> {
     let stem = model_path.file_stem().and_then(|s| s.to_str())?;
 
     // Exactly whisper.cpp's test: a final '-' segment of five characters
-    // shaped `-qX_X`.
+    // shaped `-qX_X`, plus k-quants suffixes.
     let base = match stem.rfind('-') {
         Some(pos) => {
             let suffix = &stem[pos..];
             let bytes = suffix.as_bytes();
-            if suffix.len() == 5 && bytes[1] == b'q' && bytes[3] == b'_' {
+            if (suffix.len() == 5 && bytes[1] == b'q' && bytes[3] == b'_')
+                || suffix.eq_ignore_ascii_case("-q3_k_m")
+                || suffix.eq_ignore_ascii_case("-q3_k")
+            {
                 &stem[..pos]
             } else {
                 stem
@@ -79,6 +82,10 @@ mod tests {
         // publishes and the name whisper.cpp 1.8.3 actually opens.
         assert_eq!(
             coreml_encoder_path(Path::new("/m/ggml-large-v3-turbo-q5_0.bin")),
+            Some(PathBuf::from("/m/ggml-large-v3-turbo-encoder.mlmodelc"))
+        );
+        assert_eq!(
+            coreml_encoder_path(Path::new("/m/ggml-large-v3-turbo-q3_k_m.bin")),
             Some(PathBuf::from("/m/ggml-large-v3-turbo-encoder.mlmodelc"))
         );
         assert_eq!(

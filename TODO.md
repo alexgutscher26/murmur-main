@@ -93,7 +93,7 @@
 - [x] [WIN] [INFRA] Fix pnpm tauri build on Windows — [EPERM] on node_modules/.bin/tauri.EXE unlink fails when Bun lockfile-cached binary is in use. Investigate switching to bun tauri build exclusively or adding a pre-build script that kills stale handles.
 - [x] [WIN] [PERF] WASAPI exclusive-mode capture — Current CPAL setup uses shared mode (WASAPI shared), which adds ~10 ms of audio latency. Exclusive-mode gives sub-millisecond capture latency at the cost of stealing the device; expose as an advanced setting.
 - [x] [WIN] [PERF] Promote [profile.dev.package."*"] opt-level = 3 to the project README so other Windows contributors don't hit 20-second Whisper decode times in debug builds.
-- [ ] [WIN] [FEAT] Raw Input hook for mouse push-to-talk — Register WM_INPUT on a hidden HWND so mouse button 4/5 can trigger dictation even when a game or fullscreen app has mouse focus captured.
+- [x] [WIN] [FEAT] Raw Input hook for mouse push-to-talk — Register WM_INPUT on a hidden HWND so mouse button 4/5 can trigger dictation even when a game or fullscreen app has mouse focus captured.
   - Use RegisterRawInputDevices with HID_USAGE_PAGE_GENERIC and HID_USAGE_GENERIC_MOUSE
   - Parse RI_MOUSE_BUTTON_4_DOWN / RI_MOUSE_BUTTON_5_DOWN from RAWMOUSE.usButtonFlags
   - Forward to the same session actor event as keyboard push-to-talk
@@ -153,7 +153,7 @@
 - [x] [PERF] Persistent WhisperState across sessions — Currently states.acquire() creates a new state for each chunk. Reusing a single persistent state (resetting it between chunks) would save ~5 ms per chunk on allocation overhead.
 - [x] [PERF] Thread count auto-tuning — decode_thread_count() is currently a fixed heuristic. Measure transcription speed during the prepare() warmup across 1-N threads and pick the fastest count automatically.
 - [x] [BUG] Hallucination filter misses multi-sentence hallucinations — The blocklist drops a segment only when it is the entire segment text. Whisper sometimes emits "[BLANK_AUDIO] Thank you. [BLANK_AUDIO]" as one segment; the prefix/suffix noise bypasses the exact-match check. Add a strip-and-retry path.
-- [ ] [FEAT] Whisper large-v3-turbo-q3_K_M quantization — Add a 3-bit quantization option for the large-v3-turbo model giving ~40% smaller footprint (~280MB) suitable for 8GB RAM devices, with a "Compressed" badge in the model picker.
+- [x] [FEAT] Whisper large-v3-turbo-q3_K_M quantization — Add a 3-bit quantization option for the large-v3-turbo model giving ~40% smaller footprint (~280MB) suitable for 8GB RAM devices, with a "Compressed" badge in the model picker.
 - [ ] [FEAT] Custom vocabulary / hotword biasing — Pass a hotwords prompt to whisper.cpp's whisper_full_params.initial_prompt to bias toward user-defined technical terms, names, and brand words.
   - Read from the user's active dictionary and format as a comma-separated string
   - Cap at 224 tokens (whisper's context limit) and prefer high-frequency dictionary terms
@@ -181,15 +181,15 @@
 - [x] [FEAT] Correction learning — When the user edits a Murmur-typed string immediately after paste detected via accessibility APIs, record the before/after pair and auto-add it to the corrections dictionary.
 - [x] [UX] Inline correction UI — After pasting, show a 3-second floating undo button ("Undo dictation") that restores the pre-paste clipboard content and removes the typed text.
 - [ ] [FEAT] Smart sentence-boundary capitalization — Detect sentence boundaries based on pause duration (VAD silence > 400ms) and capitalize the first word of the new sentence automatically, even mid-session.
-- [ ] [FEAT] Abbreviation expansion — "eg" to "e.g.", "ie" to "i.e.", "etc" to "etc.", "vs" to "vs.", with a per-language list. User-configurable opt-out per abbreviation.
-- [ ] [FEAT] Number normalization — "forty two" to "42", "third" to "3rd", "one thousand" to "1,000". Handle ordinals, cardinals, and currency ("twenty dollars" to "$20").
-- [ ] [FEAT] URL / path normalization — "https colon slash slash github dot com" to https://github.com. Detect and canonicalize spoken URLs, file paths, and email addresses.
-- [ ] [FEAT] Code identifier casing pipeline — In code mode, detect compound words and apply the active casing style: "user profile component" to UserProfileComponent (PascalCase) or user_profile_component (snake_case).
+- [x] [FEAT] Abbreviation expansion — "eg" to "e.g.", "ie" to "i.e.", "etc" to "etc.", "vs" to "vs.", with a per-language list. User-configurable opt-out per abbreviation.
+- [x] [FEAT] Number normalization — "forty two" to "42", "third" to "3rd", "one thousand" to "1,000". Handle ordinals, cardinals, and currency ("twenty dollars" to "$20").
+- [x] [FEAT] URL / path normalization — "https colon slash slash github dot com" to https://github.com. Detect and canonicalize spoken URLs, file paths, and email addresses.
+- [x] [FEAT] Code identifier casing pipeline — In code mode, detect compound words and apply the active casing style: "user profile component" to UserProfileComponent (PascalCase) or user_profile_component (snake_case).
 - [ ] [FEAT] Post-processing rule priority ordering — Let users drag-and-drop the order in which enhancement rules execute. Persist order in registry as an ordered list of rule IDs.
 - [ ] [FEAT] Rule preview sandbox — A text area in settings where users can paste raw transcript text and see how each enabled rule transforms it in real time, rule-by-rule, with a diff view.
 - [ ] [FEAT] Profanity filter (opt-in) — Optional bleep/asterisk replacement of profanity, configurable per app profile (e.g. enable in Slack, disable in personal notes).
 - [ ] [PERF] Rules pipeline caching — Cache the compiled regex patterns for filler words, corrections, and punctuation rules across sessions so they are not recompiled on every chunk.
-- [ ] [BUG] LLM post-processing doubles certain punctuation — When both the Whisper model and the LLM post-processor add a period at the end of a sentence, the output has "word..". Fix by stripping trailing punctuation from the ASR output before feeding it to the LLM.
+- [x] [BUG] LLM post-processing doubles certain punctuation — When both the Whisper model and the LLM post-processor add a period at the end of a sentence, the output has "word..". Fix by stripping trailing punctuation from the ASR output before feeding it to the LLM.
 
 ---
 
@@ -296,7 +296,7 @@
 - [x] [FEAT] Audit log — Write an append-only log separate from the sessions table recording session timestamps, durations, and delivery outcomes but never the transcript text for enterprise compliance.
 - [x] [FEAT] Remote wipe / data clear — A "Delete all data" option in settings that drops all sessions, dictionary entries, and resets all settings to defaults in one step.
 - [x] [UX] Privacy policy in onboarding — Link to a local privacy.md during onboarding that explains exactly what data stays on device.
-- [ ] [SEC] In-app "Air-Gap / Hardware Isolation Mode" hard kill-switch that closes any sockets and disables all outbound networking in the binary.
+- [x] [SEC] In-app "Air-Gap / Hardware Isolation Mode" hard kill-switch that closes any sockets and disables all outbound networking in the binary.
   - Bind reqwest client to a no-proxy, local-only adapter when the mode is active
   - Block the GitHub release check and CDN model manifest fetch entirely
   - Show a persistent "Air-Gapped" badge in the dashboard header when the mode is active
@@ -487,7 +487,7 @@
   - Validate the file header magic bytes before accepting
   - Show the model file size, parameter count (from header), and a "Custom" badge in the model picker
   - Warn that custom models are not covered by Murmur support
-- [ ] [FEAT] Dictionary versioning & changelog — Track changes to the user dictionary over time (word added, modified, deleted) with timestamps, so users can undo accidental bulk imports.
+- [x] [FEAT] Dictionary versioning & changelog — Track changes to the user dictionary over time (word added, modified, deleted) with timestamps, so users can undo accidental bulk imports.
 - [ ] [FEAT] Shared team dictionary (Pro tier) — A team admin can publish a shared dictionary via a signed JSON URL that team members subscribe to. Dictionary entries are merged read-only (cannot be deleted by individual users).
 - [ ] [FEAT] Voice macro conditional logic — A simple condition syntax in macros: "if app == Slack then use casual tone else use formal tone". Evaluated at inject time.
 - [ ] [FEAT] Smart abbreviation learning — After 5 manual corrections of the same word, auto-suggest adding it to the substitutions dictionary with a one-click "Remember this" toast.
