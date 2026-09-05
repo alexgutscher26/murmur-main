@@ -78,6 +78,8 @@ jobs:
           workspaces: src-tauri
           key: universal-apple-darwin
 
+      - uses: oven-sh/setup-bun@v2
+
       - run: pnpm install --frozen-lockfile
 
       # Fails in seconds rather than after a ~40 minute universal build. A
