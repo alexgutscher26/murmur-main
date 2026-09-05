@@ -142,7 +142,7 @@ const HOME_SCHEMA = {
 
 export default function Home() {
   return (
-    <main id="main-content" className="min-h-screen bg-[#050505] text-white selection:bg-emerald-500/25 selection:text-emerald-200 overflow-x-hidden">
+    <main id="main-content" className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white overflow-x-hidden">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(HOME_SCHEMA) }}

@@ -102,7 +102,7 @@ function ExternalLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`text-neutral-400 hover:text-white focus-visible:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 rounded-sm transition-colors ${className}`}
+      className={`text-neutral-600 hover:text-neutral-950 focus-visible:text-neutral-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 rounded-sm transition-colors ${className}`}
     >
       {children}
       <span className="sr-only"> (opens in a new tab)</span>
@@ -114,11 +114,11 @@ function NavLinkItem({ link }: { link: FooterLink }) {
   const content = (
     <span className="inline-flex items-center gap-1.5">
       {link.icon && (
-        <GithubIcon className="w-3.5 h-3.5 text-neutral-400 group-hover:text-white transition-colors" />
+        <GithubIcon className="w-3.5 h-3.5 text-neutral-500 group-hover:text-neutral-950 transition-colors" />
       )}
       <span>{link.label}</span>
       {link.badge && (
-        <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono font-medium">
+        <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-mono font-medium">
           {link.badge}
         </span>
       )}
@@ -137,10 +137,10 @@ function NavLinkItem({ link }: { link: FooterLink }) {
     <li>
       <Link
         href={link.href}
-        className={`transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 rounded-sm ${
+        className={`transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 rounded-sm ${
           link.accent
-            ? "text-emerald-400 hover:text-emerald-300 font-medium"
-            : "text-neutral-400 hover:text-white"
+            ? "text-emerald-700 hover:text-emerald-800 font-medium"
+            : "text-neutral-600 hover:text-neutral-950"
         }`}
       >
         {content}
@@ -157,7 +157,7 @@ export function Footer() {
   return (
     <footer
       aria-label="Site footer"
-      className="relative border-t border-white/[0.08] bg-[#050505] pt-14 pb-12 overflow-hidden"
+      className="relative border-t border-neutral-200/80 bg-neutral-50/70 pt-16 pb-12 overflow-hidden text-neutral-600"
     >
       {/* Signature moment: a waveform trailing off along the top edge */}
       <div
@@ -191,41 +191,41 @@ export function Footer() {
       `}</style>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-white/[0.08]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-neutral-200/80">
           {/* Brand */}
           <div className="lg:col-span-4 flex flex-col gap-5">
             <div className="flex items-center gap-3">
-              <div className="p-1.5 rounded-xl bg-white/[0.04] border border-white/10 shadow-inner">
+              <div className="p-1.5 rounded-xl bg-white border border-neutral-200/90 shadow-sm">
                 <Mark size="sm" animated />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-base text-white tracking-tight">Murmur</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                <span className="font-bold text-base text-neutral-950 tracking-tight">Murmur</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-mono font-medium">
                   v0.8.4-local
                 </span>
               </div>
             </div>
 
-            <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
+            <p className="text-sm text-neutral-600 leading-relaxed max-w-sm">
               Local speech-to-text for macOS and Windows. Free forever, open
               source, and your audio never leaves your device. Built with Rust,
               Tauri 2, and whisper.cpp.
             </p>
 
             <ul className="flex flex-wrap items-center gap-2">
-              <li className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] text-neutral-300 border border-white/[0.08] text-xs">
+              <li className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-neutral-700 border border-neutral-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs">
                 <span className="relative flex w-2 h-2" aria-hidden="true">
                   <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full w-2 h-2 bg-emerald-400" />
+                  <span className="relative inline-flex rounded-full w-2 h-2 bg-emerald-500" />
                 </span>
                 Works fully offline
               </li>
-              <li className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.02] text-neutral-400 border border-white/[0.06] text-xs">
+              <li className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white text-neutral-700 border border-neutral-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs">
                 <ShieldCheck className="w-3.5 h-3.5 text-neutral-500" aria-hidden="true" />
                 MIT License
               </li>
-              <li className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.02] text-neutral-400 border border-white/[0.06] text-xs font-mono">
-                <Cpu className="w-3.5 h-3.5 text-emerald-400/80" aria-hidden="true" />
+              <li className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white text-neutral-700 border border-neutral-200/80 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs font-mono">
+                <Cpu className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
                 GPU Accelerated
               </li>
             </ul>
@@ -235,8 +235,8 @@ export function Footer() {
           <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
             {/* Solutions */}
             <nav aria-label="Solutions" className="flex flex-col gap-2.5 text-sm">
-              <span className="text-neutral-300 font-semibold mb-1 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
+              <span className="text-neutral-900 font-semibold mb-1 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
                 Solutions
               </span>
               <ul className="flex flex-col gap-2.5">
@@ -248,7 +248,7 @@ export function Footer() {
 
             {/* Comparisons */}
             <nav aria-label="Comparisons" className="flex flex-col gap-2.5 text-sm">
-              <span className="text-neutral-300 font-semibold mb-1">Comparisons</span>
+              <span className="text-neutral-900 font-semibold mb-1">Comparisons</span>
               <ul className="flex flex-col gap-2.5">
                 {COMPARISONS_LINKS.map((link) => (
                   <NavLinkItem key={link.href + link.label} link={link} />
@@ -258,7 +258,7 @@ export function Footer() {
 
             {/* Resources & Guides */}
             <nav aria-label="Resources" className="flex flex-col gap-2.5 text-sm">
-              <span className="text-neutral-300 font-semibold mb-1">Resources</span>
+              <span className="text-neutral-900 font-semibold mb-1">Resources</span>
               <ul className="flex flex-col gap-2.5">
                 {RESOURCES_LINKS.map((link) => (
                   <NavLinkItem key={link.href + link.label} link={link} />
@@ -268,8 +268,8 @@ export function Footer() {
 
             {/* Ecosystem & Open Source */}
             <nav aria-label="Ecosystem" className="flex flex-col gap-2.5 text-sm">
-              <span className="text-neutral-300 font-semibold mb-1 flex items-center gap-1.5">
-                <Cpu className="w-3.5 h-3.5 text-neutral-400" aria-hidden="true" />
+              <span className="text-neutral-900 font-semibold mb-1 flex items-center gap-1.5">
+                <Cpu className="w-3.5 h-3.5 text-neutral-500" aria-hidden="true" />
                 Ecosystem
               </span>
               <ul className="flex flex-col gap-2.5">
@@ -286,9 +286,9 @@ export function Footer() {
           <p>© {new Date().getFullYear()} Murmur. Zero telemetry, 100% on-device data sovereignty.</p>
 
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] px-3 py-1 rounded-full">
-              <span className="text-neutral-400">Shortcut:</span>
-              <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] border border-white/10 text-neutral-300 text-[10px] font-mono font-medium">
+            <div className="hidden sm:flex items-center gap-2 bg-white border border-neutral-200/80 px-3 py-1 rounded-full shadow-sm">
+              <span className="text-neutral-500">Shortcut:</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200/80 text-neutral-800 text-[10px] font-mono font-medium">
                 ⌥ Space / Ctrl+Space
               </kbd>
             </div>
@@ -296,7 +296,7 @@ export function Footer() {
             <button
               onClick={scrollToTop}
               aria-label="Scroll to top"
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 hover:text-white border border-white/[0.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white hover:bg-neutral-100 text-neutral-700 hover:text-neutral-950 border border-neutral-200/90 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 transition-colors"
             >
               <span>Top</span>
               <ArrowUp className="w-3 h-3" aria-hidden="true" />

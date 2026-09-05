@@ -210,12 +210,6 @@ export function Hero() {
       {/* Subtle Pixel Grid Texture matching the screenshot */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
 
-      {/* Top Badge: Pill with Red Dot matching the screenshot */}
-      <div className="relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-8 transition-transform hover:scale-[1.02] cursor-default z-10">
-        <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444]" />
-        <span className="text-sm font-medium text-neutral-800">We are hiring</span>
-      </div>
-
       {/* Two-Tier Headline matching the screenshot */}
       <div className="relative text-center max-w-4xl px-4 mx-auto mb-6 z-10">
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold tracking-[-0.035em] text-neutral-950 mb-6 leading-[1.06]">

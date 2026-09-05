@@ -95,20 +95,26 @@ export function LatencyBenchmarks() {
   const [activeMetric, setActiveMetric] = useState<BenchmarkMetric>(BENCHMARKS[0]);
 
   return (
-    <section id="benchmarks" className="py-24 relative overflow-hidden border-t border-white/[0.06]">
-      <div className="max-w-5xl mx-auto px-4">
+    <section id="benchmarks" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+      {/* Subtle Ambient Light Glow matching Hero */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
+
+      {/* Subtle Pixel Grid Texture matching Hero */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
+
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-4">
-            <Gauge className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-zinc-400">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4 transition-transform hover:scale-[1.02] cursor-default">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="text-xs font-mono font-medium text-neutral-800">
               Dated, Reproducible Benchmarks
             </span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
             Beat the cloud on latency.
           </h2>
-          <p className="text-zinc-400 text-base sm:text-lg leading-relaxed">
+          <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
             Local AI is only compelling if it feels instantaneous. We engineered Murmur in native Rust to outpace cloud WebSocket pipelines at every stage.
           </p>
         </div>
@@ -121,32 +127,32 @@ export function LatencyBenchmarks() {
               <button
                 key={m.id}
                 onClick={() => setActiveMetric(m)}
-                className={`p-3.5 rounded-xl border text-left transition-all duration-300 ${
+                className={`p-3.5 rounded-xl border text-left transition-all duration-200 ${
                   isSelected
-                    ? "bg-white text-black border-white shadow-lg scale-[1.01]"
-                    : "bg-white/[0.02] text-zinc-400 border-white/[0.06] hover:bg-white/[0.05] hover:text-white"
+                    ? "bg-white text-neutral-950 border-neutral-900 shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
+                    : "bg-white/80 text-neutral-600 border-neutral-200/80 hover:bg-neutral-50 hover:text-neutral-950"
                 }`}
               >
-                <span className={`text-[10px] font-mono uppercase tracking-wider block mb-1 font-semibold ${isSelected ? "text-emerald-700" : "text-emerald-400"}`}>
+                <span className={`text-[10px] font-mono uppercase tracking-wider block mb-1 font-bold ${isSelected ? "text-emerald-700" : "text-emerald-600"}`}>
                   {m.category}
                 </span>
-                <span className="text-xs font-bold block truncate">{m.name}</span>
+                <span className="text-xs font-bold block truncate text-neutral-900">{m.name}</span>
               </button>
             );
           })}
         </div>
 
         {/* Benchmark Card */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-[#0e0e11]/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_16px_48px_rgba(0,0,0,0.5)]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.08]">
+        <div className="p-6 sm:p-8 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-neutral-200/80">
             <div>
-              <span className="text-xs font-mono text-emerald-400 font-bold block mb-1">
+              <span className="text-xs font-mono text-emerald-700 font-bold block mb-1">
                 {activeMetric.category}
               </span>
-              <h3 className="text-lg sm:text-2xl font-bold text-white">{activeMetric.name}</h3>
+              <h3 className="text-lg sm:text-2xl font-bold text-neutral-950">{activeMetric.name}</h3>
             </div>
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-mono font-bold self-start sm:self-auto shadow-[0_0_15px_rgba(16,185,129,0.15)]">
-              <Zap className="w-3.5 h-3.5 fill-current" />
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs font-mono font-bold self-start sm:self-auto shadow-sm">
+              <Zap className="w-3.5 h-3.5 fill-current text-emerald-600" />
               <span>{activeMetric.diffHighlight}</span>
             </div>
           </div>
@@ -154,60 +160,60 @@ export function LatencyBenchmarks() {
           {/* Side-by-Side Comparison Panels */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
             {/* Murmur (Local) */}
-            <div className="p-5 rounded-xl bg-white/[0.03] border border-emerald-500/30 flex flex-col justify-between relative overflow-hidden">
+            <div className="p-5 rounded-xl bg-emerald-50/40 border border-emerald-200/90 flex flex-col justify-between relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
               <div>
-                <span className="text-[11px] font-mono text-emerald-400 font-semibold uppercase tracking-wider block mb-1.5">
+                <span className="text-[11px] font-mono text-emerald-700 font-semibold uppercase tracking-wider block mb-1.5">
                   Murmur (Native On-Device)
                 </span>
-                <span className="text-2xl sm:text-3xl font-bold text-white font-mono block">
+                <span className="text-2xl sm:text-3xl font-bold text-neutral-950 font-mono block">
                   {activeMetric.murmurValue}
                 </span>
               </div>
               <div className="mt-4">
-                <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden mb-2 border border-white/[0.06]">
+                <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden mb-2">
                   <div
-                    className="h-full bg-emerald-400 rounded-full transition-all duration-500 shadow-[0_0_10px_#10b981]"
+                    className="h-full bg-emerald-500 rounded-full transition-all duration-500"
                     style={{ width: `${activeMetric.murmurBarPercent}%` }}
                   />
                 </div>
-                <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Zero network hop · Direct GPU decode
+                <span className="text-[11px] font-mono text-emerald-700 flex items-center gap-1 font-medium">
+                  <Check className="w-3 h-3 text-emerald-600" /> Zero network hop · Direct GPU decode
                 </span>
               </div>
             </div>
 
             {/* Cloud Alternative */}
-            <div className="p-5 rounded-xl bg-white/[0.01] border border-white/[0.06] flex flex-col justify-between">
+            <div className="p-5 rounded-xl bg-neutral-50 border border-neutral-200/80 flex flex-col justify-between">
               <div>
-                <span className="text-[11px] font-mono text-zinc-500 font-semibold uppercase tracking-wider block mb-1.5">
+                <span className="text-[11px] font-mono text-neutral-500 font-semibold uppercase tracking-wider block mb-1.5">
                   Cloud Dictation (Wispr / Cloud APIs)
                 </span>
-                <span className="text-2xl sm:text-3xl font-bold text-zinc-400 font-mono block">
+                <span className="text-2xl sm:text-3xl font-bold text-neutral-600 font-mono block">
                   {activeMetric.cloudValue}
                 </span>
               </div>
               <div className="mt-4">
-                <div className="w-full bg-black/40 h-2 rounded-full overflow-hidden mb-2 border border-white/[0.06]">
+                <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden mb-2">
                   <div
-                    className="h-full bg-zinc-600 rounded-full transition-all duration-500"
+                    className="h-full bg-neutral-400 rounded-full transition-all duration-500"
                     style={{ width: `${activeMetric.cloudBarPercent}%` }}
                   />
                 </div>
-                <span className="text-[11px] font-mono text-zinc-500">
+                <span className="text-[11px] font-mono text-neutral-500">
                   WebSocket upload + Cloud queue + TLS overhead
                 </span>
               </div>
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mb-5">
+          <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed mb-5">
             {activeMetric.description}
           </p>
 
-          <div className="p-3.5 rounded-xl bg-[#060608] border border-white/[0.06] text-[11px] font-mono text-zinc-400 flex items-center justify-between flex-wrap gap-2">
+          <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80 text-[11px] font-mono text-neutral-600 flex items-center justify-between flex-wrap gap-2">
             <span>Test Configuration: {activeMetric.testMethod}</span>
-            <span className="text-emerald-400/80 font-medium">Reproducible via cargo bench</span>
+            <span className="text-emerald-700 font-semibold">Reproducible via cargo bench</span>
           </div>
         </div>
       </div>

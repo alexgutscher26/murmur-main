@@ -80,11 +80,11 @@ export function ComparisonTable() {
   const renderCell = (val: string | boolean, isMurmur = false) => {
     if (typeof val === "boolean") {
       return val ? (
-        <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${isMurmur ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40" : "bg-white/[0.06] text-zinc-400"}`}>
+        <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${isMurmur ? "bg-emerald-50 text-emerald-700 border border-emerald-200/80" : "bg-neutral-100 text-neutral-700 border border-neutral-200/80"}`}>
           <Check className="w-3 h-3 stroke-[2.5]" />
         </span>
       ) : (
-        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500/10 text-red-400/60 border border-red-500/20">
+        <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-neutral-100 text-neutral-400 border border-neutral-200/80">
           <X className="w-3 h-3 stroke-[2]" />
         </span>
       );
@@ -93,7 +93,7 @@ export function ComparisonTable() {
     return (
       <span
         className={`text-xs font-mono font-medium ${
-          isMurmur ? "text-white font-bold" : "text-zinc-400"
+          isMurmur ? "text-neutral-950 font-bold" : "text-neutral-600"
         }`}
       >
         {val}
@@ -102,68 +102,74 @@ export function ComparisonTable() {
   };
 
   return (
-    <section id="comparison" className="py-24 relative overflow-hidden border-t border-white/[0.06]">
-      <div className="max-w-5xl mx-auto px-4">
+    <section id="comparison" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+      {/* Subtle Ambient Light Glow matching Hero */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
+
+      {/* Subtle Pixel Grid Texture matching Hero */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
+
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-4">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-zinc-400">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4 transition-transform hover:scale-[1.02] cursor-default">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="text-xs font-mono font-medium text-neutral-800">
               Architecture vs. Policy
             </span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
             Cloud dictation vs. Local dictation.
           </h2>
-          <p className="text-zinc-400 text-base sm:text-lg leading-relaxed">
+          <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
             Cloud tools protect data with privacy policies. Murmur protects data by keeping your dictation on your device in the first place.
           </p>
         </div>
 
         {/* Contrast Banner Callout */}
-        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] mb-8 text-center max-w-2xl mx-auto">
-          <p className="text-xs sm:text-sm text-zinc-300 font-mono leading-relaxed">
-            <span className="text-emerald-400 font-bold">The Local-First Difference:</span> You don&apos;t have to trade speed, usability, or smart formatting to get complete air-gapped privacy.
+        <div className="p-4 rounded-xl bg-neutral-50 border border-neutral-200/80 mb-8 text-center max-w-2xl mx-auto shadow-sm">
+          <p className="text-xs sm:text-sm text-neutral-700 font-mono leading-relaxed">
+            <span className="text-emerald-700 font-bold">The Local-First Difference:</span> You don&apos;t have to trade speed, usability, or smart formatting to get complete air-gapped privacy.
           </p>
         </div>
 
         {/* Table Container */}
-        <div className="rounded-2xl bg-[#0e0e11]/90 backdrop-blur-2xl border border-white/[0.08] overflow-x-auto shadow-[0_16px_48px_rgba(0,0,0,0.5)]">
+        <div className="rounded-2xl bg-white border border-neutral-200/90 overflow-x-auto shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)]">
           <table className="w-full text-left border-collapse min-w-[640px]">
             <thead>
-              <tr className="border-b border-white/[0.08] bg-white/[0.02]">
-                <th className="p-4 sm:p-5 text-xs font-semibold text-zinc-300 w-2/5">
+              <tr className="border-b border-neutral-200/80 bg-neutral-50/80">
+                <th className="p-4 sm:p-5 text-xs font-semibold text-neutral-900 w-2/5">
                   Capability
                 </th>
-                <th className="p-4 sm:p-5 text-center w-1/5 bg-emerald-500/[0.06] border-x border-emerald-500/20">
-                  <span className="text-xs font-bold text-white block">
+                <th className="p-4 sm:p-5 text-center w-1/5 bg-emerald-50/50 border-x border-emerald-200/80">
+                  <span className="text-xs font-bold text-neutral-950 block">
                     Murmur
                   </span>
-                  <span className="text-[10px] font-mono text-emerald-400 block font-semibold">
+                  <span className="text-[10px] font-mono text-emerald-700 block font-semibold">
                     Local-First (Free MIT)
                   </span>
                 </th>
-                <th className="p-4 sm:p-5 text-center text-xs font-semibold text-zinc-400 w-1/5">
+                <th className="p-4 sm:p-5 text-center text-xs font-semibold text-neutral-600 w-1/5">
                   Wispr Flow
                 </th>
-                <th className="p-4 sm:p-5 text-center text-xs font-semibold text-zinc-400 w-1/5">
+                <th className="p-4 sm:p-5 text-center text-xs font-semibold text-neutral-600 w-1/5">
                   Superwhisper
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06] text-xs">
+            <tbody className="divide-y divide-neutral-200/80 text-xs">
               {COMPARISONS.map((row, idx) => (
-                <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="p-4 font-medium text-zinc-200">
+                <tr key={idx} className="hover:bg-neutral-50/60 transition-colors">
+                  <td className="p-4 font-medium text-neutral-800">
                     {row.feature}
                   </td>
-                  <td className="p-4 text-center bg-emerald-500/[0.03] border-x border-emerald-500/20">
+                  <td className="p-4 text-center bg-emerald-50/20 border-x border-emerald-200/60">
                     {renderCell(row.murmur, true)}
                   </td>
-                  <td className="p-4 text-center text-zinc-400">
+                  <td className="p-4 text-center text-neutral-600">
                     {renderCell(row.wisprFlow)}
                   </td>
-                  <td className="p-4 text-center text-zinc-400">
+                  <td className="p-4 text-center text-neutral-600">
                     {renderCell(row.superwhisper)}
                   </td>
                 </tr>

@@ -198,18 +198,26 @@ export function InteractivePlayground() {
   };
 
   return (
-    <section id="playground" className="py-24 relative overflow-hidden border-t border-white/[0.06]">
-      <div className="max-w-5xl mx-auto px-4">
-        {/* Section Header */}
+    <section id="playground" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+      {/* Subtle Ambient Light Glow matching Hero */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
+
+      {/* Subtle Pixel Grid Texture matching Hero */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
+
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
+        {/* Section Header matching Hero */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-4">
-            <Activity className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
-            <span className="text-xs font-semibold text-neutral-300">Interactive lab</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4 transition-transform hover:scale-[1.02] cursor-default">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="text-xs font-mono font-medium text-neutral-800">
+              Interactive Voice Lab
+            </span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
             Test Murmur in your browser.
           </h2>
-          <p className="text-neutral-400 text-base sm:text-lg">
+          <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
             Experience how Murmur turns unstructured messy speech into formatted writing while stripping filler words with zero cloud latency.
           </p>
         </div>
@@ -218,9 +226,9 @@ export function InteractivePlayground() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
           {/* Left Column: Preset Scenarios (5 cols) */}
           <div className="lg:col-span-5 flex flex-col gap-4">
-            <div className="p-5 rounded-2xl bg-[#0e0e11]/80 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+            <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
               <div className="flex items-center justify-between mb-3.5">
-                <span className="text-xs font-bold text-white">Select a scenario</span>
+                <span className="text-xs font-bold text-neutral-900">Select a scenario</span>
                 <span className="text-[11px] font-mono text-neutral-500">Instant decode</span>
               </div>
 
@@ -232,17 +240,17 @@ export function InteractivePlayground() {
                       key={scenario.id}
                       onClick={() => handleScenarioSelect(scenario)}
                       aria-pressed={isSelected}
-                      className={`w-full p-3.5 rounded-xl border text-left transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${
+                      className={`w-full p-3.5 rounded-xl border text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 ${
                         isSelected
-                          ? "bg-white/[0.08] border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.1)] text-white"
-                          : "bg-white/[0.02] border-white/[0.06] text-neutral-400 hover:text-white hover:bg-white/[0.04]"
+                          ? "bg-neutral-50 border-neutral-900 shadow-[0_2px_8px_rgba(0,0,0,0.06)] text-neutral-950"
+                          : "bg-white border-neutral-200/80 text-neutral-600 hover:text-neutral-950 hover:bg-neutral-50/70"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-semibold text-neutral-200">
+                        <span className="text-xs font-semibold text-neutral-900">
                           {scenario.title}
                         </span>
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-bold">
                           {scenario.latency}ms
                         </span>
                       </div>
@@ -255,33 +263,33 @@ export function InteractivePlayground() {
               </div>
 
               {/* Real Mic Trigger */}
-              <div className="mt-4 pt-4 border-t border-white/[0.06]">
+              <div className="mt-4 pt-4 border-t border-neutral-200/80">
                 <button
                   onClick={toggleLiveMic}
                   aria-pressed={isLiveMic}
-                  className={`w-full py-2.5 px-3 rounded-xl text-xs font-semibold transition-all duration-300 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${
+                  className={`w-full py-2.5 px-3 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 ${
                     isLiveMic
-                      ? "bg-emerald-400 text-black font-bold shadow-[0_0_20px_#10b981]"
-                      : "bg-white/[0.04] hover:bg-white/[0.08] text-neutral-200 border border-white/[0.08]"
+                      ? "bg-emerald-500 text-white font-bold shadow-md"
+                      : "bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-200/90 shadow-sm"
                   }`}
                 >
-                  <Mic className={`w-3.5 h-3.5 ${isLiveMic ? "text-black motion-safe:animate-pulse" : "text-emerald-400"}`} />
+                  <Mic className={`w-3.5 h-3.5 ${isLiveMic ? "text-white motion-safe:animate-pulse" : "text-emerald-600"}`} />
                   <span>{isLiveMic ? "Stop microphone" : "Test live with microphone"}</span>
                 </button>
               </div>
             </div>
 
-            {/* Telemetry Stats — one panel with internal dividers, not four repeated cards */}
-            <div className="p-5 rounded-2xl bg-[#0e0e11]/80 backdrop-blur-xl border border-white/[0.08]">
+            {/* Telemetry Stats */}
+            <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.06)]">
               <div className="flex items-center gap-2 mb-3">
-                <Cpu className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
-                <span className="text-xs font-semibold text-neutral-300">Local system telemetry</span>
+                <Cpu className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
+                <span className="text-xs font-semibold text-neutral-800">Local system telemetry</span>
               </div>
-              <div className="grid grid-cols-2 gap-px rounded-xl overflow-hidden bg-white/[0.06] border border-white/[0.06]">
+              <div className="grid grid-cols-2 gap-2">
                 {TELEMETRY.map(({ label, getValue, accent }) => (
-                  <div key={label} className="p-3 bg-[#0e0e11]">
+                  <div key={label} className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80">
                     <span className="text-neutral-500 block text-[10px] font-mono">{label}</span>
-                    <span className={`font-bold text-sm ${accent ? "text-emerald-400" : "text-white"}`}>
+                    <span className={`font-bold text-sm ${accent ? "text-emerald-700" : "text-neutral-900"}`}>
                       {getValue(activeScenario)}
                     </span>
                   </div>
@@ -290,29 +298,36 @@ export function InteractivePlayground() {
             </div>
           </div>
 
-          {/* Right Column: Output Viewer (7 cols) */}
-          <div className="lg:col-span-7 p-6 rounded-2xl bg-[#0e0e11]/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between">
-            <div>
-              {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] flex-wrap gap-2">
-                <div>
-                  <h3 className="text-sm font-bold text-white">
-                    {isLiveMic ? "Live audio stream" : activeScenario.title}
-                  </h3>
-                  <span className="text-xs font-mono text-neutral-500">
-                    {isLiveMic ? "In-browser speech recognition" : activeScenario.category}
-                  </span>
+          {/* Right Column: Output Viewer (7 cols) - Styled as macOS window */}
+          <div className="lg:col-span-7 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between overflow-hidden">
+            <div className="p-6">
+              {/* Window Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-neutral-200/80 flex-wrap gap-2">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-neutral-300" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-neutral-300" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-neutral-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-neutral-900">
+                      {isLiveMic ? "Live audio stream" : activeScenario.title}
+                    </h3>
+                    <span className="text-xs font-mono text-neutral-500">
+                      {isLiveMic ? "In-browser speech recognition" : activeScenario.category}
+                    </span>
+                  </div>
                 </div>
 
                 {!isLiveMic && (
-                  <div className="flex items-center gap-1 bg-black/50 p-1 rounded-xl border border-white/[0.08]">
+                  <div className="flex items-center gap-1 bg-neutral-100/80 p-1 rounded-full border border-neutral-200/80">
                     <button
                       onClick={() => {
                         setMode("clean");
                         setDisplayedText(activeScenario.cleanTranscription);
                       }}
-                      className={`text-xs px-3 py-1 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${
-                        mode === "clean" ? "bg-white text-black font-semibold shadow-sm" : "text-neutral-400 hover:text-white"
+                      className={`text-xs px-3 py-1 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 ${
+                        mode === "clean" ? "bg-white text-neutral-950 font-semibold shadow-sm border border-neutral-200/70" : "text-neutral-600 hover:text-neutral-950"
                       }`}
                     >
                       Clean text
@@ -322,8 +337,8 @@ export function InteractivePlayground() {
                         setMode("formatted");
                         setDisplayedText(activeScenario.smartFormatted);
                       }}
-                      className={`text-xs px-3 py-1 rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 ${
-                        mode === "formatted" ? "bg-white text-black font-semibold shadow-sm" : "text-neutral-400 hover:text-white"
+                      className={`text-xs px-3 py-1 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 ${
+                        mode === "formatted" ? "bg-white text-neutral-950 font-semibold shadow-sm border border-neutral-200/70" : "text-neutral-600 hover:text-neutral-950"
                       }`}
                     >
                       Smart format
@@ -333,13 +348,13 @@ export function InteractivePlayground() {
               </div>
 
               {/* Sound Wave Bars */}
-              <div className="my-4 p-3.5 rounded-xl bg-[#060608] border border-white/[0.06] flex items-center justify-between">
-                <div className="flex items-center gap-1 h-6">
+              <div className="my-4 p-3 rounded-xl bg-neutral-50 border border-neutral-200/80 flex items-center justify-between">
+                <div className="flex items-center gap-1 h-5">
                   {audioLevels.map((lvl, idx) => (
                     <span
                       key={idx}
-                      className="w-1 rounded-full bg-gradient-to-t from-emerald-500 to-emerald-300 transition-all duration-75"
-                      style={{ height: `${Math.max(4, lvl / 2)}px` }}
+                      className="w-1 rounded-full bg-emerald-500 transition-all duration-75"
+                      style={{ height: `${Math.max(4, lvl / 2.5)}px` }}
                     />
                   ))}
                 </div>
@@ -351,18 +366,18 @@ export function InteractivePlayground() {
 
               {/* Raw Spoken Voice */}
               {!isLiveMic && (
-                <div className="mb-3.5 p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
-                  <span className="text-xs font-semibold text-emerald-400 block mb-1">
-                    What you said
+                <div className="mb-3.5 p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80">
+                  <span className="text-xs font-semibold text-emerald-700 block mb-1">
+                    What you said:
                   </span>
-                  <p className="text-xs text-neutral-300 font-mono leading-relaxed">
+                  <p className="text-xs text-neutral-700 font-mono leading-relaxed">
                     &ldquo;{activeScenario.rawSpoken}&rdquo;
                   </p>
                 </div>
               )}
 
               {/* Output Box */}
-              <div className="p-5 rounded-xl bg-[#060608] border border-white/[0.08] font-mono text-xs sm:text-sm text-neutral-100 min-h-[180px] whitespace-pre-wrap leading-relaxed shadow-inner">
+              <div className="p-5 rounded-xl bg-neutral-900 text-neutral-100 font-mono text-xs sm:text-sm min-h-[180px] whitespace-pre-wrap leading-relaxed shadow-inner border border-neutral-800">
                 {isLiveMic ? liveTranscript : displayedText}
                 {isPlaying && (
                   <span className="inline-block w-2 h-4 bg-emerald-400 ml-1 motion-safe:animate-pulse shadow-[0_0_8px_#10b981]" />
@@ -371,13 +386,13 @@ export function InteractivePlayground() {
             </div>
 
             {/* Bottom Actions */}
-            <div className="mt-4 pt-4 border-t border-white/[0.08] flex items-center justify-between">
+            <div className="px-6 py-4 border-t border-neutral-200/80 bg-neutral-50/50 flex items-center justify-between">
               <span className="text-xs font-mono text-neutral-500">
                 Pasted directly into active cursor position
               </span>
               <button
                 onClick={handleCopy}
-                className="text-xs font-semibold text-white bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.1] px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60"
+                className="text-xs font-semibold text-white bg-[#141416] hover:bg-neutral-800 px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 hover:scale-[1.01] active:scale-[0.99]"
               >
                 {isCopied ? (
                   <>
@@ -386,7 +401,7 @@ export function InteractivePlayground() {
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5 text-neutral-400" />
+                    <Copy className="w-3.5 h-3.5 text-neutral-300" />
                     <span>Copy text</span>
                   </>
                 )}

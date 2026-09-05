@@ -111,20 +111,26 @@ const TESTIMONIALS: Testimonial[] = [
 
 export function Testimonials() {
   return (
-    <section className="py-24 relative overflow-hidden border-t border-white/[0.06]">
-      <div className="max-w-5xl mx-auto px-4">
+    <section className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+      {/* Subtle Ambient Light Glow matching Hero */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
+
+      {/* Subtle Pixel Grid Texture matching Hero */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
+
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-4">
-            <Star className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
-            <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-zinc-400">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4 transition-transform hover:scale-[1.02] cursor-default">
+            <Star className="w-3.5 h-3.5 text-emerald-500 fill-emerald-500" />
+            <span className="text-xs font-mono font-medium text-neutral-800">
               Verified Community Feedback
             </span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
             Trusted by engineers, clinicians, and writers.
           </h2>
-          <p className="text-zinc-400 text-base sm:text-lg">
+          <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
             Practical feedback from professionals who rely on on-device speech recognition daily.
           </p>
         </div>
@@ -134,30 +140,30 @@ export function Testimonials() {
           {TESTIMONIALS.map((t, idx) => (
             <div
               key={idx}
-              className="p-6 rounded-2xl bg-[#0e0e11]/90 backdrop-blur-2xl border border-white/[0.08] hover:border-white/[0.16] flex flex-col justify-between transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.4)] group"
+              className="p-6 rounded-2xl bg-white border border-neutral-200/90 hover:border-neutral-300 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-8px_rgba(0,0,0,0.08)] flex flex-col justify-between transition-all duration-300 group"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-4">
-                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-emerald-400 font-semibold">
+                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-semibold">
                     {t.tag}
                   </span>
-                  <MessageSquareQuote className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                  <MessageSquareQuote className="w-4 h-4 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
                 </div>
-                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mb-6 font-normal">
+                <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed mb-6 font-normal">
                   &ldquo;{t.quote}&rdquo;
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-white/[0.06] flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.1] flex items-center justify-center font-bold text-xs text-white">
+              <div className="pt-4 border-t border-neutral-200/80 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-neutral-100 border border-neutral-200/80 flex items-center justify-center font-bold text-xs text-neutral-900">
                   {t.avatarInitial}
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <h3 className="text-xs font-bold text-neutral-950 flex items-center gap-1.5">
                     <span>{t.author}</span>
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                   </h3>
-                  <p className="text-[11px] text-zinc-500">{t.role}</p>
+                  <p className="text-[11px] text-neutral-500">{t.role}</p>
                 </div>
               </div>
             </div>

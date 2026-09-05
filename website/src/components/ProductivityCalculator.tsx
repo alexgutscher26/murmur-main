@@ -15,34 +15,40 @@ export function ProductivityCalculator() {
   const moneyValueSaved = hoursSavedPerYear * hourlyRate;
 
   return (
-    <section className="py-24 relative overflow-hidden border-t border-white/[0.06]">
-      <div className="max-w-5xl mx-auto px-4">
+    <section className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+      {/* Subtle Ambient Light Glow matching Hero */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
+
+      {/* Subtle Pixel Grid Texture matching Hero */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
+
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-4">
-            <Calculator className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-zinc-400">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4 transition-transform hover:scale-[1.02] cursor-default">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="text-xs font-mono font-medium text-neutral-800">
               Time & Value ROI Calculator
             </span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
             Calculate your speaking speed dividend.
           </h2>
-          <p className="text-zinc-400 text-base sm:text-lg leading-relaxed">
+          <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
             Human speech flows at ~160 words per minute while average typing tops out at ~40 words per minute.
           </p>
         </div>
 
         {/* Calculator Body */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-[#0e0e11]/90 backdrop-blur-2xl border border-white/[0.08] shadow-[0_16px_48px_rgba(0,0,0,0.5)]">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-white/[0.08]">
+        <div className="p-6 sm:p-8 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8 pb-8 border-b border-neutral-200/80">
             {/* Input 1: Daily Typing Hours Slider */}
             <div>
               <div className="flex justify-between items-center mb-3">
-                <label className="text-xs font-semibold text-zinc-200">
+                <label className="text-xs font-semibold text-neutral-800">
                   Daily hours spent typing:
                 </label>
-                <span className="text-xs font-mono font-bold text-white bg-white/[0.06] px-3 py-1 rounded-lg border border-white/[0.08]">
+                <span className="text-xs font-mono font-bold text-neutral-900 bg-neutral-100 px-3 py-1 rounded-lg border border-neutral-200/80 shadow-sm">
                   {dailyTypingHours.toFixed(1)} hrs / day
                 </span>
               </div>
@@ -53,9 +59,9 @@ export function ProductivityCalculator() {
                 step="0.5"
                 value={dailyTypingHours}
                 onChange={(e) => setDailyTypingHours(parseFloat(e.target.value))}
-                className="w-full h-2 rounded-lg cursor-pointer"
+                className="w-full h-2 rounded-lg cursor-pointer accent-[#141416]"
               />
-              <div className="flex justify-between text-[10px] font-mono text-zinc-500 mt-2">
+              <div className="flex justify-between text-[10px] font-mono text-neutral-500 mt-2">
                 <span>0.5 hr (Light)</span>
                 <span>4.0 hrs (Average)</span>
                 <span>8.0 hrs (Heavy)</span>
@@ -65,10 +71,10 @@ export function ProductivityCalculator() {
             {/* Input 2: Hourly Rate Slider */}
             <div>
               <div className="flex justify-between items-center mb-3">
-                <label className="text-xs font-semibold text-zinc-200">
+                <label className="text-xs font-semibold text-neutral-800">
                   Estimated hourly value:
                 </label>
-                <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+                <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-lg border border-emerald-200/80 shadow-sm">
                   ${hourlyRate} / hr
                 </span>
               </div>
@@ -79,9 +85,9 @@ export function ProductivityCalculator() {
                 step="5"
                 value={hourlyRate}
                 onChange={(e) => setHourlyRate(parseInt(e.target.value))}
-                className="w-full h-2 rounded-lg cursor-pointer"
+                className="w-full h-2 rounded-lg cursor-pointer accent-[#141416]"
               />
-              <div className="flex justify-between text-[10px] font-mono text-zinc-500 mt-2">
+              <div className="flex justify-between text-[10px] font-mono text-neutral-500 mt-2">
                 <span>$20 / hr</span>
                 <span>$100 / hr</span>
                 <span>$250 / hr</span>
@@ -91,47 +97,47 @@ export function ProductivityCalculator() {
 
           {/* Results Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-            <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <div className="p-5 rounded-xl bg-neutral-50 border border-neutral-200/80">
               <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-3.5 h-3.5 text-zinc-400" />
-                <span className="text-zinc-500 text-[10px] uppercase font-bold">
+                <Clock className="w-3.5 h-3.5 text-neutral-500" />
+                <span className="text-neutral-500 text-[10px] uppercase font-bold">
                   Monthly Hours Saved
                 </span>
               </div>
-              <span className="text-2xl sm:text-3xl font-bold text-white block mb-1">
+              <span className="text-2xl sm:text-3xl font-bold text-neutral-950 block mb-1">
                 {hoursSavedPerMonth.toFixed(0)} hrs
               </span>
-              <span className="text-zinc-500 text-[11px]">
+              <span className="text-neutral-500 text-[11px]">
                 ~{hoursSavedPerWeek.toFixed(1)} hours reclaimed weekly
               </span>
             </div>
 
-            <div className="p-5 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <div className="p-5 rounded-xl bg-neutral-50 border border-neutral-200/80">
               <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-3.5 h-3.5 text-zinc-400" />
-                <span className="text-zinc-500 text-[10px] uppercase font-bold">
+                <Calendar className="w-3.5 h-3.5 text-neutral-500" />
+                <span className="text-neutral-500 text-[10px] uppercase font-bold">
                   Work Days Gained / Year
                 </span>
               </div>
-              <span className="text-2xl sm:text-3xl font-bold text-emerald-400 block mb-1">
+              <span className="text-2xl sm:text-3xl font-bold text-emerald-700 block mb-1">
                 +{workDaysSavedPerYear.toFixed(0)} days
               </span>
-              <span className="text-zinc-500 text-[11px]">
+              <span className="text-neutral-500 text-[11px]">
                 Annual productivity dividend
               </span>
             </div>
 
-            <div className="p-5 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/30">
+            <div className="p-5 rounded-xl bg-emerald-50/50 border border-emerald-200/90">
               <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400 text-[10px] uppercase font-bold">
+                <DollarSign className="w-3.5 h-3.5 text-emerald-700" />
+                <span className="text-emerald-800 text-[10px] uppercase font-bold">
                   Annual Value Created
                 </span>
               </div>
-              <span className="text-2xl sm:text-3xl font-bold text-white block mb-1">
+              <span className="text-2xl sm:text-3xl font-bold text-neutral-950 block mb-1">
                 ${moneyValueSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </span>
-              <span className="text-emerald-400/80 text-[11px]">
+              <span className="text-emerald-700 font-medium text-[11px]">
                 $0.00 Murmur software cost (Free)
               </span>
             </div>

@@ -73,20 +73,26 @@ const JOBS = [
 
 export function FeatureBento() {
   return (
-    <section id="features" className="py-24 relative overflow-hidden border-t border-white/[0.06]">
-      <div className="max-w-5xl mx-auto px-4">
+    <section id="features" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+      {/* Subtle Ambient Light Glow matching Hero */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
+
+      {/* Subtle Pixel Grid Texture matching Hero */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
+
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-4">
-            <Zap className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[11px] font-mono font-semibold uppercase tracking-widest text-zinc-400">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4 transition-transform hover:scale-[1.02] cursor-default">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+            <span className="text-xs font-mono font-medium text-neutral-800">
               Built for High-Trust Workflows
             </span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
             Features that solve real daily jobs.
           </h2>
-          <p className="text-zinc-400 text-base sm:text-lg leading-relaxed">
+          <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
             Built for developers, lawyers, healthcare professionals, and founders who cannot—and will not—stream sensitive voice data to the cloud.
           </p>
         </div>
@@ -98,35 +104,35 @@ export function FeatureBento() {
             return (
               <div
                 key={idx}
-                className="p-6 rounded-2xl bg-[#0e0e11]/90 backdrop-blur-2xl border border-white/[0.08] hover:border-white/[0.16] flex flex-col justify-between transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.4)] group"
+                className="p-6 rounded-2xl bg-white border border-neutral-200/90 hover:border-neutral-300 shadow-[0_8px_30px_-8px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_16px_40px_-8px_rgba(0,0,0,0.08)] flex flex-col justify-between transition-all duration-300 group"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-4">
-                    <div className="p-2 rounded-xl bg-white/[0.04] text-emerald-400 border border-white/[0.08] group-hover:bg-emerald-500/10 group-hover:border-emerald-500/30 transition-colors">
+                    <div className="p-2.5 rounded-xl bg-neutral-100 text-neutral-800 border border-neutral-200/80 group-hover:bg-emerald-50 group-hover:text-emerald-700 group-hover:border-emerald-200/80 transition-colors">
                       <Icon className="w-4 h-4" />
                     </div>
-                    <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">
+                    <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider">
                       {item.feature}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-white mb-2 leading-snug">
+                  <h3 className="text-base font-bold text-neutral-950 mb-2 leading-snug">
                     {item.quote}
                   </h3>
 
-                  <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed mb-4">
+                  <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mb-4">
                     {item.description}
                   </p>
 
-                  <div className="mb-6 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.03] border border-white/[0.06] text-[11px] text-zinc-400">
-                    <span className="text-zinc-500 font-mono">For:</span>
-                    <span className="text-zinc-300 font-medium">{item.audience}</span>
+                  <div className="mb-6 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-50 border border-neutral-200/80 text-[11px] text-neutral-600">
+                    <span className="text-neutral-400 font-mono">For:</span>
+                    <span className="text-neutral-800 font-medium">{item.audience}</span>
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#060608] border border-white/[0.06] flex items-center justify-between text-xs font-mono text-zinc-300">
+                <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80 flex items-center justify-between text-xs font-mono text-neutral-700">
                   <span>{item.pill}</span>
-                  <span className="text-emerald-400 font-bold">{item.pillDetail}</span>
+                  <span className="text-emerald-700 font-bold">{item.pillDetail}</span>
                 </div>
               </div>
             );
