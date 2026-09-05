@@ -9,7 +9,7 @@
  */
 
 import { useCallback, useState } from "react";
-import { Download, Trash2, Sparkles, Check, ShieldAlert } from "lucide-react";
+import { Download, Trash2, Sparkles, Check, ShieldAlert, Loader2 } from "lucide-react";
 import {
   commands,
   events,
@@ -45,6 +45,7 @@ export function ModelManager() {
 
   const [progress, setProgress] = useState<Readonly<Record<string, DownloadProgress>>>({});
   const [liveStates, setLiveStates] = useState<Readonly<Record<string, ModelState>>>({});
+  const [downloadingIds, setDownloadingIds] = useState<ReadonlySet<string>>(new Set());
   const [proModalOpen, setProModalOpen] = useState(false);
   const [gatedModelName, setGatedModelName] = useState("Whisper Large v3 Turbo");
   const [downloadError, setDownloadError] = useState<AppError | null>(null);
@@ -89,6 +90,9 @@ export function ModelManager() {
         setProModalOpen(true);
         return;
       }
+      if (downloadingIds.has(modelId)) {
+        return;
+      }
       if (isAirGapActive) {
         await unwrapCommand(() =>
           commands.setSetting({
@@ -99,13 +103,29 @@ export function ModelManager() {
         settings.reload();
       }
       clearOverride(modelId);
-      const res = await unwrapCommand(() => commands.downloadModel({ model_id: modelId }));
-      if (res.status === "error") {
-        setDownloadError(res.error);
+      setDownloadingIds((prev) => new Set([...prev, modelId]));
+      setLiveStates((current) => ({
+        ...current,
+        [modelId]: { kind: "DOWNLOADING", received_bytes: 0, total_bytes: 0 },
+      }));
+
+      try {
+        const res = await unwrapCommand(() => commands.downloadModel({ model_id: modelId }));
+        if (res.status === "error") {
+          if (res.error.message !== "That is already in progress.") {
+            setDownloadError(res.error);
+          }
+        }
+      } finally {
+        setDownloadingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(modelId);
+          return next;
+        });
+        models.reload();
       }
-      models.reload();
     },
-    [clearOverride, isAirGapActive, models.reload, settings, tier],
+    [clearOverride, downloadingIds, isAirGapActive, models, settings, tier],
   );
 
   const remove = useCallback(
@@ -168,6 +188,7 @@ export function ModelManager() {
           const isUnlocked = canUseTurboModel(tier);
           const isLocked = isProModel && !isUnlocked;
           const isActive = model.descriptor.id === activeModelId;
+          const isDownloading = downloadingIds.has(model.descriptor.id);
 
           return (
             <li key={model.descriptor.id} className="hairline-b flex items-center gap-4 py-3 last:border-b-0">
@@ -179,11 +200,13 @@ export function ModelManager() {
                 isLocked={isLocked}
                 isUnlocked={isUnlocked}
                 isActive={isActive}
+                isDownloading={isDownloading}
               />
               <ModelAction
                 model={model}
                 isLocked={isLocked}
                 isActive={isActive}
+                isDownloading={isDownloading}
                 onDownload={(id) => download(id, model.descriptor.display_name)}
                 onDelete={remove}
                 onActivate={() => activateModel(model.descriptor.id)}
@@ -215,6 +238,7 @@ function ModelSummary({
   isLocked,
   isUnlocked,
   isActive,
+  isDownloading,
 }: {
   model: ModelReport;
   progress: DownloadProgress | undefined;
@@ -223,11 +247,13 @@ function ModelSummary({
   isLocked: boolean;
   isUnlocked: boolean;
   isActive: boolean;
+  isDownloading?: boolean;
 }) {
   const { descriptor, state } = model;
-  const downloading = state.kind === "DOWNLOADING";
-  const received = progress?.received_bytes ?? (downloading ? state.received_bytes : 0);
-  const total = progress?.total_bytes ?? (downloading ? state.total_bytes : descriptor.size_bytes);
+  const isStateDownloading = state.kind === "DOWNLOADING";
+  const downloading = Boolean(isDownloading) || isStateDownloading;
+  const received = progress?.received_bytes ?? (isStateDownloading ? state.received_bytes : 0);
+  const total = progress?.total_bytes ?? (isStateDownloading ? state.total_bytes : descriptor.size_bytes);
   const eta = progress ? formatEta(Math.max(0, total - received), progress.bytes_per_second) : null;
 
   return (
@@ -293,6 +319,7 @@ function ModelAction({
   model,
   isLocked,
   isActive,
+  isDownloading,
   onDownload,
   onDelete,
   onActivate,
@@ -301,15 +328,27 @@ function ModelAction({
   model: ModelReport;
   isLocked: boolean;
   isActive: boolean;
+  isDownloading?: boolean;
   onDownload: (modelId: ModelId) => void;
   onDelete: (modelId: ModelId) => void;
   onActivate: () => void;
   onUnlock: () => void;
 }) {
   const { state, descriptor } = model;
-  const busy = state.kind === "DOWNLOADING" || state.kind === "VERIFYING" || state.kind === "OPTIMIZING";
+  const busy =
+    Boolean(isDownloading) ||
+    state.kind === "DOWNLOADING" ||
+    state.kind === "VERIFYING" ||
+    state.kind === "OPTIMIZING";
 
-  if (busy) return <span className="shrink-0 text-caption text-text-tertiary">{STATE_LABEL[state.kind]}</span>;
+  if (busy) {
+    return (
+      <div className="flex items-center gap-1.5 shrink-0 text-xs font-medium text-stone-500 dark:text-stone-400">
+        <Loader2 className="size-3.5 animate-spin" />
+        <span>{STATE_LABEL[state.kind] || "Downloading..."}</span>
+      </div>
+    );
+  }
 
   if (state.kind === "READY") {
     if (isActive) {
