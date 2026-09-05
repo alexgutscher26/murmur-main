@@ -62,10 +62,23 @@ export function ModelManager() {
 
   useTauriEvent(events.modelDownloadProgress, (payload) => {
     setProgress((current) => ({ ...current, [payload.progress.model_id]: payload.progress }));
+    setDownloadingIds((current) => {
+      if (current.has(payload.progress.model_id)) return current;
+      return new Set([...current, payload.progress.model_id]);
+    });
   });
 
   useTauriEvent(events.modelStateChanged, (payload) => {
     setLiveStates((current) => ({ ...current, [payload.model_id]: payload.state }));
+    if (payload.state.kind !== "DOWNLOADING") {
+      setDownloadingIds((current) => {
+        if (!current.has(payload.model_id)) return current;
+        const next = new Set(current);
+        next.delete(payload.model_id);
+        return next;
+      });
+      models.reload();
+    }
   });
 
   const clearOverride = useCallback((modelId: ModelId) => {
@@ -117,23 +130,28 @@ export function ModelManager() {
         [modelId]: { kind: "DOWNLOADING", received_bytes: existingReceived, total_bytes: existingTotal },
       }));
 
+      let inProgress = false;
       try {
         const res = await unwrapCommand(() => commands.downloadModel({ model_id: modelId }));
         if (res.status === "error") {
-          if (res.error.message !== "That is already in progress.") {
+          if (res.error.message === "That is already in progress.") {
+            inProgress = true;
+          } else {
             setDownloadError(res.error);
           }
         }
       } finally {
-        setDownloadingIds((prev) => {
-          const next = new Set(prev);
-          next.delete(modelId);
-          return next;
-        });
-        models.reload();
+        if (!inProgress) {
+          setDownloadingIds((prev) => {
+            const next = new Set(prev);
+            next.delete(modelId);
+            return next;
+          });
+          models.reload();
+        }
       }
     },
-    [clearOverride, downloadingIds, isAirGapActive, models, settings, tier],
+    [clearOverride, downloadingIds, isAirGapActive, liveStates, models, settings, tier],
   );
 
   const remove = useCallback(
@@ -197,6 +215,7 @@ export function ModelManager() {
           const isLocked = isProModel && !isUnlocked;
           const isActive = model.descriptor.id === activeModelId;
           const isDownloading = downloadingIds.has(model.descriptor.id);
+          const isAnyDownloading = downloadingIds.size > 0;
 
           return (
             <li key={model.descriptor.id} className="hairline-b flex items-center gap-4 py-3 last:border-b-0">
@@ -215,6 +234,7 @@ export function ModelManager() {
                 isLocked={isLocked}
                 isActive={isActive}
                 isDownloading={isDownloading}
+                isAnyDownloading={isAnyDownloading}
                 onDownload={(id) => download(id, model.descriptor.display_name)}
                 onDelete={remove}
                 onActivate={() => activateModel(model.descriptor.id)}
@@ -329,6 +349,7 @@ function ModelAction({
   isLocked,
   isActive,
   isDownloading,
+  isAnyDownloading,
   onDownload,
   onDelete,
   onActivate,
@@ -338,6 +359,7 @@ function ModelAction({
   isLocked: boolean;
   isActive: boolean;
   isDownloading?: boolean;
+  isAnyDownloading?: boolean;
   onDownload: (modelId: ModelId) => void;
   onDelete: (modelId: ModelId) => void;
   onActivate: () => void;
@@ -360,18 +382,21 @@ function ModelAction({
       <div className="flex items-center gap-1.5 shrink-0">
         <button
           type="button"
+          disabled={isAnyDownloading}
           onClick={() => onDownload(descriptor.id)}
-          className="hairline flex shrink-0 items-center gap-1.5 rounded-input bg-sunken px-2.5 py-1 text-xs font-semibold text-text-primary transition-colors hover:bg-sunken-strong cursor-pointer"
+          className="hairline flex shrink-0 items-center gap-1.5 rounded-input bg-sunken px-2.5 py-1 text-xs font-semibold text-text-primary transition-colors hover:bg-sunken-strong disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          title={isAnyDownloading ? "Another download is in progress" : undefined}
         >
           <Download className="size-3.5" />
           Resume
         </button>
         <button
           type="button"
+          disabled={isAnyDownloading}
           aria-label={`Delete partial download for ${descriptor.display_name}`}
           onClick={() => onDelete(descriptor.id)}
-          className="shrink-0 rounded-input p-1 text-text-secondary transition-colors hover:bg-sunken hover:text-danger cursor-pointer"
-          title="Delete partial download"
+          className="shrink-0 rounded-input p-1 text-text-secondary transition-colors hover:bg-sunken hover:text-danger disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          title={isAnyDownloading ? "Another download is in progress" : "Delete partial download"}
         >
           <Trash2 className="size-4" />
         </button>
@@ -470,8 +495,10 @@ function ModelAction({
       <div className="flex items-center gap-1.5 shrink-0">
         <button
           type="button"
+          disabled={isAnyDownloading}
           onClick={() => onDownload(descriptor.id)}
-          className="hairline flex shrink-0 items-center gap-2 rounded-input bg-sunken px-3 py-1 text-body text-text-primary transition-colors hover:bg-sunken-strong cursor-pointer"
+          className="hairline flex shrink-0 items-center gap-2 rounded-input bg-sunken px-3 py-1 text-body text-text-primary transition-colors hover:bg-sunken-strong disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          title={isAnyDownloading ? "Another download is in progress" : undefined}
         >
           <Download className="size-4" />
           Try again
@@ -492,8 +519,10 @@ function ModelAction({
   return (
     <button
       type="button"
+      disabled={isAnyDownloading}
       onClick={() => onDownload(descriptor.id)}
-      className="hairline flex shrink-0 items-center gap-2 rounded-input bg-sunken px-3 py-1 text-body text-text-primary transition-colors hover:bg-sunken-strong cursor-pointer"
+      className="hairline flex shrink-0 items-center gap-2 rounded-input bg-sunken px-3 py-1 text-body text-text-primary transition-colors hover:bg-sunken-strong disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+      title={isAnyDownloading ? "Another download is in progress" : undefined}
     >
       <Download className="size-4" />
       Download
