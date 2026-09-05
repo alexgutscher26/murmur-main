@@ -10,6 +10,9 @@ import { useState } from "react";
 import { ScrollArea } from "@/components/global";
 import { usePlan, PlanTier } from "@/lib/plan";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { commands } from "@/lib/bindings";
+import { unwrapCommand, useCommand } from "@/lib/ipc";
+import { Gift, Copy, Check } from "lucide-react";
 
 type ProBillingCycle = "lifetime" | "annual";
 
@@ -29,6 +32,17 @@ export function BillingView() {
   const [inputKey, setInputKey] = useState("");
   const [keyError, setKeyError] = useState(false);
   const [keySuccess, setKeySuccess] = useState(false);
+  const [copiedReferral, setCopiedReferral] = useState(false);
+  const referralStatus = useCommand(commands.getReferralStatus, []);
+
+  const handleCopyReferral = () => {
+    const url =
+      referralStatus.data?.referral_url || "https://murmur.app/pricing";
+    void unwrapCommand(() => commands.copyText({ text: url })).then(() => {
+      setCopiedReferral(true);
+      setTimeout(() => setCopiedReferral(false), 2000);
+    });
+  };
 
   const handleOpenLink = async (url: string) => {
     try {
@@ -228,6 +242,49 @@ export function BillingView() {
         >
           Apply for 50% Grant →
         </button>
+      </div>
+
+      {/* Post-Activation Referral Program Card */}
+      <div className="hairline rounded-card bg-surface p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shrink-0">
+            <Gift className="h-5 w-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-body font-bold text-text-primary">
+                Post-Activation Referral Program
+              </span>
+              <span className="rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.2 text-[10px] font-mono font-semibold">
+                {referralStatus.data?.eligible
+                  ? "50+ Dictations Unlocked"
+                  : `${referralStatus.data?.session_count ?? 0} / 50 Dictations`}
+              </span>
+            </div>
+            <p className="text-caption text-text-secondary">
+              Share your invite link with friends or colleagues. They receive a welcome discount, and you unlock developer prompt packs.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={handleCopyReferral}
+            className="hairline h-8 rounded-input bg-sunken px-3 text-caption font-semibold text-text-primary transition-colors hover:bg-sunken-strong shrink-0 flex items-center gap-1.5 cursor-pointer"
+          >
+            {copiedReferral ? (
+              <>
+                <Check className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>Copied Link!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="size-3.5" />
+                <span>Copy Invite Link</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* License Key Activation Box */}

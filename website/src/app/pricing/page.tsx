@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { Gift } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BadgeGenerator } from "@/components/BadgeGenerator";
@@ -93,7 +95,10 @@ const PRICING_FAQS = [
   },
 ];
 
-export default function PricingPage() {
+function PricingContent() {
+  const searchParams = useSearchParams();
+  const refCode = searchParams.get("ref");
+
   const [proBilling, setProBilling] = useState<ProBilling>("lifetime");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
@@ -107,7 +112,10 @@ export default function PricingPage() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier }),
+        body: JSON.stringify({
+          tier,
+          discountCode: refCode || undefined,
+        }),
       });
       const data = await res.json();
       if (data.url) {
@@ -122,6 +130,30 @@ export default function PricingPage() {
       setCheckoutLoading(false);
     }
   };
+
+  const proPrice = refCode
+    ? proBilling === "lifetime"
+      ? "$79"
+      : "$39"
+    : proBilling === "lifetime"
+      ? "$89"
+      : "$49";
+
+  const proPeriod = refCode
+    ? proBilling === "lifetime"
+      ? "one-time ($10 off)"
+      : "/ yr ($10 off)"
+    : proBilling === "lifetime"
+      ? "one-time"
+      : "/ year";
+
+  const proSubtext = refCode
+    ? proBilling === "lifetime"
+      ? "Friend referral applied ($10 off reg. $89) · Own forever"
+      : "Friend referral applied ($10 off reg. $49) · Continuous updates"
+    : proBilling === "lifetime"
+      ? "Pay once · Own forever · 1 yr updates included"
+      : "Equivalent to $4.08/mo · Continuous updates";
 
   const tiers: PricingTier[] = [
     {
@@ -147,13 +179,14 @@ export default function PricingPage() {
     {
       id: "pro",
       name: "Pro",
-      badge: proBilling === "lifetime" ? "Perpetual · Best Value" : "Most Flexible",
-      price: proBilling === "lifetime" ? "$89" : "$49",
-      period: proBilling === "lifetime" ? "one-time" : "/ year",
-      subtext:
-        proBilling === "lifetime"
-          ? "Pay once · Own forever · 1 yr updates included"
-          : "Equivalent to $4.08/mo · Continuous updates",
+      badge: refCode
+        ? "Referral Gift Applied"
+        : proBilling === "lifetime"
+          ? "Perpetual · Best Value"
+          : "Most Flexible",
+      price: proPrice,
+      period: proPeriod,
+      subtext: proSubtext,
       description: "For professionals who write daily and want peak accuracy, custom jargon, and context awareness.",
       features: [
         "Everything in Free, plus:",
@@ -165,7 +198,10 @@ export default function PricingPage() {
         "Valid on 2 personal devices (macOS & Windows)",
         "Continuous performance tuning & model drops",
       ],
-      ctaText: proBilling === "lifetime" ? "Get Pro Lifetime ($89)" : "Start Pro Annual ($49/yr)",
+      ctaText:
+        proBilling === "lifetime"
+          ? `Get Pro Lifetime (${proPrice})`
+          : `Start Pro Annual (${proPrice}/yr)`,
       ctaHref: "/#download",
       isPrimary: true,
     },
@@ -220,6 +256,38 @@ export default function PricingPage() {
             Zero cloud compute markups. Choose Free forever, purchase a perpetual Pro license to own on your machine, or deploy across your team.
           </p>
         </div>
+
+        {/* Friend Referral Welcome Banner */}
+        {refCode && (
+          <div className="mb-8 max-w-3xl w-full p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50/60 to-emerald-50 border-2 border-emerald-500/40 shadow-[0_4px_24px_rgba(16,185,129,0.1)] text-left flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-2">
+            <div className="flex items-start sm:items-center gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-800 flex items-center justify-center shrink-0">
+                <Gift className="size-5 text-emerald-700" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="text-xs font-mono font-semibold uppercase text-emerald-800 tracking-wider">
+                    Friend Referral Applied
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-white border border-emerald-200 text-xs font-mono font-bold text-emerald-900 shadow-xs">
+                    {refCode}
+                  </span>
+                </div>
+                <h2 className="text-sm sm:text-base font-bold text-emerald-950">
+                  $10 Off Any Pro Tier + Developer Prompt Pack Included
+                </h2>
+                <p className="text-xs text-emerald-800/90 mt-0.5">
+                  Your invite bonus is active. Select Lifetime ($79) or Annual ($39/yr) below to check out.
+                </p>
+              </div>
+            </div>
+            <div className="text-right shrink-0">
+              <span className="inline-block px-3 py-1 rounded-xl bg-emerald-600 text-white text-xs font-mono font-bold shadow-xs">
+                {proBilling === "lifetime" ? "$79 Lifetime" : "$39 / Year"}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Competitive Migration / Switcher Offer */}
         <div className="mb-12 max-w-3xl w-full p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-neutral-50/90 to-white border border-neutral-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left">
@@ -590,5 +658,13 @@ export default function PricingPage() {
         defaultTab={studentGrantTab}
       />
     </main>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <PricingContent />
+    </Suspense>
   );
 }

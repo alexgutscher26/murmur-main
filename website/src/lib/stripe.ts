@@ -53,6 +53,17 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
       };
     }
 
+    if (normalizedDiscount?.startsWith("MURMUR-") || normalizedDiscount?.startsWith("REF-")) {
+      return {
+        tier,
+        name: "Murmur Pro Lifetime (Referral Bonus)",
+        amountCents: 7900, // $79.00 ($10 off)
+        currency: "usd",
+        discountApplied: `Friend Referral Bonus ($10 Off with ${normalizedDiscount})`,
+        originalAmountCents,
+      };
+    }
+
     return {
       tier,
       name: "Murmur Pro Lifetime License",
@@ -87,6 +98,18 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
       currency: "usd",
       interval: "year",
       discountApplied: "Academic / OSS 50% Annual Grant",
+      originalAmountCents,
+    };
+  }
+
+  if (normalizedDiscount?.startsWith("MURMUR-") || normalizedDiscount?.startsWith("REF-")) {
+    return {
+      tier,
+      name: "Murmur Pro Annual Pass (Referral Bonus)",
+      amountCents: 3900, // $39.00 / yr ($10 off)
+      currency: "usd",
+      interval: "year",
+      discountApplied: `Friend Referral Bonus ($10 Off with ${normalizedDiscount})`,
       originalAmountCents,
     };
   }

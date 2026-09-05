@@ -28,6 +28,8 @@ import {
   Check,
   ArrowRight,
   ShieldCheck,
+  Gift,
+  Copy,
 } from "lucide-react";
 import {
   commands,
@@ -36,7 +38,8 @@ import {
   type RegistrySnapshot,
   type SettingValue,
 } from "@/lib/bindings";
-import { useCommand } from "@/lib/ipc";
+import { unwrapCommand, useCommand } from "@/lib/ipc";
+import { usePlan } from "@/lib/plan";
 import { useSettings } from "./use-settings";
 import {
   ErrorBoundary,
@@ -90,6 +93,24 @@ export function Dashboard() {
   const [showChangelog, setShowChangelog] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [resumeCardDismissed, setResumeCardDismissed] = useState(false);
+  const [referralDismissed, setReferralDismissed] = useState(false);
+  const referralStatus = useCommand(commands.getReferralStatus, []);
+  const { activateLicense } = usePlan();
+
+  // Auto-activate license key if passed via URL or deep-link (?key=... or ?activate=...)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const incomingKey = params.get("key") || params.get("activate");
+      if (incomingKey) {
+        const ok = activateLicense(incomingKey);
+        if (ok) {
+          setToastMessage("Pro License activated successfully!");
+        }
+      }
+    } catch {}
+  }, [activateLicense]);
 
   const isOnboardingIncomplete =
     settings.data?.["general.onboarding_complete"]?.value !== true;
@@ -348,33 +369,21 @@ export function Dashboard() {
 
             {/* Secondary navigation */}
             <div className="flex flex-col gap-0.5">
-              {/* <button
+              <button
                 type="button"
                 onClick={() => {
+                  const url =
+                    referralStatus.data?.referral_url || "https://murmur.app/pricing";
                   void unwrapCommand(() =>
-                    commands.copyText({ text: "https://murmur.app/invite/alex" }),
-                  ).then(() => showToast("Invite link copied to clipboard!"));
+                    commands.copyText({ text: url }),
+                  ).then(() => showToast("Personal referral link copied to clipboard!"));
                 }}
-                className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors"
-                title="Invite your team"
+                className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors cursor-pointer"
+                title="Invite friends & get Pro packs"
               >
-                <Users className="h-4 w-4 shrink-0" />
-                {!sidebarCollapsed && <span>Invite your team</span>}
-              </button> */}
-
-              {/* <button
-                type="button"
-                onClick={() => {
-                  void unwrapCommand(() =>
-                    commands.copyText({ text: "MURMUR-FREE-MONTH" }),
-                  ).then(() => showToast("Referral code copied!"));
-                }}
-                className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors"
-                title="Get a free month"
-              >
-                <Gift className="h-4 w-4 shrink-0" />
-                {!sidebarCollapsed && <span>Get a free month</span>}
-              </button> */}
+                <Gift className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                {!sidebarCollapsed && <span>Invite & Earn Pro</span>}
+              </button>
 
               <button
                 type="button"
@@ -449,6 +458,59 @@ export function Dashboard() {
                   onClick={() => setResumeCardDismissed(true)}
                   title="Dismiss banner"
                   className="flex h-7 w-7 items-center justify-center rounded-lg text-amber-700 hover:bg-amber-200/50 dark:text-amber-400 dark:hover:bg-amber-900/40 transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Post-Activation Referral Trigger (After 50 Dictations) */}
+          {referralStatus.data?.eligible && !referralDismissed && (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-emerald-200/80 bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-emerald-50/90 px-5 py-3 dark:border-emerald-900/50 dark:from-emerald-950/40 dark:via-teal-950/30 dark:to-emerald-950/40 animate-in fade-in slide-in-from-top-1 shrink-0 gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 shrink-0">
+                  <Gift className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-emerald-950 dark:text-emerald-200">
+                      🎉 50 Dictations Milestone Reached!
+                    </span>
+                    <span className="rounded-md bg-emerald-200/70 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-800 dark:bg-emerald-900/70 dark:text-emerald-200 font-mono">
+                      Referral Unlocked
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-emerald-800/90 dark:text-emerald-300/90 leading-tight mt-0.5">
+                    You've built a solid local dictation habit. Invite colleagues or friends: they get a welcome discount, and you unlock free Pro developer packs.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (referralStatus.data?.referral_url) {
+                      void unwrapCommand(() =>
+                        commands.copyText({ text: referralStatus.data!.referral_url }),
+                      ).then(() => showToast("Personal invite link copied to clipboard!"));
+                    }
+                  }}
+                  className="flex items-center gap-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-white shadow-xs transition-colors cursor-pointer"
+                >
+                  <Copy className="h-3.5 w-3.5" />
+                  <span>Copy Invite Link</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setReferralDismissed(true);
+                    await unwrapCommand(() => commands.dismissReferralPrompt());
+                    referralStatus.reload();
+                  }}
+                  title="Dismiss referral prompt"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-emerald-700 hover:bg-emerald-200/50 dark:text-emerald-300 dark:hover:bg-emerald-900/50 transition-colors cursor-pointer"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
