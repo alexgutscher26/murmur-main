@@ -28,7 +28,11 @@ const MILESTONES: Milestone[] = [
   { days: 365, label: "Annual Master", badge: "365d+", icon: Trophy, color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/30" },
 ];
 
-export function StreakHeaderBadge() {
+interface StreakHeaderBadgeProps {
+  className?: string;
+}
+
+export function StreakHeaderBadge({ className }: StreakHeaderBadgeProps = {}) {
   const stats = useCommand(commands.getStats, []);
   useTauriEvent(events.transcriptDelivered, () => stats.reload());
 
@@ -67,7 +71,7 @@ export function StreakHeaderBadge() {
   const overallProgress = isGoalMetToday ? 100 : Math.max(sessionsPct, wordsPct);
 
   return (
-    <div ref={containerRef} className="relative inline-flex items-center">
+    <div ref={containerRef} className={cn("relative inline-flex items-center", className)}>
       {/* Trigger pill */}
       <button
         type="button"
@@ -109,7 +113,7 @@ export function StreakHeaderBadge() {
         <div
           role="dialog"
           aria-label="Habit streak details"
-          className="absolute left-1/2 top-full mt-2 w-72 -translate-x-1/2 z-50 rounded-xl border border-stone-200/80 bg-white/95 p-3.5 shadow-xl backdrop-blur-md dark:border-stone-800 dark:bg-stone-900/95 animate-in fade-in zoom-in-95 duration-150"
+          className="absolute left-0 top-full mt-2 w-72 z-50 rounded-xl border border-stone-200/80 bg-white/95 p-3.5 shadow-xl backdrop-blur-md dark:border-stone-800 dark:bg-stone-900/95 animate-in fade-in zoom-in-95 duration-150"
         >
           {/* Top header in popover */}
           <div className="flex items-center justify-between pb-2 border-b border-stone-100 dark:border-stone-800/80">
@@ -234,3 +238,5 @@ export function StreakHeaderBadge() {
     </div>
   );
 }
+
+export { StreakHeaderBadge as StreakBadge };

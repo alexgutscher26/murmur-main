@@ -58,7 +58,6 @@ import { HistoryView } from "./history/HistoryView";
 import { SettingsView } from "./settings/SettingsView";
 import { InsightsView } from "./insights/InsightsView";
 import { DictionaryView } from "./dictionary/DictionaryView";
-import { StreakHeaderBadge } from "./_components/StreakHeaderBadge";
 import { UpdateNotice } from "./_components/UpdateNotice";
 
 /**
@@ -218,9 +217,8 @@ export function Dashboard() {
           </button>
         </div>
 
-        {/* Top Center: Habit Streak Tracker & Air Gap Isolation Badge */}
+        {/* Top Center: Air Gap Isolation Badge */}
         <div data-tauri-drag-region={false} className="flex items-center gap-2.5">
-          <StreakHeaderBadge />
           {isAirGapped && (
             <div
               title="Air-Gap / Hardware Isolation Mode Active: All outbound networking and update checks are disabled."

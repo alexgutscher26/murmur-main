@@ -36,6 +36,7 @@ import { cn } from "@/lib/utils";
 import { Skeleton, ErrorSurface } from "@/components/global";
 import type { DictationMode } from "@/lib/dictation-mode";
 import { useHistory } from "../history/use-history";
+import { StreakBadge } from "../_components/StreakHeaderBadge";
 
 export interface InsightsViewProps {
   hotkey: HotkeyBinding | null;
@@ -693,9 +694,12 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
             {/* Card 5: 1 day streak & Heatmap */}
             <div className="rounded-2xl border border-hairline bg-elevated/70 p-6 backdrop-blur-sm shadow-sm flex flex-col justify-between">
               <div className="flex items-center justify-between pb-2">
-                <h3 className="text-xl font-bold text-text-primary">
-                  {streakDays} day streak
-                </h3>
+                <div className="flex items-center gap-2.5">
+                  <h3 className="text-xl font-bold text-text-primary">
+                    {streakDays} day streak
+                  </h3>
+                  <StreakBadge />
+                </div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">
                   LONGEST STREAK | {Math.max(streakDays, 10)} DAYS
                 </span>
