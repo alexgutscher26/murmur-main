@@ -325,6 +325,12 @@ impl<P: PermissionProvider> TextInjector for WindowsInjector<P> {
     }
 
     fn frontmost_app(&self) -> Option<FrontmostApp> {
+        // Alt+Tab stabilization delay: in rapid window switching scenarios,
+        // the active window (HWND) may still point to the previous window for ~50ms.
+        // Waiting 30ms lets the OS finish the active window transition before reading
+        // the active window process name.
+        std::thread::sleep(Duration::from_millis(30));
+
         unsafe {
             let hwnd: HWND = GetForegroundWindow();
             if hwnd.0.is_null() {

@@ -197,8 +197,87 @@ pub fn let_the_pill_float_over_everything(app: &AppHandle) {
         tracing::info!("the pill will follow the user into full-screen apps");
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "windows")]
+    {
+        if let Some(pill) = app.get_webview_window(PILL_WINDOW) {
+            windows_pill::setup_windows_pill(&pill);
+        }
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
     let _ = app;
+}
+
+#[cfg(target_os = "windows")]
+mod windows_pill {
+    use std::sync::atomic::{AtomicIsize, Ordering};
+    use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
+    use windows::Win32::UI::WindowsAndMessaging::{
+        CallWindowProcW, DefWindowProcW, SetWindowLongPtrW, SetWindowPos,
+        GWLP_WNDPROC, HWND_TOPMOST, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW,
+        WM_ACTIVATE, WM_ACTIVATEAPP, WNDPROC,
+    };
+
+    static PREV_WNDPROC: AtomicIsize = AtomicIsize::new(0);
+
+    /**
+     * SOURCE OF TRUTH KEYWORDS: pill_subclass_wndproc, HWND_TOPMOST, WM_ACTIVATE
+     * WHAT:  Re-asserts HWND_TOPMOST position on WM_ACTIVATE / WM_ACTIVATEAPP.
+     * WHY:   DirectX exclusive-fullscreen windows or high-DPI full-screen apps
+     *        can steal exclusive display mode and demote standard topmost windows.
+     *        Re-asserting SetWindowPos with HWND_TOPMOST on activation ensures the
+     *        pill overlay stays floating on top of fullscreen applications.
+     */
+    pub(crate) unsafe extern "system" fn pill_subclass_wndproc(
+        hwnd: HWND,
+        msg: u32,
+        wparam: WPARAM,
+        lparam: LPARAM,
+    ) -> LRESULT {
+        if msg == WM_ACTIVATE || msg == WM_ACTIVATEAPP {
+            let _ = SetWindowPos(
+                hwnd,
+                HWND_TOPMOST,
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+            );
+        }
+
+        let prev = PREV_WNDPROC.load(Ordering::SeqCst);
+        if prev != 0 {
+            let prev_proc: WNDPROC = std::mem::transmute(prev);
+            CallWindowProcW(prev_proc, hwnd, msg, wparam, lparam)
+        } else {
+            DefWindowProcW(hwnd, msg, wparam, lparam)
+        }
+    }
+
+    pub fn setup_windows_pill(pill: &tauri::WebviewWindow) {
+        if let Ok(hwnd) = pill.hwnd() {
+            unsafe {
+                let raw_hwnd = HWND(hwnd.0 as _);
+                let prev = SetWindowLongPtrW(
+                    raw_hwnd,
+                    GWLP_WNDPROC,
+                    pill_subclass_wndproc as *const () as usize as isize,
+                );
+                PREV_WNDPROC.store(prev, Ordering::SeqCst);
+                let _ = SetWindowPos(
+                    raw_hwnd,
+                    HWND_TOPMOST,
+                    0,
+                    0,
+                    0,
+                    0,
+                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW,
+                );
+                tracing::info!("pill subclassed with WM_ACTIVATE HWND_TOPMOST handler on Windows");
+            }
+        }
+    }
 }
 
 /**

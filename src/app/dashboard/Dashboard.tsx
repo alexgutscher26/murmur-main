@@ -59,6 +59,7 @@ import { SettingsView } from "./settings/SettingsView";
 import { InsightsView } from "./insights/InsightsView";
 import { DictionaryView } from "./dictionary/DictionaryView";
 import { StreakHeaderBadge } from "./_components/StreakHeaderBadge";
+import { UpdateNotice } from "./_components/UpdateNotice";
 
 /**
  * WHAT:  The user's dictation hotkey — their override if they have one, the
@@ -487,6 +488,9 @@ export function Dashboard() {
               </ScrollArea>
             )}
           </ErrorBoundary>
+
+          {/* ── Docked Update Notification & Release Notes ────────────────── */}
+          <UpdateNotice />
         </main>
       </div>
 

@@ -306,8 +306,9 @@ pub fn set_pill_visible(app: &AppHandle, visible: bool) {
         {
             use windows::Win32::Foundation::HWND;
             use windows::Win32::UI::WindowsAndMessaging::{
-                GetWindowLongW, SetWindowLongW, ShowWindow, GWL_EXSTYLE, SW_SHOWNOACTIVATE,
-                WS_EX_NOACTIVATE,
+                GetWindowLongW, SetWindowLongW, SetWindowPos, ShowWindow, GWL_EXSTYLE,
+                HWND_TOPMOST, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW,
+                SW_SHOWNOACTIVATE, WS_EX_NOACTIVATE,
             };
             if let Ok(hwnd) = window.hwnd() {
                 unsafe {
@@ -315,6 +316,15 @@ pub fn set_pill_visible(app: &AppHandle, visible: bool) {
                     let ex_style = GetWindowLongW(raw_hwnd, GWL_EXSTYLE);
                     let _ = SetWindowLongW(raw_hwnd, GWL_EXSTYLE, ex_style | (WS_EX_NOACTIVATE.0 as i32));
                     let _ = ShowWindow(raw_hwnd, SW_SHOWNOACTIVATE);
+                    let _ = SetWindowPos(
+                        raw_hwnd,
+                        HWND_TOPMOST,
+                        0,
+                        0,
+                        0,
+                        0,
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW,
+                    );
                 }
             } else {
                 let _ = window.show();

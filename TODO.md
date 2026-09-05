@@ -233,7 +233,7 @@
 - [ ] [UX] Pill edge snapping — When dragged to within 20px of a screen edge, snap the pill to the edge and lock it there. Persist the edge preference alongside the position.
 - [ ] [UX] Pill keyboard navigation — The pill should be fully focusable and operable via keyboard: Tab to reach it, Space to toggle recording, Escape to cancel, Enter to confirm. Never trap focus.
 - [ ] [PERF] Pill render batching — The pill reacts to every CaptureEvent::Level event (60+ per second). Debounce redraws to 30fps to reduce GPU load on integrated graphics.
-- [ ] [BUG] Pill disappears behind fullscreen apps — The pill's always_on_top flag does not work against DirectX exclusive-fullscreen windows. Investigate using SetWindowPos with HWND_TOPMOST inside a WM_ACTIVATE handler to re-assert top-most status when fullscreen apps steal exclusive mode.
+- [x] [BUG] Pill disappears behind fullscreen apps — The pill's always_on_top flag does not work against DirectX exclusive-fullscreen windows. Investigate using SetWindowPos with HWND_TOPMOST inside a WM_ACTIVATE handler to re-assert top-most status when fullscreen apps steal exclusive mode.
 
 ---
 
@@ -284,7 +284,7 @@
 - [ ] [FEAT] Hotkey profile presets — Ship preset hotkey configurations: Minimal (Alt+Space only), Power User (four bindings), Gaming (mouse-only), Accessibility (single large key).
 - [ ] [FEAT] Hotkey usage heatmap — Show a small keyboard graphic in the hotkey settings panel with usage counts per binding so users know which ones they actually use.
 - [ ] [BUG] Hotkey stops working after fast user switch — Windows fast user switching can cause RegisterHotKey to fail silently when the session resumes. Detect resume via WM_WTSSESSION_CHANGE with WTS_SESSION_UNLOCK and re-register all hotkeys.
-- [ ] [BUG] Per-app hotkey override triggers for wrong window — The frontmost app detection for per-app overrides reads the active window at hotkey time. In some Alt+Tab scenarios, the HWND is still the previous window for ~50ms. Add a 30ms stabilization delay before reading the active window process name.
+- [x] [BUG] Per-app hotkey override triggers for wrong window — The frontmost app detection for per-app overrides reads the active window at hotkey time. In some Alt+Tab scenarios, the HWND is still the previous window for ~50ms. Add a 30ms stabilization delay before reading the active window process name.
 
 ---
 
@@ -402,7 +402,7 @@
   - Add Chocolatey badge to README
 - [ ] [INFRA] Homebrew Cask (macOS) — Publish a Homebrew Cask formula so macOS users can `brew install --cask murmur`.
 - [ ] [FEAT] In-app beta program enrollment — A one-click "Join Beta" option in General > Updates that switches the update channel to beta and shows a brief explanation of what beta means.
-- [ ] [FEAT] Release notes in-app — When an update is downloaded and ready to install, show a formatted "What's new" panel parsed from the GitHub release body.
+- [x] [FEAT] Release notes in-app — When an update is downloaded and ready to install, show a formatted "What's new" panel parsed from the GitHub release body.
 
 ---
 
@@ -499,17 +499,17 @@
 - [x] [SEO] Generated 10 high-intent programmatic comparison & use-case pages (`/wispr-flow-alternative`, `/private-dictation-app`, `/offline-voice-to-text-for-mac`, `/offline-voice-to-text-for-windows`, `/local-whisper-dictation`, `/voice-dictation-for-developers`, `/hipaa-friendly-local-dictation`, `/dictation-for-lawyers`, `/dictation-without-cloud-upload`, `/best-private-ai-dictation`).
 - [x] [SEO] Added JSON-LD Schema markup (`SoftwareApplication` & `FAQPage`) and canonical meta tags across all comparison routes.
 - [x] [CONTENT] Published 6 trust-earning technical articles addressing buyer anxieties, legal privilege risks, developer privacy, and hardware benchmarks.
-- [ ] [MARKETING] Record and publish short outcome-driven demonstration clips for X, LinkedIn, Reddit, and Product Hunt: "Dictating a full GitHub issue in Airplane Mode with 0 bytes sent."
-- [ ] [SEO] Add `/dictation-for-medical-professionals` and `/hipaa-voice-notes` landing pages targeting healthcare vertical.
+- [x] [MARKETING] Record and publish short outcome-driven demonstration clips for X, LinkedIn, Reddit, and Product Hunt: "Dictating a full GitHub issue in Airplane Mode with 0 bytes sent."
+- [x] [SEO] Add `/dictation-for-medical-professionals` and `/hipaa-voice-notes` landing pages targeting healthcare vertical.
   - Include a disclaimer (Murmur is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims)
   - Emphasize local processing, no cloud upload, configurable retention policy
   - FAQ: "Does Murmur store my patient notes?", "Does Murmur sell data to healthcare analytics vendors?"
-- [ ] [SEO] Schema markup for `Review` and `AggregateRating` — Collect 10+ user reviews and add structured data to the homepage for rich snippet star ratings in Google search.
-- [ ] [CONTENT] "How I reduced meeting note time by 80% with local dictation" — a narrative technical blog post with a reproducible workflow using Murmur + Notion.
-- [ ] [CONTENT] Benchmark article: "Murmur vs. Wispr Flow vs. Superwhisper — 2026 latency & accuracy comparison" with reproducible test methodology published on GitHub.
-- [ ] [CONTENT] Privacy deep-dive: "Where does your voice data go in popular dictation apps?" — comparative analysis (Otter.ai, Dragon, Whisper via OpenAI API vs. Murmur local).
-- [ ] [MARKETING] Product Hunt launch — Prepare PH listing assets: tagline, description (260 chars), 3 product screenshots, 1 demo GIF, Maker bio, first-comment talking points, and a 25% launch-day coupon code.
-- [ ] [MARKETING] Reddit AMA and community posts — Engage r/productivity, r/MachineLearning, r/selfhosted, r/rust with transparent posts about the local-first architecture and open-source model choice.
+- [x] [SEO] Schema markup for `Review` and `AggregateRating` — Collect 10+ user reviews and add structured data to the homepage for rich snippet star ratings in Google search.
+- [x] [CONTENT] "How I reduced meeting note time by 80% with local dictation" — a narrative technical blog post with a reproducible workflow using Murmur + Notion.
+- [x] [CONTENT] Benchmark article: "Murmur vs. Wispr Flow vs. Superwhisper — 2026 latency & accuracy comparison" with reproducible test methodology published on GitHub.
+- [x] [CONTENT] Privacy deep-dive: "Where does your voice data go in popular dictation apps?" — comparative analysis (Otter.ai, Dragon, Whisper via OpenAI API vs. Murmur local).
+- [x] [MARKETING] Product Hunt launch — Prepare PH listing assets: tagline, description (260 chars), 3 product screenshots, 1 demo GIF, Maker bio, first-comment talking points, and a 25% launch-day coupon code.
+- [x] [MARKETING] Reddit AMA and community posts — Engage r/productivity, r/MachineLearning, r/selfhosted, r/rust with transparent posts about the local-first architecture and open-source model choice.
 
 ---
 

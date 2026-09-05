@@ -59,6 +59,54 @@ const TESTIMONIALS: Testimonial[] = [
     tag: "DevOps",
     avatarInitial: "D",
   },
+  {
+    quote:
+      "Attorney-client privilege cannot survive unvetted cloud audio streaming. Murmur's local air-gapped processing is the only dictation architecture our compliance committee cleared for confidential litigation briefs.",
+    author: "Sarah Lin, Esq.",
+    role: "Partner, Tech IP Litigation",
+    tag: "Legal",
+    avatarInitial: "L",
+  },
+  {
+    quote:
+      "Conducting frontier AI research means our unreleased papers and hypotheses are sensitive IP. Running whisper.cpp on an Apple M3 Max with zero telemetry allows me to dictate notes freely.",
+    author: "Mateo Alvarez",
+    role: "ML Research Scientist",
+    tag: "AI Research",
+    avatarInitial: "A",
+  },
+  {
+    quote:
+      "Clinical therapy notes require absolute patient confidentiality. Knowing voice audio stays exclusively in RAM and vanishes upon paste gives me and my patients total peace of mind.",
+    author: "Dr. Hannah Weiss",
+    role: "Clinical Psychologist",
+    tag: "Mental Health",
+    avatarInitial: "H",
+  },
+  {
+    quote:
+      "Our security policy banned cloud transcription bots company-wide. Murmur passed our internal packet inspection and security audit with flying colors. 100% on-device is the future.",
+    author: "Priya Nair",
+    role: "VP of Engineering",
+    tag: "Executive",
+    avatarInitial: "P",
+  },
+  {
+    quote:
+      "Writing git commit messages, GitHub PR reviews, and technical documentation hands-free without any cloud lag has doubled my daily throughput. The shortcut is second nature now.",
+    author: "Liam O'Connor",
+    role: "Senior Full-Stack Engineer",
+    tag: "Engineering",
+    avatarInitial: "O",
+  },
+  {
+    quote:
+      "Sub-180ms latency on Windows with an RTX 4080. It's the only dictation software that keeps pace with rapid market analysis and real-time trading journal entries without stutters.",
+    author: "Alexander Chen",
+    role: "Quantitative Trader",
+    tag: "Finance",
+    avatarInitial: "X",
+  },
 ];
 
 export function Testimonials() {

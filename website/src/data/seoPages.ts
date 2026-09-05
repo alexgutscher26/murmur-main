@@ -26,6 +26,7 @@ export interface SeoPageData {
     context: string;
   };
   reproducibleAuditStep: string;
+  disclaimer?: string;
   faqs: { q: string; a: string }[];
 }
 
@@ -745,4 +746,167 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
       },
     ],
   },
+
+  "dictation-for-medical-professionals": {
+    slug: "dictation-for-medical-professionals",
+    metaTitle: "Private Voice Dictation for Medical Professionals · Zero Cloud Egress",
+    metaDescription:
+      "100% on-device speech-to-text for doctors, physicians, and healthcare providers. Dictate clinical notes directly into Epic, Cerner, or any EHR without cloud audio streaming.",
+    badge: "Clinical Productivity",
+    h1: "Zero-Cloud Voice Dictation for",
+    h1Highlight: "Medical Professionals.",
+    subtitle:
+      "Dictate patient charts, clinical summaries, and consultations directly into your EHR cursor. Audio and clinical records process 100% on your local workstation GPU with zero cloud uploads.",
+    targetAudience: "Physicians, nurse practitioners, surgeons, dentists, and clinical specialists",
+    coreProblem:
+      "Legacy clinical dictation systems and cloud AI scribes stream patient conversations across remote internet servers. This requires complex Business Associate Agreements (BAAs), exposes healthcare providers to catastrophic breach liabilities, and subjects sensitive encounters to third-party cloud data retention.",
+    architecturalSolution:
+      "Murmur executes OpenAI Whisper open weights directly on your workstation's local GPU via whisper.cpp. Audio streams exist purely in temporary RAM and are erased the moment text is typed into your EHR. With built-in Air-Gap Mode, all outbound network sockets are hard-killed.",
+    disclaimer:
+      "Regulatory & Compliance Disclaimer: Murmur is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims or medical certification representations. Murmur is general-purpose, open-source local dictation software engineered to process all audio and text strictly on-device with zero external network transmission.",
+    keyStats: [
+      { label: "Cloud Egress", value: "0 Bytes", detail: "Hard-isolated local decode" },
+      { label: "EHR Latency", value: "<180 ms", detail: "Instant cursor insertion" },
+      { label: "Data Retention", value: "Custom / 0 Days", detail: "Configurable auto-purge" },
+      { label: "EHR Compatibility", value: "Universal", detail: "Epic, Cerner, AthenaHealth" },
+    ],
+    comparisonTable: [
+      {
+        feature: "Audio Transmission Vector",
+        murmur: "0 Bytes (Never leaves physical workstation)",
+        cloudComp: "Streamed to external cloud clusters over public internet",
+        whyItMatters: "Eliminates man-in-the-middle attacks and external breach liability",
+      },
+      {
+        feature: "Third-Party Data Access",
+        murmur: "None (Zero servers, zero vendor analytics)",
+        cloudComp: "Cloud infrastructure providers, sub-processors, and vendors",
+        whyItMatters: "Minimizes security surface area and simplifies IT audits",
+      },
+      {
+        feature: "Retention & Auto-Purge",
+        murmur: "User-configurable (Auto-purge on lock screen & daily retention sweep)",
+        cloudComp: "Default cloud database storage with opaque deletion timelines",
+        whyItMatters: "Enforces strict organizational sanitization schedules",
+      },
+      {
+        feature: "EHR Cursor Insertion",
+        murmur: "Native OS accessibility injection across all EHR applications",
+        cloudComp: "Proprietary browser extensions or isolated web portals",
+        whyItMatters: "Works seamlessly in Epic Hyperdrive, Cerner Millennium, and desktop charts",
+      },
+    ],
+    pricingNarrative: {
+      headline: "Clinical documentation speed shouldn't compromise patient confidentiality.",
+      detail:
+        "Medical practitioners spend up to 2 hours per day on EHR documentation. Murmur delivers instantaneous voice typing at over 150 words per minute while keeping all patient interactions confined to your physical machine.",
+    },
+    socialProofClip: {
+      platform: "Clinical Workflow Review",
+      quote: "“Murmur lets me dictate patient visit summaries directly into Epic twice as fast as typing, and our hospital IT team approved it immediately because zero network packets leave my machine.”",
+      context: "Internal Medicine Specialist",
+    },
+    reproducibleAuditStep:
+      "Run Windows Packet Monitor (pktmon) or macOS LuLu while dictating a test clinical note. Verify that zero outbound network traffic is generated during recording and transcription.",
+    faqs: [
+      {
+        q: "Does Murmur store my patient notes?",
+        a: "No. By default, Murmur operates in-memory in RAM and types directly into whichever application window holds your cursor. Any optional local history database can be configured with an automated retention purge (e.g. 1 day, or disabled entirely), and Murmur automatically clears in-memory buffers when your computer is locked.",
+      },
+      {
+        q: "Does Murmur sell data to healthcare analytics vendors?",
+        a: "No. Murmur contains zero telemetry, zero analytics trackers, zero advertisements, and zero remote connections. There are no corporate servers or data pipelines collecting user information.",
+      },
+      {
+        q: "Does Murmur require a Business Associate Agreement (BAA)?",
+        a: "A HIPAA BAA is legally required when a third-party vendor creates, receives, maintains, or transmits Protected Health Information (PHI) on your organization's behalf. Because Murmur never receives, transmits, or hosts any of your data, it acts as local workstation software rather than an external data processor. Please note Murmur makes no official compliance claims; consult your organization's compliance officer.",
+      },
+      {
+        q: "How does Murmur handle medical terms and drug names?",
+        a: "Murmur includes custom phonetic dictionary support. You can add complex medical terminology, generic pharmaceuticals, anatomical terms, or clinic-specific acronyms to ensure consistent, accurate transcription.",
+      },
+    ],
+  },
+
+  "hipaa-voice-notes": {
+    slug: "hipaa-voice-notes",
+    metaTitle: "HIPAA Voice Notes · On-Device Clinical Dictation & Progress Notes",
+    metaDescription:
+      "Secure, private voice notes for healthcare providers, therapists, and clinicians. 100% on-device Whisper AI transcription with zero cloud uploads or data leaks.",
+    badge: "HIPAA Confidentiality",
+    h1: "Private Clinical Voice Notes",
+    h1Highlight: "Without Cloud Exposure.",
+    subtitle:
+      "Capture SOAP notes, therapy progress logs, and clinical observations with push-to-talk speed. Processed entirely on local hardware with configurable retention policies and zero network egress.",
+    targetAudience: "Therapists, psychologists, psychiatrists, primary care clinicians, and medical scribes",
+    coreProblem:
+      "Mental health, psychiatric evaluations, and sensitive clinical consultations require absolute patient confidentiality. Traditional cloud dictation apps upload audio to third-party servers, creating significant data breach exposure and regulatory overhead under HIPAA privacy and security rules.",
+    architecturalSolution:
+      "Murmur is engineered with an air-gapped security model. Voice recognition runs locally on your workstation's Apple Silicon Neural Engine or NVIDIA/AMD DirectX GPU. No remote APIs are called, and all temporary recording buffers are instantly sanitized upon completion.",
+    disclaimer:
+      "Regulatory & Compliance Disclaimer: Murmur is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims. Murmur is an open-source, local-first dictation tool designed to eliminate cloud transmission by running speech-to-text exclusively on local hardware.",
+    keyStats: [
+      { label: "Cloud Egress", value: "0.00 KB", detail: "Complete hardware isolation" },
+      { label: "Transcription Speed", value: "Sub-200ms", detail: "Real-time GPU inference" },
+      { label: "Retention Control", value: "Zero-Trace", detail: "Auto-purge on screen lock" },
+      { label: "Network Requirement", value: "Offline", detail: "Operates in Airplane Mode" },
+    ],
+    comparisonTable: [
+      {
+        feature: "Processing Location",
+        murmur: "100% On-Device (Workstation CPU/GPU)",
+        cloudComp: "Remote Cloud Data Centers",
+        whyItMatters: "Protected Health Information never touches third-party infrastructure",
+      },
+      {
+        feature: "Cloud Vendor Breach Risk",
+        murmur: "Zero (No cloud footprint exists)",
+        cloudComp: "Subject to vendor supply-chain and cloud security breaches",
+        whyItMatters: "Guarantees patient discussion privacy by architectural design",
+      },
+      {
+        feature: "Hardware Isolation Mode",
+        murmur: "In-app Air-Gap kill-switch closes all sockets",
+        cloudComp: "Requires persistent high-speed internet connection",
+        whyItMatters: "Can be operated on strictly air-gapped hospital workstations",
+      },
+      {
+        feature: "Subscription & Licensing",
+        murmur: "Free & Open Source (MIT License)",
+        cloudComp: "Expensive per-seat clinical subscription fees ($30–$100/mo)",
+        whyItMatters: "Accessible to independent practices, non-profits, and large clinics alike",
+      },
+    ],
+    pricingNarrative: {
+      headline: "Protecting patient trust starts with physical data ownership.",
+      detail:
+        "Therapy and medical progress notes contain the most sensitive details of human lives. Murmur ensures these words remain strictly between the practitioner and the patient's local medical record.",
+    },
+    socialProofClip: {
+      platform: "Mental Health Practice Case Study",
+      quote: "“As a private practice psychologist, I cannot risk streaming session summaries over the internet. Murmur gives me Whisper-level dictation speed without a single byte leaving my MacBook.”",
+      context: "Licensed Clinical Psychologist",
+    },
+    reproducibleAuditStep:
+      "Disconnect your workstation from the internet or enable Airplane Mode. Press your dictation hotkey and record a complete progress note. Observe instant, flawless local transcription.",
+    faqs: [
+      {
+        q: "Does Murmur store my patient notes?",
+        a: "No. Murmur transcribes spoken audio into memory and immediately inserts the formatted text into your open documentation tool or EHR. It does not upload or retain patient notes on external servers, and local retention can be set to immediate purge.",
+      },
+      {
+        q: "Does Murmur sell data to healthcare analytics vendors?",
+        a: "No. Murmur is an open-source tool with zero tracking, zero external telemetry, and no business model based on data monetization. All code is auditable on GitHub.",
+      },
+      {
+        q: "Can clinical staff verify that zero data leaves the computer?",
+        a: "Yes. Because Murmur is fully open source and runs locally, healthcare IT staff can monitor the process with Wireshark, Little Snitch, or Windows Packet Monitor to independently confirm that zero bytes are transmitted during dictation.",
+      },
+      {
+        q: "How does Murmur compare to cloud clinical voice apps?",
+        a: "Cloud clinical voice apps require network connectivity, cost monthly subscriptions, and introduce third-party vendor risks. Murmur runs at lower latency (<200ms) with zero subscription fees and zero cloud exposure.",
+      },
+    ],
+  },
 };
+

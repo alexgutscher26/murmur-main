@@ -3,31 +3,79 @@
 import Link from "next/link";
 import { Mark } from "./Mark";
 import { GithubIcon } from "./GithubIcon";
-import { ArrowUp, ShieldCheck, Cpu } from "lucide-react";
+import { ArrowUp, ShieldCheck, Cpu, Sparkles } from "lucide-react";
 
-const PRODUCT_LINKS = [
+interface FooterLink {
+  href: string;
+  label: string;
+  accent?: boolean;
+  badge?: string;
+  external?: boolean;
+  icon?: boolean;
+}
+
+const SOLUTIONS_LINKS: FooterLink[] = [
   { href: "/developers", label: "Developers & IDEs" },
   { href: "/creators", label: "Content Creators" },
-  { href: "/#features", label: "Features & Modes" },
-  { href: "/#playground", label: "Voice Lab" },
-  { href: "/#comparison", label: "Cloud vs Local" },
+  { href: "/dictation-for-medical-professionals", label: "Medical Professionals" },
+  { href: "/hipaa-voice-notes", label: "HIPAA Voice Notes" },
+  { href: "/dictation-for-lawyers", label: "Legal & Attorneys" },
+  { href: "/private-dictation-app", label: "Privacy Architecture" },
+];
+
+const COMPARISONS_LINKS: FooterLink[] = [
+  { href: "/wispr-flow-alternative", label: "Wispr Flow Alternative" },
+  { href: "/best-private-ai-dictation", label: "Best Private Dictation" },
+  { href: "/offline-voice-to-text-for-mac", label: "Offline Voice for Mac" },
+  { href: "/offline-voice-to-text-for-windows", label: "Offline Windows Dictation" },
+  { href: "/local-whisper-dictation", label: "Local Whisper Models" },
+  { href: "/#comparison", label: "Cloud vs Local Matrix" },
+];
+
+const RESOURCES_LINKS: FooterLink[] = [
+  { href: "/blog", label: "Technical Blog" },
+  {
+    href: "/blog/murmur-vs-wispr-flow-vs-superwhisper-2026-latency-accuracy-comparison",
+    label: "2026 Benchmarks",
+    badge: "New",
+  },
+  {
+    href: "/blog/how-i-reduced-meeting-note-time-by-80-percent-with-local-dictation",
+    label: "Meeting Notes Guide",
+    badge: "Guide",
+  },
   { href: "/privacy", label: "Privacy Promise", accent: true },
-  { href: "/pricing", label: "Free vs Pro" },
+  { href: "/pricing", label: "Pricing & Lifetime" },
   { href: "/#download", label: "Download App" },
 ];
 
-const STACK_LINKS = [
-  { href: "https://github.com/webprodigies/murmur", label: "Rust Backend" },
-  { href: "https://github.com/webprodigies/murmur", label: "Tauri 2 Core" },
-  { href: "https://github.com/ggerganov/whisper.cpp", label: "whisper.cpp" },
-  { href: "https://github.com/webprodigies/murmur", label: "DirectML & Metal" },
-];
-
-const ECOSYSTEM_LINKS = [
-  { href: "https://github.com/webprodigies/murmur", label: "GitHub Repository", icon: true },
-  { href: "https://github.com/webprodigies/murmur/releases", label: "Releases & Changelog" },
-  { href: "https://github.com/webprodigies/murmur/blob/main/LICENSE", label: "Open Source (MIT)" },
-  { href: "https://github.com/webprodigies/murmur/blob/main/PRIVACY.md", label: "Privacy Policy" },
+const ECOSYSTEM_LINKS: FooterLink[] = [
+  {
+    href: "https://github.com/webprodigies/murmur",
+    label: "GitHub Repository",
+    external: true,
+    icon: true,
+  },
+  {
+    href: "https://github.com/webprodigies/murmur/releases",
+    label: "Releases & Changelog",
+    external: true,
+  },
+  {
+    href: "https://github.com/ggerganov/whisper.cpp",
+    label: "whisper.cpp Engine",
+    external: true,
+  },
+  {
+    href: "https://github.com/webprodigies/murmur/blob/main/LICENSE",
+    label: "Open Source (MIT)",
+    external: true,
+  },
+  {
+    href: "https://github.com/webprodigies/murmur/blob/main/PRIVACY.md",
+    label: "Air-Gapped Policy",
+    external: true,
+  },
 ];
 
 // Deterministic bell-curve-shaped bar heights, so the waveform looks like a
@@ -62,6 +110,45 @@ function ExternalLink({
   );
 }
 
+function NavLinkItem({ link }: { link: FooterLink }) {
+  const content = (
+    <span className="inline-flex items-center gap-1.5">
+      {link.icon && (
+        <GithubIcon className="w-3.5 h-3.5 text-neutral-400 group-hover:text-white transition-colors" />
+      )}
+      <span>{link.label}</span>
+      {link.badge && (
+        <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-mono font-medium">
+          {link.badge}
+        </span>
+      )}
+    </span>
+  );
+
+  if (link.external) {
+    return (
+      <li className="group">
+        <ExternalLink href={link.href}>{content}</ExternalLink>
+      </li>
+    );
+  }
+
+  return (
+    <li>
+      <Link
+        href={link.href}
+        className={`transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 rounded-sm ${
+          link.accent
+            ? "text-emerald-400 hover:text-emerald-300 font-medium"
+            : "text-neutral-400 hover:text-white"
+        }`}
+      >
+        {content}
+      </Link>
+    </li>
+  );
+}
+
 export function Footer() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -72,8 +159,7 @@ export function Footer() {
       aria-label="Site footer"
       className="relative border-t border-white/[0.08] bg-[#050505] pt-14 pb-12 overflow-hidden"
     >
-      {/* Signature moment: a waveform trailing off along the top edge, echoing
-          the product itself rather than a generic decorative glow. */}
+      {/* Signature moment: a waveform trailing off along the top edge */}
       <div
         aria-hidden="true"
         className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-6 flex items-end justify-center gap-[3px] px-4 pointer-events-none"
@@ -104,10 +190,10 @@ export function Footer() {
         }
       `}</style>
 
-      <div className="max-w-6xl mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 pb-12 border-b border-white/[0.08]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-white/[0.08]">
           {/* Brand */}
-          <div className="md:col-span-5 flex flex-col gap-5">
+          <div className="lg:col-span-4 flex flex-col gap-5">
             <div className="flex items-center gap-3">
               <div className="p-1.5 rounded-xl bg-white/[0.04] border border-white/10 shadow-inner">
                 <Mark size="sm" animated />
@@ -122,7 +208,8 @@ export function Footer() {
 
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
               Local speech-to-text for macOS and Windows. Free forever, open
-              source, and your audio never leaves your device.
+              source, and your audio never leaves your device. Built with Rust,
+              Tauri 2, and whisper.cpp.
             </p>
 
             <ul className="flex flex-wrap items-center gap-2">
@@ -137,66 +224,66 @@ export function Footer() {
                 <ShieldCheck className="w-3.5 h-3.5 text-neutral-500" aria-hidden="true" />
                 MIT License
               </li>
+              <li className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.02] text-neutral-400 border border-white/[0.06] text-xs font-mono">
+                <Cpu className="w-3.5 h-3.5 text-emerald-400/80" aria-hidden="true" />
+                GPU Accelerated
+              </li>
             </ul>
           </div>
 
-          {/* Product */}
-          <nav aria-label="Product" className="md:col-span-2 flex flex-col gap-2.5 text-sm">
-            <span className="text-neutral-300 font-semibold mb-1">Product</span>
-            <ul className="flex flex-col gap-2.5">
-              {PRODUCT_LINKS.map((link) => (
-                <li key={link.href + link.label}>
-                  <Link
-                    href={link.href}
-                    className={`transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/60 rounded-sm ${
-                      link.accent
-                        ? "text-emerald-400 hover:text-emerald-300 font-medium"
-                        : "text-neutral-400 hover:text-white"
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {/* Link Columns */}
+          <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-8">
+            {/* Solutions */}
+            <nav aria-label="Solutions" className="flex flex-col gap-2.5 text-sm">
+              <span className="text-neutral-300 font-semibold mb-1 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
+                Solutions
+              </span>
+              <ul className="flex flex-col gap-2.5">
+                {SOLUTIONS_LINKS.map((link) => (
+                  <NavLinkItem key={link.href + link.label} link={link} />
+                ))}
+              </ul>
+            </nav>
 
-          {/* Stack */}
-          <nav aria-label="Stack" className="md:col-span-2 flex flex-col gap-2.5 text-sm">
-            <span className="text-neutral-300 font-semibold mb-1 flex items-center gap-1.5">
-              <Cpu className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
-              Stack
-            </span>
-            <ul className="flex flex-col gap-2.5">
-              {STACK_LINKS.map((link) => (
-                <li key={link.label}>
-                  <ExternalLink href={link.href}>{link.label}</ExternalLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+            {/* Comparisons */}
+            <nav aria-label="Comparisons" className="flex flex-col gap-2.5 text-sm">
+              <span className="text-neutral-300 font-semibold mb-1">Comparisons</span>
+              <ul className="flex flex-col gap-2.5">
+                {COMPARISONS_LINKS.map((link) => (
+                  <NavLinkItem key={link.href + link.label} link={link} />
+                ))}
+              </ul>
+            </nav>
 
-          {/* Ecosystem */}
-          <nav aria-label="Ecosystem" className="md:col-span-3 flex flex-col gap-2.5 text-sm">
-            <span className="text-neutral-300 font-semibold mb-1">Ecosystem</span>
-            <ul className="flex flex-col gap-2.5">
-              {ECOSYSTEM_LINKS.map((link) => (
-                <li key={link.label} className="group">
-                  <ExternalLink href={link.href} className="flex items-center gap-2">
-                    {link.icon && (
-                      <GithubIcon className="w-4 h-4 text-neutral-400 group-hover:text-white transition-colors" />
-                    )}
-                    <span>{link.label}</span>
-                  </ExternalLink>
-                </li>
-              ))}
-            </ul>
-          </nav>
+            {/* Resources & Guides */}
+            <nav aria-label="Resources" className="flex flex-col gap-2.5 text-sm">
+              <span className="text-neutral-300 font-semibold mb-1">Resources</span>
+              <ul className="flex flex-col gap-2.5">
+                {RESOURCES_LINKS.map((link) => (
+                  <NavLinkItem key={link.href + link.label} link={link} />
+                ))}
+              </ul>
+            </nav>
+
+            {/* Ecosystem & Open Source */}
+            <nav aria-label="Ecosystem" className="flex flex-col gap-2.5 text-sm">
+              <span className="text-neutral-300 font-semibold mb-1 flex items-center gap-1.5">
+                <Cpu className="w-3.5 h-3.5 text-neutral-400" aria-hidden="true" />
+                Ecosystem
+              </span>
+              <ul className="flex flex-col gap-2.5">
+                {ECOSYSTEM_LINKS.map((link) => (
+                  <NavLinkItem key={link.href + link.label} link={link} />
+                ))}
+              </ul>
+            </nav>
+          </div>
         </div>
 
         {/* Bottom bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
-          <p>© {new Date().getFullYear()} Murmur. Zero telemetry, 100% on-device.</p>
+          <p>© {new Date().getFullYear()} Murmur. Zero telemetry, 100% on-device data sovereignty.</p>
 
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 bg-white/[0.02] border border-white/[0.06] px-3 py-1 rounded-full">

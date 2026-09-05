@@ -95,6 +95,28 @@ Let me know if you would like to review our plain-English privacy architecture.
 Best regards,
 Alex`,
   },
+  {
+    id: "github-airplane",
+    name: "GitHub (Airplane Mode)",
+    category: "Air-Gapped Issue",
+    icon: "✈",
+    rawSpoken:
+      "issue title memory leak in webview audio buffer description steps to reproduce toggle air gap mode disconnect wifi dictate five paragraphs expected behavior memory stays flat at eighty megabytes with zero network egress observed behavior verified zero bytes sent via packet monitor",
+    formattedOutput: `### Bug: Memory Profile & Network Egress in Air-Gap Mode
+
+**Steps to Reproduce:**
+1. Toggle Airplane / Air-Gap Mode in Murmur Settings
+2. Disconnect Wi-Fi and Ethernet (\`0 bytes/sec\` egress)
+3. Dictate 5 continuous paragraphs into the issue editor
+
+**Expected Behavior:**
+- Working set memory stays flat at ~80MB
+- 0 bytes outbound packets captured in packet monitor (\`pktmon\` / \`lulu\`)
+- Text arrives instantly at cursor with sub-200ms latency
+
+**Audit Result:**
+Verified ✅ — 100% on-device Whisper decode. 0 bytes transmitted over network.`,
+  },
 ];
 
 export function Hero() {

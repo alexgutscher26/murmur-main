@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ShieldAlert } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { SEO_PAGES, SeoPageData } from "@/data/seoPages";
@@ -118,6 +119,17 @@ export default async function HighIntentSeoPage({ params }: Props) {
             </Link>
           </div>
         </div>
+
+        {/* Regulatory & Compliance Disclaimer (when specified) */}
+        {page.disclaimer && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200/90 text-xs leading-relaxed mb-12 shadow-[0_0_24px_rgba(245,158,11,0.06)]">
+            <div className="flex items-center gap-2 font-semibold text-amber-400 mb-2 uppercase text-[11px] tracking-wider font-mono">
+              <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Compliance & Regulatory Notice</span>
+            </div>
+            <p className="font-sans text-amber-100/80">{page.disclaimer}</p>
+          </div>
+        )}
 
         {/* Key Stats Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-14">
