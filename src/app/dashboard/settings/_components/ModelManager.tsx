@@ -102,11 +102,19 @@ export function ModelManager() {
         );
         settings.reload();
       }
+      const existingState =
+        liveStates[modelId] ?? models.data?.find((m) => m.descriptor.id === modelId)?.state;
+      const existingReceived = existingState?.kind === "DOWNLOADING" ? existingState.received_bytes : 0;
+      const existingTotal =
+        existingState?.kind === "DOWNLOADING"
+          ? existingState.total_bytes
+          : (models.data?.find((m) => m.descriptor.id === modelId)?.descriptor.size_bytes ?? 0);
+
       clearOverride(modelId);
       setDownloadingIds((prev) => new Set([...prev, modelId]));
       setLiveStates((current) => ({
         ...current,
-        [modelId]: { kind: "DOWNLOADING", received_bytes: 0, total_bytes: 0 },
+        [modelId]: { kind: "DOWNLOADING", received_bytes: existingReceived, total_bytes: existingTotal },
       }));
 
       try {
@@ -251,7 +259,8 @@ function ModelSummary({
 }) {
   const { descriptor, state } = model;
   const isStateDownloading = state.kind === "DOWNLOADING";
-  const downloading = Boolean(isDownloading) || isStateDownloading;
+  const isActivelyDownloading = Boolean(isDownloading);
+  const downloading = isActivelyDownloading || isStateDownloading;
   const received = progress?.received_bytes ?? (isStateDownloading ? state.received_bytes : 0);
   const total = progress?.total_bytes ?? (isStateDownloading ? state.total_bytes : descriptor.size_bytes);
   const eta = progress ? formatEta(Math.max(0, total - received), progress.bytes_per_second) : null;
@@ -295,12 +304,12 @@ function ModelSummary({
       {downloading ? (
         <ProgressBar
           className="mt-2"
-          label={`Downloading ${descriptor.display_name}`}
+          label={isActivelyDownloading ? `Downloading ${descriptor.display_name}` : `Partial download: ${descriptor.display_name}`}
           fraction={total > 0 ? received / total : 0}
           caption={
             <>
               {formatBytes(received)} of {formatBytes(total)}
-              {progress ? ` · ${formatRate(progress.bytes_per_second)}` : ""}
+              {progress ? ` · ${formatRate(progress.bytes_per_second)}` : (!isActivelyDownloading ? " · Paused" : "")}
               {eta ? ` · ${eta} left` : ""}
             </>
           }
@@ -335,17 +344,66 @@ function ModelAction({
   onUnlock: () => void;
 }) {
   const { state, descriptor } = model;
-  const busy =
-    Boolean(isDownloading) ||
-    state.kind === "DOWNLOADING" ||
-    state.kind === "VERIFYING" ||
-    state.kind === "OPTIMIZING";
 
-  if (busy) {
+  if (isDownloading) {
     return (
       <div className="flex items-center gap-1.5 shrink-0 text-xs font-medium text-stone-500 dark:text-stone-400">
         <Loader2 className="size-3.5 animate-spin" />
-        <span>{STATE_LABEL[state.kind] || "Downloading..."}</span>
+        <span>Downloading...</span>
+      </div>
+    );
+  }
+
+  if (state.kind === "DOWNLOADING") {
+    // Partial download exists on disk, but no active download in flight
+    return (
+      <div className="flex items-center gap-1.5 shrink-0">
+        <button
+          type="button"
+          onClick={() => onDownload(descriptor.id)}
+          className="hairline flex shrink-0 items-center gap-1.5 rounded-input bg-sunken px-2.5 py-1 text-xs font-semibold text-text-primary transition-colors hover:bg-sunken-strong cursor-pointer"
+        >
+          <Download className="size-3.5" />
+          Resume
+        </button>
+        <button
+          type="button"
+          aria-label={`Delete partial download for ${descriptor.display_name}`}
+          onClick={() => onDelete(descriptor.id)}
+          className="shrink-0 rounded-input p-1 text-text-secondary transition-colors hover:bg-sunken hover:text-danger cursor-pointer"
+          title="Delete partial download"
+        >
+          <Trash2 className="size-4" />
+        </button>
+      </div>
+    );
+  }
+
+  if (state.kind === "VERIFYING") {
+    return (
+      <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 text-xs font-medium text-stone-500 dark:text-stone-400">
+          <Loader2 className="size-3.5 animate-spin" />
+          <span>Verifying...</span>
+        </div>
+        <button
+          type="button"
+          aria-label={`Delete ${descriptor.display_name}`}
+          onClick={() => onDelete(descriptor.id)}
+          className="shrink-0 rounded-input p-1 text-text-secondary transition-colors hover:bg-sunken hover:text-danger cursor-pointer"
+          title="Delete file"
+        >
+          <Trash2 className="size-4" />
+        </button>
+      </div>
+    );
+  }
+
+  if (state.kind === "OPTIMIZING") {
+    return (
+      <div className="flex items-center gap-1.5 shrink-0 text-xs font-medium text-stone-500 dark:text-stone-400">
+        <Loader2 className="size-3.5 animate-spin" />
+        <span>Optimizing...</span>
       </div>
     );
   }
@@ -407,6 +465,30 @@ function ModelAction({
     );
   }
 
+  if (state.kind === "FAILED") {
+    return (
+      <div className="flex items-center gap-1.5 shrink-0">
+        <button
+          type="button"
+          onClick={() => onDownload(descriptor.id)}
+          className="hairline flex shrink-0 items-center gap-2 rounded-input bg-sunken px-3 py-1 text-body text-text-primary transition-colors hover:bg-sunken-strong cursor-pointer"
+        >
+          <Download className="size-4" />
+          Try again
+        </button>
+        <button
+          type="button"
+          aria-label={`Delete ${descriptor.display_name}`}
+          onClick={() => onDelete(descriptor.id)}
+          className="shrink-0 rounded-input p-1 text-text-secondary transition-colors hover:bg-sunken hover:text-danger cursor-pointer"
+          title="Delete file"
+        >
+          <Trash2 className="size-4" />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -414,7 +496,7 @@ function ModelAction({
       className="hairline flex shrink-0 items-center gap-2 rounded-input bg-sunken px-3 py-1 text-body text-text-primary transition-colors hover:bg-sunken-strong cursor-pointer"
     >
       <Download className="size-4" />
-      {state.kind === "FAILED" ? "Try again" : "Download"}
+      Download
     </button>
   );
 }

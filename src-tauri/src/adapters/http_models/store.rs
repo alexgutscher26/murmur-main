@@ -67,7 +67,7 @@ pub struct HttpModelStore {
     /// The result of every hash that has actually run this process: true when
     /// the file matched the catalog, false when it did not. Never written
     /// without a hash having run, so it can be stale-empty and never stale-true.
-    verified: Mutex<HashMap<ModelId, bool>>,
+    verified: Arc<Mutex<HashMap<ModelId, bool>>>,
     /**
      * SOURCE OF TRUTH KEYWORDS: in_flight, per_model_lock, download_race
      * WHAT:  One async lock per model id, held for the whole of `ensure`.
@@ -142,7 +142,7 @@ impl HttpModelStore {
             paths,
             client,
             events,
-            verified: Mutex::new(HashMap::new()),
+            verified: Arc::new(Mutex::new(HashMap::new())),
             in_flight: Mutex::new(HashMap::new()),
         })
     }
@@ -310,6 +310,57 @@ impl HttpModelStore {
      *        which is what lets the model manager render on a plane.
      * WHERE: list and status. The hashing gate is is_installed_and_verified.
      */
+    fn spawn_background_verification(&self, entry: &CatalogEntry) {
+        let id = ModelId(entry.id.to_string());
+        let gate = self.gate_for(&id);
+        let path = self.model_file(entry);
+        let marker_file = self.verified_marker_file(entry);
+        let expected_sha256 = entry.sha256.to_string();
+        let events = Arc::clone(&self.events);
+        let verified = Arc::clone(&self.verified);
+
+        tokio::spawn(async move {
+            let Ok(permit) = gate.try_lock_owned() else {
+                return;
+            };
+
+            tracing::info!(model = id.as_str(), "verifying model file in background");
+            let Ok(digest) = hash_file(path.clone()).await else {
+                return;
+            };
+            let matches = digest.eq_ignore_ascii_case(&expected_sha256);
+            verified.lock().insert(id.clone(), matches);
+
+            if matches {
+                if let Ok(meta) = tokio::fs::metadata(&path).await {
+                    if let Some(modified_ms) = modified_ms(&meta) {
+                        let marker = VerifiedMarker {
+                            sha256: expected_sha256,
+                            size_bytes: meta.len(),
+                            modified_ms,
+                        };
+                        if let Ok(encoded) = serde_json::to_string(&marker) {
+                            let _ = tokio::fs::write(marker_file, encoded).await;
+                        }
+                    }
+                }
+            }
+
+            events.model_state_changed(
+                id,
+                if matches {
+                    ModelState::Ready
+                } else {
+                    ModelState::Failed {
+                        message: "This model file is damaged or incomplete. Download it again.".to_string(),
+                    }
+                },
+            );
+
+            drop(permit);
+        });
+    }
+
     async fn state_of(&self, entry: &CatalogEntry) -> AppResult<ModelStatus> {
         let descriptor = entry.descriptor();
         let path = self.model_file(entry);
@@ -320,6 +371,16 @@ impl HttpModelStore {
             .filter(|meta| meta.is_file())
             .map(|meta| meta.len());
         let received = resume_offset(&self.part_file(entry)).await;
+
+        let id = ModelId(entry.id.to_string());
+        if installed == Some(entry.size_bytes) && self.cached_verdict(entry).is_none() {
+            if self.marker_still_describes(entry).await {
+                tracing::debug!(model = entry.id, "verification restored from marker");
+                self.record_verdict(&id, true);
+            } else {
+                self.spawn_background_verification(entry);
+            }
+        }
 
         let state = state_from_evidence(
             self.cached_verdict(entry),
@@ -776,12 +837,20 @@ mod tests {
      */
     #[tokio::test]
     async fn listing_models_never_hashes() {
-        let Ok(paths) = AppPaths::resolve() else {
-            eprintln!("skipped: no application support directory on this host");
-            return;
+        let dir = std::env::temp_dir().join(format!("murmur-list-test-{}", uuid::Uuid::new_v4()));
+        let paths = AppPaths {
+            data_dir: dir.clone(),
+            models_dir: dir.join("models"),
+            logs_dir: dir.join("logs"),
+            audio_dir: dir.join("audio"),
+            db_path: dir.join("test.db"),
+            bundled_models_dir: None,
         };
+        let _ = tokio::fs::create_dir_all(&paths.models_dir).await;
+
         let Ok(store) = HttpModelStore::new(paths, Arc::new(crate::ports::NullEventSink)) else {
             eprintln!("skipped: could not build an http client");
+            let _ = tokio::fs::remove_dir_all(&dir).await;
             return;
         };
 
@@ -803,6 +872,42 @@ mod tests {
                 );
             }
         }
+        let _ = tokio::fs::remove_dir_all(&dir).await;
+    }
+
+    #[tokio::test]
+    async fn listing_models_restores_from_valid_marker_file() {
+        let dir = std::env::temp_dir().join(format!("murmur-marker-test-{}", uuid::Uuid::new_v4()));
+        let paths = AppPaths {
+            data_dir: dir.clone(),
+            models_dir: dir.join("models"),
+            logs_dir: dir.join("logs"),
+            audio_dir: dir.join("audio"),
+            db_path: dir.join("test.db"),
+            bundled_models_dir: None,
+        };
+        tokio::fs::create_dir_all(&paths.models_dir).await.unwrap();
+
+        let entry = &MODEL_CATALOG[0];
+        let file_path = paths.models_dir.join(format!("ggml-{}.bin", entry.id));
+        let f = tokio::fs::File::create(&file_path).await.unwrap();
+        f.set_len(entry.size_bytes).await.unwrap();
+        let meta = tokio::fs::metadata(&file_path).await.unwrap();
+        let mtime = modified_ms(&meta).unwrap();
+
+        let marker = VerifiedMarker {
+            sha256: entry.sha256.to_string(),
+            size_bytes: entry.size_bytes,
+            modified_ms: mtime,
+        };
+        let marker_path = paths.models_dir.join(format!("ggml-{}.verified", entry.id));
+        tokio::fs::write(&marker_path, serde_json::to_string(&marker).unwrap()).await.unwrap();
+
+        let store = HttpModelStore::new(paths, Arc::new(crate::ports::NullEventSink)).unwrap();
+        let status = store.status(&ModelId(entry.id.to_string())).await.unwrap();
+        assert_eq!(status.state, ModelState::Ready);
+        assert!(status.path.is_some());
+        let _ = tokio::fs::remove_dir_all(&dir).await;
     }
 
     /**
