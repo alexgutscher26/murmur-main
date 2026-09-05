@@ -58,6 +58,7 @@ import { StatsView } from "./stats/StatsView";
 import { HistoryView } from "./history/HistoryView";
 import { SettingsView } from "./settings/SettingsView";
 import { InsightsView } from "./insights/InsightsView";
+import { DictionaryView } from "./dictionary/DictionaryView";
 import { StreakHeaderBadge } from "./_components/StreakHeaderBadge";
 
 /**
@@ -153,11 +154,31 @@ export function Dashboard() {
     [registry.data],
   );
 
+  // Known dashboard routes matching the sidebar navigation
+  const knownRoutes = useMemo(
+    () =>
+      new Set([
+        "dictation",
+        "stats",
+        "insights",
+        "dictionary",
+        "snippets",
+        "style",
+        "transforms",
+        "scratchpad",
+        "notetaker",
+        "history",
+        "settings",
+        "billing",
+      ]),
+    [],
+  );
+
   // Active route fallback to "dictation" (or "stats")
   const activeRoute =
     route === "stats"
       ? "dictation"
-      : navItems.some((item) => item.route === route)
+      : knownRoutes.has(route) || navItems.some((item) => item.route === route)
         ? route
         : "dictation";
 
@@ -582,7 +603,7 @@ function View({
         </div>
       );
     case "dictionary":
-      return <SettingsView registry={registry} section="dictionary" />;
+      return <DictionaryView />;
     case "snippets":
       return (
         <div className="flex h-full flex-col items-center justify-center p-8 text-center">

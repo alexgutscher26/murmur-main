@@ -5,7 +5,7 @@
  */
 
 use super::helpers::text;
-use crate::registry::capability::{Capability, CapabilityKey};
+use crate::registry::capability::{Capability, CapabilityKey, NavDef};
 use crate::types::EngineFeature;
 
 pub fn dictionary_capability() -> Capability {
@@ -17,7 +17,12 @@ pub fn dictionary_capability() -> Capability {
         // Prompting the engine with these terms is what fixes recognition
         // rather than patching the output, so the feature declares it.
         engine_needs: vec![EngineFeature::InitialPrompt],
-        nav: None,
+        nav: Some(NavDef {
+            label: text("Dictionary"),
+            route: text("dictionary"),
+            icon: text("BookOpen"),
+            order: 25,
+        }),
         hotkey: None,
         metrics: vec![],
         settings: vec![],
