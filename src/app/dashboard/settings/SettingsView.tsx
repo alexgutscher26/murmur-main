@@ -29,7 +29,7 @@ import { useSettings } from "../use-settings";
 import { formatBytes } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useTheme, type ThemeChoice } from "@/lib/theme";
-import { ErrorSurface, SettingControl, Skeleton, EmptyState } from "@/components/global";
+import { ErrorSurface, SettingControl, Skeleton, EmptyState, ProFeatureModal } from "@/components/global";
 import type { SettingOption } from "@/components/global";
 import { PermissionNotice } from "./_components/PermissionNotice";
 import { ModelManager } from "./_components/ModelManager";
@@ -39,6 +39,7 @@ import { SettingsBackup } from "./_components/SettingsBackup";
 import { WpmCalibrationWizard } from "../_components/WpmCalibrationWizard";
 import { toControlSetting, type DynamicOptions } from "./to-setting-def";
 import { navigateTo } from "../use-hash-route";
+import { usePlan, canUseFillerStripper, type PlanTier } from "@/lib/plan";
 
 /** Presentation order and wording */
 const SECTION_ORDER: readonly SettingSection[] = [
@@ -70,6 +71,8 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
   const languages = useCommand(commands.listLanguages, []);
   const engine = useCommand(commands.getEngineCapabilities, []);
   const permissions = usePermissions();
+  const { tier } = usePlan();
+  const [proModalOpen, setProModalOpen] = useState(false);
   const [writeError, setWriteError] = useState<AppError | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const { containerRef, onScroll } = useScrollRestoration("settings", Boolean(settings.data));
@@ -111,11 +114,23 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
     return { INPUT_DEVICES: deviceOptions, MODELS: modelOptions, LANGUAGES: languageOptions };
   }, [devices.data, engine.data, languages.data, models.data]);
 
-  const write = useCallback((key: string, value: SettingValue) => {
-    void unwrapCommand(() => commands.setSetting({ key, value })).then((result) => {
-      setWriteError(result.status === "error" ? result.error : null);
-    });
-  }, []);
+  const write = useCallback(
+    (key: string, value: SettingValue) => {
+      if (
+        key === "enhance.strip_fillers" &&
+        value.type === "BOOL" &&
+        value.value === true &&
+        !canUseFillerStripper(tier)
+      ) {
+        setProModalOpen(true);
+        return;
+      }
+      void unwrapCommand(() => commands.setSetting({ key, value })).then((result) => {
+        setWriteError(result.status === "error" ? result.error : null);
+      });
+    },
+    [tier],
+  );
 
   const allDefs = useMemo(
     () => registry.capabilities.flatMap((capability) => capability.settings),
@@ -225,8 +240,14 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
                     {SECTION_LABEL[def.section]}
                   </span>
                   <SettingControl
-                    setting={toControlSetting(def, settings.data?.[def.key], dynamic, engine.data, permissions.data, (value) =>
-                      write(def.key, value),
+                    setting={toControlSetting(
+                      def,
+                      settings.data?.[def.key],
+                      dynamic,
+                      engine.data,
+                      permissions.data,
+                      (value) => write(def.key, value),
+                      tier,
                     )}
                   />
                 </div>
@@ -255,6 +276,7 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
                 permissions={permissions.data}
                 onWrite={write}
                 extra={extra}
+                tier={tier}
               />
             );
           })}
@@ -276,6 +298,13 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
           </section>
         </>
       )}
+
+      <ProFeatureModal
+        isOpen={proModalOpen}
+        onClose={() => setProModalOpen(false)}
+        featureName="Filler Word Removal"
+        description="Automatically remove ums, uhs, and verbal hesitations in real-time with Murmur Pro."
+      />
     </div>
   );
 }
@@ -299,6 +328,7 @@ function SettingsSection({
   onWrite,
   extra,
   sectionKey,
+  tier,
 }: {
   title: string;
   highlighted: boolean;
@@ -310,6 +340,7 @@ function SettingsSection({
   onWrite: (key: string, value: SettingValue) => void;
   extra: SectionPanel | undefined;
   sectionKey?: string;
+  tier?: PlanTier;
 }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showCalibration, setShowCalibration] = useState(false);
@@ -387,8 +418,14 @@ function SettingsSection({
         <div key={def.key}>
           <SettingControl
             className="hairline-b last:border-b-0"
-            setting={toControlSetting(def, values?.[def.key], dynamic, engine, permissions, (value) =>
-              onWrite(def.key, value),
+            setting={toControlSetting(
+              def,
+              values?.[def.key],
+              dynamic,
+              engine,
+              permissions,
+              (value) => onWrite(def.key, value),
+              tier,
             )}
           />
           {def.key === "enhance.expand_abbreviations" &&
@@ -471,8 +508,14 @@ function SettingsSection({
                 <SettingControl
                   key={def.key}
                   className="hairline-b last:border-b-0"
-                  setting={toControlSetting(def, values?.[def.key], dynamic, engine, permissions, (value) =>
-                    onWrite(def.key, value),
+                  setting={toControlSetting(
+                    def,
+                    values?.[def.key],
+                    dynamic,
+                    engine,
+                    permissions,
+                    (value) => onWrite(def.key, value),
+                    tier,
                   )}
                 />
               ))

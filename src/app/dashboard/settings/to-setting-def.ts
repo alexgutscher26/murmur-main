@@ -30,6 +30,7 @@
 
 import { bindingFromCapture, glyphsForBinding } from "@/lib/hotkey";
 import { missingPermissions, permissionLabel } from "@/lib/use-permissions";
+import { type PlanTier, canUseFillerStripper } from "@/lib/plan";
 import type {
   ChoiceSource,
   EngineCapabilities,
@@ -87,6 +88,7 @@ export function toControlSetting(
   engine: EngineCapabilities | null,
   permissions: readonly PermissionReport[] | null,
   onChange: (value: SettingValue) => void,
+  tier?: PlanTier,
 ): ControlSetting {
   const value = stored ?? def.default;
   const missing = missingFeatures(def, engine);
@@ -107,10 +109,16 @@ export function toControlSetting(
     );
   }
 
+  const isFillerGated = def.key === "enhance.strip_fillers" && tier && !canUseFillerStripper(tier);
+  const label = isFillerGated ? `${def.label} (PRO)` : def.label;
+  const description = isFillerGated
+    ? `${def.description} (Pro capability: automatically strips verbal hesitations and filler words).`
+    : [def.description, ...notes].join(" ");
+
   const base = {
     id: def.key,
-    label: def.label,
-    description: [def.description, ...notes].join(" "),
+    label,
+    description,
     disabled: missing.length > 0 || ungranted.length > 0,
   };
 

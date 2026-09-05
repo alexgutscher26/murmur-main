@@ -9,10 +9,11 @@
  */
 
 import { useCallback, useState } from "react";
-import { Download, Trash2, Sparkles } from "lucide-react";
+import { Download, Trash2, Sparkles, Check, ShieldAlert } from "lucide-react";
 import {
   commands,
   events,
+  type AppError,
   type DownloadProgress,
   type ModelId,
   type ModelReport,
@@ -23,6 +24,7 @@ import { useTauriEvent } from "@/lib/use-event";
 import { formatBytes, formatEta, formatRate } from "@/lib/format";
 import { ErrorSurface, ProgressBar, Skeleton, ProFeatureModal } from "@/components/global";
 import { usePlan, canUseTurboModel } from "@/lib/plan";
+import { useSettings } from "../../use-settings";
 
 const STATE_LABEL: Readonly<Record<ModelState["kind"], string>> = {
   NOT_DOWNLOADED: "Not downloaded",
@@ -35,11 +37,27 @@ const STATE_LABEL: Readonly<Record<ModelState["kind"], string>> = {
 
 export function ModelManager() {
   const models = useCommand(commands.listModels, []);
+  const settings = useSettings();
+  const activeModelId = (settings.data?.["transcription.model"]?.value as string) || "small-q5_1";
+  const isAirGapActive =
+    settings.data?.["privacy.air_gap_mode"]?.type === "BOOL" &&
+    Boolean(settings.data["privacy.air_gap_mode"].value);
+
   const [progress, setProgress] = useState<Readonly<Record<string, DownloadProgress>>>({});
   const [liveStates, setLiveStates] = useState<Readonly<Record<string, ModelState>>>({});
   const [proModalOpen, setProModalOpen] = useState(false);
   const [gatedModelName, setGatedModelName] = useState("Whisper Large v3 Turbo");
+  const [downloadError, setDownloadError] = useState<AppError | null>(null);
   const { tier } = usePlan();
+
+  const activateModel = useCallback((modelId: ModelId) => {
+    void unwrapCommand(() =>
+      commands.setSetting({
+        key: "transcription.model",
+        value: { type: "CHOICE", value: modelId },
+      }),
+    );
+  }, []);
 
   useTauriEvent(events.modelDownloadProgress, (payload) => {
     setProgress((current) => ({ ...current, [payload.progress.model_id]: payload.progress }));
@@ -63,17 +81,31 @@ export function ModelManager() {
   }, []);
 
   const download = useCallback(
-    (modelId: ModelId, displayName?: string) => {
+    async (modelId: ModelId, displayName?: string) => {
+      setDownloadError(null);
       const isProModel = modelId.includes("turbo") || modelId.includes("large") || modelId.includes("medium");
       if (isProModel && !canUseTurboModel(tier)) {
         setGatedModelName(displayName || "Whisper Large v3 Turbo");
         setProModalOpen(true);
         return;
       }
+      if (isAirGapActive) {
+        await unwrapCommand(() =>
+          commands.setSetting({
+            key: "privacy.air_gap_mode",
+            value: { type: "BOOL", value: false },
+          }),
+        );
+        settings.reload();
+      }
       clearOverride(modelId);
-      void unwrapCommand(() => commands.downloadModel({ model_id: modelId })).then(models.reload);
+      const res = await unwrapCommand(() => commands.downloadModel({ model_id: modelId }));
+      if (res.status === "error") {
+        setDownloadError(res.error);
+      }
+      models.reload();
     },
-    [clearOverride, models.reload, tier],
+    [clearOverride, isAirGapActive, models.reload, settings, tier],
   );
 
   const remove = useCallback(
@@ -94,6 +126,37 @@ export function ModelManager() {
 
   return (
     <>
+      {isAirGapActive && (
+        <div className="mb-3 flex items-center justify-between gap-3 rounded-card border border-amber-500/20 bg-amber-500/10 px-3.5 py-2.5 text-xs text-amber-900 dark:text-amber-200">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+            <span>
+              <strong>Air-Gap Mode is Active:</strong> Network sockets are isolated. Downloading a model will automatically disable Air-Gap Mode.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              void unwrapCommand(() =>
+                commands.setSetting({
+                  key: "privacy.air_gap_mode",
+                  value: { type: "BOOL", value: false },
+                }),
+              ).then(settings.reload);
+            }}
+            className="shrink-0 rounded-lg bg-amber-500/20 px-2.5 py-1 font-medium hover:bg-amber-500/30 transition-colors cursor-pointer"
+          >
+            Disable Air-Gap
+          </button>
+        </div>
+      )}
+
+      {downloadError ? (
+        <div className="mb-3">
+          <ErrorSurface error={downloadError} size="compact" />
+        </div>
+      ) : null}
+
       <ul className="hairline rounded-card bg-surface px-4">
         {(models.data ?? []).map((report) => {
           const model: ModelReport = { ...report, state: liveStates[report.descriptor.id] ?? report.state };
@@ -102,7 +165,9 @@ export function ModelManager() {
             model.descriptor.id.includes("large") ||
             model.descriptor.id.includes("medium");
           const isCompressed = model.descriptor.id.includes("q3_");
-          const isLocked = isProModel && !canUseTurboModel(tier);
+          const isUnlocked = canUseTurboModel(tier);
+          const isLocked = isProModel && !isUnlocked;
+          const isActive = model.descriptor.id === activeModelId;
 
           return (
             <li key={model.descriptor.id} className="hairline-b flex items-center gap-4 py-3 last:border-b-0">
@@ -112,12 +177,16 @@ export function ModelManager() {
                 isProModel={isProModel}
                 isCompressed={isCompressed}
                 isLocked={isLocked}
+                isUnlocked={isUnlocked}
+                isActive={isActive}
               />
               <ModelAction
                 model={model}
                 isLocked={isLocked}
+                isActive={isActive}
                 onDownload={(id) => download(id, model.descriptor.display_name)}
                 onDelete={remove}
+                onActivate={() => activateModel(model.descriptor.id)}
                 onUnlock={() => {
                   setGatedModelName(model.descriptor.display_name);
                   setProModalOpen(true);
@@ -144,12 +213,16 @@ function ModelSummary({
   isProModel,
   isCompressed,
   isLocked,
+  isUnlocked,
+  isActive,
 }: {
   model: ModelReport;
   progress: DownloadProgress | undefined;
   isProModel: boolean;
   isCompressed?: boolean;
   isLocked: boolean;
+  isUnlocked: boolean;
+  isActive: boolean;
 }) {
   const { descriptor, state } = model;
   const downloading = state.kind === "DOWNLOADING";
@@ -159,18 +232,31 @@ function ModelSummary({
 
   return (
     <div className="min-w-0 flex-1">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <p className="text-sm font-medium text-stone-900 dark:text-white">{descriptor.display_name}</p>
+        {isActive && (
+          <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+            <Check className="size-3" />
+            Active
+          </span>
+        )}
         {isCompressed && (
           <span className="inline-flex items-center rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
             Compressed
           </span>
         )}
         {isProModel && (
-          <span className="inline-flex items-center gap-1 rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold text-stone-800 dark:bg-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700">
-            <Sparkles className="size-2.5" />
-            PRO
-          </span>
+          isUnlocked ? (
+            <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+              <Sparkles className="size-2.5" />
+              PRO UNLOCKED
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 rounded-md bg-stone-100 px-1.5 py-0.5 text-[10px] font-semibold text-stone-800 dark:bg-stone-800 dark:text-stone-200 border border-stone-200 dark:border-stone-700">
+              <Sparkles className="size-2.5" />
+              PRO
+            </span>
+          )
         )}
         {isLocked && (
           <span className="text-[10px] text-stone-400 dark:text-stone-500 font-mono">
@@ -206,14 +292,18 @@ function ModelSummary({
 function ModelAction({
   model,
   isLocked,
+  isActive,
   onDownload,
   onDelete,
+  onActivate,
   onUnlock,
 }: {
   model: ModelReport;
   isLocked: boolean;
+  isActive: boolean;
   onDownload: (modelId: ModelId) => void;
   onDelete: (modelId: ModelId) => void;
+  onActivate: () => void;
   onUnlock: () => void;
 }) {
   const { state, descriptor } = model;
@@ -222,15 +312,46 @@ function ModelAction({
   if (busy) return <span className="shrink-0 text-caption text-text-tertiary">{STATE_LABEL[state.kind]}</span>;
 
   if (state.kind === "READY") {
+    if (isActive) {
+      return (
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+            <Check className="size-3.5" />
+            Active Model
+          </span>
+          <button
+            type="button"
+            aria-label={`Delete ${descriptor.display_name}`}
+            onClick={() => onDelete(descriptor.id)}
+            className="shrink-0 rounded-input p-1 text-text-secondary transition-colors hover:bg-sunken hover:text-danger cursor-pointer"
+            title="Delete local file"
+          >
+            <Trash2 className="size-4" />
+          </button>
+        </div>
+      );
+    }
+
     return (
-      <button
-        type="button"
-        aria-label={`Delete ${descriptor.display_name}`}
-        onClick={() => onDelete(descriptor.id)}
-        className="shrink-0 rounded-input p-1 text-text-secondary transition-colors hover:bg-sunken hover:text-danger"
-      >
-        <Trash2 className="size-4" />
-      </button>
+      <div className="flex items-center gap-1.5 shrink-0">
+        <button
+          type="button"
+          onClick={onActivate}
+          className="hairline flex shrink-0 items-center gap-1.5 rounded-input bg-text-primary px-3 py-1 text-xs font-semibold text-opaque-elevated transition-all hover:opacity-90 cursor-pointer shadow-xs"
+        >
+          <Check className="size-3.5" />
+          Use Model
+        </button>
+        <button
+          type="button"
+          aria-label={`Delete ${descriptor.display_name}`}
+          onClick={() => onDelete(descriptor.id)}
+          className="shrink-0 rounded-input p-1 text-text-secondary transition-colors hover:bg-sunken hover:text-danger cursor-pointer"
+          title="Delete local file"
+        >
+          <Trash2 className="size-4" />
+        </button>
+      </div>
     );
   }
 
@@ -239,7 +360,7 @@ function ModelAction({
       <button
         type="button"
         onClick={onUnlock}
-        className="hairline flex shrink-0 items-center gap-1.5 rounded-input bg-sunken px-2.5 py-1 text-xs font-semibold text-text-primary transition-colors hover:bg-sunken-strong"
+        className="hairline flex shrink-0 items-center gap-1.5 rounded-input bg-sunken px-2.5 py-1 text-xs font-semibold text-text-primary transition-colors hover:bg-sunken-strong cursor-pointer"
       >
         <Sparkles className="size-3" />
         Unlock Trial
@@ -251,7 +372,7 @@ function ModelAction({
     <button
       type="button"
       onClick={() => onDownload(descriptor.id)}
-      className="hairline flex shrink-0 items-center gap-2 rounded-input bg-sunken px-3 py-1 text-body text-text-primary transition-colors hover:bg-sunken-strong"
+      className="hairline flex shrink-0 items-center gap-2 rounded-input bg-sunken px-3 py-1 text-body text-text-primary transition-colors hover:bg-sunken-strong cursor-pointer"
     >
       <Download className="size-4" />
       {state.kind === "FAILED" ? "Try again" : "Download"}

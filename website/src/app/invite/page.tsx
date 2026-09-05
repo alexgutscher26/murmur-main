@@ -93,7 +93,7 @@ function InviteContent() {
               <span>Pro Pack Unlocked</span>
             </div>
             <p className="text-neutral-500 text-[11px] leading-relaxed">
-              Conventional commits, markdown schemas, and LaTeX math triggers included.
+              Whisper Large v3 Turbo, automatic filler word removal, and Smart Context Engine included.
             </p>
           </div>
 

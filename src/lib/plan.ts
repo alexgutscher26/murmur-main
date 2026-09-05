@@ -6,6 +6,8 @@
  */
 
 import { useSyncExternalStore } from "react";
+import { commands } from "@/lib/bindings";
+import { unwrapCommand } from "@/lib/ipc";
 
 export type PlanTier = "starter" | "pro" | "team";
 
@@ -49,6 +51,7 @@ function saveState(next: PlanState) {
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      window.dispatchEvent(new CustomEvent("murmur-plan-changed", { detail: next }));
     } catch {}
   }
   listeners.forEach((listener) => listener());
@@ -56,7 +59,27 @@ function saveState(next: PlanState) {
 
 function subscribe(listener: () => void) {
   listeners.add(listener);
-  return () => listeners.delete(listener);
+  const handleStorage = (e: StorageEvent) => {
+    if (e.key === STORAGE_KEY) {
+      memoryState = getStoredState();
+      listener();
+    }
+  };
+  const handleCustom = () => {
+    memoryState = getStoredState();
+    listener();
+  };
+  if (typeof window !== "undefined") {
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("murmur-plan-changed", handleCustom);
+  }
+  return () => {
+    listeners.delete(listener);
+    if (typeof window !== "undefined") {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("murmur-plan-changed", handleCustom);
+    }
+  };
 }
 
 function getSnapshot(): PlanState {
@@ -64,6 +87,60 @@ function getSnapshot(): PlanState {
     memoryState = getStoredState();
   }
   return memoryState;
+}
+
+/** Automatically activates the settings features unlocked by Pro upon license activation or trial start */
+async function unlockProFeatures() {
+  try {
+    // 1. Enable automatic filler word stripping (flagship Pro benefit)
+    void unwrapCommand(() =>
+      commands.setSetting({
+        key: "enhance.strip_fillers",
+        value: { type: "BOOL", value: true },
+      }),
+    );
+    // 2. Enable spoken formatting commands
+    void unwrapCommand(() =>
+      commands.setSetting({
+        key: "enhance.spoken_commands",
+        value: { type: "BOOL", value: true },
+      }),
+    );
+    // 3. Enable common abbreviation expansions
+    void unwrapCommand(() =>
+      commands.setSetting({
+        key: "enhance.expand_abbreviations",
+        value: { type: "BOOL", value: true },
+      }),
+    );
+    // 4. If Large v3 Turbo or Medium is already downloaded, activate it
+    const modelsResult = await unwrapCommand(commands.listModels);
+    if (modelsResult.status === "ok") {
+      const turbo = modelsResult.data.find(
+        (m) => m.descriptor.id === "large-v3-turbo" && m.state.kind === "READY",
+      );
+      if (turbo) {
+        void unwrapCommand(() =>
+          commands.setSetting({
+            key: "transcription.model",
+            value: { type: "CHOICE", value: "large-v3-turbo" },
+          }),
+        );
+      } else {
+        const medium = modelsResult.data.find(
+          (m) => m.descriptor.id === "medium-q5_0" && m.state.kind === "READY",
+        );
+        if (medium) {
+          void unwrapCommand(() =>
+            commands.setSetting({
+              key: "transcription.model",
+              value: { type: "CHOICE", value: "medium-q5_0" },
+            }),
+          );
+        }
+      }
+    }
+  } catch {}
 }
 
 export function usePlan() {
@@ -77,6 +154,7 @@ export function usePlan() {
       trialExpiresAt: expires,
       licenseKey: "TRIAL-14DAYS-ACTIVE",
     });
+    unlockProFeatures();
   };
 
   const setTier = (tier: PlanTier) => {
@@ -86,6 +164,9 @@ export function usePlan() {
       isTrial: false,
       trialExpiresAt: null,
     });
+    if (tier === "pro" || tier === "team") {
+      unlockProFeatures();
+    }
   };
 
   const activateLicense = (key: string): boolean => {
@@ -99,6 +180,7 @@ export function usePlan() {
         trialExpiresAt: null,
         licenseKey: cleanKey,
       });
+      unlockProFeatures();
       return true;
     } else if (
       cleanKey.startsWith("PRO-") ||
@@ -115,6 +197,7 @@ export function usePlan() {
         trialExpiresAt: null,
         licenseKey: cleanKey,
       });
+      unlockProFeatures();
       return true;
     }
     return false;
