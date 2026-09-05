@@ -69,38 +69,48 @@ const DATA_BOUNDARY_MATRIX = [
 
 const VERIFICATION_QUESTIONS = [
   {
-    q: "Is audio or spoken text ever uploaded to a server?",
-    a: "No. Never. Audio recorded from your microphone is held temporarily in local system memory (RAM) and fed directly into the local whisper.cpp engine running on your CPU or GPU. Once transcribed, the raw audio buffer is immediately freed. Transcripts are typed directly into your focused application via native OS input injection.",
-    badge: "0 Bytes Outbound",
+    q: "Is audio ever uploaded? — No, never.",
+    a: "No. Never. Spoken voice captured from your microphone is streamed strictly into a temporary volatile RAM buffer on your physical machine and passed directly to the local Whisper inference engine. The millisecond decoding finishes, the raw audio buffer is immediately freed and zeroed. Zero bytes of audio are ever transmitted over the network.",
+    badge: "0 Bytes Audio Uploaded",
   },
   {
-    q: "Does Murmur require creating an account or logging in?",
-    a: "No. Murmur works entirely without an account. There are no sign-up screens, email collections, API keys, or user tokens. You download the app, choose a local model weight, and dictate immediately.",
-    badge: "No Account Needed",
+    q: "Are transcripts ever uploaded? — No, never.",
+    a: "No. Never. Transcripts are generated locally on-device and typed directly into your active window at your cursor position via native OS keyboard injection. Murmur maintains no cloud transcript databases, remote backups, or synchronization servers. Your spoken words never touch an external server.",
+    badge: "0 Cloud Transcripts",
   },
   {
-    q: "What outbound network calls does Murmur make?",
-    a: "Exactly two optional requests: (1) downloading open-source Whisper model weights during first setup or model switch, and (2) checking the official GitHub Releases API for new desktop versions. If both are disabled or blocked in your firewall, Murmur operates with 100% functionality.",
-    badge: "Audited Network Spec",
+    q: "Does the product work with no internet connection?",
+    a: "Yes, 100%. Once model weights are stored on your local disk, Murmur requires zero internet connectivity to operate. You can dictate on airplanes, in air-gapped secure development facilities, or during network outages with zero drop in speed or accuracy.",
+    badge: "100% Offline Capable",
   },
   {
-    q: "Can I cut off all internet access and still use Murmur?",
-    a: "Yes. Murmur has an in-app 'Air-Gap Mode' toggle and is fully compatible with Little Snitch, LuLu, and Windows Firewall outbound blocks. All core capabilities—dictation, phonetic biasing, app-aware rules, and history—run strictly offline.",
-    badge: "Air-Gap Verified",
+    q: "What data leaves the device for licensing, updates, or error reporting?",
+    a: "Murmur is free and open-source under the MIT license, so there are zero licensing calls, seat tracking, or activation checks. For software updates, Murmur makes an optional, read-only HTTPS query to the official public GitHub Releases API to check version tags (which can be disabled with one click in Settings). Zero crash logs, stack traces, or error diagnostics leave your machine.",
+    badge: "Zero Licensing Telemetry",
   },
   {
-    q: "Is telemetry or crash reporting enabled by default?",
-    a: "No. Murmur contains zero telemetry libraries, analytics beacons, or third-party trackers. We do not track words spoken, session duration, or which apps you paste into. Any future optional diagnostics will strictly follow an explicit opt-in model with event-level disclosure.",
-    badge: "Zero Telemetry",
+    q: "Is analytics disabled by default?",
+    a: "Yes. Telemetry and analytics are zero by default—Murmur contains no analytics SDKs, telemetry beacons, Google Analytics, PostHog, or third-party tracking scripts. We do not track words spoken, session frequencies, or what applications you dictate into.",
+    badge: "Zero Analytics by Default",
   },
   {
-    q: "How is local history stored and can it be encrypted or disabled?",
-    a: "History is stored in an on-device SQLite database. You can turn off history completely, use Incognito Mode for transient sessions, set auto-wipe timers (e.g. purge after 7 days), or enable local database encryption so transcripts are protected at rest with OS keychain keys.",
-    badge: "Encrypted / Ephemeral",
+    q: "Can users delete all local history?",
+    a: "Yes. Local history is stored in an on-device SQLite database (`murmur.db`). You can purge your entire history at any time with a single click in Settings, configure automatic purge retention rules (e.g. wipe after 24 hours, 7 days, or 30 days), or use Incognito Mode so transcripts are never written to disk in the first place.",
+    badge: "1-Click Wipe & Incognito",
+  },
+  {
+    q: "What model runs locally?",
+    a: "Murmur runs open-source OpenAI Whisper architecture models compiled into compact, quantized GGML weights (Tiny, Base, Small, Medium, and Large-v3-Turbo) using whisper.cpp. Models execute natively with GPU hardware acceleration via Apple Metal on macOS and DirectML or CUDA on Windows.",
+    badge: "Open-Source Whisper Models",
+  },
+  {
+    q: "Can advanced users block the app's network access and retain core functionality?",
+    a: "Yes. Advanced users and IT administrators can block Murmur in Windows Defender Firewall, Little Snitch, LuLu, or pf, or toggle Murmur's built-in 'Air-Gap Mode' in Settings. Core dictation, custom phonetic dictionary biasing, and context-aware formatting continue to function with 100% reliability.",
+    badge: "Firewall & Air-Gap Friendly",
   },
   {
     q: "How does Murmur differ from cloud dictation tools like Wispr Flow?",
-    a: "Cloud tools like Wispr Flow stream your voice over WebSockets to remote GPU clusters, store transcripts in cloud databases, and use cloud LLMs for post-processing. Murmur executes speech recognition and prompt formatting on your local hardware using whisper.cpp.",
+    a: "Cloud tools like Wispr Flow stream your voice over WebSockets to remote GPU clusters, store transcripts in cloud databases, and use cloud LLMs for post-processing. Murmur executes speech recognition and prompt formatting on your local hardware using whisper.cpp with sub-180ms latency.",
     badge: "Architecture vs Policy",
   },
   {
@@ -170,6 +180,9 @@ export default function PrivacyPage() {
               <h2 className="text-xl sm:text-2xl font-bold text-white">
                 How voice flows from microphone to active window
               </h2>
+              <p className="text-xs font-mono text-emerald-400/90 mt-1">
+                Microphone → Your Computer (whisper.cpp & RAM) → Any App (Zero network egress)
+              </p>
             </div>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1c1c1c] border border-emerald-500/30 text-[11px] font-mono text-emerald-300">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />

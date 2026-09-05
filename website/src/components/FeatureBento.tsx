@@ -4,23 +4,12 @@ import { ShieldCheck, Zap, Globe, Command, WifiOff, Sparkles, Sliders } from "lu
 
 const JOBS = [
   {
-    job: "Protect sensitive ideas",
-    quote: "“Your client notes, code, and private thoughts stay yours.”",
-    feature: "Local-first architecture",
-    audience: "Lawyers, therapists, founders & developers",
-    description:
-      "Unlike cloud dictation tools that upload audio to remote servers for transcription and AI training, Murmur executes 100% on your local CPU/GPU. No remote database, no audio logs.",
-    pill: "Zero cloud telemetry",
-    pillDetail: "0 bytes sent",
-    icon: ShieldCheck,
-  },
-  {
-    job: "Write messages & docs faster",
+    job: "Write emails faster",
     quote: "“Speak the messy first draft. Paste the polished version.”",
-    feature: "Instant clean-up & formatting",
+    feature: "Clean-up and formatting",
     audience: "Busy operators, executives & consultants",
     description:
-      "Murmur automatically strips filler words (um, uh, like), corrects run-on sentences, and injects proper paragraphs so what you paste is already finalized.",
+      "Speak freely with false starts and filler words. Murmur strips ums, ahs, and repetitions, injects proper punctuation, and outputs clean paragraphs ready to send.",
     pill: "Smart cleanup",
     pillDetail: "Auto-punctuation",
     icon: Sparkles,
@@ -28,21 +17,32 @@ const JOBS = [
   {
     job: "Dictate in every app",
     quote: "“One shortcut works wherever you write.”",
-    feature: "Universal global hotkey",
+    feature: "Global hotkey + universal insertion",
     audience: "Slack, Cursor, Word, Notion & Gmail users",
     description:
-      "Press Option+Space (macOS) or Alt+Space (Windows) in any text field. Speak naturally, release, and text pastes immediately at your cursor without losing focus.",
+      "Press Option+Space (macOS) or Alt+Space (Windows) in any text field. Speak naturally and text pastes directly at your cursor via native OS input injection.",
     pill: "Universal hook",
     pillDetail: "⌥Space / Alt+Space",
     icon: Command,
   },
   {
+    job: "Protect sensitive ideas",
+    quote: "“Your client notes and private thoughts stay yours.”",
+    feature: "Fully local processing",
+    audience: "Lawyers, therapists, founders & developers",
+    description:
+      "Inference runs 100% on your local CPU/GPU using whisper.cpp. Audio is held only in RAM and deleted on decode. Zero cloud telemetry, zero remote databases.",
+    pill: "Zero cloud telemetry",
+    pillDetail: "0 bytes sent",
+    icon: ShieldCheck,
+  },
+  {
     job: "Work while traveling",
     quote: "“Dictate on a plane, in a hotel, or anywhere Wi-Fi fails.”",
-    feature: "100% offline transcription",
+    feature: "Offline dictation",
     audience: "Frequent travelers & air-gapped environments",
     description:
-      "Whisper model weights run completely offline on device. Transcribe on 30,000 feet flights or in high-security air-gapped office networks with zero internet connection.",
+      "Whisper weights execute completely offline on your device. Transcribe on 35,000-ft flights, in subways, or in secure air-gapped rooms with zero internet connection.",
     pill: "Offline mode",
     pillDetail: "100% local model",
     icon: WifiOff,
@@ -50,10 +50,10 @@ const JOBS = [
   {
     job: "Handle jargon correctly",
     quote: "“Teach it client names, code terms, medications, or product names.”",
-    feature: "Phonetic dictionary biasing",
+    feature: "Custom vocabulary / dictionary",
     audience: "Engineers, medical teams & specialized domains",
     description:
-      "Add proprietary names, code symbols, technical acronyms, or rare medication names. Murmur biases recognition weights to achieve flawless accuracy.",
+      "Add proprietary names, code symbols, technical acronyms, or medication terms. Murmur biases recognition weights to achieve flawless accuracy.",
     pill: "Custom dictionary",
     pillDetail: "Phonetic biasing",
     icon: Sliders,
@@ -61,10 +61,10 @@ const JOBS = [
   {
     job: "Use multiple languages",
     quote: "“Private dictation in the languages you actually use.”",
-    feature: "99 local language models",
+    feature: "Local language models",
     audience: "Multilingual teams & global professionals",
     description:
-      "Automatic language detection across 99 languages. Dictate in Spanish, German, Japanese, French, or English without reconfiguring settings.",
+      "Automatic language detection across 99 languages. Dictate in Spanish, German, Japanese, French, or English without cloud transmission or reconfiguring settings.",
     pill: "Multilingual",
     pillDetail: "99 languages",
     icon: Globe,

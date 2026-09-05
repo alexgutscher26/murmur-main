@@ -4,15 +4,14 @@
 import { useState, useEffect } from "react";
 import {
   Mic,
-  Cpu,
   ShieldCheck,
-  Zap,
   WifiOff,
   Wifi,
   Terminal,
   ArrowRight,
   Sparkles,
   Command,
+  Check,
 } from "lucide-react";
 
 interface AppPreset {
@@ -117,6 +116,19 @@ Alex`,
 **Audit Result:**
 Verified ✅ — 100% on-device Whisper decode. 0 bytes transmitted over network.`,
   },
+  {
+    id: "chatgpt",
+    name: "ChatGPT & Claude",
+    category: "AI Prompts",
+    icon: "✦",
+    rawSpoken:
+      "summarize our competitive advantage in private on-device dictation focusing on zero cloud streaming and sub-200ms latency",
+    formattedOutput: `Please analyze and structure our positioning for on-device AI dictation:
+
+1. Technical Moat: whisper.cpp running 100% locally via Apple Metal / Windows DirectML (sub-180ms latency)
+2. Verifiable Privacy: 0 bytes outbound egress, audited by Wireshark/LuLu, zero accounts required
+3. Workflow Impact: Universal global hotkey typing directly into any active app without clipboard hijack`,
+  },
 ];
 
 export function Hero() {
@@ -215,12 +227,28 @@ export function Hero() {
       {/* Hero Headline & Subheadline */}
       <div className="relative text-center max-w-3xl px-4 mx-auto mb-10">
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.08]">
-          Speak freely.
-          <span className="block text-gradient-hero mt-1">Keep everything private.</span>
+          Speak naturally. Write anywhere.
+          <span className="block text-gradient-hero mt-2">Keep it private.</span>
         </h1>
-        <p className="text-base sm:text-xl text-neutral-300 max-w-2xl mx-auto leading-relaxed font-normal">
-          Private, instant AI dictation for macOS and Windows. Whisper speech models decode locally on your GPU—your voice, transcripts, and writing context never leave your machine.
+        <p className="text-base sm:text-xl text-neutral-300 max-w-2xl mx-auto leading-relaxed font-normal mb-8">
+          Turn your voice into polished text in any app — processed locally on your PC or Mac.
         </p>
+
+        {/* 3 Value Pillars */}
+        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs sm:text-sm font-mono text-neutral-300">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md">
+            <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+            No uploaded audio
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md">
+            <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+            No cloud transcript history
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md">
+            <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+            No selling your data
+          </span>
+        </div>
       </div>
 
       {/* Primary CTA and Secondary Demo Button */}
@@ -229,7 +257,10 @@ export function Hero() {
           href="#download"
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm font-semibold text-black bg-gradient-to-b from-white to-zinc-200 hover:from-white hover:to-white px-8 py-3.5 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:shadow-[0_0_40px_rgba(255,255,255,0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
-          <span>Download free for {detectedOs === "mac" ? "macOS" : "Windows"}</span>
+          <span>Download free</span>
+          <span className="text-xs text-neutral-500 font-mono font-normal">
+            ({detectedOs === "mac" ? "macOS" : "Windows"})
+          </span>
           <ArrowRight className="w-4 h-4 stroke-[2.5]" />
         </a>
         <a
