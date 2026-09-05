@@ -104,6 +104,9 @@ export function usePlan() {
       cleanKey.startsWith("PRO-") ||
       cleanKey.startsWith("FOUNDING-") ||
       cleanKey.startsWith("LIFETIME-") ||
+      cleanKey.startsWith("STUDENT-") ||
+      cleanKey.startsWith("OSS-") ||
+      cleanKey.startsWith("SWITCHER-") ||
       cleanKey.length >= 8
     ) {
       saveState({

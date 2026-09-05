@@ -80,16 +80,16 @@ export function BadgeGenerator() {
   };
 
   return (
-    <section className="py-16 px-4 max-w-6xl mx-auto">
+    <section className="py-16 px-4 max-w-6xl w-full mx-auto">
       <div className="text-center mb-12">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-4">
-          <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white text-neutral-800 border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           Product Virality & Open Source Badges
         </div>
-        <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        <h2 className="text-3xl sm:text-4xl font-bold text-neutral-950 tracking-[-0.03em]">
           "Made with Local Dictation" Badges & Macros
         </h2>
-        <p className="mt-3 text-base text-zinc-400 max-w-2xl mx-auto">
+        <p className="mt-3 text-base text-neutral-600 max-w-2xl mx-auto">
           Add exportable badges to your READMEs, PRs, and documentation. Use voice trigger words to instantly insert markdown schemas.
         </p>
       </div>
@@ -97,8 +97,8 @@ export function BadgeGenerator() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Badges & Snippets */}
         <div className="lg:col-span-7 space-y-6">
-          <div className="bg-zinc-900/70 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm">
-            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <h3 className="text-base font-bold text-neutral-950 mb-4 flex items-center gap-2">
               <span>🏷️</span> Exportable Badges for READMEs & PRs
             </h3>
 
@@ -110,11 +110,11 @@ export function BadgeGenerator() {
                   onClick={() => setSelectedBadge(preset.id)}
                   className={`p-3 rounded-xl border text-left transition-all ${
                     selectedBadge === preset.id
-                      ? "border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10"
-                      : "border-zinc-800 bg-zinc-950/50 hover:border-zinc-700"
+                      ? "border-neutral-900 bg-neutral-50 shadow-sm"
+                      : "border-neutral-200/80 bg-white hover:border-neutral-300 hover:bg-neutral-50/50"
                   }`}
                 >
-                  <div className="text-xs font-medium text-zinc-300 mb-2 truncate">{preset.name}</div>
+                  <div className="text-xs font-medium text-neutral-700 mb-2 truncate">{preset.name}</div>
                   <img src={preset.badgeUrl} alt={preset.name} className="h-5" />
                 </button>
               ))}
@@ -123,80 +123,80 @@ export function BadgeGenerator() {
             {/* Live Copy Panel */}
             <div className="space-y-4">
               <div>
-                <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5 font-medium">
+                <div className="flex items-center justify-between text-xs text-neutral-600 mb-1.5 font-medium">
                   <span>Markdown Embed (GitHub Issues & PRs)</span>
                   <button
                     onClick={() => handleCopy(activePreset.markdown, "md")}
-                    className="text-indigo-400 hover:text-indigo-300 font-semibold"
+                    className="text-emerald-700 hover:text-emerald-800 font-semibold"
                   >
                     {copiedKey === "md" ? "✓ Copied!" : "Copy Markdown"}
                   </button>
                 </div>
-                <pre className="p-3 bg-zinc-950 border border-zinc-800/80 rounded-xl text-xs font-mono text-zinc-300 overflow-x-auto select-all">
+                <pre className="p-3 bg-neutral-50 border border-neutral-200/80 rounded-xl text-xs font-mono text-neutral-800 overflow-x-auto select-all">
                   {activePreset.markdown}
                 </pre>
               </div>
 
               <div>
-                <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5 font-medium">
+                <div className="flex items-center justify-between text-xs text-neutral-600 mb-1.5 font-medium">
                   <span>HTML Embed (Docs & Web Pages)</span>
                   <button
                     onClick={() => handleCopy(activePreset.html, "html")}
-                    className="text-indigo-400 hover:text-indigo-300 font-semibold"
+                    className="text-emerald-700 hover:text-emerald-800 font-semibold"
                   >
                     {copiedKey === "html" ? "✓ Copied!" : "Copy HTML"}
                   </button>
                 </div>
-                <pre className="p-3 bg-zinc-950 border border-zinc-800/80 rounded-xl text-xs font-mono text-zinc-300 overflow-x-auto select-all">
+                <pre className="p-3 bg-neutral-50 border border-neutral-200/80 rounded-xl text-xs font-mono text-neutral-800 overflow-x-auto select-all">
                   {activePreset.html}
                 </pre>
               </div>
 
-              <div className="pt-2 border-t border-zinc-800/80">
-                <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5 font-medium">
+              <div className="pt-3 border-t border-neutral-200/80">
+                <div className="flex items-center justify-between text-xs text-neutral-600 mb-1.5 font-medium">
                   <span>Subtle Italicized Footer</span>
                   <button
                     onClick={() =>
                       handleCopy("_Dictated privately on-device with [Murmur](https://murmur.app)_", "footer")
                     }
-                    className="text-indigo-400 hover:text-indigo-300 font-semibold"
+                    className="text-emerald-700 hover:text-emerald-800 font-semibold"
                   >
                     {copiedKey === "footer" ? "✓ Copied!" : "Copy Footer"}
                   </button>
                 </div>
-                <div className="p-3 bg-zinc-950/80 border border-zinc-800/80 rounded-xl text-xs text-zinc-400 italic">
-                  _Dictated privately on-device with <span className="text-indigo-400 underline">Murmur</span>_
+                <div className="p-3 bg-neutral-50 border border-neutral-200/80 rounded-xl text-xs text-neutral-600 italic">
+                  _Dictated privately on-device with <span className="text-neutral-900 font-medium underline">Murmur</span>_
                 </div>
               </div>
             </div>
           </div>
 
           {/* Referral Activation Card */}
-          <div className="bg-gradient-to-br from-indigo-950/40 via-zinc-900/60 to-purple-950/30 border border-indigo-500/20 rounded-2xl p-6">
+          <div className="bg-gradient-to-br from-emerald-50/40 via-white to-neutral-50/60 border border-emerald-200/80 rounded-2xl p-6 shadow-sm">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🎁</span>
-                  <h4 className="text-base font-bold text-white">Post-Activation Referral Program</h4>
+                  <h4 className="text-base font-bold text-neutral-950">Post-Activation Referral Program</h4>
                 </div>
-                <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
+                <p className="mt-1 text-xs text-neutral-600 leading-relaxed">
                   Earn lifetime rewards & Pro pack unlocks. Prompt triggers only after <strong>50 successful dictations</strong> (never during onboarding) when you've already experienced the value.
                 </p>
               </div>
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 whitespace-nowrap">
+              <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100/70 text-emerald-800 border border-emerald-200/90 whitespace-nowrap">
                 50 Dictations Gate
               </span>
             </div>
 
-            <div className="mt-4 p-3 bg-zinc-950/80 border border-zinc-800/80 rounded-xl flex items-center justify-between gap-3">
-              <div className="font-mono text-xs text-indigo-300 truncate">
+            <div className="mt-4 p-2.5 bg-white border border-neutral-200/80 rounded-xl flex items-center justify-between gap-3 shadow-inner">
+              <div className="font-mono text-xs text-neutral-700 truncate px-1">
                 https://murmur.app/invite?ref=MURMUR-8X7K9P
               </div>
               <button
                 onClick={() =>
                   handleCopy("https://murmur.app/invite?ref=MURMUR-8X7K9P", "referral")
                 }
-                className="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition-all whitespace-nowrap"
+                className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-neutral-900 hover:bg-neutral-800 text-white transition-all whitespace-nowrap shadow-sm"
               >
                 {copiedKey === "referral" ? "✓ Copied" : "Copy Link"}
               </button>
@@ -205,12 +205,12 @@ export function BadgeGenerator() {
         </div>
 
         {/* Right Column: Voice-Triggered Text Expander Macros */}
-        <div className="lg:col-span-5 bg-zinc-900/70 border border-zinc-800 rounded-2xl p-6 backdrop-blur-sm space-y-5">
+        <div className="lg:col-span-5 bg-white border border-neutral-200/80 rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)] space-y-5">
           <div>
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
+            <h3 className="text-base font-bold text-neutral-950 flex items-center gap-2">
               <span>🎙️</span> Voice-Triggered Macros
             </h3>
-            <p className="text-xs text-zinc-400 mt-1">
+            <p className="text-xs text-neutral-600 mt-1">
               Speak these trigger words during dictation to instantly expand structured markdown schemas:
             </p>
           </div>
@@ -219,20 +219,20 @@ export function BadgeGenerator() {
             {SNIPPET_MACROS.map((macro, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-xl border border-zinc-800 bg-zinc-950/60 hover:border-zinc-700 transition-all"
+                className="p-3.5 rounded-xl border border-neutral-200/80 bg-neutral-50/50 hover:bg-neutral-50 hover:border-neutral-300 transition-all"
               >
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-bold text-white">{macro.title}</span>
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                  <span className="text-xs font-bold text-neutral-900">{macro.title}</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-200/80">
                     "{macro.voiceTrigger}"
                   </span>
                 </div>
-                <p className="text-[11px] font-mono text-zinc-400 whitespace-pre-line bg-zinc-900/50 p-2 rounded border border-zinc-800/50 mb-2">
+                <p className="text-[11px] font-mono text-neutral-600 whitespace-pre-line bg-white p-2 rounded border border-neutral-200/70 mb-2">
                   {macro.preview}
                 </p>
                 <button
                   onClick={() => handleCopy(macro.schema, `schema-${idx}`)}
-                  className="w-full py-1 text-center text-[11px] font-medium text-zinc-400 hover:text-white bg-zinc-800/50 hover:bg-zinc-800 rounded transition-all"
+                  className="w-full py-1.5 text-center text-[11px] font-medium text-neutral-700 hover:text-neutral-900 bg-neutral-100 hover:bg-neutral-200/70 rounded-lg transition-all border border-neutral-200/60"
                 >
                   {copiedKey === `schema-${idx}` ? "✓ Copied Schema" : "Copy Template"}
                 </button>

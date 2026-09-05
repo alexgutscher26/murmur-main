@@ -6,122 +6,21 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BadgeGenerator } from "@/components/BadgeGenerator";
 
-type BillingCycle = "lifetime" | "annual" | "monthly";
+type ProBilling = "lifetime" | "annual";
 
 interface PricingTier {
-  id: string;
+  id: "free" | "pro" | "team";
   name: string;
   badge?: string;
-  monthlyPrice: string;
-  annualPrice: string;
-  annualBilled: string;
-  lifetimePrice: string;
+  price: string;
   period: string;
+  subtext: string;
   description: string;
   features: string[];
   ctaText: string;
   ctaHref: string;
   isPrimary: boolean;
 }
-
-const PRICING_TIERS: PricingTier[] = [
-  {
-    id: "free",
-    name: "Free",
-    badge: "Free Forever",
-    monthlyPrice: "$0",
-    annualPrice: "$0",
-    annualBilled: "Free forever · 100% private core",
-    lifetimePrice: "$0",
-    period: "forever",
-    description: "Private local dictation. Prove the sub-200ms speed on your machine with zero cloud processing.",
-    features: [
-      "100% on-device local Whisper dictation",
-      "Basic model (Whisper Base quantized)",
-      "Standard weekly dictation usage",
-      "Single primary language dictation",
-      "Standard punctuation & raw text insertion",
-      "Universal global hotkey (⌥Space / Alt+Space)",
-      "macOS (Metal) & Windows (DirectML) native",
-      "Audio and transcripts never leave RAM",
-    ],
-    ctaText: "Download Free Forever",
-    ctaHref: "/#download",
-    isPrimary: false,
-  },
-  {
-    id: "pro-lifetime",
-    name: "Founding Pro Lifetime",
-    badge: "Launch Offer · First 300 Users",
-    monthlyPrice: "$8",
-    annualPrice: "$49",
-    annualBilled: "Launch deal: $89 once (Regular $129)",
-    lifetimePrice: "$89",
-    period: "one-time",
-    description: "Private dictation forever on 1–2 devices, plus 1 full year of all software and model updates included.",
-    features: [
-      "Unlimited dictation & local transcription",
-      "Premium models (Whisper Large v3 Turbo & Medium)",
-      "Custom vocabulary for client names & jargon",
-      "Per-app writing profiles (Slack, Mail, Code, Notes)",
-      "Automatic filler word removal (strips ums/ahs)",
-      "100% offline dictation & air-gap verified",
-      "1–2 personal devices (macOS & Windows)",
-      "All updates included for 1 full year",
-    ],
-    ctaText: "Claim Founding Pro ($89)",
-    ctaHref: "/#download",
-    isPrimary: true,
-  },
-  {
-    id: "pro-annual",
-    name: "Pro Annual",
-    badge: "Continuous Updates",
-    monthlyPrice: "$8",
-    annualPrice: "$49",
-    annualBilled: "$49 / year or $8 / month flexible",
-    lifetimePrice: "$89",
-    period: "flexible",
-    description: "For professionals wanting continuous new model drops, OS compatibility tuning, and priority support.",
-    features: [
-      "Everything in Pro Lifetime included",
-      "Continuous updates for new Whisper model releases",
-      "OS compatibility & DirectML/Metal GPU driver tuning",
-      "Voice commands & smart text transformations",
-      "Automatic multi-language detection",
-      "Local meeting transcription with speaker labeling",
-      "Priority driver tuning & new local model drops",
-      "Continuous feature updates & priority support",
-    ],
-    ctaText: "Start Pro Annual ($49/yr)",
-    ctaHref: "/#download",
-    isPrimary: false,
-  },
-  {
-    id: "team-business",
-    name: "Team / Business",
-    badge: "Admin & Compliance",
-    monthlyPrice: "$19",
-    annualPrice: "$15",
-    annualBilled: "$15 / user / month billed annually",
-    lifetimePrice: "$149",
-    period: "per seat",
-    description: "Admin deployment, centralized preferences, priority support, and security compliance documentation.",
-    features: [
-      "Everything in Pro included for all seats",
-      "Admin deployment via MSIX & PKG enterprise installers",
-      "Centralized preferences & shared dictionary packs",
-      "Commercial-use rights & volume seat licensing",
-      "Signed physical data boundary attestation",
-      "Tamper-evident local compliance audit log",
-      "Priority business SLA & security documentation",
-      "Dedicated technical onboarding engineer support",
-    ],
-    ctaText: "Contact Team Sales",
-    ctaHref: "mailto:sales@murmur.app?subject=Team%20Inquiry",
-    isPrimary: false,
-  },
-];
 
 const COMMUNITY_PACKS = [
   {
@@ -160,244 +59,435 @@ const COMMUNITY_PACKS = [
 
 const PRICING_FAQS = [
   {
-    question: "Why use a hybrid model instead of subscription-only?",
+    question: "What is the difference between Free and Pro?",
     answer:
-      "Because you supply your own hardware and audio never needs cloud GPU processing, subscription-only pricing feels misaligned unless it pays for continuous value. Our hybrid model gives you an affordable perpetual path (Founding Pro Lifetime) to own local dictation forever on your device, with an optional annual path ($49/yr) for those who want continuous new Whisper model drops, driver tuning, and domain packs.",
+      "Free gives you unlimited local dictation using the lightweight Whisper Base model with standard punctuation. Pro unlocks Whisper Large v3 Turbo & Medium models, per-app style adaptation (Slack vs code vs email), custom vocabulary & client jargon, and automatic filler word stripping.",
   },
   {
-    question: "What updates are included with the Founding Pro Lifetime license?",
+    question: "How does Pro Lifetime vs Pro Annual work?",
     answer:
-      "Founding Pro includes private dictation forever on 1–2 devices, plus all software, driver, and model updates for 1 full year. We avoid promising 'lifetime updates' because it creates an unsustainable support obligation for a one-time payment. After year 1, your purchased version remains yours to use forever offline with zero subscriptions, and you can optionally renew an annual update pass ($39/year) whenever you want major new feature releases.",
+      "Pro Lifetime ($89 one-time) lets you own the software forever on up to 2 personal devices with 1 full year of continuous updates included. After year 1, your version remains yours to use offline indefinitely with zero subscriptions. Pro Annual ($49/year) is for users who prefer continuous ongoing model upgrades, driver tuning, and priority support as a low annual expense.",
   },
   {
-    question: "Does the Pro plan still run 100% locally on my machine?",
+    question: "Does Murmur ever send my audio or text to the cloud?",
     answer:
-      "Yes, absolutely. Every feature across Free, Pro Lifetime, Pro Annual, and Team executes entirely within your physical machine's CPU/GPU via whisper.cpp. No audio, transcripts, or personal dictionaries are ever streamed to cloud servers.",
+      "Never. Every model inference, dictionary lookup, and text transformation runs 100% locally on your computer's CPU and GPU via whisper.cpp. Audio is processed directly in RAM and discarded immediately.",
   },
   {
     question: "How does the Switcher Discount work?",
     answer:
-      "If you currently subscribe to Wispr Flow, Superwhisper, or Dragon, you can claim 40% off your first year of Pro or $20 off Founding Pro Lifetime by showing an active receipt or account screenshot.",
+      "If you currently pay for Wispr Flow, Superwhisper, or Dragon, you can claim 40% off Pro Annual or $20 off Pro Lifetime by emailing proof of an active receipt or account screenshot.",
   },
   {
-    question: "Do you offer Student and Open Source Developer pricing?",
+    question: "Do you offer Student and Open Source Maintainer pricing?",
     answer:
-      "Yes! Students, educators, and verified open-source maintainers receive a 50% discount ($44 for Founding Pro Lifetime, $24/yr for Pro Annual). Simply reach out with your student ID or GitHub profile.",
+      "Yes! Students, educators, and verified open-source maintainers receive a 50% discount ($44 for Pro Lifetime or $24/yr for Pro Annual). Simply reach out with your student ID or GitHub profile.",
+  },
+  {
+    question: "How do Team licenses work?",
+    answer:
+      "Team licenses ($15/seat/month) include everything in Pro plus enterprise packaging (silent MSIX / PKG deployment), centralized team vocabularies, commercial licensing rights, and priority technical support.",
   },
 ];
 
 export default function PricingPage() {
-  const [billingCycle, setBillingCycle] = useState<BillingCycle>("lifetime");
+  const [proBilling, setProBilling] = useState<ProBilling>("lifetime");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
+  const tiers: PricingTier[] = [
+    {
+      id: "free",
+      name: "Free",
+      badge: "Free Forever",
+      price: "$0",
+      period: "forever",
+      subtext: "100% on-device · Zero cloud needed",
+      description: "Fast local dictation for individuals. Experience sub-200ms transcription directly on your hardware.",
+      features: [
+        "100% on-device Whisper Base model",
+        "Sub-200ms instantaneous transcription",
+        "Universal hotkey (⌥Space / Alt+Space)",
+        "Standard punctuation & raw text insertion",
+        "macOS (Metal) & Windows (DirectML) native",
+        "Audio and transcripts never leave RAM",
+      ],
+      ctaText: "Download Free Forever",
+      ctaHref: "/#download",
+      isPrimary: false,
+    },
+    {
+      id: "pro",
+      name: "Pro",
+      badge: proBilling === "lifetime" ? "Perpetual · Best Value" : "Most Flexible",
+      price: proBilling === "lifetime" ? "$89" : "$49",
+      period: proBilling === "lifetime" ? "one-time" : "/ year",
+      subtext:
+        proBilling === "lifetime"
+          ? "Pay once · Own forever · 1 yr updates included"
+          : "Equivalent to $4.08/mo · Continuous updates",
+      description: "For professionals who write daily and want peak accuracy, custom jargon, and context awareness.",
+      features: [
+        "Everything in Free, plus:",
+        "Whisper Large v3 Turbo & Medium models",
+        "Per-app writing styles (Slack, Mail, Code, Docs)",
+        "Custom dictionary for technical terms & client names",
+        "Automatic filler word removal (strips ums/ahs)",
+        "Works 100% offline & air-gap verified",
+        "Valid on 2 personal devices (macOS & Windows)",
+        "Continuous performance tuning & model drops",
+      ],
+      ctaText: proBilling === "lifetime" ? "Get Pro Lifetime ($89)" : "Start Pro Annual ($49/yr)",
+      ctaHref: "/#download",
+      isPrimary: true,
+    },
+    {
+      id: "team",
+      name: "Team",
+      badge: "For Organizations",
+      price: "$15",
+      period: "/ seat / mo",
+      subtext: "Billed annually · Commercial license",
+      description: "Admin deployment, shared organizational vocabularies, and compliance guarantees for teams.",
+      features: [
+        "Everything in Pro included for all seats",
+        "Admin deployment via MSIX & PKG installers",
+        "Centralized team dictionary & shared prompt packs",
+        "Commercial-use rights & volume seat licensing",
+        "Tamper-evident local compliance audit log",
+        "Priority business SLA & dedicated support",
+      ],
+      ctaText: "Contact Team Sales",
+      ctaHref: "mailto:sales@murmur.app?subject=Team%20Inquiry",
+      isPrimary: false,
+    },
+  ];
+
   return (
-    <main id="main-content" className="min-h-screen bg-[#000000] text-white selection:bg-white/20 selection:text-white overflow-x-hidden">
+    <main id="main-content" className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white overflow-x-hidden relative">
+      {/* Background glow & subtle texture */}
+      <div className="absolute inset-0 pointer-events-none -z-10 flex items-center justify-center overflow-hidden">
+        <div className="absolute -top-32 w-[700px] h-[600px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50" />
+      </div>
+
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-36 pb-12 md:pt-44 md:pb-16 bg-[#000000] flex flex-col items-center text-center px-4">
+      <section className="relative pt-32 pb-12 md:pt-40 md:pb-16 flex flex-col items-center text-center px-4">
         {/* Value Proposition Badge */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#181818] border border-[#313131] mb-6 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
-          <span className="text-xs font-semibold text-white/90">
-            Perpetual Core Ownership + Optional Pro Superpowers
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-6">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-semibold text-neutral-800">
+            Simple, Transparent Pricing · No Cloud Subscriptions Required
           </span>
         </div>
 
-        <div className="max-w-[740px] mx-auto mb-8">
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white mb-6">
+        <div className="max-w-[760px] mx-auto mb-8">
+          <h1 className="text-4xl sm:text-6xl font-bold tracking-[-0.03em] text-neutral-950 mb-6">
             Invest in speed.
             <span className="block text-gradient-hero mt-1">Own your software forever.</span>
           </h1>
-          <p className="text-base sm:text-lg text-white/70 leading-relaxed font-normal">
-            No mandatory recurring cloud compute taxes. Choose an affordable perpetual license for core private dictation, or upgrade to Pro for advanced local models and domain packs.
+          <p className="text-base sm:text-lg text-neutral-600 leading-relaxed font-normal max-w-2xl mx-auto">
+            Zero cloud compute markups. Choose Free forever, purchase a perpetual Pro license to own on your machine, or deploy across your team.
           </p>
         </div>
 
-        {/* Switcher & Special Discounts Banner */}
-        <div className="mb-10 p-3.5 rounded-2xl bg-[#141414] border border-[#292929] max-w-3xl w-full flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-left">
-            <span className="text-emerald-400 text-sm">⚡</span>
+        {/* Competitive Migration / Switcher Offer */}
+        <div className="mb-12 max-w-3xl w-full p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-neutral-50/90 to-white border border-neutral-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.03)] text-left">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200/60">
             <div>
-              <span className="font-bold text-white">Migrating from Wispr Flow or Superwhisper?</span>
-              <p className="text-white/60 text-[11px]">Get 40% off your first year or $20 off Lifetime with proof of subscription.</p>
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-mono font-semibold mb-2">
+                <span>⚡</span> Switcher Guarantee · Zero Cloud Latency
+              </div>
+              <h2 className="text-base sm:text-lg font-bold text-neutral-950 tracking-tight">
+                Migrating from Wispr Flow or Superwhisper?
+              </h2>
+              <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
+                Stop paying $120–$180/year in cloud compute taxes for voice data that can run locally.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <div className="text-right">
+                <span className="block text-[11px] font-mono text-neutral-400 line-through">$89 / $49</span>
+                <span className="block text-sm font-bold font-mono text-emerald-700">Save up to 40%</span>
+              </div>
+              <Link
+                href="mailto:support@murmur.app?subject=Switcher%20Discount%20Claim&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20currently%20subscribed%20to%20%5BWispr%20Flow%20%2F%20Superwhisper%5D%20and%20would%20like%20to%20switch%20to%20Murmur.%20Attached%20is%20my%20receipt%20%2F%20account%20screenshot.%0A%0APlease%20send%20me%20my%20switcher%20discount%20code!%0A%0AThanks!"
+                className="px-4 py-2.5 rounded-xl bg-neutral-950 hover:bg-neutral-800 text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-1.5"
+              >
+                <span>Claim Switcher Deal</span>
+                <span>→</span>
+              </Link>
             </div>
           </div>
-          <Link
-            href="mailto:support@murmur.app?subject=Switcher%20Discount%20Claim"
-            className="shrink-0 px-3 py-1.5 rounded-lg bg-[#222] hover:bg-[#2b2b2b] text-white/90 font-mono text-[11px] border border-[#383838] transition-colors"
-          >
-            Claim Switcher Deal →
-          </Link>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 text-xs">
+            <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-neutral-50/60 border border-neutral-200/60">
+              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[11px] shrink-0">1</span>
+              <div>
+                <span className="font-semibold text-neutral-900 block">40% Off Annual Pass</span>
+                <span className="text-[11px] text-neutral-500">Pay only $29 for your entire first year (reg. $49).</span>
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-neutral-50/60 border border-neutral-200/60">
+              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[11px] shrink-0">2</span>
+              <div>
+                <span className="font-semibold text-neutral-900 block">$20 Off Pro Lifetime</span>
+                <span className="text-[11px] text-neutral-500">Pay $69 once instead of $89 and own it forever.</span>
+              </div>
+            </div>
+            <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-neutral-50/60 border border-neutral-200/60">
+              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[11px] shrink-0">3</span>
+              <div>
+                <span className="font-semibold text-neutral-900 block">Frictionless Switch</span>
+                <span className="text-[11px] text-neutral-500">Fast email verification with receipt or active screenshot.</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Billing Cycle Switcher */}
-        <div className="inline-flex items-center p-1 rounded-full bg-[#181818] border border-[#313131] mb-12">
+        {/* Pro Plan Billing Toggle */}
+        <div className="inline-flex items-center p-1 rounded-full bg-neutral-100/90 border border-neutral-200/90 mb-12 shadow-inner">
           <button
-            onClick={() => setBillingCycle("lifetime")}
-            className={`text-xs font-semibold px-4 py-1.5 rounded-full transition-all ${
-              billingCycle === "lifetime"
-                ? "bg-white text-black shadow-sm"
-                : "text-white/60 hover:text-white"
+            onClick={() => setProBilling("lifetime")}
+            className={`text-xs font-semibold px-4 py-2 rounded-full transition-all flex items-center gap-1.5 ${
+              proBilling === "lifetime"
+                ? "bg-white text-neutral-950 shadow-sm border border-neutral-200/60"
+                : "text-neutral-600 hover:text-neutral-950"
             }`}
           >
-            <span>Lifetime Perpetual (Pay Once)</span>
-            <span className="ml-1.5 text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-              Best Value
+            <span>Lifetime License ($89)</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-semibold">
+              Pay Once
             </span>
           </button>
 
           <button
-            onClick={() => setBillingCycle("annual")}
-            className={`text-xs font-semibold px-4 py-1.5 rounded-full transition-all ${
-              billingCycle === "annual"
-                ? "bg-white text-black shadow-sm"
-                : "text-white/60 hover:text-white"
+            onClick={() => setProBilling("annual")}
+            className={`text-xs font-semibold px-4 py-2 rounded-full transition-all ${
+              proBilling === "annual"
+                ? "bg-white text-neutral-950 shadow-sm border border-neutral-200/60"
+                : "text-neutral-600 hover:text-neutral-950"
             }`}
           >
-            <span>Pro Annual ($49/yr)</span>
-          </button>
-
-          <button
-            onClick={() => setBillingCycle("monthly")}
-            className={`text-xs font-semibold px-4 py-1.5 rounded-full transition-all ${
-              billingCycle === "monthly"
-                ? "bg-white text-black shadow-sm"
-                : "text-white/60 hover:text-white"
-            }`}
-          >
-            Monthly ($8/mo)
+            <span>Annual Pass ($49/yr)</span>
           </button>
         </div>
 
-        {/* Pricing Cards Grid (4 Tiers: Starter, Core Perpetual, Pro, Privacy Pro) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl w-full text-left mb-16">
-          {PRICING_TIERS.map((tier) => {
-            const displayPrice =
-              billingCycle === "lifetime"
-                ? tier.lifetimePrice
-                : billingCycle === "annual"
-                ? tier.annualPrice
-                : tier.monthlyPrice;
-
-            const periodLabel =
-              billingCycle === "lifetime"
-                ? tier.lifetimePrice === "$0" ? "forever" : "one-time"
-                : billingCycle === "annual"
-                ? "/ year"
-                : "/ month";
-
-            return (
-              <div
-                key={tier.id}
-                className={`p-6 rounded-2xl flex flex-col justify-between transition-all duration-300 ${
-                  tier.isPrimary
-                    ? "bg-[#181818] border-2 border-emerald-500/60 shadow-[0_0_32px_rgba(16,185,129,0.08)]"
-                    : "bg-[#141414] border border-[#2a2a2a] hover:border-[#383838]"
-                }`}
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <h3 className="text-base font-bold text-white">{tier.name}</h3>
-                    {tier.badge && (
-                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
-                        tier.isPrimary
-                          ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
-                          : "bg-[#222] text-white/70 border-[#333]"
-                      }`}>
-                        {tier.badge}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="mb-4">
-                    <span className="text-3xl font-bold font-mono text-white">{displayPrice}</span>
-                    <span className="text-xs text-white/50 font-mono ml-1">{periodLabel}</span>
-                    <p className="text-[11px] text-white/40 font-mono mt-1">{tier.annualBilled}</p>
-                  </div>
-
-                  <p className="text-xs text-white/70 leading-relaxed mb-6 font-sans">
-                    {tier.description}
-                  </p>
-
-                  <div className="space-y-2.5 mb-6 text-xs text-white/80">
-                    {tier.features.map((feat, idx) => (
-                      <div key={idx} className="flex items-start gap-2">
-                        <span className="text-emerald-400 font-bold shrink-0">✓</span>
-                        <span className="leading-tight">{feat}</span>
-                      </div>
-                    ))}
-                  </div>
+        {/* 3 Streamlined Pricing Cards (Free | Pro | Team) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-6xl w-full text-left mb-16">
+          {tiers.map((tier) => (
+            <div
+              key={tier.id}
+              className={`p-7 rounded-3xl flex flex-col justify-between transition-all duration-300 ${
+                tier.isPrimary
+                  ? "bg-white border-2 border-neutral-900 shadow-[0_16px_40px_rgba(0,0,0,0.08)] relative ring-4 ring-neutral-900/5 lg:-translate-y-2"
+                  : "bg-white border border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:border-neutral-300"
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <h3 className="text-lg font-bold text-neutral-950">{tier.name}</h3>
+                  {tier.badge && (
+                    <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full border ${
+                      tier.isPrimary
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200/90 font-semibold"
+                        : "bg-neutral-100 text-neutral-700 border-neutral-200/80 font-medium"
+                    }`}>
+                      {tier.badge}
+                    </span>
+                  )}
                 </div>
 
-                <Link
-                  href={tier.ctaHref}
-                  className={`w-full py-2.5 rounded-full text-xs font-semibold text-center transition-all ${
-                    tier.isPrimary
-                      ? "bg-white text-black hover:bg-white/90 shadow-md"
-                      : "bg-[#222222] hover:bg-[#2b2b2b] text-white border border-[#333]"
-                  }`}
-                >
-                  {tier.ctaText}
-                </Link>
+                <div className="mb-4">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-bold font-mono text-neutral-950 tracking-tight">{tier.price}</span>
+                    <span className="text-xs text-neutral-500 font-mono">{tier.period}</span>
+                  </div>
+                  <p className="text-[12px] text-neutral-500 font-mono mt-1">{tier.subtext}</p>
+                </div>
+
+                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed mb-6 font-sans">
+                  {tier.description}
+                </p>
+
+                <div className="space-y-3 mb-8 text-xs sm:text-sm text-neutral-700">
+                  {tier.features.map((feat, idx) => (
+                    <div key={idx} className="flex items-start gap-2.5">
+                      <span className="w-4 h-4 rounded-full bg-emerald-50 text-emerald-700 font-bold shrink-0 flex items-center justify-center text-[10px] border border-emerald-200/60 mt-0.5">
+                        ✓
+                      </span>
+                      <span className="leading-tight">{feat}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            );
-          })}
+
+              <Link
+                href={tier.ctaHref}
+                className={`w-full py-3 rounded-full text-xs sm:text-sm font-semibold text-center transition-all ${
+                  tier.isPrimary
+                    ? "bg-neutral-900 text-white hover:bg-neutral-800 shadow-md hover:shadow-lg"
+                    : "bg-neutral-100 hover:bg-neutral-200/80 text-neutral-900 border border-neutral-200/70"
+                }`}
+              >
+                {tier.ctaText}
+              </Link>
+            </div>
+          ))}
         </div>
 
-        {/* Student / Open Source Discount Box */}
-        <div className="max-w-4xl w-full p-4 rounded-xl bg-[#121212] border border-[#262626] mb-16 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-left">
-          <div className="flex items-center gap-3">
-            <span className="text-xl">🎓</span>
+        {/* Student, Academic & Open-Source Developer Grant */}
+        <div className="max-w-4xl w-full p-7 sm:p-9 rounded-3xl bg-neutral-50/70 border border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] mb-16 text-left">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div>
-              <span className="text-white font-bold block">Student & Open Source Developer Plan</span>
-              <span className="text-white/60 text-[11px]">50% discount ($29 Core Lifetime) for students, educators, and active OSS maintainers.</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-neutral-200/90 text-xs font-mono font-semibold text-neutral-800 shadow-xs mb-3">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Academic Grants & Open Source Sponsorship
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-neutral-950 tracking-[-0.03em]">
+                Student & Open Source Developer Grant
+              </h2>
+              <p className="mt-2 text-sm text-neutral-600 max-w-xl">
+                We support researchers, students, and open-source creators who push the boundaries of knowledge and open software. Enjoy a flat 50% discount on any Pro license.
+              </p>
+            </div>
+
+            <div className="shrink-0 flex flex-col items-start md:items-end gap-1.5 p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
+              <span className="text-xs font-mono text-neutral-500 uppercase tracking-wider">Flat Grant Rate</span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-bold font-mono text-emerald-700">50% OFF</span>
+                <span className="text-xs text-neutral-600 font-sans">Pro Lifetime & Annual</span>
+              </div>
+              <span className="text-[11px] font-mono text-neutral-400">Lifetime: $44 · Annual: $24/yr</span>
             </div>
           </div>
-          <Link
-            href="mailto:support@murmur.app?subject=Student%2FOSS%20Discount%20Request"
-            className="shrink-0 px-3.5 py-1.5 rounded-lg bg-[#1f1f1f] hover:bg-[#272727] text-white border border-[#333] transition-colors"
-          >
-            Apply for 50% Off
-          </Link>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {/* Track 1: Students & Educators */}
+            <div className="p-5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2.5 mb-2.5">
+                  <span className="text-2xl">🎓</span>
+                  <div>
+                    <h3 className="text-sm font-bold text-neutral-950">Students & Academic Faculty</h3>
+                    <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 font-semibold">
+                      Verified via .edu or student ID
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-neutral-600 leading-relaxed mb-4">
+                  For high school, undergraduate, and graduate students, professors, and academic researchers writing theses, papers, or lab notes.
+                </p>
+                <ul className="text-xs text-neutral-700 space-y-1.5 mb-4">
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>$44 Pro Lifetime (normally $89)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>$24 / year Pro Annual (normally $49/yr)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-emerald-600 font-bold">✓</span>
+                    <span>LaTeX & Academic citation formatting triggers</span>
+                  </li>
+                </ul>
+              </div>
+
+              <Link
+                href="mailto:support@murmur.app?subject=Student%20Discount%20Request&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20a%20student%20%2F%20academic%20faculty%20at%20%5BUniversity%20Name%5D.%0A%0AAttached%20is%20my%20student%20ID%20%2F%20enrollment%20proof%20(or%20I%20am%20emailing%20from%20my%20.edu%20address).%0A%0APlease%20send%20me%20the%2050%25%20academic%20discount%20code.%0A%0AThank%20you!"
+                className="w-full py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/70 text-neutral-900 text-xs font-semibold text-center border border-neutral-200/70 transition-colors"
+              >
+                Apply with Student ID / .edu →
+              </Link>
+            </div>
+
+            {/* Track 2: Open Source Maintainers */}
+            <div className="p-5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center gap-2.5 mb-2.5">
+                  <span className="text-2xl">🐙</span>
+                  <div>
+                    <h3 className="text-sm font-bold text-neutral-950">Open Source Maintainers</h3>
+                    <span className="text-[11px] font-mono text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200/60 font-semibold">
+                      Active maintainer of public repo (50+ ★)
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-neutral-600 leading-relaxed mb-4">
+                  For contributors and maintainers creating free software for the community. We sponsor your dictation tooling so you can ship code faster.
+                </p>
+                <ul className="text-xs text-neutral-700 space-y-1.5 mb-4">
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-600 font-bold">✓</span>
+                    <span>$44 Pro Lifetime or $24/yr Annual</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-600 font-bold">✓</span>
+                    <span>Engineering commit prefix & PR macro templates</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <span className="text-purple-600 font-bold">✓</span>
+                    <span>Free community pack distribution for your project</span>
+                  </li>
+                </ul>
+              </div>
+
+              <Link
+                href="mailto:support@murmur.app?subject=OSS%20Maintainer%20Discount%20Request&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20an%20active%20maintainer%20of%20%5BRepository%20URL%5D.%0A%0AMy%20GitHub%20profile%20is%3A%20%5BGitHub%20Profile%20URL%5D.%0A%0APlease%20send%20me%20the%2050%25%20open-source%20maintainer%20discount%20code.%0A%0AThank%20you!"
+                className="w-full py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/70 text-neutral-900 text-xs font-semibold text-center border border-neutral-200/70 transition-colors"
+              >
+                Apply with GitHub Profile →
+              </Link>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-600">
+            <div className="flex items-center gap-2">
+              <span className="text-base">⚡</span>
+              <span><strong>Fast Verification:</strong> Codes are typically approved and emailed back within 12 hours. No complicated bureaucratic paperwork.</span>
+            </div>
+            <span className="font-mono text-emerald-700 font-semibold text-[11px] shrink-0">12hr turn-around</span>
+          </div>
         </div>
 
         {/* Virality: Shareable Vocabulary & Voice-Command Packs */}
-        <div className="max-w-4xl w-full p-6 sm:p-8 rounded-2xl bg-[#141414] border border-[#2c2c2c] mb-16 text-left">
+        <div className="max-w-4xl w-full p-6 sm:p-8 rounded-3xl bg-neutral-50/60 border border-neutral-200/80 mb-16 text-left shadow-sm">
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#1e1e1e] border border-[#333] text-[10px] font-mono text-emerald-400 mb-2">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white border border-neutral-200/90 text-[10px] font-mono font-semibold text-emerald-700 shadow-xs mb-2">
               <span>📦</span> Shareable Workflows & Virality
             </div>
-            <h2 className="text-2xl font-bold text-white mb-1">
+            <h2 className="text-2xl font-bold text-neutral-950 tracking-[-0.02em] mb-1">
               Public Voice-Command & Vocabulary Packs
             </h2>
-            <p className="text-xs sm:text-sm text-white/70">
-              Export your shortcuts or install curated community packs in one click. Your team can sync vocabularies via plain <code className="text-emerald-300">.murmur/pack.json</code> files.
+            <p className="text-xs sm:text-sm text-neutral-600">
+              Export your shortcuts or install curated community packs in one click. Your team can sync vocabularies via plain <code className="text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200/60 font-mono">.murmur/pack.json</code> files.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-6">
             {COMMUNITY_PACKS.map((pack, idx) => (
-              <div key={idx} className="p-4 rounded-xl bg-[#191919] border border-[#2e2e2e] flex flex-col justify-between">
+              <div key={idx} className="p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:border-neutral-300 transition-all">
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-1.5">
-                    <span className="text-xs font-bold text-white">{pack.title}</span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#242424] text-emerald-400 border border-[#353535]">
+                    <span className="text-xs font-bold text-neutral-900">{pack.title}</span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 font-semibold">
                       {pack.category}
                     </span>
                   </div>
-                  <p className="text-xs text-white/65 leading-relaxed mb-3">{pack.description}</p>
+                  <p className="text-xs text-neutral-600 leading-relaxed mb-3">{pack.description}</p>
                 </div>
-                <div className="p-2 rounded-lg bg-[#0e0e0e] border border-[#242424] text-[11px] font-mono text-emerald-300/90 truncate">
+                <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/70 text-[11px] font-mono text-neutral-700 truncate">
                   {pack.example}
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#101010] border border-[#242424] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/70">
+          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-700">
             <span>🎁 <strong>Referral Program:</strong> Dictate 50 times → Unlock your personal invite link to give friends free Pro packs.</span>
-            <span className="font-mono text-emerald-400 text-[11px]">Zero spam · Triggered post-activation</span>
+            <span className="font-mono text-emerald-700 font-semibold text-[11px]">Zero spam · Triggered post-activation</span>
           </div>
         </div>
 
@@ -406,14 +496,32 @@ export default function PricingPage() {
 
         {/* FAQs */}
         <div className="max-w-3xl w-full text-left mb-16">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">Pricing & Licensing FAQ</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-neutral-950 mb-6 text-center tracking-[-0.03em]">Pricing & Licensing FAQ</h2>
           <div className="space-y-3">
-            {PRICING_FAQS.map((faq, idx) => (
-              <div key={idx} className="p-5 rounded-xl bg-[#141414] border border-[#272727]">
-                <h3 className="text-sm font-bold text-white mb-2">{faq.question}</h3>
-                <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-sans">{faq.answer}</p>
-              </div>
-            ))}
+            {PRICING_FAQS.map((faq, idx) => {
+              const isOpen = openFaqIndex === idx;
+              return (
+                <div
+                  key={idx}
+                  className="rounded-2xl bg-white border border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden transition-all"
+                >
+                  <button
+                    onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                    className="w-full p-5 text-left flex items-center justify-between gap-4 hover:bg-neutral-50/50 transition-colors"
+                  >
+                    <h3 className="text-sm font-bold text-neutral-950">{faq.question}</h3>
+                    <span className={`w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs text-neutral-600 shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+                      ▼
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-neutral-600 leading-relaxed font-sans border-t border-neutral-100">
+                      {faq.answer}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
