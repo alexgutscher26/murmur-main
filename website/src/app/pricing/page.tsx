@@ -5,6 +5,9 @@ import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { BadgeGenerator } from "@/components/BadgeGenerator";
+import { SwitcherModal } from "@/components/SwitcherModal";
+import { StudentGrantModal } from "@/components/StudentGrantModal";
+import { PlanTierKey } from "@/lib/stripe";
 
 type ProBilling = "lifetime" | "annual";
 
@@ -93,6 +96,32 @@ const PRICING_FAQS = [
 export default function PricingPage() {
   const [proBilling, setProBilling] = useState<ProBilling>("lifetime");
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+  const [isSwitcherOpen, setIsSwitcherOpen] = useState(false);
+  const [isStudentGrantOpen, setIsStudentGrantOpen] = useState(false);
+  const [studentGrantTab, setStudentGrantTab] = useState<"student" | "oss">("student");
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const handleCheckout = async (tier: PlanTierKey) => {
+    setCheckoutLoading(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Checkout failed: " + (data.error || "Unknown error"));
+        setCheckoutLoading(false);
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      alert("Unable to reach checkout server. Please try again.");
+      setCheckoutLoading(false);
+    }
+  };
 
   const tiers: PricingTier[] = [
     {
@@ -211,13 +240,14 @@ export default function PricingPage() {
                 <span className="block text-[11px] font-mono text-neutral-400 line-through">$89 / $49</span>
                 <span className="block text-sm font-bold font-mono text-emerald-700">Save up to 40%</span>
               </div>
-              <Link
-                href="mailto:support@murmur.app?subject=Switcher%20Discount%20Claim&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20currently%20subscribed%20to%20%5BWispr%20Flow%20%2F%20Superwhisper%5D%20and%20would%20like%20to%20switch%20to%20Murmur.%20Attached%20is%20my%20receipt%20%2F%20account%20screenshot.%0A%0APlease%20send%20me%20my%20switcher%20discount%20code!%0A%0AThanks!"
-                className="px-4 py-2.5 rounded-xl bg-neutral-950 hover:bg-neutral-800 text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-1.5"
+              <button
+                type="button"
+                onClick={() => setIsSwitcherOpen(true)}
+                className="px-4 py-2.5 rounded-xl bg-neutral-950 hover:bg-neutral-800 text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Claim Switcher Deal</span>
                 <span>→</span>
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -323,16 +353,27 @@ export default function PricingPage() {
                 </div>
               </div>
 
-              <Link
-                href={tier.ctaHref}
-                className={`w-full py-3 rounded-full text-xs sm:text-sm font-semibold text-center transition-all ${
-                  tier.isPrimary
-                    ? "bg-neutral-900 text-white hover:bg-neutral-800 shadow-md hover:shadow-lg"
-                    : "bg-neutral-100 hover:bg-neutral-200/80 text-neutral-900 border border-neutral-200/70"
-                }`}
-              >
-                {tier.ctaText}
-              </Link>
+              {tier.id === "pro" ? (
+                <button
+                  type="button"
+                  onClick={() => handleCheckout(proBilling === "lifetime" ? "pro_lifetime" : "pro_annual")}
+                  disabled={checkoutLoading}
+                  className="w-full py-3 rounded-full text-xs sm:text-sm font-semibold text-center transition-all bg-neutral-900 text-white hover:bg-neutral-800 shadow-md hover:shadow-lg cursor-pointer disabled:opacity-50"
+                >
+                  {checkoutLoading ? "Connecting to Stripe..." : tier.ctaText}
+                </button>
+              ) : (
+                <Link
+                  href={tier.ctaHref}
+                  className={`w-full py-3 rounded-full text-xs sm:text-sm font-semibold text-center transition-all ${
+                    tier.isPrimary
+                      ? "bg-neutral-900 text-white hover:bg-neutral-800 shadow-md hover:shadow-lg"
+                      : "bg-neutral-100 hover:bg-neutral-200/80 text-neutral-900 border border-neutral-200/70"
+                  }`}
+                >
+                  {tier.ctaText}
+                </Link>
+              )}
             </div>
           ))}
         </div>
@@ -395,12 +436,16 @@ export default function PricingPage() {
                 </ul>
               </div>
 
-              <Link
-                href="mailto:support@murmur.app?subject=Student%20Discount%20Request&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20a%20student%20%2F%20academic%20faculty%20at%20%5BUniversity%20Name%5D.%0A%0AAttached%20is%20my%20student%20ID%20%2F%20enrollment%20proof%20(or%20I%20am%20emailing%20from%20my%20.edu%20address).%0A%0APlease%20send%20me%20the%2050%25%20academic%20discount%20code.%0A%0AThank%20you!"
-                className="w-full py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/70 text-neutral-900 text-xs font-semibold text-center border border-neutral-200/70 transition-colors"
+              <button
+                type="button"
+                onClick={() => {
+                  setStudentGrantTab("student");
+                  setIsStudentGrantOpen(true);
+                }}
+                className="w-full py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/70 text-neutral-900 text-xs font-semibold text-center border border-neutral-200/70 transition-colors cursor-pointer"
               >
                 Apply with Student ID / .edu →
-              </Link>
+              </button>
             </div>
 
             {/* Track 2: Open Source Maintainers */}
@@ -434,12 +479,16 @@ export default function PricingPage() {
                 </ul>
               </div>
 
-              <Link
-                href="mailto:support@murmur.app?subject=OSS%20Maintainer%20Discount%20Request&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20an%20active%20maintainer%20of%20%5BRepository%20URL%5D.%0A%0AMy%20GitHub%20profile%20is%3A%20%5BGitHub%20Profile%20URL%5D.%0A%0APlease%20send%20me%20the%2050%25%20open-source%20maintainer%20discount%20code.%0A%0AThank%20you!"
-                className="w-full py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/70 text-neutral-900 text-xs font-semibold text-center border border-neutral-200/70 transition-colors"
+              <button
+                type="button"
+                onClick={() => {
+                  setStudentGrantTab("oss");
+                  setIsStudentGrantOpen(true);
+                }}
+                className="w-full py-2.5 rounded-xl bg-neutral-100 hover:bg-neutral-200/70 text-neutral-900 text-xs font-semibold text-center border border-neutral-200/70 transition-colors cursor-pointer"
               >
                 Apply with GitHub Profile →
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -527,6 +576,19 @@ export default function PricingPage() {
       </section>
 
       <Footer />
+
+      {/* Interactive Custom Modals */}
+      <SwitcherModal
+        isOpen={isSwitcherOpen}
+        onClose={() => setIsSwitcherOpen(false)}
+        defaultPlan={proBilling}
+      />
+
+      <StudentGrantModal
+        isOpen={isStudentGrantOpen}
+        onClose={() => setIsStudentGrantOpen(false)}
+        defaultTab={studentGrantTab}
+      />
     </main>
   );
 }
