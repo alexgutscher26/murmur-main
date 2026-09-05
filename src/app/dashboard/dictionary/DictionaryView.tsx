@@ -515,41 +515,21 @@ export function DictionaryView() {
 
       <div className="mx-auto w-full max-w-4xl flex flex-col gap-5">
         {/* ── Top Header Row ───────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
-              Dictionary
-            </h1>
-            <div className="flex items-center gap-1.5 rounded-full border border-stone-200/80 bg-stone-50 px-2.5 py-1 text-[11px] font-mono text-stone-600 dark:border-stone-800 dark:bg-stone-900/60 dark:text-stone-300">
-              <span>Words:</span>
-              <strong className="text-stone-900 dark:text-white">{count}</strong>
-              <span>/</span>
-              <span>{limit === Infinity ? "Unlimited (Pro)" : `${limit} (Starter)`}</span>
-            </div>
-            {isLimitReached && (
-              <button
-                type="button"
-                onClick={startTrial}
-                className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/25 transition-colors"
-              >
-                <Sparkles className="size-3 text-amber-500" />
-                <span>Unlock Pro</span>
-              </button>
-            )}
-          </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
+            Dictionary
+          </h1>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={() => setRepoImporterOpen(true)}
               title="Import symbols and dependencies from a codebase"
-              className="flex items-center gap-1.5 rounded-xl border border-stone-200/80 bg-stone-50/80 px-3 py-1.5 text-xs font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-800 dark:bg-stone-900/80 dark:text-stone-300 dark:hover:bg-stone-800 transition-all active:scale-[0.98]"
+              className="flex h-8 items-center gap-1.5 rounded-xl border border-stone-200/90 bg-stone-50/80 px-3 text-xs font-semibold text-stone-700 shadow-2xs hover:bg-stone-100 hover:text-stone-900 dark:border-stone-800 dark:bg-stone-900/60 dark:text-stone-300 dark:hover:bg-stone-800 dark:hover:text-white transition-all active:scale-[0.98]"
             >
-              <Code className="h-3.5 w-3.5 text-stone-500 dark:text-stone-400" />
+              <Code className="h-3.5 w-3.5 text-stone-400 dark:text-stone-500" />
               <span>Import Codebase…</span>
             </button>
-
-
 
             <button
               type="button"
@@ -561,7 +541,7 @@ export function DictionaryView() {
                 setPrefilledTerm("");
                 setAddModalOpen(true);
               }}
-              className="flex items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-all active:scale-[0.98]"
+              className="flex h-8 items-center gap-1.5 rounded-xl bg-stone-900 px-3.5 text-xs font-semibold text-white shadow-xs hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-all active:scale-[0.98]"
             >
               <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
               <span>Add new</span>
@@ -633,7 +613,7 @@ export function DictionaryView() {
                 )}
               >
                 <span>Vocabulary Packs</span>
-                <span className="rounded-full bg-stone-100 dark:bg-stone-800 px-1.5 py-0.2 text-[10px] font-mono text-stone-600 dark:text-stone-300">
+                <span className="rounded-full bg-stone-100 dark:bg-stone-800/80 px-1.5 py-0.2 text-[10px] font-mono text-stone-500 dark:text-stone-400">
                   {DOMAIN_PACKS.length}
                 </span>
                 {activeTab === "packs" && (
@@ -642,42 +622,68 @@ export function DictionaryView() {
               </button>
             </div>
 
-            {/* Right Action Icons */}
-            <div className="flex items-center gap-2 pb-2">
-              <button
-                type="button"
-                onClick={() => setSearchOpen((v) => !v)}
-                title="Search dictionary"
-                className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
-                  searchOpen || searchQuery
-                    ? "bg-stone-100 text-stone-900 dark:bg-stone-800 dark:text-white"
-                    : "text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300"
+            {/* Right Action Icons & Quota Status */}
+            <div className="flex items-center gap-3 pb-2">
+              {/* Quota / Word limit counter */}
+              <div className="flex items-center gap-1.5 text-xs text-stone-400 dark:text-stone-500">
+                <span>Words:</span>
+                <span className="font-semibold text-stone-700 dark:text-stone-300">{count}</span>
+                <span>/</span>
+                <span>{limit === Infinity ? "Unlimited (Pro)" : `${limit}`}</span>
+                {isLimitReached && (
+                  <button
+                    type="button"
+                    onClick={startTrial}
+                    className="ml-1 inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 hover:underline dark:text-amber-400"
+                  >
+                    <Sparkles className="size-3" />
+                    <span>Upgrade</span>
+                  </button>
                 )}
-              >
-                <Search className="h-3.5 w-3.5" />
-              </button>
+              </div>
 
-              <button
-                type="button"
-                onClick={cycleSort}
-                title={`Sort words (${sortMode})`}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300 transition-colors"
-              >
-                <ArrowUpDown className="h-3.5 w-3.5" />
-              </button>
+              {activeTab !== "packs" && (
+                <>
+                  <div className="h-3.5 w-px bg-stone-200 dark:bg-stone-800" />
 
-              <button
-                type="button"
-                onClick={handleRefresh}
-                title="Refresh entries"
-                className={cn(
-                  "flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300 transition-colors",
-                  isRefreshing && "animate-spin text-stone-700 dark:text-stone-200"
-                )}
-              >
-                <RotateCw className="h-3.5 w-3.5" />
-              </button>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setSearchOpen((v) => !v)}
+                      title="Search dictionary"
+                      className={cn(
+                        "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
+                        searchOpen || searchQuery
+                          ? "bg-stone-100 text-stone-900 dark:bg-stone-800 dark:text-white"
+                          : "text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300"
+                      )}
+                    >
+                      <Search className="h-3.5 w-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={cycleSort}
+                      title={`Sort words (${sortMode})`}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300 transition-colors"
+                    >
+                      <ArrowUpDown className="h-3.5 w-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleRefresh}
+                      title="Refresh entries"
+                      className={cn(
+                        "flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300 transition-colors",
+                        isRefreshing && "animate-spin text-stone-700 dark:text-stone-200"
+                      )}
+                    >
+                      <RotateCw className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
