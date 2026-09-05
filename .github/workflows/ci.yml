@@ -82,6 +82,9 @@ jobs:
       - name: Generated bindings are current
         run: git diff --exit-code -- src/lib/bindings.ts
 
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+      
   frontend:
     name: Frontend — typecheck and build
     runs-on: macos-14
