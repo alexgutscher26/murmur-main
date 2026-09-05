@@ -196,14 +196,37 @@ export function BillingView() {
         </div>
         <button
           type="button"
-          onClick={() =>
-            handleOpenLink(
-              "mailto:support@murmur.app?subject=Switcher%20Discount%20Claim&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20currently%20subscribed%20to%20%5BWispr%20Flow%20%2F%20Superwhisper%5D%20and%20would%20like%20to%20switch%20to%20Murmur.%20Attached%20is%20my%20receipt%20%2F%20account%20screenshot.%0A%0APlease%20send%20me%20my%20switcher%20discount%20code!%0A%0AThanks!"
-            )
-          }
-          className="hairline h-8 rounded-input bg-sunken px-3 text-caption font-semibold text-text-primary transition-colors hover:bg-sunken-strong shrink-0"
+          onClick={() => handleOpenLink("https://murmur.app/pricing")}
+          className="hairline h-8 rounded-input bg-sunken px-3 text-caption font-semibold text-text-primary transition-colors hover:bg-sunken-strong shrink-0 cursor-pointer"
         >
           Claim Switcher Deal →
+        </button>
+      </div>
+
+      {/* Student & OSS Grant Banner */}
+      <div className="hairline rounded-card bg-surface p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className="text-xl shrink-0">🎓</span>
+          <div>
+            <div className="flex items-center gap-2 mb-0.5">
+              <span className="text-body font-bold text-text-primary">
+                Student or Open Source Developer?
+              </span>
+              <span className="rounded-full bg-purple-500/15 text-purple-600 dark:text-purple-400 px-2 py-0.2 text-[10px] font-mono font-semibold">
+                50% OFF Grant
+              </span>
+            </div>
+            <p className="text-caption text-text-secondary">
+              Get 50% off Pro Lifetime ($44) or Annual ($24/yr) with a .edu email or public GitHub repository.
+            </p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => handleOpenLink("https://murmur.app/pricing")}
+          className="hairline h-8 rounded-input bg-sunken px-3 text-caption font-semibold text-text-primary transition-colors hover:bg-sunken-strong shrink-0 cursor-pointer"
+        >
+          Apply for 50% Grant →
         </button>
       </div>
 

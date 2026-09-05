@@ -22,7 +22,7 @@ import {
   type SettingValue,
 } from "@/lib/bindings";
 import { unwrapCommand, useCommand } from "@/lib/ipc";
-import { EmptyState, ErrorSurface } from "@/components/global";
+import { EmptyState, ErrorSurface, ProFeatureModal } from "@/components/global";
 import { ProfileOverrides } from "./ProfileOverrides";
 import type { DynamicOptions } from "../to-setting-def";
 import { usePlan, canUseContextEngine } from "@/lib/plan";
@@ -33,10 +33,10 @@ const FIELD_CLASS = "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body
 
 const POPULAR_APP_PRESETS = [
   { bundle_id: "com.microsoft.VSCode", name: "VS Code" },
-  { bundle_id: "com.todesktop.230313mzl4w4u92", name: "Cursor" },
   { bundle_id: "com.tinyspeck.slackmacgap", name: "Slack" },
   { bundle_id: "notion.id", name: "Notion" },
-  { bundle_id: "com.apple.mail", name: "Mail" },
+  { bundle_id: "com.google.Chrome", name: "Chrome" },
+  { bundle_id: "com.apple.mail", name: "Apple Mail" },
   { bundle_id: "com.apple.Terminal", name: "Terminal" },
 ];
 
@@ -59,8 +59,9 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
   const recent = useCommand(() => commands.listHistory({ limit: CANDIDATE_SCAN, offset: 0 }), []);
   const [bundleId, setBundleId] = useState("");
   const [saveError, setSaveError] = useState<AppError | null>(null);
+  const [proModalOpen, setProModalOpen] = useState(false);
   const listId = useId();
-  const { tier, startTrial } = usePlan();
+  const { tier } = usePlan();
   const isContextEngineUnlocked = canUseContextEngine(tier);
 
   const candidates = useMemo(() => {
@@ -75,7 +76,7 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
   const save = useCallback(
     (profile: AppProfile) => {
       if (!isContextEngineUnlocked) {
-        startTrial();
+        setProModalOpen(true);
         return;
       }
       void unwrapCommand(() => commands.saveAppProfile({ profile })).then((result) => {
@@ -83,7 +84,7 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
         profiles.reload();
       });
     },
-    [profiles, isContextEngineUnlocked, startTrial],
+    [profiles, isContextEngineUnlocked],
   );
 
   const remove = useCallback(
@@ -127,11 +128,11 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
           </div>
           <button
             type="button"
-            onClick={startTrial}
-            className="shrink-0 text-[11px] font-semibold text-text-primary hover:underline flex items-center gap-1"
+            onClick={() => setProModalOpen(true)}
+            className="shrink-0 text-[11px] font-semibold text-text-primary hover:underline flex items-center gap-1 cursor-pointer"
           >
             <Sparkles className="size-3" />
-            Start 14-Day Free Trial
+            Unlock Smart Context Engine
           </button>
         </div>
       )}
@@ -229,6 +230,13 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
           </li>
         ))}
       </ul>
+
+      <ProFeatureModal
+        isOpen={proModalOpen}
+        onClose={() => setProModalOpen(false)}
+        featureName="Smart Context Engine"
+        description="Smart Context Engine automatically adapts your voice dictation to the active application: formatting conventional commits in VS Code, casual conversational tone in Slack, and structured headers in Notion."
+      />
     </div>
   );
 }

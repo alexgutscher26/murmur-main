@@ -10,7 +10,7 @@ import { useCallback, useState, type FormEvent } from "react";
 import { Plus, Trash2, Sparkles, BookOpen, Code } from "lucide-react";
 import { commands, type DictionaryEntry, type MatchKind } from "@/lib/bindings";
 import { unwrapCommand, useCommand } from "@/lib/ipc";
-import { ErrorSurface, EmptyState } from "@/components/global";
+import { ErrorSurface, EmptyState, ProFeatureModal } from "@/components/global";
 import { usePlan, getDictionaryWordLimit, canUseDomainPacks } from "@/lib/plan";
 import { RepoImporterModal } from "./RepoImporterModal";
 
@@ -43,72 +43,50 @@ const DOMAIN_PACKS: readonly DomainPack[] = [
       { pattern: "tailwind css", replacement: "Tailwind CSS" },
       { pattern: "zoo stand", replacement: "Zustand" },
       { pattern: "tan stack query", replacement: "TanStack Query" },
-      { pattern: "t r p c", replacement: "tRPC" },
-      { pattern: "use effect", replacement: "useEffect" },
+      { pattern: "tea rpc", replacement: "tRPC" },
       { pattern: "use state", replacement: "useState" },
+      { pattern: "use effect", replacement: "useEffect" },
       { pattern: "use callback", replacement: "useCallback" },
-      { pattern: "use memo", replacement: "useMemo" },
     ],
   },
   {
-    id: "backend-systems",
-    name: "Backend, Python & Rust",
+    id: "backend-rust-go",
+    name: "Rust & Systems",
     badge: "Developer",
-    description: "FastAPI, PyTorch, PostgreSQL, SQLite, Prisma, Docker, Tokio, Cargo, Serde, async/await.",
+    description: "whisper cpp, DirectML, WebAssembly, tokio, serde, Cargo, anyhow, arc mutex, axum.",
     entries: [
-      { pattern: "fast a p i", replacement: "FastAPI" },
-      { pattern: "pie torch", replacement: "PyTorch" },
-      { pattern: "post gres", replacement: "PostgreSQL" },
-      { pattern: "sequel lite", replacement: "SQLite" },
-      { pattern: "prisma", replacement: "Prisma" },
-      { pattern: "tokyo", replacement: "Tokio" },
-      { pattern: "cube nettes", replacement: "Kubernetes" },
-      { pattern: "a sync", replacement: "async" },
-      { pattern: "a wait", replacement: "await" },
+      { pattern: "whisper c p p", replacement: "whisper.cpp" },
+      { pattern: "direct m l", replacement: "DirectML" },
+      { pattern: "tokio", replacement: "tokio" },
+      { pattern: "sir dee", replacement: "serde" },
+      { pattern: "arc mutex", replacement: "Arc<Mutex<T>>" },
+      { pattern: "cargo build", replacement: "cargo build" },
     ],
   },
   {
-    id: "cloud-devops",
-    name: "Git, DevOps & Cloud",
-    badge: "Developer",
-    description: "GitHub Actions, CI/CD, Terraform, Cloudflare Workers, AWS, Kubernetes, pull request, merge conflict.",
-    entries: [
-      { pattern: "git hub actions", replacement: "GitHub Actions" },
-      { pattern: "c i c d", replacement: "CI/CD" },
-      { pattern: "terra form", replacement: "Terraform" },
-      { pattern: "cloud flare workers", replacement: "Cloudflare Workers" },
-      { pattern: "pull request", replacement: "PR" },
-      { pattern: "a p i endpoint", replacement: "API endpoint" },
-      { pattern: "web hook", replacement: "webhook" },
-    ],
-  },
-  {
-    id: "legal",
-    name: "Legal & Compliance",
-    badge: "Pro",
-    description: "Force majeure, indemnification, jurisdiction, GDPR, HIPAA, affidavit, subpoena, non-disclosure.",
+    id: "legal-contract",
+    name: "Legal & Corporate",
+    badge: "Legal",
+    description: "Res judicata, force majeure, indemnity, statutory jurisdiction, privileged work product.",
     entries: [
       { pattern: "force major", replacement: "force majeure" },
-      { pattern: "g d p r", replacement: "GDPR" },
-      { pattern: "hipaa", replacement: "HIPAA" },
-      { pattern: "n d a", replacement: "NDA" },
-      { pattern: "affidavit", replacement: "affidavit" },
-      { pattern: "indemnification", replacement: "indemnification" },
-      { pattern: "sub poena", replacement: "subpoena" },
+      { pattern: "res judicata", replacement: "res judicata" },
+      { pattern: "habeas corpus", replacement: "habeas corpus" },
+      { pattern: "inter alia", replacement: "inter alia" },
+      { pattern: "prima facie", replacement: "prima facie" },
     ],
   },
   {
-    id: "sales",
-    name: "Sales & Executive",
-    badge: "Pro",
-    description: "ARR, MRR, churn rate, SLA, pipeline velocity, CAC, LTV, quarterly touchpoints.",
+    id: "clinical-medical",
+    name: "Clinical SOAP & Medical",
+    badge: "Healthcare",
+    description: "Common medications and clinical SOAP shorthand (hypertension, acetaminophen, amoxicillin).",
     entries: [
-      { pattern: "a r r", replacement: "ARR" },
-      { pattern: "m r r", replacement: "MRR" },
-      { pattern: "s l a", replacement: "SLA" },
-      { pattern: "c a c", replacement: "CAC" },
-      { pattern: "l t v", replacement: "LTV" },
-      { pattern: "touch points", replacement: "touchpoints" },
+      { pattern: "h t n", replacement: "HTN (hypertension)" },
+      { pattern: "a fib", replacement: "A-fib" },
+      { pattern: "acetaminophen", replacement: "acetaminophen" },
+      { pattern: "amoxicillin", replacement: "amoxicillin" },
+      { pattern: "metformin", replacement: "metformin" },
     ],
   },
 ];
@@ -119,6 +97,9 @@ export function DictionaryManager() {
   const [replacement, setReplacement] = useState("");
   const [installingPackId, setInstallingPackId] = useState<string | null>(null);
   const [repoImporterOpen, setRepoImporterOpen] = useState(false);
+  const [proModalOpen, setProModalOpen] = useState(false);
+  const [gatedFeatureName, setGatedFeatureName] = useState("Unlimited Custom Vocabulary");
+  const [gatedDescription, setGatedDescription] = useState("");
   const { tier, startTrial } = usePlan();
 
   const count = entries.data?.length ?? 0;
@@ -131,7 +112,9 @@ export function DictionaryManager() {
       event.preventDefault();
       if (pattern.trim().length === 0 || replacement.trim().length === 0) return;
       if (isLimitReached) {
-        startTrial();
+        setGatedFeatureName("Unlimited Custom Vocabulary");
+        setGatedDescription("Free starter tier is limited to 25 custom dictionary words. Upgrade to Pro for unlimited custom jargon, client names, and phonetic replacements.");
+        setProModalOpen(true);
         return;
       }
       void unwrapCommand(() =>
@@ -143,13 +126,15 @@ export function DictionaryManager() {
         entries.reload();
       });
     },
-    [entries, pattern, replacement, isLimitReached, startTrial],
+    [entries, pattern, replacement, isLimitReached],
   );
 
   const installPack = useCallback(
     async (pack: DomainPack) => {
       if (!hasDomainPackAccess) {
-        startTrial();
+        setGatedFeatureName(`${pack.name} Vocabulary Pack`);
+        setGatedDescription(`The ${pack.name} pack is part of Murmur Pro domain packs, including specialized phonetic mappings.`);
+        setProModalOpen(true);
         return;
       }
       setInstallingPackId(pack.id);
@@ -168,7 +153,7 @@ export function DictionaryManager() {
         setInstallingPackId(null);
       }
     },
-    [hasDomainPackAccess, startTrial, entries],
+    [hasDomainPackAccess, entries],
   );
 
   const update = useCallback(
@@ -205,8 +190,12 @@ export function DictionaryManager() {
         {isLimitReached && (
           <button
             type="button"
-            onClick={startTrial}
-            className="inline-flex items-center gap-1 text-[11px] font-semibold text-text-primary hover:underline"
+            onClick={() => {
+              setGatedFeatureName("Unlimited Custom Vocabulary");
+              setGatedDescription("Free starter tier is limited to 25 custom dictionary words. Upgrade to Pro for unlimited custom jargon, client names, and phonetic replacements.");
+              setProModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1 text-[11px] font-semibold text-text-primary hover:underline cursor-pointer"
           >
             <Sparkles className="size-3" />
             Upgrade to Pro for Unlimited Words
@@ -382,6 +371,13 @@ export function DictionaryManager() {
           </li>
         ))}
       </ul>
+
+      <ProFeatureModal
+        isOpen={proModalOpen}
+        onClose={() => setProModalOpen(false)}
+        featureName={gatedFeatureName}
+        description={gatedDescription}
+      />
     </div>
   );
 }

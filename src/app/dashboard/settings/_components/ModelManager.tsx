@@ -21,14 +21,14 @@ import {
 import { unwrapCommand, useCommand } from "@/lib/ipc";
 import { useTauriEvent } from "@/lib/use-event";
 import { formatBytes, formatEta, formatRate } from "@/lib/format";
-import { ErrorSurface, ProgressBar, Skeleton } from "@/components/global";
+import { ErrorSurface, ProgressBar, Skeleton, ProFeatureModal } from "@/components/global";
 import { usePlan, canUseTurboModel } from "@/lib/plan";
 
 const STATE_LABEL: Readonly<Record<ModelState["kind"], string>> = {
   NOT_DOWNLOADED: "Not downloaded",
   DOWNLOADING: "Downloading",
   VERIFYING: "Verifying",
-  OPTIMIZING: "Optimising for the Neural Engine — 15 to 60 seconds, once",
+  OPTIMIZING: "Optimizing for DirectML/Metal",
   READY: "Ready",
   FAILED: "Failed",
 };
@@ -37,7 +37,9 @@ export function ModelManager() {
   const models = useCommand(commands.listModels, []);
   const [progress, setProgress] = useState<Readonly<Record<string, DownloadProgress>>>({});
   const [liveStates, setLiveStates] = useState<Readonly<Record<string, ModelState>>>({});
-  const { tier, startTrial } = usePlan();
+  const [proModalOpen, setProModalOpen] = useState(false);
+  const [gatedModelName, setGatedModelName] = useState("Whisper Large v3 Turbo");
+  const { tier } = usePlan();
 
   useTauriEvent(events.modelDownloadProgress, (payload) => {
     setProgress((current) => ({ ...current, [payload.progress.model_id]: payload.progress }));
@@ -53,18 +55,25 @@ export function ModelManager() {
       delete next[modelId];
       return next;
     });
+    setProgress((prev) => {
+      const next = { ...prev };
+      delete next[modelId];
+      return next;
+    });
   }, []);
 
   const download = useCallback(
-    (modelId: ModelId) => {
+    (modelId: ModelId, displayName?: string) => {
       const isProModel = modelId.includes("turbo") || modelId.includes("large") || modelId.includes("medium");
       if (isProModel && !canUseTurboModel(tier)) {
-        startTrial();
+        setGatedModelName(displayName || "Whisper Large v3 Turbo");
+        setProModalOpen(true);
+        return;
       }
       clearOverride(modelId);
       void unwrapCommand(() => commands.downloadModel({ model_id: modelId })).then(models.reload);
     },
-    [clearOverride, models.reload, tier, startTrial],
+    [clearOverride, models.reload, tier],
   );
 
   const remove = useCallback(
@@ -84,36 +93,48 @@ export function ModelManager() {
   }
 
   return (
-    <ul className="hairline rounded-card bg-surface px-4">
-      {(models.data ?? []).map((report) => {
-        const model: ModelReport = { ...report, state: liveStates[report.descriptor.id] ?? report.state };
-        const isProModel =
-          model.descriptor.id.includes("turbo") ||
-          model.descriptor.id.includes("large") ||
-          model.descriptor.id.includes("medium");
-        const isCompressed = model.descriptor.id.includes("q3_");
-        const isLocked = isProModel && !canUseTurboModel(tier);
+    <>
+      <ul className="hairline rounded-card bg-surface px-4">
+        {(models.data ?? []).map((report) => {
+          const model: ModelReport = { ...report, state: liveStates[report.descriptor.id] ?? report.state };
+          const isProModel =
+            model.descriptor.id.includes("turbo") ||
+            model.descriptor.id.includes("large") ||
+            model.descriptor.id.includes("medium");
+          const isCompressed = model.descriptor.id.includes("q3_");
+          const isLocked = isProModel && !canUseTurboModel(tier);
 
-        return (
-          <li key={model.descriptor.id} className="hairline-b flex items-center gap-4 py-3 last:border-b-0">
-            <ModelSummary
-              model={model}
-              progress={progress[model.descriptor.id]}
-              isProModel={isProModel}
-              isCompressed={isCompressed}
-              isLocked={isLocked}
-            />
-            <ModelAction
-              model={model}
-              isLocked={isLocked}
-              onDownload={download}
-              onDelete={remove}
-              onUnlock={startTrial}
-            />
-          </li>
-        );
-      })}
-    </ul>
+          return (
+            <li key={model.descriptor.id} className="hairline-b flex items-center gap-4 py-3 last:border-b-0">
+              <ModelSummary
+                model={model}
+                progress={progress[model.descriptor.id]}
+                isProModel={isProModel}
+                isCompressed={isCompressed}
+                isLocked={isLocked}
+              />
+              <ModelAction
+                model={model}
+                isLocked={isLocked}
+                onDownload={(id) => download(id, model.descriptor.display_name)}
+                onDelete={remove}
+                onUnlock={() => {
+                  setGatedModelName(model.descriptor.display_name);
+                  setProModalOpen(true);
+                }}
+              />
+            </li>
+          );
+        })}
+      </ul>
+
+      <ProFeatureModal
+        isOpen={proModalOpen}
+        onClose={() => setProModalOpen(false)}
+        featureName={gatedModelName}
+        description="Whisper Large v3 Turbo delivers high-precision accuracy with deep domain jargon understanding, punctuation inference, and zero cloud latency."
+      />
+    </>
   );
 }
 
