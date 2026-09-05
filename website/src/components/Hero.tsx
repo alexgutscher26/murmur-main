@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import {
   Mic,
   ShieldCheck,
+  Eye,
+  Lock,
   WifiOff,
   Wifi,
   Terminal,
@@ -201,75 +203,78 @@ export function Hero() {
   };
 
   return (
-    <section className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden flex flex-col items-center">
-      {/* Background Ambient Glows */}
-      <div className="ambient-glow-emerald -top-20 left-1/2 -translate-x-1/2 opacity-70" />
-      <div className="ambient-glow-white top-40 left-1/4 opacity-40" />
+    <section className="relative pt-36 pb-24 md:pt-44 md:pb-32 overflow-hidden flex flex-col items-center bg-[#ffffff] text-neutral-900 selection:bg-neutral-900 selection:text-white">
+      {/* Subtle Ambient Light Glows */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
-      {/* Subtle Background Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+      {/* Subtle Pixel Grid Texture matching the screenshot */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
 
-      {/* Proof Badge — the one place the on-device / air-gap claim lives up top */}
-      <div className="relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.1] backdrop-blur-xl mb-8 shadow-[0_0_24px_rgba(16,185,129,0.15)] transition-all cursor-default">
-        <span className="relative flex h-2 w-2">
-          <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-        </span>
-        <span className="text-xs font-semibold text-neutral-200 tracking-wide">
-          100% on-device speech AI, zero cloud telemetry
-        </span>
-        <span className="text-[11px] font-mono text-emerald-400 pl-2 border-l border-white/[0.1] flex items-center gap-1">
-          <ShieldCheck className="w-3 h-3" />
-          Air-gap ready
-        </span>
+      {/* Top Badge: Pill with Red Dot matching the screenshot */}
+      <div className="relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-8 transition-transform hover:scale-[1.02] cursor-default z-10">
+        <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444]" />
+        <span className="text-sm font-medium text-neutral-800">We are hiring</span>
       </div>
 
-      {/* Hero Headline & Subheadline */}
-      <div className="relative text-center max-w-3xl px-4 mx-auto mb-10">
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.08]">
-          Speak naturally. Write anywhere.
-          <span className="block text-gradient-hero mt-2">Keep it private.</span>
+      {/* Two-Tier Headline matching the screenshot */}
+      <div className="relative text-center max-w-4xl px-4 mx-auto mb-6 z-10">
+        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold tracking-[-0.035em] text-neutral-950 mb-6 leading-[1.06]">
+          Speak naturally.
+          <span className="block text-[#737373] font-bold mt-1 sm:mt-2">
+            Keep it private.
+          </span>
         </h1>
-        <p className="text-base sm:text-xl text-neutral-300 max-w-2xl mx-auto leading-relaxed font-normal mb-8">
-          Turn your voice into polished text in any app — processed locally on your PC or Mac.
-        </p>
 
-        {/* 3 Value Pillars */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs sm:text-sm font-mono text-neutral-300">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md">
-            <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
-            No uploaded audio
+        {/* Subtitle with Inline Badges matching the screenshot */}
+        <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed font-normal">
+          Turn your voice into polished text in any app — processed locally on your PC or Mac through key guarantees like{" "}
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800 align-middle my-1">
+            <Eye className="w-3.5 h-3.5 text-neutral-500" />
+            <span>No uploaded audio</span>
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md">
-            <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
-            No cloud transcript history
+          {" , "}
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800 align-middle my-1">
+            <ShieldCheck className="w-3.5 h-3.5 text-neutral-500" />
+            <span>0 cloud transcripts</span>
           </span>
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] backdrop-blur-md">
-            <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
-            No selling your data
+          {" , and "}
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800 align-middle my-1">
+            <Lock className="w-3.5 h-3.5 text-neutral-500" />
+            <span>Zero data selling</span>
           </span>
-        </div>
+        </p>
       </div>
 
-      {/* Primary CTA and Secondary Demo Button */}
+      {/* Two CTA Buttons matching the screenshot */}
       <div className="relative flex flex-col sm:flex-row items-center gap-3.5 mb-14 z-10">
         <a
-          href="#download"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm font-semibold text-black bg-gradient-to-b from-white to-zinc-200 hover:from-white hover:to-white px-8 py-3.5 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:shadow-[0_0_40px_rgba(255,255,255,0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+          href="mailto:sales@murmur.app?subject=Murmur%20Enterprise%20and%20Team%20Inquiry"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-50 border border-neutral-200/90 shadow-sm text-sm font-semibold text-neutral-800 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
         >
-          <span>Download free</span>
-          <span className="text-xs text-neutral-500 font-mono font-normal">
-            ({detectedOs === "mac" ? "macOS" : "Windows"})
-          </span>
-          <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+          <span className="w-3 h-3 rounded-[3px] bg-neutral-200/80 border border-neutral-300" />
+          <span>Talk to Sales</span>
         </a>
         <a
-          href="#playground"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm font-semibold text-neutral-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-white/[0.2] backdrop-blur-xl px-7 py-3.5 rounded-full transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+          href="#download"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white text-sm font-semibold shadow-md transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
         >
-          <Sparkles className="w-4 h-4 text-emerald-400" />
-          <span>Try interactive lab</span>
+          <span>Start Free Trial</span>
+          <span className="text-xs text-neutral-400 font-normal">
+            ({detectedOs === "mac" ? "macOS" : "Windows"})
+          </span>
         </a>
+      </div>
+
+      {/* Pixelated square-cell matrix grid matching screenshot */}
+      <div className="absolute inset-x-0 bottom-0 h-48 pointer-events-none opacity-45 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white_35%,white)]">
+        <svg className="w-full h-full text-neutral-300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="pixel-matrix-grid" width="16" height="16" patternUnits="userSpaceOnUse">
+              <rect x="2" y="2" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#pixel-matrix-grid)" />
+        </svg>
       </div>
 
       {/* Interactive Desktop Product Simulator */}

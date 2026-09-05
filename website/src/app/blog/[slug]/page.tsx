@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
@@ -146,7 +147,13 @@ export default async function BlogPostPage({ params }: Props) {
       }
 
       // Headings
-      if (line.startsWith("### ")) {
+      if (line.startsWith("## ")) {
+        elements.push(
+          <h2 key={idx} className="text-2xl sm:text-3xl font-bold text-white mt-12 mb-5 tracking-tight">
+            {formatInlineMarkdown(line.replace("## ", ""))}
+          </h2>
+        );
+      } else if (line.startsWith("### ")) {
         elements.push(
           <h3 key={idx} className="text-xl sm:text-2xl font-bold text-white mt-10 mb-4 tracking-tight">
             {formatInlineMarkdown(line.replace("### ", ""))}
@@ -165,6 +172,14 @@ export default async function BlogPostPage({ params }: Props) {
           <li key={idx} className="text-xs sm:text-sm text-white/80 leading-relaxed ml-4 list-disc mb-2">
             {formatInlineMarkdown(line.replace("- ", ""))}
           </li>
+        );
+      } else if (/^\d+\.\s/.test(line)) {
+        const match = line.match(/^(\d+\.)\s(.*)$/);
+        elements.push(
+          <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-white/80 leading-relaxed mb-2.5 ml-1">
+            <span className="font-mono text-emerald-400 font-semibold shrink-0">{match ? match[1] : ""}</span>
+            <div>{formatInlineMarkdown(match ? match[2] : line)}</div>
+          </div>
         );
       } else if (line.startsWith("> ")) {
         elements.push(

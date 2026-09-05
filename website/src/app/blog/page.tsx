@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 "use client";
 
 import { useState } from "react";
@@ -10,7 +11,7 @@ export default function BlogIndexPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const categories = ["All", "Comparisons", "Privacy & Security", "Guides"];
+  const categories = ["All", "Comparisons", "Privacy & Security", "Guides", "Engineering"];
 
   const filteredPosts = BLOG_POSTS.filter((post) => {
     const matchesCategory =

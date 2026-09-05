@@ -89,7 +89,30 @@ Even without cloud transcription, users will happily pay recurring fees when the
 
 ---
 
-## 4. Privacy Architecture Page Specifications
+## 4. SEO & Content Strategy
+
+Own the high-intent comparison and privacy keywords early. Publish comparison and how-to pages that rank for the exact terms buyers search.
+
+### Priority Pages Portfolio
+
+| Priority Page Title | Target Keywords | Source Document & Live Route | Primary Buyer Intent |
+|:---|:---|:---|:---|
+| **"Best private Wispr Flow alternatives for Mac"** | `best Wispr Flow alternative Mac`, `private voice dictation macOS` | [01-best-private-wispr-flow-alternatives-mac.md](file:///c:/Users/gutsc/OneDrive/Desktop/murmur-main/docs/blog-posts/01-best-private-wispr-flow-alternatives-mac.md)<br>`/blog/best-private-wispr-flow-alternatives-mac` | Mac buyers looking for fast inline dictation without cloud transmission |
+| **"Local speech-to-text vs cloud transcription: what leaves your computer?"** | `local speech to text vs cloud`, `dictation privacy comparison` | [02-local-speech-to-text-vs-cloud-transcription.md](file:///c:/Users/gutsc/OneDrive/Desktop/murmur-main/docs/blog-posts/02-local-speech-to-text-vs-cloud-transcription.md)<br>`/blog/local-speech-to-text-vs-cloud-transcription` | IT security, privacy evaluators researching data egress risks |
+| **"How to dictate private client notes without uploading recordings"** | `dictate client notes offline`, `HIPAA private dictation` | [03-how-to-dictate-private-client-notes-without-uploading-recordings.md](file:///c:/Users/gutsc/OneDrive/Desktop/murmur-main/docs/blog-posts/03-how-to-dictate-private-client-notes-without-uploading-recordings.md)<br>`/blog/dictate-private-client-notes-offline` | Therapists, attorneys, and doctors with strict confidentiality duties |
+| **"Best offline dictation software for Windows"** | `offline dictation Windows 11`, `local voice to text PC` | [04-best-offline-dictation-software-windows.md](file:///c:/Users/gutsc/OneDrive/Desktop/murmur-main/docs/blog-posts/04-best-offline-dictation-software-windows.md)<br>`/blog/best-offline-dictation-software-windows` | Windows power users requiring offline DirectML/CUDA acceleration |
+| **"How to use voice dictation for coding without sending audio to the cloud"** | `voice dictation coding`, `private speech to text VS Code` | [05-how-to-use-voice-dictation-for-coding-without-sending-audio-to-the-cloud.md](file:///c:/Users/gutsc/OneDrive/Desktop/murmur-main/docs/blog-posts/05-how-to-use-voice-dictation-for-coding-without-sending-audio-to-the-cloud.md)<br>`/blog/voice-dictation-for-coding-private` | Software engineers with proprietary repos and air-gapped dev setups |
+| **"Murmur vs Wispr Flow: local processing vs cloud transcription"** | `Murmur vs Wispr Flow`, `Wispr Flow comparison` | [06-murmur-vs-wispr-flow-local-processing-vs-cloud-transcription.md](file:///c:/Users/gutsc/OneDrive/Desktop/murmur-main/docs/blog-posts/06-murmur-vs-wispr-flow-local-processing-vs-cloud-transcription.md)<br>`/blog/murmur-vs-wispr-flow-comparison` | High-intent decision makers comparing cloud service vs local binary |
+
+### Editorial Integrity: Credibility Outperforms Attacks
+In all comparison articles, maintain a strictly objective, fair, and professional tone:
+- **Fairness First:** State clearly that Wispr never sells user data and offers user data controls (such as toggles for model training opt-outs).
+- **Architectural Distinction:** Rather than attacking cloud tools, explain *why* a local-only architecture matters to specific users (e.g. legal privilege, HIPAA mandates, enterprise IP protection, and offline flights).
+- **Verifiable Proof:** Back assertions with reproducible network test recipes (Little Snitch, LuLu, Wireshark, `pktmon`) and hardware benchmarks rather than emotional marketing rhetoric.
+
+---
+
+## 5. Privacy Architecture Page Specifications
 
 A dedicated public page (`/privacy`) providing plain-language, audit-ready answers to every question a privacy-minded buyer, security officer, physician, or attorney will ask:
 
@@ -106,7 +129,7 @@ A dedicated public page (`/privacy`) providing plain-language, audit-ready answe
 
 ---
 
-## 5. Proof Assets Portfolio
+## 6. Proof Assets Portfolio
 
 To turn "Trust Me" into "Verify Me", we deploy five tangible proof assets across all marketing channels:
 
@@ -141,7 +164,7 @@ Plain-language hardware matrix stating exact memory and GPU expectations:
 
 ---
 
-## 6. Credibility Escalation Roadmap
+## 7. Credibility Escalation Roadmap
 
 To continually deepen competitive trust over time:
 1. **Third-Party Privacy Review:** Engage independent privacy researchers to publish formal reviews of Murmur's local data lifecycle.
