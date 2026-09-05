@@ -241,7 +241,7 @@ async fn deliver(ctx: &SessionContext, pending: PendingDelivery) {
             _ => 0.0,
         };
         let wpm = if duration_sec > 0.0 {
-            (word_count as f64) / (duration_sec / 60.0)
+            ((word_count as f64) / (duration_sec / 60.0)).round()
         } else {
             0.0
         };

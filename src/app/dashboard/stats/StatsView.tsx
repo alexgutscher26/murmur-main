@@ -376,7 +376,7 @@ export function StatsView({
 
   const data = stats.data;
   const totalWords = data?.total_words || 4543;
-  const speakingWpm = data?.speaking_wpm || 78;
+  const speakingWpm = Math.round(data?.speaking_wpm || 78);
   const streakDays = data?.current_streak_days || 1;
   const persona = personaFrom(totalWords);
 

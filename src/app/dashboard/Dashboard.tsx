@@ -2,7 +2,7 @@
  * SOURCE OF TRUTH KEYWORDS: Dashboard, WhisperFlowShell, navItems, useHashRoute,
  *   dictationHotkey, StatsView, HistoryView, SettingsView, ShortcutsModal, ChangelogModal
  * WHAT:  The dashboard shell completely redesigned to match Whisper Flow:
- *        - Window controls bar with sidebar toggle, user avatar, bell, min/max/close
+ *        - Window bar with sidebar toggle, user avatar, bell
  *        - Expanded left sidebar (Flow branding, navigation items, words remaining
  *          quota card, team invite, free month, settings with badge, help)
  *        - Spacious rounded white canvas card hosting active views
@@ -18,11 +18,9 @@ import {
   Gift,
   HelpCircle,
   Mic,
-  Minus,
   PanelLeft,
   Scissors,
   Settings,
-  Square,
   Type,
   User,
   Users,
@@ -32,7 +30,6 @@ import {
   Check,
   ArrowRight,
 } from "lucide-react";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
   commands,
   type HotkeyBinding,
@@ -141,30 +138,6 @@ export function Dashboard() {
     setTimeout(() => setToastMessage(null), 2500);
   };
 
-  const handleMinimize = () => {
-    try {
-      void getCurrentWindow().minimize();
-    } catch {
-      // ignore outside tauri
-    }
-  };
-
-  const handleMaximize = () => {
-    try {
-      void getCurrentWindow().toggleMaximize();
-    } catch {
-      // ignore outside tauri
-    }
-  };
-
-  const handleClose = () => {
-    try {
-      void getCurrentWindow().close();
-    } catch {
-      // ignore outside tauri
-    }
-  };
-
   const navItems = useMemo<NavDef[]>(() => {
     const items = (registry.data?.capabilities ?? [])
       .map((capability) => capability.nav)
@@ -228,7 +201,7 @@ export function Dashboard() {
           <StreakHeaderBadge />
         </div>
 
-        {/* Top Right: Notifications + Window controls */}
+        {/* Top Right: Notifications */}
         <div data-tauri-drag-region={false} className="flex items-center gap-1">
           <button
             type="button"
@@ -237,30 +210,6 @@ export function Dashboard() {
             className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
           >
             <Bell className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={handleMinimize}
-            title="Minimize"
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
-          >
-            <Minus className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={handleMaximize}
-            title="Maximize"
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
-          >
-            <Square className="h-3 w-3" />
-          </button>
-          <button
-            type="button"
-            onClick={handleClose}
-            title="Close"
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-red-500 hover:text-white dark:text-stone-400 dark:hover:bg-red-600 transition-colors"
-          >
-            <X className="h-3.5 w-3.5" />
           </button>
         </div>
       </header>
@@ -307,22 +256,6 @@ export function Dashboard() {
               >
                 <Mic className="h-4 w-4 shrink-0" />
                 {!sidebarCollapsed && <span>Dictation</span>}
-              </button>
-
-              {/* Notetaker */}
-              <button
-                type="button"
-                onClick={() => navigateTo("notetaker")}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
-                  activeRoute === "notetaker"
-                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
-                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
-                )}
-                title="Notetaker"
-              >
-                <CircleDot className="h-4 w-4 shrink-0" />
-                {!sidebarCollapsed && <span>Notetaker</span>}
               </button>
 
               {/* Insights */}

@@ -289,7 +289,7 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
 
   // ── Stats Calculations ──
   const totalWords = stats?.total_words ?? 4543;
-  const speakingWpm = stats?.speaking_wpm ?? 78;
+  const speakingWpm = Math.round(stats?.speaking_wpm ?? 78);
   const streakDays = stats?.current_streak_days ?? 1;
 
   // Derive post-processing fixes count

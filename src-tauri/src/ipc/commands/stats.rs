@@ -122,7 +122,7 @@ fn words_per_minute(words: i64, duration_ms: i64) -> f64 {
     if duration_ms <= 0 {
         return 0.0;
     }
-    words as f64 / (duration_ms as f64 / 60_000.0)
+    (words as f64 / (duration_ms as f64 / 60_000.0)).round()
 }
 
 /**
@@ -244,6 +244,7 @@ mod tests {
     fn words_per_minute_handles_an_empty_history() {
         assert_eq!(words_per_minute(0, 0), 0.0);
         assert_eq!(words_per_minute(120, 60_000), 120.0);
+        assert_eq!(words_per_minute(10, 39_291), 15.0);
     }
 
     #[test]
