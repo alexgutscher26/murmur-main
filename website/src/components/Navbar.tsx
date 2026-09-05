@@ -38,10 +38,6 @@ export function Navbar() {
             <span className="font-bold text-sm tracking-tight text-neutral-900 group-hover:text-black transition-colors">
               Murmur
             </span>
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-100 text-neutral-700 border border-neutral-200/90 font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              v0.1.0-local
-            </span>
           </div>
         </Link>
 

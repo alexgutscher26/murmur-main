@@ -247,6 +247,17 @@ impl SessionMachine {
                 },
                 self.terminal_effects(),
             ),
+            (SessionState::Arming, SessionEvent::StopRequested) => {
+                let session_id = self.take_session_id();
+                (
+                    SessionState::Idle,
+                    vec![
+                        Effect::StopCapture,
+                        Effect::DestroySession { session_id },
+                        Effect::EmitState,
+                    ],
+                )
+            }
 
             // ── Recording ────────────────────────────────────────────────
             (SessionState::Recording { .. }, SessionEvent::Tick { elapsed_ms, .. }) => (

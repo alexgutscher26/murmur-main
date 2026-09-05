@@ -195,14 +195,13 @@ export function Pill() {
 
   return (
     <GlassPanel
-      data-tauri-drag-region
       material="pill"
       radius="pill"
       role="status"
       aria-live="polite"
       style={{ opacity: pillOpacity }}
       className={cn(
-        "flex h-full w-full cursor-grab active:cursor-grabbing select-none items-center px-3",
+        "flex h-full w-full select-none cursor-default items-center px-3",
         isCompactActive ? "justify-center px-2" : "gap-2"
       )}
     >

@@ -16,7 +16,6 @@
  * WHERE: Installed once during bootstrap.
  */
 
-use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
@@ -29,21 +28,8 @@ use crate::error::{AppError, AppResult};
 const MENU_DASHBOARD: &str = "dashboard";
 const MENU_QUIT: &str = "quit";
 
-type PillPositionMap = HashMap<(i32, i32), (i32, i32)>;
-static CUSTOM_PILL_POSITIONS: std::sync::Mutex<Option<PillPositionMap>> =
-    std::sync::Mutex::new(None);
-
-pub fn record_pill_drag_position(app: &AppHandle, x: i32, y: i32) {
-    if !PILL_SHOWN.load(Ordering::SeqCst) {
-        return;
-    }
-    if let Ok(Some(monitor)) = app.monitor_from_point(x as f64, y as f64) {
-        let origin = (monitor.position().x, monitor.position().y);
-        if let Ok(mut guard) = CUSTOM_PILL_POSITIONS.lock() {
-            let map = guard.get_or_insert_with(HashMap::new);
-            map.insert(origin, (x, y));
-        }
-    }
+pub fn record_pill_drag_position(_app: &AppHandle, _x: i32, _y: i32) {
+    // Pill position is permanently fixed to the bottom of the active monitor.
 }
 
 static LAST_SESSION_WPM: std::sync::Mutex<Option<f64>> = std::sync::Mutex::new(None);
@@ -428,6 +414,29 @@ fn animate_pill_out(window: &tauri::WebviewWindow, leaving: Option<crate::types:
     #[cfg(not(target_os = "macos"))]
     {
         let _ = rising;
+        #[cfg(target_os = "windows")]
+        {
+            use windows::Win32::Foundation::HWND;
+            use windows::Win32::UI::WindowsAndMessaging::{
+                ShowWindow, SetWindowPos, HWND_NOTOPMOST, SW_HIDE,
+                SWP_NOMOVE, SWP_NOSIZE, SWP_NOACTIVATE, SWP_HIDEWINDOW,
+            };
+            if let Ok(hwnd) = window.hwnd() {
+                unsafe {
+                    let raw_hwnd = HWND(hwnd.0 as _);
+                    let _ = ShowWindow(raw_hwnd, SW_HIDE);
+                    let _ = SetWindowPos(
+                        raw_hwnd,
+                        HWND_NOTOPMOST,
+                        0,
+                        0,
+                        0,
+                        0,
+                        SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_HIDEWINDOW,
+                    );
+                }
+            }
+        }
         let _ = window.hide();
     }
 }
@@ -682,19 +691,10 @@ fn pill_frame_on(
     let height = (pill_points.1 * scale).round() as i32;
     let inset = (PILL_BOTTOM_INSET_PT * scale).round() as i32;
 
-    let (x, y) = if let Some(saved) = CUSTOM_PILL_POSITIONS
-        .lock()
-        .ok()
-        .and_then(|guard| guard.as_ref().and_then(|m| m.get(&monitor_position).copied()))
-    {
-        saved
-    } else {
-        let default_x = monitor_position.0 + (monitor_size.0 as i32 - width) / 2;
-        let default_y = monitor_position.1 + monitor_size.1 as i32 - height - inset;
-        (default_x, default_y)
-    };
+    let default_x = monitor_position.0 + (monitor_size.0 as i32 - width) / 2;
+    let default_y = monitor_position.1 + monitor_size.1 as i32 - height - inset;
 
-    ((x, y), (width as u32, height as u32))
+    ((default_x, default_y), (width as u32, height as u32))
 }
 
 /**

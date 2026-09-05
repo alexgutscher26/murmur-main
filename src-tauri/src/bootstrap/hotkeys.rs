@@ -16,7 +16,7 @@ use crate::ipc::context::AppState;
 use crate::registry::{self, keys};
 use crate::services;
 use crate::session::SessionEvent;
-use crate::types::{HotkeyBinding, KeyModifier, RecordingMode, SettingValue};
+use crate::types::{HotkeyBinding, KeyModifier, RecordingMode, SessionState, SettingValue};
 
 static DICTATION_SHORTCUT: parking_lot::Mutex<Option<Shortcut>> = parking_lot::Mutex::new(None);
 static MODIFIER_TAP: parking_lot::Mutex<Option<crate::adapters::os::ModifierTap>> =
@@ -228,7 +228,7 @@ pub fn on_dictation_hotkey(app: &AppHandle, key_state: ShortcutState) {
     }
 
     let mode = recording_mode(&state.db);
-    let capturing = state.current_state().is_capturing();
+    let in_session = !matches!(state.current_state(), SessionState::Idle);
 
     let (should_drop, is_double_tap) = with_binding_state("dictation", |bs| {
         if key_state == ShortcutState::Pressed {
@@ -258,21 +258,21 @@ pub fn on_dictation_hotkey(app: &AppHandle, key_state: ShortcutState) {
 
     let event = match (mode, key_state) {
         (RecordingMode::PushToTalk, ShortcutState::Pressed) => {
-            if !capturing {
+            if !in_session {
                 SessionEvent::StartRequested
             } else {
                 return;
             }
         }
         (RecordingMode::PushToTalk, ShortcutState::Released) => {
-            if capturing {
+            if in_session {
                 SessionEvent::StopRequested
             } else {
                 return;
             }
         }
         (RecordingMode::Toggle, ShortcutState::Pressed) => {
-            if capturing {
+            if in_session {
                 SessionEvent::StopRequested
             } else {
                 SessionEvent::StartRequested
@@ -318,7 +318,7 @@ pub fn on_mouse_push_to_talk(app: &AppHandle, key_state: ShortcutState) {
         }
     }
 
-    let capturing = state.current_state().is_capturing();
+    let in_session = !matches!(state.current_state(), SessionState::Idle);
 
     let should_drop = with_binding_state("mouse_ptt", |bs| {
         if key_state == ShortcutState::Pressed {
@@ -339,14 +339,14 @@ pub fn on_mouse_push_to_talk(app: &AppHandle, key_state: ShortcutState) {
 
     let event = match key_state {
         ShortcutState::Pressed => {
-            if !capturing {
+            if !in_session {
                 SessionEvent::StartRequested
             } else {
                 return;
             }
         }
         ShortcutState::Released => {
-            if capturing {
+            if in_session {
                 SessionEvent::StopRequested
             } else {
                 return;

@@ -53,15 +53,8 @@ pub fn keep_windows_alive(app: &AppHandle) {
     }
 }
 
-pub fn track_pill_drag(app: &AppHandle) {
-    if let Some(window) = app.get_webview_window(PILL_WINDOW) {
-        let app_handle = app.clone();
-        window.on_window_event(move |event| {
-            if let tauri::WindowEvent::Moved(pos) = event {
-                crate::tray::record_pill_drag_position(&app_handle, pos.x, pos.y);
-            }
-        });
-    }
+pub fn track_pill_drag(_app: &AppHandle) {
+    // Pill position is permanently fixed to the bottom of the active monitor.
 }
 
 /**
@@ -213,8 +206,8 @@ mod windows_pill {
     use std::sync::atomic::{AtomicIsize, Ordering};
     use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
     use windows::Win32::UI::WindowsAndMessaging::{
-        CallWindowProcW, DefWindowProcW, SetWindowLongPtrW, SetWindowPos,
-        GWLP_WNDPROC, HWND_TOPMOST, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW,
+        CallWindowProcW, DefWindowProcW, IsWindowVisible, SetWindowLongPtrW, SetWindowPos,
+        GWLP_WNDPROC, HWND_TOPMOST, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
         WM_ACTIVATE, WM_ACTIVATEAPP, WNDPROC,
     };
 
@@ -235,15 +228,17 @@ mod windows_pill {
         lparam: LPARAM,
     ) -> LRESULT {
         if msg == WM_ACTIVATE || msg == WM_ACTIVATEAPP {
-            let _ = SetWindowPos(
-                hwnd,
-                HWND_TOPMOST,
-                0,
-                0,
-                0,
-                0,
-                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
-            );
+            if IsWindowVisible(hwnd).as_bool() {
+                let _ = SetWindowPos(
+                    hwnd,
+                    HWND_TOPMOST,
+                    0,
+                    0,
+                    0,
+                    0,
+                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+                );
+            }
         }
 
         let prev = PREV_WNDPROC.load(Ordering::SeqCst);
@@ -272,7 +267,7 @@ mod windows_pill {
                     0,
                     0,
                     0,
-                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW,
+                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
                 );
                 tracing::info!("pill subclassed with WM_ACTIVATE HWND_TOPMOST handler on Windows");
             }
