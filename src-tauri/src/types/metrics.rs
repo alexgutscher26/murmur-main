@@ -100,6 +100,10 @@ pub struct StatsSummary {
     pub sessions_this_week: i64,
     #[specta(type = TsNumber)]
     pub words_this_week: i64,
+    #[specta(type = TsNumber)]
+    pub today_sessions: i64,
+    #[specta(type = TsNumber)]
+    pub today_words: i64,
     /// Words per minute actually spoken, measured.
     pub speaking_wpm: f64,
     /// The user's typing baseline, from settings. The comparison, not a fact.

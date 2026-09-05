@@ -50,7 +50,7 @@
 - [x] [UX] Safe microphone status: live audio level visualization in floating pill + instant silence warning.
 - [x] [UX] Fast audio error recovery: auto-reopen stream on device switch within 500ms before failing session.
 - [x] [FEAT] Low-end hardware presets: downloadable Tiny & Base Q5_0 quantizations for budget laptops without dedicated GPUs.
-- [ ] [FEAT] Interruption & backtracking correction: detect voice backtracks ("no wait", "scratch that") and scrub previous segment in memory before injection.
+- [x] [FEAT] Interruption & backtracking correction: detect voice backtracks ("no wait", "scratch that") and scrub previous segment in memory before injection.
   - Detect phrase variants: "no wait", "scratch that", "delete that", "undo", "never mind", "cancel that", "forget it"
   - Identify the segment boundary and remove only the corrected span, not the whole transcript
   - Re-arm automatically after the cancel command so the user can continue
@@ -61,11 +61,11 @@
   - Step 3: demonstrate paste into a dummy text field inside the onboarding window
   - Step 4: show the history entry and the WPM summary
   - Skip button that marks tutorial complete and never shows again
-- [ ] [UX] Habit-formation streak tracker: show a daily streak counter in the dashboard header as a low-pressure retention nudge.
+- [x] [UX] Habit-formation streak tracker: show a daily streak counter in the dashboard header as a low-pressure retention nudge.
   - Only count days with at least 3 successful sessions or 100 words dictated
   - Milestone badges at 7, 30, 90, and 365 days
   - Streak calculated from session timestamps in SQLite — no external dependency
-- [ ] [UX] Re-engagement prompt: if 3+ days pass with zero sessions, show a soft notification with a one-tap re-activation shortcut.
+- [x] [UX] Re-engagement prompt: if 3+ days pass with zero sessions, show a soft notification with a one-tap re-activation shortcut.
   - Show as Windows toast, not an in-app modal
   - Respect system Do Not Disturb state
   - Max one prompt per 7-day idle window to avoid spam
@@ -601,15 +601,15 @@
 - [x] [TECH DEBT] `adapters/rules/text.rs` is 39 KB — Split the filler, correction, punctuation, whitespace, dictionary, and spoken command logic into dedicated modular files under `adapters/rules/` with a clean re-export and test facade in `text.rs`.
 - [x] [TECH DEBT] No API versioning on IPC commands — Added API versioning contracts (`CURRENT_API_VERSION`, `MIN_COMPATIBLE_API_VERSION`, `ApiVersionInfo`) and registered `get_api_version` IPC command with Specta bindings to prevent frontend/backend drift.
 - [x] [TECH DEBT] `tauri.conf.json` `resources: []` — Enhanced model bundling support with multi-directory fallback resolver checking Tauri resource directory and APPDATA models path so releases can bundle models cleanly.
-- [ ] [BUG] Tray tooltip shows stale WPM after a session with zero words — The `last_session_wpm` value in the tray tooltip is not reset when a session is cancelled or produces an empty transcript. Guard with `word_count > 0` before updating the WPM display.
-- [ ] [BUG] Settings page scroll position resets on every route navigation — The settings route unmounts and remounts on each tab switch, losing scroll position. Lift the scroll container outside the tab router or use a scroll restoration hook.
-- [ ] [BUG] History FTS search returns duplicate results when a session matches in both `raw_text` and `final_text` — The FTS5 virtual table joins against the sessions table without `DISTINCT`. Add `GROUP BY sessions.id` or use `SELECT DISTINCT` in `search_sessions`.
-- [ ] [TECH DEBT] IPC command handlers have inconsistent error logging — Some handlers log the error before returning it, some log after, some not at all. Standardize: the command factory should be the sole logger for all command-level errors.
-- [ ] [TECH DEBT] `services/sessions.rs` is approaching 500 lines — Pre-emptively split into `services/sessions/crud.rs`, `services/sessions/search.rs`, `services/sessions/stats.rs` before it hits the 400-line single-responsibility limit.
-- [ ] [TECH DEBT] No integration tests for the IPC command factory — The factory's validation, permission preflight, and reentrancy guard logic is only covered by unit tests on the factory itself. Add integration tests that call commands end-to-end through a test app handle.
-- [ ] [TECH DEBT] Hardcoded color values in `pill.html` — The pill HTML uses inline rgba color values that do not respect the app's design token system. Replace with CSS custom properties matching the design system tokens from `docs/04-DESIGN-SYSTEM.md`.
-- [ ] [DX] Pre-commit hook for SOT keyword checks — Add a `pre-commit` hook that runs `pnpm sot:validate` and fails if any Rust file over 50 lines is missing a `SOURCE OF TRUTH KEYWORDS` header.
-- [ ] [DX] `cargo-deny` for supply chain security — Add `deny.toml` with `licenses` and `bans` sections to block GPL-incompatible dependencies and known-bad crate versions from entering the build.
+- [x] [BUG] Tray tooltip shows stale WPM after a session with zero words — The `last_session_wpm` value in the tray tooltip is not reset when a session is cancelled or produces an empty transcript. Guard with `word_count > 0` before updating the WPM display.
+- [x] [BUG] Settings page scroll position resets on every route navigation — The settings route unmounts and remounts on each tab switch, losing scroll position. Lift the scroll container outside the tab router or use a scroll restoration hook.
+- [x] [BUG] History FTS search returns duplicate results when a session matches in both `raw_text` and `final_text` — The FTS5 virtual table joins against the sessions table without `DISTINCT`. Add `GROUP BY sessions.id` or use `SELECT DISTINCT` in `search_sessions`.
+- [x] [TECH DEBT] IPC command handlers have inconsistent error logging — Some handlers log the error before returning it, some log after, some not at all. Standardize: the command factory should be the sole logger for all command-level errors.
+- [x] [TECH DEBT] `services/sessions.rs` is approaching 500 lines — Pre-emptively split into `services/sessions/crud.rs`, `services/sessions/search.rs`, `services/sessions/stats.rs` before it hits the 400-line single-responsibility limit.
+- [x] [TECH DEBT] No integration tests for the IPC command factory — The factory's validation, permission preflight, and reentrancy guard logic is only covered by unit tests on the factory itself. Add integration tests that call commands end-to-end through a test app handle.
+- [x] [TECH DEBT] Hardcoded color values in `pill.html` — The pill HTML uses inline rgba color values that do not respect the app's design token system. Replace with CSS custom properties matching the design system tokens from `docs/04-DESIGN-SYSTEM.md`.
+- [x] [DX] Pre-commit hook for SOT keyword checks — Add a `pre-commit` hook that runs `pnpm sot:validate` and fails if any Rust file over 50 lines is missing a `SOURCE OF TRUTH KEYWORDS` header.
+- [x] [DX] `cargo-deny` for supply chain security — Add `deny.toml` with `licenses` and `bans` sections to block GPL-incompatible dependencies and known-bad crate versions from entering the build.
 
 ---
 

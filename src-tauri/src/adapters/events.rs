@@ -18,8 +18,8 @@ use tauri::AppHandle;
 use tauri_specta::Event;
 
 use crate::ipc::events::{
-    AudioLevelChanged, ModelDownloadProgress, ModelStateChanged, SessionStateChanged,
-    TranscriptDelivered,
+    AudioLevelChanged, BacktrackOccurred, ModelDownloadProgress, ModelStateChanged,
+    SessionStateChanged, TranscriptDelivered,
 };
 use crate::ports::events::EventSink;
 use crate::types::{AudioLevel, DownloadProgress, ModelId, ModelState, SessionState};
@@ -75,12 +75,27 @@ impl EventSink for TauriEventSink {
         .emit(&self.app);
     }
 
+    fn backtrack_occurred(&self, message: &str) {
+        let _ = (BacktrackOccurred {
+            message: message.to_string(),
+        })
+        .emit(&self.app);
+    }
+
     fn set_pill_visible(&self, visible: bool) {
         crate::tray::set_pill_visible(&self.app, visible);
     }
 
     fn set_cancel_key_active(&self, active: bool) {
         crate::bootstrap::set_escape_registered(&self.app, active);
+    }
+
+    fn update_session_wpm(&self, wpm: Option<f64>) {
+        crate::tray::update_tray_wpm(&self.app, wpm);
+    }
+
+    fn session_cancelled(&self) {
+        crate::tray::reset_tray_wpm(&self.app);
     }
 
     fn download_progress(&self, progress: DownloadProgress) {

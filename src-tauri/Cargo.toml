@@ -101,6 +101,7 @@ windows = { version = "0.58.0", features = [
     "Win32_UI_Accessibility",
     "Win32_System_Com",
     "Win32_System_Ole",
+    "Win32_System_LibraryLoader",
 ] }
 
 [target.'cfg(not(any(target_os = "macos", target_os = "windows")))'.dependencies]
@@ -108,6 +109,7 @@ whisper-rs = { version = "0.16.0" }
 
 [dev-dependencies]
 tokio = { version = "1.53.1", features = ["rt", "macros"] }
+tauri = { version = "2", features = ["test"] }
 
 [profile.dev.package."*"]
 opt-level = 3

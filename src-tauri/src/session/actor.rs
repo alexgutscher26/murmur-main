@@ -476,6 +476,8 @@ impl SessionActor {
         self.in_flight = 0;
         let _ = self.latency.take_samples();
 
+        self.ctx.ports.events.session_cancelled();
+
         if let Err(err) = services::sessions::delete_session(&self.ctx.db, &session_id) {
             tracing::error!(error = %err, "could not destroy a cancelled session");
         }
@@ -550,15 +552,21 @@ impl SessionActor {
             Some(pending) => {
                 let _timer = pending.latency.stage_timer(LatencyStage::Assemble);
                 pending.assembler.push_segments(&decode.segments);
+                pending.assembler.scrub_backtracks();
                 pending.in_flight = pending.in_flight.saturating_sub(1);
             }
             None if Some(&decode.session_id) == self.machine.session_id() => {
                 self.in_flight = self.in_flight.saturating_sub(1);
                 let _timer = self.latency.stage_timer(LatencyStage::Assemble);
                 self.assembler.push_segments(&decode.segments);
+                if let Some(msg) = self.assembler.scrub_backtracks() {
+                    self.ctx.ports.events.backtrack_occurred(msg);
+                }
                 let text = self.assembler.finish();
                 if !text.is_empty() {
                     self.ctx.ports.events.partial_transcript(&text);
+                } else {
+                    self.ctx.ports.events.partial_transcript("");
                 }
             }
             None => {

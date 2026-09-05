@@ -86,6 +86,38 @@ impl Assembler {
         self.parts.is_empty()
     }
 
+    /// Checks accumulated segments for voice backtracks ("scratch that", "no wait", etc.).
+    /// If found, scrubs the corrected span from memory and returns confirmation.
+    pub fn scrub_backtracks(&mut self) -> Option<&'static str> {
+        let current = self.finish();
+        if current.trim().is_empty() {
+            return None;
+        }
+
+        let mut scrubbed = current.clone();
+        let mut modified = false;
+
+        while let Some(next) = crate::adapters::rules::corrections::apply_backtracking_corrections(&scrubbed) {
+            if next == scrubbed {
+                break;
+            }
+            scrubbed = next;
+            modified = true;
+        }
+
+        if modified {
+            let trimmed = scrubbed.trim().to_string();
+            if trimmed.is_empty() {
+                self.parts.clear();
+            } else {
+                self.parts = vec![(0, trimmed)];
+            }
+            Some("Removed last segment")
+        } else {
+            None
+        }
+    }
+
     pub fn clear(&mut self) {
         self.parts.clear();
         self.language = None;
@@ -261,5 +293,20 @@ mod tests {
         assert!(assembler.is_empty());
         assert_eq!(assembler.finish(), "");
         assert_eq!(assembler.language(), None);
+    }
+
+    #[test]
+    fn assembler_scrubs_backtracks_and_preserves_continuation() {
+        let mut assembler = Assembler::new();
+        assembler.push_segments(&[segment("First point.", 0, 3000)]);
+        assembler.push_segments(&[segment("Second wrong point. Scratch that,", 3000, 7000)]);
+
+        let msg = assembler.scrub_backtracks();
+        assert_eq!(msg, Some("Removed last segment"));
+        assert_eq!(assembler.finish(), "First point.");
+
+        // Continued dictation appends properly after scrubbing
+        assembler.push_segments(&[segment("Second right point.", 7000, 10000)]);
+        assert_eq!(assembler.finish(), "First point. Second right point.");
     }
 }

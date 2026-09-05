@@ -111,7 +111,7 @@ pub async fn run_delivery_worker(ctx: SessionContext, mut rx: mpsc::Receiver<Fin
 async fn deliver(ctx: &SessionContext, pending: PendingDelivery) {
     let PendingDelivery {
         session_id,
-        assembler,
+        mut assembler,
         settings,
         detected_language,
         latency,
@@ -124,10 +124,12 @@ async fn deliver(ctx: &SessionContext, pending: PendingDelivery) {
 
     let raw = {
         let _timer = latency.stage_timer(LatencyStage::Assemble);
+        assembler.scrub_backtracks();
         assembler.finish()
     };
 
     if raw.trim().is_empty() {
+        ctx.ports.events.update_session_wpm(None);
         // An empty transcript has two very different causes and they must not
         // be reported the same way. Pure digital silence means the capture path
         // is broken and the user has to be told; saying nothing means they said
@@ -229,6 +231,28 @@ async fn deliver(ctx: &SessionContext, pending: PendingDelivery) {
 
     let word_count = final_text.split_whitespace().count() as u32;
     ctx.ports.events.transcript_delivered(word_count, delivery);
+
+    if word_count > 0 {
+        let duration_sec = match (started_at, finalize_started) {
+            (Some(started), Some(finalized)) if finalized >= started => {
+                finalized.duration_since(started).as_secs_f64()
+            }
+            (Some(started), _) => started.elapsed().as_secs_f64(),
+            _ => 0.0,
+        };
+        let wpm = if duration_sec > 0.0 {
+            (word_count as f64) / (duration_sec / 60.0)
+        } else {
+            0.0
+        };
+        if wpm > 0.0 {
+            ctx.ports.events.update_session_wpm(Some(wpm));
+        } else {
+            ctx.ports.events.update_session_wpm(None);
+        }
+    } else {
+        ctx.ports.events.update_session_wpm(None);
+    }
 
     // NO SOUND HERE, deliberately. The stop chime plays the instant capture
     // ends, in the actor's emit_state — see FeedbackSound::Stop. Delivery can

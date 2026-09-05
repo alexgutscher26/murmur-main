@@ -55,4 +55,58 @@ impl WindowsToast {
             tracing::debug!(error = %err, "could not post Windows error toast");
         }
     }
+
+    /**
+     * SOURCE OF TRUTH KEYWORDS: is_dnd_active
+     * WHAT:  Checks whether Windows Focus Assist / Do Not Disturb / Quiet Hours is active.
+     * WHY:   Re-engagement prompts must respect the user's quiet hours and fullscreen apps.
+     * WHERE: Called by bootstrap/reengagement.rs before dispatching re-engagement toasts.
+     */
+    #[cfg(target_os = "windows")]
+    pub fn is_dnd_active() -> bool {
+        use windows::Win32::System::LibraryLoader::{GetModuleHandleA, GetProcAddress};
+
+        unsafe {
+            let shell32 = GetModuleHandleA(windows::core::s!("shell32.dll")).unwrap_or_default();
+            if shell32.0.is_null() {
+                return false;
+            }
+            let func = GetProcAddress(shell32, windows::core::s!("SHQueryUserNotificationState"));
+            if let Some(func) = func {
+                type FnSHQueryUserNotificationState = unsafe extern "system" fn(*mut i32) -> i32;
+                let query_fn: FnSHQueryUserNotificationState = std::mem::transmute(func);
+                let mut state: i32 = 0;
+                if query_fn(&mut state) == 0 {
+                    // 1 = QUNS_BUSY, 2 = QUNS_RUNNING_D3D_FULL_SCREEN, 3 = QUNS_PRESENTATION_MODE, 5 = QUNS_QUIET_TIME
+                    return state == 1 || state == 2 || state == 3 || state == 5;
+                }
+            }
+            false
+        }
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    pub fn is_dnd_active() -> bool {
+        false
+    }
+
+    /**
+     * SOURCE OF TRUTH KEYWORDS: notify_reengagement
+     * WHAT:  Shows a gentle re-engagement toast after prolonged inactivity (3+ days).
+     * WHY:   Provides a soft reminder with a clear shortcut prompt, respecting Do Not Disturb.
+     */
+    pub fn notify_reengagement(app: &AppHandle, hotkey_desc: &str) {
+        let body = format!(
+            "It's been a few days since your last dictation. Press {hotkey_desc} anytime to capture your thoughts."
+        );
+        if let Err(err) = app
+            .notification()
+            .builder()
+            .title("Murmur is ready whenever you are")
+            .body(&body)
+            .show()
+        {
+            tracing::debug!(error = %err, "could not post re-engagement toast");
+        }
+    }
 }

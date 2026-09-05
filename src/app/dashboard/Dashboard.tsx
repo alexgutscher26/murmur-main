@@ -60,6 +60,7 @@ import { StatsView } from "./stats/StatsView";
 import { HistoryView } from "./history/HistoryView";
 import { SettingsView } from "./settings/SettingsView";
 import { InsightsView } from "./insights/InsightsView";
+import { StreakHeaderBadge } from "./_components/StreakHeaderBadge";
 
 /**
  * WHAT:  The user's dictation hotkey — their override if they have one, the
@@ -211,6 +212,11 @@ export function Dashboard() {
           >
             <User className="h-4 w-4" />
           </button>
+        </div>
+
+        {/* Top Center: Habit Streak Tracker */}
+        <div data-tauri-drag-region={false} className="flex items-center">
+          <StreakHeaderBadge />
         </div>
 
         {/* Top Right: Notifications + Window controls */}

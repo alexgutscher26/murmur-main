@@ -143,15 +143,16 @@ impl CommandSpec {
  *          5. Map       — one error surface for the UI.
  * WHERE: Called by every command in ipc/commands/.
  */
-pub async fn execute<I, O, F, Fut>(
-    state: &AppState,
+pub async fn execute<R, I, O, F, Fut>(
+    state: &AppState<R>,
     spec: CommandSpec,
     input: I,
     handler: F,
 ) -> Result<O, AppError>
 where
+    R: tauri::Runtime,
     I: Validate,
-    F: FnOnce(CommandContext, I) -> Fut,
+    F: FnOnce(CommandContext<R>, I) -> Fut,
     Fut: Future<Output = AppResult<O>>,
 {
     let correlation_id = uuid::Uuid::new_v4().to_string();
@@ -165,14 +166,22 @@ where
 
     // 1. Validation. The input schema is the source of truth.
     if let Err(reason) = input.validate() {
-        tracing::warn!(reason, "input rejected");
+        tracing::warn!(reason = %reason, "command validation rejected");
         return Err(AppError::invalid_input(reason));
     }
 
     // 2. Permission preflight, straight from the registry declaration — but
     // only for commands that actually use the resource. See ResourceUse.
     if spec.resource_use == ResourceUse::Acquires {
-        preflight_permissions(state, spec.capability)?;
+        if let Err(err) = preflight_permissions(state, spec.capability) {
+            tracing::warn!(
+                code = ?err.code,
+                message = %err.message,
+                detail = ?err.detail,
+                "command preflight failed"
+            );
+            return Err(err);
+        }
     }
 
     // 3. Reentrancy. Held for the life of the call, released on any exit.
@@ -180,7 +189,7 @@ where
         Reentrancy::Exclusive => match state.begin_exclusive(spec.capability) {
             Some(guard) => Some(guard),
             None => {
-                tracing::debug!("rejected a reentrant call");
+                tracing::warn!("command reentrant call rejected");
                 return Err(AppError::new(
                     ErrorCode::SessionAlreadyActive,
                     "That is already in progress.",
@@ -201,12 +210,17 @@ where
     let outcome = handler(context, input).await;
     let elapsed_ms = started.elapsed().as_secs_f64() * 1000.0;
 
-    // 5. One error surface. Per-stage latency is recorded by the pipeline
-    // itself against the registry's declared metrics; this is the coarse
-    // command timing, which belongs in the log rather than the dashboard.
+    // 5. One error surface. The command factory is the sole logger for all
+    // command-level errors and timings. Handlers return AppError directly.
     match &outcome {
         Ok(_) => tracing::info!(elapsed_ms, "ok"),
-        Err(err) => tracing::warn!(elapsed_ms, code = ?err.code, detail = ?err.detail, "failed"),
+        Err(err) => tracing::error!(
+            elapsed_ms,
+            code = ?err.code,
+            message = %err.message,
+            detail = ?err.detail,
+            "command failed"
+        ),
     }
 
     outcome
@@ -222,7 +236,7 @@ where
  *        macOS never asks twice.
  * WHERE: Step 2 of execute.
  */
-fn preflight_permissions(state: &AppState, key: CapabilityKey) -> AppResult<()> {
+fn preflight_permissions<R: tauri::Runtime>(state: &AppState<R>, key: CapabilityKey) -> AppResult<()> {
     let Some(capability) = registry::capability(key) else {
         // A command naming a capability that is not declared is a wiring bug,
         // not a user problem — fail loudly rather than running unprotected.
@@ -351,5 +365,331 @@ mod tests {
 
         let err = AppError::accessibility_denied();
         assert!(err.recoverable, "the app still works without Accessibility");
+    }
+
+    // ── Integration tests for execute end-to-end through a test AppHandle ───
+
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::path::PathBuf;
+    use tauri::Manager;
+    use crate::config::AppPaths;
+    use crate::db::Database;
+    use crate::error::ErrorCode;
+    use crate::ipc::context::{Ports, SessionHandle};
+    use crate::ports::{
+        AudioSource, EventSink, ModelStore, PermissionProvider, TextInjector,
+        TranscriptionEngine,
+    };
+
+    struct DummyEngine;
+    impl TranscriptionEngine for DummyEngine {
+        fn capabilities(&self) -> crate::types::EngineCapabilities {
+            crate::types::EngineCapabilities {
+                id: crate::types::EngineId("dummy".into()),
+                display_name: "Dummy".into(),
+                languages: crate::types::LanguageSupport::All,
+                features: vec![],
+                realtime_factor: 1.0,
+                requires_download: false,
+                runs_offline: true,
+            }
+        }
+        fn prepare(&self) -> AppResult<()> {
+            Ok(())
+        }
+        fn is_ready(&self) -> bool {
+            true
+        }
+        fn transcribe(
+            &self,
+            _chunk: &crate::types::AudioChunk,
+            _request: &crate::ports::engine::TranscribeRequest,
+        ) -> AppResult<Vec<crate::types::TranscriptSegment>> {
+            Ok(vec![])
+        }
+    }
+
+    struct DummySession;
+    impl crate::ports::audio::CaptureSession for DummySession {
+        fn device(&self) -> &crate::types::DeviceInfo {
+            static INFO: once_cell::sync::Lazy<crate::types::DeviceInfo> = once_cell::sync::Lazy::new(|| {
+                crate::types::DeviceInfo {
+                    id: "dummy".into(),
+                    name: "Dummy".into(),
+                    is_default: true,
+                    sample_rate: 16000,
+                    channels: 1,
+                }
+            });
+            &INFO
+        }
+        fn native_sample_rate(&self) -> u32 {
+            16000
+        }
+        fn stop(self: Box<Self>) -> AppResult<()> {
+            Ok(())
+        }
+    }
+
+    struct DummyAudio;
+    impl AudioSource for DummyAudio {
+        fn list_devices(&self) -> AppResult<Vec<crate::types::DeviceInfo>> {
+            Ok(vec![])
+        }
+        fn default_device(&self) -> AppResult<crate::types::DeviceInfo> {
+            Ok(crate::types::DeviceInfo {
+                id: "dummy".into(),
+                name: "Dummy".into(),
+                is_default: true,
+                sample_rate: 16000,
+                channels: 1,
+            })
+        }
+        fn start(
+            &self,
+            _config: &crate::ports::audio::CaptureConfig,
+            _sink: crate::ports::audio::SampleSender,
+        ) -> AppResult<Box<dyn crate::ports::audio::CaptureSession>> {
+            Ok(Box::new(DummySession))
+        }
+    }
+
+    struct DummyInjector;
+    impl TextInjector for DummyInjector {
+        fn can_inject(&self) -> bool {
+            true
+        }
+        fn frontmost_app(&self) -> Option<crate::ports::injector::FrontmostApp> {
+            None
+        }
+        fn deliver(
+            &self,
+            _request: &crate::ports::injector::InjectionRequest,
+        ) -> AppResult<crate::ports::injector::InjectionOutcome> {
+            Ok(crate::ports::injector::InjectionOutcome {
+                delivery: crate::types::DeliveryKind::Pasted,
+                reason: None,
+                clipboard_write_ms: 0.1,
+            })
+        }
+    }
+
+    struct DummyModelStore;
+    #[async_trait::async_trait]
+    impl ModelStore for DummyModelStore {
+        async fn list(&self) -> AppResult<Vec<crate::ports::models::ModelStatus>> {
+            Ok(vec![])
+        }
+        async fn status(&self, id: &crate::types::ModelId) -> AppResult<crate::ports::models::ModelStatus> {
+            Err(AppError::not_found(id.as_str()))
+        }
+        async fn ensure(&self, _id: &crate::types::ModelId) -> AppResult<PathBuf> {
+            Err(AppError::not_found("model"))
+        }
+        async fn verify(&self, _id: &crate::types::ModelId) -> AppResult<bool> {
+            Ok(true)
+        }
+        async fn delete(&self, _id: &crate::types::ModelId) -> AppResult<()> {
+            Ok(())
+        }
+    }
+
+    struct DummyEvents;
+    impl EventSink for DummyEvents {
+        fn audio_level(&self, _level: crate::types::AudioLevel) {}
+        fn transcript_delivered(&self, _word_count: u32, _delivery: crate::types::DeliveryKind) {}
+        fn session_state_changed(&self, _state: &crate::types::SessionState) {}
+        fn set_pill_visible(&self, _visible: bool) {}
+        fn download_progress(&self, _progress: crate::types::DownloadProgress) {}
+        fn partial_transcript(&self, _text: &str) {}
+        fn backtrack_occurred(&self, _message: &str) {}
+        fn set_cancel_key_active(&self, _active: bool) {}
+        fn model_state_changed(&self, _model_id: crate::types::ModelId, _state: crate::types::ModelState) {}
+    }
+
+    struct MockPermissions {
+        mic: PermissionState,
+        a11y: PermissionState,
+    }
+
+    impl PermissionProvider for MockPermissions {
+        fn check(&self, permission: OsPermission) -> PermissionState {
+            match permission {
+                OsPermission::Microphone => self.mic,
+                OsPermission::Accessibility => self.a11y,
+            }
+        }
+        fn request(&self, permission: OsPermission) -> AppResult<PermissionState> {
+            Ok(self.check(permission))
+        }
+        fn open_privacy_pane(&self, _pane: PrivacyPane) -> AppResult<()> {
+            Ok(())
+        }
+    }
+
+    fn build_test_app(
+        permissions: Arc<dyn PermissionProvider>,
+    ) -> (
+        tauri::App<tauri::test::MockRuntime>,
+        AppState<tauri::test::MockRuntime>,
+    ) {
+        let app = tauri::test::mock_app();
+        let handle = app.handle().clone();
+        let db = Database::open_in_memory().expect("in memory database");
+        let (event_tx, _event_rx) = tokio::sync::mpsc::channel(16);
+        let session = SessionHandle::new(event_tx);
+        let paths = AppPaths {
+            data_dir: PathBuf::from("/test/data"),
+            models_dir: PathBuf::from("/test/models"),
+            logs_dir: PathBuf::from("/test/logs"),
+            audio_dir: PathBuf::from("/test/audio"),
+            db_path: PathBuf::from(":memory:"),
+            bundled_models_dir: None,
+        };
+        let ports = Ports {
+            engine: Arc::new(DummyEngine),
+            audio: Arc::new(DummyAudio),
+            enhancer: Arc::new(crate::adapters::rules::RuleEnhancer::new()),
+            injector: Arc::new(DummyInjector),
+            models: Arc::new(DummyModelStore),
+            permissions,
+            events: Arc::new(DummyEvents),
+        };
+        let state = AppState::new(paths, db, ports, session, handle);
+        app.manage(state.clone());
+        (app, state)
+    }
+
+    #[tokio::test]
+    async fn integration_validation_preempts_permissions_and_handler() {
+        let permissions = Arc::new(MockPermissions {
+            mic: PermissionState::Denied,
+            a11y: PermissionState::Denied,
+        });
+        let (_app, state) = build_test_app(permissions);
+        let spec = CommandSpec::new("test_command", CapabilityKey::Dictation);
+        let handler_ran = Arc::new(AtomicBool::new(false));
+        let ran = Arc::clone(&handler_ran);
+
+        // Invalid input (-10) should fail validation immediately.
+        let result = execute(&state, spec, Input { value: -10 }, |_ctx, _inp| async move {
+            ran.store(true, Ordering::SeqCst);
+            Ok("unreachable")
+        })
+        .await;
+
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert_eq!(err.code, ErrorCode::InvalidInput);
+        assert!(!handler_ran.load(Ordering::SeqCst), "handler must not run on validation failure");
+    }
+
+    #[tokio::test]
+    async fn integration_permission_preflight_blocks_when_denied() {
+        let permissions = Arc::new(MockPermissions {
+            mic: PermissionState::Denied,
+            a11y: PermissionState::Granted,
+        });
+        let (_app, state) = build_test_app(permissions);
+        let spec = CommandSpec::new("start_dictation", CapabilityKey::Dictation);
+        let handler_ran = Arc::new(AtomicBool::new(false));
+        let ran = Arc::clone(&handler_ran);
+
+        let result = execute(&state, spec, Input { value: 42 }, |_ctx, _inp| async move {
+            ran.store(true, Ordering::SeqCst);
+            Ok("unreachable")
+        })
+        .await;
+
+        assert!(result.is_err());
+        let err = result.unwrap_err();
+        assert_eq!(err.code, ErrorCode::MicrophoneDenied);
+        assert!(matches!(err.action, Some(ErrorAction::OpenPrivacyPane { pane: PrivacyPane::Microphone })));
+        assert!(!handler_ran.load(Ordering::SeqCst), "handler must not run when permissions are denied");
+    }
+
+    #[tokio::test]
+    async fn integration_permission_preflight_bypassed_for_reports() {
+        let permissions = Arc::new(MockPermissions {
+            mic: PermissionState::Denied,
+            a11y: PermissionState::Denied,
+        });
+        let (_app, state) = build_test_app(permissions);
+        // .reports() should skip permission preflight even on Dictation
+        let spec = CommandSpec::new("get_dictation_state", CapabilityKey::Dictation).reports();
+        let handler_ran = Arc::new(AtomicBool::new(false));
+        let ran = Arc::clone(&handler_ran);
+
+        let result = execute(&state, spec, Input { value: 10 }, |_ctx, _inp| async move {
+            ran.store(true, Ordering::SeqCst);
+            Ok("reports_ok")
+        })
+        .await;
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "reports_ok");
+        assert!(handler_ran.load(Ordering::SeqCst), "handler should run when spec declares reports()");
+    }
+
+    #[tokio::test]
+    async fn integration_exclusive_command_guards_reentrancy() {
+        let permissions = Arc::new(MockPermissions {
+            mic: PermissionState::Granted,
+            a11y: PermissionState::Granted,
+        });
+        let (_app, state) = build_test_app(permissions);
+        let spec = CommandSpec::new("exclusive_op", CapabilityKey::Dictation).exclusive();
+
+        let state_clone = state.clone();
+        let result = execute(&state, spec, Input { value: 1 }, |_ctx, _inp| async move {
+            // Inside the exclusive execution, attempt another exclusive call for the same capability.
+            let nested_spec = CommandSpec::new("nested_exclusive_op", CapabilityKey::Dictation).exclusive();
+            let nested_res = execute(&state_clone, nested_spec, Input { value: 2 }, |_c, _i| async move {
+                Ok("nested_ok")
+            })
+            .await;
+
+            assert!(nested_res.is_err());
+            let err = nested_res.unwrap_err();
+            assert_eq!(err.code, ErrorCode::SessionAlreadyActive);
+
+            Ok("primary_ok")
+        })
+        .await;
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), "primary_ok");
+
+        // Once the first exclusive call has finished, a new exclusive call should succeed.
+        let follow_up = execute(&state, spec, Input { value: 3 }, |_ctx, _inp| async move {
+            Ok("follow_up_ok")
+        })
+        .await;
+        assert!(follow_up.is_ok());
+        assert_eq!(follow_up.unwrap(), "follow_up_ok");
+    }
+
+    #[tokio::test]
+    async fn integration_end_to_end_through_managed_app_handle() {
+        let permissions = Arc::new(MockPermissions {
+            mic: PermissionState::Granted,
+            a11y: PermissionState::Granted,
+        });
+        let (app, _state) = build_test_app(permissions);
+
+        // Retrieve the state through Tauri's app handle managed state
+        let managed_state = app.state::<AppState<tauri::test::MockRuntime>>();
+        let spec = CommandSpec::new("managed_cmd", CapabilityKey::History);
+
+        let result = execute(&managed_state, spec, Input { value: 100 }, |ctx, inp| async move {
+            assert!(!ctx.correlation_id.is_empty());
+            assert_eq!(ctx.paths().data_dir, PathBuf::from("/test/data"));
+            Ok(inp.value * 2)
+        })
+        .await;
+
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), 200);
     }
 }

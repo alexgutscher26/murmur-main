@@ -127,14 +127,55 @@ function matchKeyword(keywords, query) {
   return keywords.some((k) => k.toLowerCase().includes(needle))
 }
 
+/**
+ * SOURCE OF TRUTH KEYWORDS: validateSotHeaders, sot-validate
+ * WHAT:  Checks that all authored Rust files over 50 lines have SOT headers.
+ * WHY:   Enforces CLAUDE.md §6 at commit time so missing headers are caught
+ *        before landing in main.
+ * WHERE: Invoked via `pnpm sot:validate` or the pre-commit hook.
+ */
+function validateSotHeaders() {
+  const rustFiles = collectSourceFiles(join(ROOT, 'src-tauri/src')).filter(
+    (f) => extname(f) === '.rs'
+  )
+  const violations = []
+
+  for (const file of rustFiles) {
+    const text = readFileSync(file, 'utf8')
+    const lineCount = text.split('\n').length
+    if (lineCount > 50 && !text.includes(SOT_MARKER)) {
+      violations.push({ file: relative(ROOT, file), lineCount })
+    }
+  }
+
+  if (violations.length > 0) {
+    console.error('❌ SOT Keyword Validation Failed:')
+    for (const v of violations) {
+      console.error(`   - ${v.file} (${v.lineCount} lines) is missing "${SOT_MARKER}" header`)
+    }
+    console.error(`\nFound ${violations.length} Rust file(s) over 50 lines missing SOT headers.`)
+    console.error('See CLAUDE.md §6 for header requirements.')
+    process.exit(1)
+  }
+
+  console.log(`✅ SOT validation passed: all ${rustFiles.length} Rust files checked (files > 50 lines have headers).`)
+  process.exit(0)
+}
+
 function main() {
   const argv = process.argv.slice(2)
+  if (argv.includes('--validate')) {
+    validateSotHeaders()
+    return
+  }
+
   const show = argv.includes('--show')
   const query = argv.filter((a) => a !== '--show').join(' ').trim()
 
   if (!query) {
     console.error('Usage: pnpm sot <keyword>        # files that own the symbol')
     console.error('       pnpm sot:show <keyword>   # the same, with headers')
+    console.error('       pnpm sot:validate         # validate SOT headers in Rust files')
     process.exit(1)
   }
 

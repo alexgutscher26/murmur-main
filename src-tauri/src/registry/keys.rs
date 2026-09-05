@@ -57,4 +57,5 @@ pub const UPDATE_CHANNEL: &str = "general.update_channel";
 pub const ONBOARDING_COMPLETE: &str = "general.onboarding_complete";
 pub const REFERRAL_PROMPT_DISMISSED: &str = "virality.referral_prompt_dismissed";
 pub const REFERRAL_CODE: &str = "virality.referral_code";
+pub const LAST_REENGAGEMENT_PROMPT_MS: &str = "retention.last_reengagement_prompt_ms";
 

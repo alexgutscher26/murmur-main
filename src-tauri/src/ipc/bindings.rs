@@ -64,6 +64,7 @@ pub fn specta_builder() -> Builder<tauri::Wry> {
             commands::stats::get_stats,
             commands::stats::get_referral_status,
             commands::stats::dismiss_referral_prompt,
+            commands::stats::check_reengagement,
             // Dictionary
             commands::dictionary::list_dictionary,
             commands::dictionary::create_dictionary_entry,
@@ -96,6 +97,7 @@ pub fn specta_builder() -> Builder<tauri::Wry> {
             events::PermissionsChanged,
             events::AudioLevelChanged,
             events::PartialTranscript,
+            events::BacktrackOccurred,
             events::ModelDownloadProgress,
             events::ModelStateChanged,
             events::OnboardingProgress,

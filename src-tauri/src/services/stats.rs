@@ -15,7 +15,7 @@
  * WHERE: Called by ipc/commands/stats.rs, which assembles StatsSummary.
  */
 
-use rusqlite::Row;
+use rusqlite::{OptionalExtension, Row};
 
 use crate::db::Database;
 use crate::error::AppResult;
@@ -149,6 +149,72 @@ pub fn distinct_active_days(db: &Database, limit: i64) -> AppResult<Vec<String>>
             |row| row.get::<_, String>(0),
         )?;
         rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
+    })
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: distinct_qualified_days
+ * WHAT:  Local dates that meet the habit qualification criteria (>= 3 sessions OR >= 100 words).
+ * WHY:   A habit streak must represent genuine daily engagement rather than a single accidental
+ *        keypress. Only days reaching 3 delivered sessions or 100 words qualify towards the streak.
+ * WHERE: The command layer folds this into `current_streak_days`.
+ */
+pub fn distinct_qualified_days(db: &Database, limit: i64) -> AppResult<Vec<String>> {
+    db.with_connection(|conn| {
+        let mut stmt = conn.prepare(
+            "SELECT date(started_at / 1000, 'unixepoch', 'localtime') AS day
+               FROM sessions
+              WHERE outcome = ?1
+              GROUP BY day
+             HAVING count(*) >= 3 OR coalesce(sum(word_count), 0) >= 100
+              ORDER BY day DESC
+              LIMIT ?2",
+        )?;
+        let rows = stmt.query_map(
+            rusqlite::params![SessionOutcome::Delivered.as_str(), limit],
+            |row| row.get::<_, String>(0),
+        )?;
+        rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
+    })
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: today_totals
+ * WHAT:  Session count and word count delivered on the specified local date.
+ * WHERE: Consumed by get_stats to report today's progress towards habit qualification.
+ */
+pub fn today_totals(db: &Database, today_local_date: &str) -> AppResult<(i64, i64)> {
+    db.with_connection(|conn| {
+        let mut stmt = conn.prepare(
+            "SELECT count(*), coalesce(sum(word_count), 0)
+               FROM sessions
+              WHERE outcome = ?1
+                AND date(started_at / 1000, 'unixepoch', 'localtime') = ?2",
+        )?;
+        let row = stmt.query_row(
+            rusqlite::params![SessionOutcome::Delivered.as_str(), today_local_date],
+            |r| Ok((r.get(0)?, r.get(1)?)),
+        )?;
+        Ok(row)
+    })
+}
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: latest_session_timestamp
+ * WHAT:  The epoch timestamp (ms) of the most recent delivered session, or None if none exist.
+ * WHERE: Used by re-engagement prompt checks to measure inactivity duration.
+ */
+pub fn latest_session_timestamp(db: &Database) -> AppResult<Option<i64>> {
+    db.with_connection(|conn| {
+        let mut stmt = conn.prepare(
+            "SELECT max(started_at)
+               FROM sessions
+              WHERE outcome = ?1",
+        )?;
+        let ts: Option<i64> = stmt
+            .query_row(rusqlite::params![SessionOutcome::Delivered.as_str()], |r| r.get(0))
+            .optional()?;
+        Ok(ts)
     })
 }
 
@@ -338,6 +404,40 @@ mod tests {
         let status = referral_status(&db)?;
         assert!(!status.eligible);
         assert!(status.prompt_dismissed);
+        Ok(())
+    }
+
+    #[test]
+    fn habit_streak_qualification_thresholds() -> AppResult<()> {
+        let db = Database::open_in_memory()?;
+
+        // Day 1 (1_700_000_000_000): 2 sessions, 30 words total -> does NOT qualify (< 3 sessions and < 100 words)
+        let day1_base = 1_700_000_000_000;
+        deliver(&db, "d1_1", day1_base, 15)?;
+        deliver(&db, "d1_2", day1_base + 1_000, 15)?;
+
+        let qualified = distinct_qualified_days(&db, 10)?;
+        assert_eq!(qualified.len(), 0);
+
+        // Day 2 (1_700_100_000_000): 3 sessions, 30 words total -> QUALIFIES (>= 3 sessions)
+        let day2_base = 1_700_100_000_000;
+        deliver(&db, "d2_1", day2_base, 10)?;
+        deliver(&db, "d2_2", day2_base + 1_000, 10)?;
+        deliver(&db, "d2_3", day2_base + 2_000, 10)?;
+
+        let qualified = distinct_qualified_days(&db, 10)?;
+        assert_eq!(qualified.len(), 1);
+
+        // Day 3 (1_700_200_000_000): 1 session, 120 words -> QUALIFIES (>= 100 words)
+        let day3_base = 1_700_200_000_000;
+        deliver(&db, "d3_1", day3_base, 120)?;
+
+        let qualified = distinct_qualified_days(&db, 10)?;
+        assert_eq!(qualified.len(), 2);
+
+        // Check latest session timestamp
+        let latest = latest_session_timestamp(&db)?;
+        assert_eq!(latest, Some(day3_base));
         Ok(())
     }
 }

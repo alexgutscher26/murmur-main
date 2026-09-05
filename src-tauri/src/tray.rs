@@ -29,7 +29,8 @@ use crate::error::{AppError, AppResult};
 const MENU_DASHBOARD: &str = "dashboard";
 const MENU_QUIT: &str = "quit";
 
-static CUSTOM_PILL_POSITIONS: std::sync::Mutex<Option<HashMap<(i32, i32), (i32, i32)>>> =
+type PillPositionMap = HashMap<(i32, i32), (i32, i32)>;
+static CUSTOM_PILL_POSITIONS: std::sync::Mutex<Option<PillPositionMap>> =
     std::sync::Mutex::new(None);
 
 pub fn record_pill_drag_position(app: &AppHandle, x: i32, y: i32) {
@@ -43,6 +44,39 @@ pub fn record_pill_drag_position(app: &AppHandle, x: i32, y: i32) {
             map.insert(origin, (x, y));
         }
     }
+}
+
+static LAST_SESSION_WPM: std::sync::Mutex<Option<f64>> = std::sync::Mutex::new(None);
+
+/**
+ * SOURCE OF TRUTH KEYWORDS: update_tray_wpm, reset_tray_wpm, last_session_wpm
+ * WHAT:  Updates or resets the tray tooltip to display dictation WPM from the
+ *        most recent session.
+ * WHY:   A session that is cancelled or produces zero words must not leave a stale
+ *        WPM reading in the system tray. Guarded by word_count > 0.
+ * WHERE: Called by delivery worker on transcript delivery, and on session cancellation.
+ */
+pub fn update_tray_wpm(app: &AppHandle, wpm: Option<f64>) {
+    let mut guard = match LAST_SESSION_WPM.lock() {
+        Ok(g) => g,
+        Err(poisoned) => poisoned.into_inner(),
+    };
+    *guard = wpm;
+    if let Some(tray) = app.tray_by_id("murmur") {
+        let tooltip = match wpm {
+            Some(w) if w > 0.0 => format!("Murmur — {:.0} WPM", w),
+            _ => "Murmur".to_string(),
+        };
+        let _ = tray.set_tooltip(Some(tooltip));
+    }
+}
+
+pub fn reset_tray_wpm(app: &AppHandle) {
+    update_tray_wpm(app, None);
+}
+
+pub fn last_session_wpm() -> Option<f64> {
+    LAST_SESSION_WPM.lock().ok().and_then(|g| *g)
 }
 
 /**

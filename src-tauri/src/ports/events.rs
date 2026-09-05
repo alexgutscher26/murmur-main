@@ -46,6 +46,9 @@ pub trait EventSink: Send + Sync {
     /// Partial transcript preview decoded while recording is live.
     fn partial_transcript(&self, text: &str);
 
+    /// Voice backtrack correction detected and scrubbed ("scratch that", "no wait", etc.).
+    fn backtrack_occurred(&self, message: &str);
+
     /**
      * WHAT:  A model's state settled into something new.
      * WHY:   `list` and `status` deliberately do not hash, so a model that is
@@ -71,6 +74,12 @@ pub trait EventSink: Send + Sync {
      *        the OS.
      */
     fn set_cancel_key_active(&self, active: bool);
+
+    /// Dictation WPM from the last completed session, or None if reset/zero.
+    fn update_session_wpm(&self, _wpm: Option<f64>) {}
+
+    /// Notification that an active session was cancelled or discarded.
+    fn session_cancelled(&self) {}
 }
 
 /**
@@ -91,6 +100,7 @@ impl EventSink for NullEventSink {
     fn set_pill_visible(&self, _visible: bool) {}
     fn download_progress(&self, _progress: DownloadProgress) {}
     fn partial_transcript(&self, _text: &str) {}
+    fn backtrack_occurred(&self, _message: &str) {}
     fn model_state_changed(&self, _model_id: ModelId, _state: ModelState) {}
     fn set_cancel_key_active(&self, _active: bool) {}
 }

@@ -67,11 +67,13 @@ export const commands = {
 	wipeAllData: () => typedError<WipeResult, AppError>(__TAURI_INVOKE("wipe_all_data")),
 	checkForUpdate: () => typedError<UpdateCheck, AppError>(__TAURI_INVOKE("check_for_update")),
 	installUpdate: () => typedError<null, AppError>(__TAURI_INVOKE("install_update")),
+	checkReengagement: () => typedError<boolean, AppError>(__TAURI_INVOKE("check_reengagement")),
 };
 
 /** Events */
 export const events = {
 	audioLevelChanged: makeEvent<AudioLevelChanged>("audio-level-changed"),
+	backtrackOccurred: makeEvent<BacktrackOccurred>("backtrack-occurred"),
 	modelDownloadProgress: makeEvent<ModelDownloadProgress>("model-download-progress"),
 	modelStateChanged: makeEvent<ModelStateChanged>("model-state-changed"),
 	onboardingProgress: makeEvent<OnboardingProgress>("onboarding-progress"),
@@ -89,6 +91,10 @@ export type ActivityDay = {
 	date: string,
 	session_count: number,
 	word_count: number,
+};
+
+export type BacktrackOccurred = {
+	message: string,
 };
 
 /**
@@ -974,6 +980,8 @@ export type StatsSummary = {
 	total_speaking_ms: number,
 	sessions_this_week: number,
 	words_this_week: number,
+	today_sessions: number,
+	today_words: number,
 	/**  Words per minute actually spoken, measured. */
 	speaking_wpm: number | null,
 	/**  The user's typing baseline, from settings. The comparison, not a fact. */

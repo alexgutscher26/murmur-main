@@ -30,7 +30,7 @@ impl WindowsCredentialStore {
         let target_name: Vec<u16> = format!("{DEFAULT_TARGET_PREFIX}{key}\0").encode_utf16().collect();
         let user_name: Vec<u16> = "MurmurUser\0".encode_utf16().collect();
 
-        let mut credential = CREDENTIALW {
+        let credential = CREDENTIALW {
             Flags: CRED_FLAGS(0),
             Type: CRED_TYPE_GENERIC,
             TargetName: PWSTR(target_name.as_ptr() as *mut u16),
@@ -45,7 +45,7 @@ impl WindowsCredentialStore {
             UserName: PWSTR(user_name.as_ptr() as *mut u16),
         };
 
-        unsafe { CredWriteW(&mut credential, 0).is_ok() }
+        unsafe { CredWriteW(&credential, 0).is_ok() }
     }
 
     /**

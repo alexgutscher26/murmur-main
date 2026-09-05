@@ -85,6 +85,17 @@ pub struct PartialTranscript {
     pub text: String,
 }
 
+/**
+ * SOURCE OF TRUTH KEYWORDS: BacktrackOccurred
+ * WHAT:  Notifies the frontend that a voice backtrack ("scratch that", "no wait") was detected
+ *        and the preceding segment was scrubbed from memory while keeping recording active.
+ * WHERE: Emitted by session/actor.rs; consumed by the pill overlay for a brief flash confirmation.
+ */
+#[derive(Debug, Clone, Serialize, Deserialize, Type, Event)]
+pub struct BacktrackOccurred {
+    pub message: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Type, Event)]
 pub struct ModelDownloadProgress {
     pub progress: DownloadProgress,

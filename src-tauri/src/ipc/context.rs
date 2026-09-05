@@ -139,8 +139,7 @@ impl SessionHandle {
  * WHAT:  Everything a command can reach.
  * WHERE: Tauri managed state; the single argument every command takes.
  */
-#[derive(Clone)]
-pub struct AppState {
+pub struct AppState<R: tauri::Runtime = tauri::Wry> {
     pub paths: AppPaths,
     pub db: Database,
     pub ports: Ports,
@@ -148,20 +147,34 @@ pub struct AppState {
     /// Held so any layer can emit a typed event. Rust owns domain state and
     /// PUSHES it — the frontend never polls — so an emit handle is not a
     /// convenience here, it is how the UI learns anything.
-    pub app: tauri::AppHandle,
+    pub app: tauri::AppHandle<R>,
     /// Capabilities with a command currently executing. See InflightGuard.
     inflight: Arc<Mutex<HashSet<CapabilityKey>>>,
     /// Last state the actor published. See `current_state`.
     published_state: Arc<Mutex<SessionState>>,
 }
 
-impl AppState {
+impl<R: tauri::Runtime> Clone for AppState<R> {
+    fn clone(&self) -> Self {
+        Self {
+            paths: self.paths.clone(),
+            db: self.db.clone(),
+            ports: self.ports.clone(),
+            session: self.session.clone(),
+            app: self.app.clone(),
+            inflight: Arc::clone(&self.inflight),
+            published_state: Arc::clone(&self.published_state),
+        }
+    }
+}
+
+impl<R: tauri::Runtime> AppState<R> {
     pub fn new(
         paths: AppPaths,
         db: Database,
         ports: Ports,
         session: SessionHandle,
-        app: tauri::AppHandle,
+        app: tauri::AppHandle<R>,
     ) -> Self {
         Self {
             paths,
@@ -303,12 +316,12 @@ impl SessionContext {
  *        handful of refcount bumps and removes the problem entirely.
  * WHERE: The first argument of every command handler.
  */
-pub struct CommandContext {
-    pub state: AppState,
+pub struct CommandContext<R: tauri::Runtime = tauri::Wry> {
+    pub state: AppState<R>,
     pub correlation_id: String,
 }
 
-impl CommandContext {
+impl<R: tauri::Runtime> CommandContext<R> {
     pub fn db(&self) -> &Database {
         &self.state.db
     }

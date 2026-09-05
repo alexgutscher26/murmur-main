@@ -14,6 +14,7 @@
 pub mod engine;
 pub mod hotkeys;
 pub mod recovery;
+pub mod reengagement;
 pub mod updates;
 pub mod windows;
 
@@ -118,6 +119,7 @@ pub fn setup(app: &AppHandle) -> AppResult<()> {
     windows::track_pill_drag(app);
     updates::report_permissions(&ports);
     recovery::start_retention_sweep(state.clone());
+    reengagement::start_reengagement_checks(state.clone());
     if std::env::var("TAURI_UPDATER_DISABLE")
         .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
         .unwrap_or(false)

@@ -43,6 +43,7 @@ import { unwrapCommand, useCommand } from "@/lib/ipc";
 import { formatClock } from "@/lib/format";
 import { readDurationMs } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { RotateCcw } from "lucide-react";
 import { CountdownLine, GlassPanel } from "@/components/global";
 import { MicIndicator } from "./_components/MicIndicator";
 import type { PillTone } from "./_components/StateDot";
@@ -90,7 +91,18 @@ export function Pill() {
   const [live, setLive] = useState(false);
   const [refilling, setRefilling] = useState(false);
   const [partialText, setPartialText] = useState<string | null>(null);
+  const [backtrackNotice, setBacktrackNotice] = useState<string | null>(null);
   const previousKind = useRef<VisibleState["kind"] | null>(null);
+  const backtrackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (backtrackTimer.current) {
+        clearTimeout(backtrackTimer.current);
+      }
+    };
+  }, []);
 
   // Settings for opacity
   const settings = useCommand(commands.getSettings, []);
@@ -120,6 +132,7 @@ export function Pill() {
     setLive(state.kind !== "IDLE");
     if (state.kind === "ARMING" || state.kind === "IDLE") {
       setPartialText(null);
+      setBacktrackNotice(null);
     }
     if (state.kind !== "IDLE") setShown(state);
   });
@@ -127,7 +140,19 @@ export function Pill() {
   useTauriEvent(events.partialTranscript, ({ text }) => {
     if (text.trim().length > 0) {
       setPartialText(text);
+    } else {
+      setPartialText(null);
     }
+  });
+
+  useTauriEvent(events.backtrackOccurred, ({ message }) => {
+    setBacktrackNotice(message);
+    if (backtrackTimer.current) {
+      clearTimeout(backtrackTimer.current);
+    }
+    backtrackTimer.current = setTimeout(() => {
+      setBacktrackNotice(null);
+    }, 2200);
   });
 
   // A second Escape: hold the ring on screen while it springs back to full,
@@ -197,6 +222,7 @@ export function Pill() {
             showLine={showLine}
             refilling={refilling}
             partialText={partialText}
+            backtrackNotice={backtrackNotice}
             onKeepRecording={handleKeepRecording}
           />
 
@@ -244,12 +270,14 @@ function PillBody({
   showLine,
   refilling,
   partialText,
+  backtrackNotice,
   onKeepRecording,
 }: {
   state: VisibleState;
   showLine: boolean;
   refilling: boolean;
   partialText: string | null;
+  backtrackNotice: string | null;
   onKeepRecording: () => void;
 }) {
   if (showLine) {
@@ -283,6 +311,18 @@ function PillBody({
     case "ARMING":
       return <PillWaveform className="min-w-0 flex-1 justify-center text-text-primary" />;
     case "RECORDING":
+      if (backtrackNotice) {
+        return (
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 animate-in fade-in zoom-in-95 duration-200">
+            <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-500">
+              <RotateCcw className="h-2 w-2" />
+            </span>
+            <span className="truncate text-caption font-medium text-amber-600 dark:text-amber-400">
+              {backtrackNotice}
+            </span>
+          </div>
+        );
+      }
       if (partialText) {
         return (
           <span className="min-w-0 flex-1 truncate text-label text-text-primary/90 select-none animate-in fade-in duration-200">

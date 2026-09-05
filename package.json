@@ -12,6 +12,7 @@
     "typecheck": "tsc --noEmit",
     "sot": "node scripts/sot.mjs",
     "sot:show": "node scripts/sot.mjs --show",
+    "sot:validate": "node scripts/sot.mjs --validate",
     "website:dev": "bun --cwd website dev",
     "website:build": "bun --cwd website build"
   },

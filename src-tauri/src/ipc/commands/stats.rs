@@ -29,6 +29,7 @@ const LATENCY_WINDOW: i64 = 200;
 const GET: CommandSpec = CommandSpec::new("get_stats", CapabilityKey::Stats);
 const GET_REFERRAL: CommandSpec = CommandSpec::new("get_referral_status", CapabilityKey::Stats);
 const DISMISS_REFERRAL: CommandSpec = CommandSpec::new("dismiss_referral_prompt", CapabilityKey::Stats);
+const CHECK_REENGAGEMENT: CommandSpec = CommandSpec::new("check_reengagement", CapabilityKey::Stats);
 
 use crate::registry::CapabilityKey;
 
@@ -39,7 +40,7 @@ pub async fn get_referral_status(
 ) -> Result<crate::types::ReferralStatus, AppError> {
     execute(&state, GET_REFERRAL, (), |ctx, ()| async move {
         let db = ctx.db();
-        stats::referral_status(db).map_err(Into::into)
+        stats::referral_status(db)
     })
     .await
 }
@@ -49,7 +50,17 @@ pub async fn get_referral_status(
 pub async fn dismiss_referral_prompt(state: State<'_, AppState>) -> Result<(), AppError> {
     execute(&state, DISMISS_REFERRAL, (), |ctx, ()| async move {
         let db = ctx.db();
-        stats::dismiss_referral_prompt(db).map_err(Into::into)
+        stats::dismiss_referral_prompt(db)
+    })
+    .await
+}
+
+#[tauri::command]
+#[specta::specta]
+pub async fn check_reengagement(state: State<'_, AppState>) -> Result<bool, AppError> {
+    execute(&state, CHECK_REENGAGEMENT, (), |ctx, ()| async move {
+        let db = ctx.db();
+        crate::bootstrap::reengagement::evaluate_and_prompt(&ctx.state.app, db).await
     })
     .await
 }
@@ -64,6 +75,11 @@ pub async fn get_stats(state: State<'_, AppState>) -> Result<StatsSummary, AppEr
         let lifetime = stats::totals(db)?;
         let this_week = stats::totals_since(db, now - WEEK_MS)?;
 
+        let today_date = local_date(now);
+        let (today_sessions, today_words) = stats::today_totals(db, &today_date).unwrap_or((0, 0));
+        let qualified_days = stats::distinct_qualified_days(db, 400)?;
+        let current_streak = current_streak_days(&qualified_days, now);
+
         let baseline_typing_wpm = read_baseline_wpm(db)?;
         let speaking_wpm = words_per_minute(lifetime.word_count, lifetime.speaking_ms);
 
@@ -73,6 +89,8 @@ pub async fn get_stats(state: State<'_, AppState>) -> Result<StatsSummary, AppEr
             total_speaking_ms: lifetime.speaking_ms,
             sessions_this_week: this_week.session_count,
             words_this_week: this_week.word_count,
+            today_sessions,
+            today_words,
             speaking_wpm,
             baseline_typing_wpm,
             time_saved_ms: time_saved_ms(
@@ -80,7 +98,7 @@ pub async fn get_stats(state: State<'_, AppState>) -> Result<StatsSummary, AppEr
                 lifetime.speaking_ms,
                 baseline_typing_wpm,
             ),
-            current_streak_days: current_streak_days(&stats::distinct_active_days(db, 400)?, now),
+            current_streak_days: current_streak,
             activity: stats::activity_by_day(db, now - YEAR_MS)?,
             languages: stats::language_breakdown(db)?,
             latency: metrics::latency_summary(db, LATENCY_WINDOW)?,

@@ -172,6 +172,7 @@ impl EventSink for RecordingEventSink {
     }
     fn download_progress(&self, _progress: DownloadProgress) {}
     fn partial_transcript(&self, _text: &str) {}
+    fn backtrack_occurred(&self, _message: &str) {}
     fn set_cancel_key_active(&self, _active: bool) {}
     fn model_state_changed(
         &self,

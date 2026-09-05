@@ -9,8 +9,9 @@
  * WHERE: Rendered by Dashboard.tsx for the registry's "settings" route.
  */
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useState } from "react";
 import { ChevronDown, Search, X, Sun, Moon, Monitor } from "lucide-react";
+import { useScrollRestoration } from "../use-scroll-restoration";
 import {
   commands,
   type AppError,
@@ -71,6 +72,16 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
   const permissions = usePermissions();
   const [writeError, setWriteError] = useState<AppError | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const { containerRef, onScroll } = useScrollRestoration("settings", Boolean(settings.data));
+
+  useLayoutEffect(() => {
+    if (section && containerRef.current) {
+      const target = containerRef.current.querySelector(`[data-section="${section.toLowerCase()}"]`);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, [section, settings.data, containerRef]);
 
   const dynamic = useMemo<DynamicOptions>(() => {
     const deviceOptions: SettingOption[] = (devices.data ?? []).map((device) => ({
@@ -141,6 +152,8 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
 
   return (
     <div
+      ref={containerRef}
+      onScroll={onScroll}
       data-scroll-area
       className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-6 space-y-6"
     >
@@ -226,6 +239,7 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
             return (
               <SettingsSection
                 key={key}
+                sectionKey={key.toLowerCase()}
                 title={SECTION_LABEL[key]}
                 highlighted={section === key.toLowerCase()}
                 defs={defs}
@@ -240,7 +254,7 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
           })}
 
           {/* Per-App Profiles Section */}
-          <section className="flex flex-col gap-1 pt-4">
+          <section data-section="profiles" className="flex flex-col gap-1 pt-4">
             <h2 className="text-base font-semibold text-stone-900 dark:text-white">Per-app profiles</h2>
             <p className="text-xs text-stone-500 dark:text-stone-400">
               Settings that apply only while a particular app is in front. Anything a profile does not override keeps
@@ -279,6 +293,7 @@ function SettingsSection({
   permissions,
   onWrite,
   extra,
+  sectionKey,
 }: {
   title: string;
   highlighted: boolean;
@@ -289,6 +304,7 @@ function SettingsSection({
   permissions: readonly PermissionReport[] | null;
   onWrite: (key: string, value: SettingValue) => void;
   extra: SectionPanel | undefined;
+  sectionKey?: string;
 }) {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showCalibration, setShowCalibration] = useState(false);
@@ -308,6 +324,7 @@ function SettingsSection({
 
   return (
     <section
+      data-section={sectionKey}
       className={cn(
         "flex flex-col gap-1 rounded-card transition-colors",
         highlighted && "bg-elevated p-4 ring-1 ring-[var(--accent)]",
@@ -411,8 +428,16 @@ function SettingsSection({
         </>
       ) : null}
 
-      {extra === "MODELS_PANEL" ? <ModelManager /> : null}
-      {extra === "DICTIONARY_PANEL" ? <DictionaryManager /> : null}
+      {extra === "MODELS_PANEL" ? (
+        <div data-section="models">
+          <ModelManager />
+        </div>
+      ) : null}
+      {extra === "DICTIONARY_PANEL" ? (
+        <div data-section="dictionary">
+          <DictionaryManager />
+        </div>
+      ) : null}
       {extra === "PRIVACY_PANEL" ? <PrivacyControls /> : null}
 
       {advanced.length > 0 ? (
