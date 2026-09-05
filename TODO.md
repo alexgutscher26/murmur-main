@@ -55,7 +55,7 @@
   - Identify the segment boundary and remove only the corrected span, not the whole transcript
   - Re-arm automatically after the cancel command so the user can continue
   - Show a brief pill flash ("Removed last segment") as confirmation
-- [ ] [UX] First-run interactive dictation tutorial: guided step-by-step practice dictating a messy thought into a clean formatted email or commit.
+- [x] [UX] First-run interactive dictation tutorial: guided step-by-step practice dictating a messy thought into a clean formatted email or commit.
   - Step 1: speak a short messy sentence (fillers allowed)
   - Step 2: show before/after transformation with the post-processing rules
   - Step 3: demonstrate paste into a dummy text field inside the onboarding window
@@ -69,10 +69,10 @@
   - Show as Windows toast, not an in-app modal
   - Respect system Do Not Disturb state
   - Max one prompt per 7-day idle window to avoid spam
-- [ ] [FEAT] Adaptive onboarding re-entry points: if user skips onboarding mid-way, resume from the last completed step rather than restarting.
+- [x] [FEAT] Adaptive onboarding re-entry points: if user skips onboarding mid-way, resume from the last completed step rather than restarting.
   - Persist onboarding step index in registry
   - Show a "Resume Setup" card in the dashboard for users with incomplete onboarding
-- [ ] [PERF] Sub-100ms hotkey-to-recording latency: profile and reduce the gap between keydown event and first audio sample captured to under 100ms.
+- [x] [PERF] Sub-100ms hotkey-to-recording latency: profile and reduce the gap between keydown event and first audio sample captured to under 100ms.
   - Instrument with `tracing::span!` from keydown in the keyboard hook to first AudioData event
   - Target: p99 under 100ms on a mid-range 2022 laptop without GPU
 

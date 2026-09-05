@@ -30,6 +30,7 @@ import {
   X,
   Gauge,
   Check,
+  ArrowRight,
 } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
@@ -91,6 +92,14 @@ export function Dashboard() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [resumeCardDismissed, setResumeCardDismissed] = useState(false);
+
+  const isOnboardingIncomplete =
+    settings.data?.["general.onboarding_complete"]?.value !== true;
+  const savedStepIndex =
+    typeof settings.data?.["general.onboarding_step_index"]?.value === "number"
+      ? (settings.data["general.onboarding_step_index"].value as number)
+      : 0;
 
   useTauriEvent(navSelectedChannel, (payload) => navigateTo(payload.route));
 
@@ -502,6 +511,49 @@ export function Dashboard() {
 
         {/* ── Main Canvas (Rounded Card) ─────────────────────────────────── */}
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[26px] border border-stone-200/70 bg-white shadow-xs dark:border-stone-800/80 dark:bg-[#1b1917] text-stone-900 dark:text-stone-100 m-1 mr-3 mb-3">
+          {/* Adaptive Onboarding Re-entry Banner */}
+          {isOnboardingIncomplete && !resumeCardDismissed && (
+            <div className="flex items-center justify-between border-b border-amber-200/70 bg-gradient-to-r from-amber-50/80 via-orange-50/50 to-amber-50/80 px-5 py-3 dark:border-amber-900/40 dark:from-amber-950/30 dark:via-orange-950/20 dark:to-amber-950/30 animate-in fade-in slide-in-from-top-1 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-400">
+                  <WandSparkles className="h-4 w-4" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-amber-950 dark:text-amber-200">
+                      Finish Setting Up Murmur
+                    </span>
+                    <span className="rounded-md bg-amber-200/60 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">
+                      Step {savedStepIndex + 1} of 5
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-amber-800/80 dark:text-amber-400/80">
+                    You have incomplete onboarding steps. Resume where you left off to complete guided practice.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => void commands.openOnboardingWindow()}
+                  className="flex items-center gap-1.5 rounded-xl bg-amber-600 px-3 py-1.5 text-xs font-semibold text-white shadow-xs hover:bg-amber-700 transition-colors"
+                >
+                  <span>Resume Setup</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setResumeCardDismissed(true)}
+                  title="Dismiss banner"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-amber-700 hover:bg-amber-200/50 dark:text-amber-400 dark:hover:bg-amber-900/40 transition-colors"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+
           <ErrorBoundary
             key={activeRoute}
             fallback={({ error, reset }) => (

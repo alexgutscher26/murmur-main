@@ -135,6 +135,10 @@ pub struct SessionActor {
 
     /// Number of chunk decodes currently submitted to the worker for the active session.
     in_flight: usize,
+    /// When the hotkey keydown occurred for the active session, to measure hotkey-to-audio latency.
+    capture_start_stamp: Option<Instant>,
+    /// Whether the first audio sample of the active session has been captured.
+    first_sample_captured: bool,
 }
 
 impl SessionActor {
@@ -184,6 +188,8 @@ impl SessionActor {
             deliveries,
             delivery_rx: Some(delivery_rx),
             in_flight: 0,
+            capture_start_stamp: None,
+            first_sample_captured: false,
         }
     }
 
@@ -276,6 +282,7 @@ impl SessionActor {
             _ => None,
         };
         let was_stop = matches!(event, SessionEvent::StopRequested);
+        let was_start = matches!(event, SessionEvent::StartRequested);
 
         match self.machine.handle(event) {
             Ok(transition) => {
@@ -284,11 +291,16 @@ impl SessionActor {
                         // Held open across the decode; closed in deliver.
                         self.finalize_started = Some(pressed);
                     } else {
+                        self.capture_start_stamp = Some(pressed);
+                        self.first_sample_captured = false;
                         self.latency.record(
                             LatencyStage::HotkeyDispatch,
                             pressed.elapsed().as_secs_f64() * 1000.0,
                         );
                     }
+                } else if was_start {
+                    self.capture_start_stamp = Some(Instant::now());
+                    self.first_sample_captured = false;
                 }
                 for effect in transition.effects {
                     self.apply_effect(effect).await;
@@ -486,6 +498,14 @@ impl SessionActor {
     async fn handle_capture(&mut self, event: CaptureEvent) {
         match event {
             CaptureEvent::Samples(samples) => {
+                if !self.first_sample_captured {
+                    self.first_sample_captured = true;
+                    if let Some(start) = self.capture_start_stamp.take() {
+                        let elapsed_ms = start.elapsed().as_secs_f64() * 1000.0;
+                        tracing::info!(elapsed_ms, "first audio sample captured from hotkey");
+                        self.latency.record(LatencyStage::CaptureStart, elapsed_ms);
+                    }
+                }
                 if let Some(chunk) = self.chunker.push(&samples) {
                     let request = self.transcribe_request();
                     if let Some(session_id) = self.machine.session_id().cloned() {

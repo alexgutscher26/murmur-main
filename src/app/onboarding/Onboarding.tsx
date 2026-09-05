@@ -27,7 +27,7 @@
  * WHERE: Mounted by src/entries/onboarding.tsx. Steps live in ./_components.
  */
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import {
   commands,
@@ -48,11 +48,14 @@ import { ModelStep } from "./_components/ModelStep";
 import { HotkeyStep } from "./_components/HotkeyStep";
 import { TourStep } from "./_components/TourStep";
 import { InviteStep } from "./_components/InviteStep";
+import { TutorialStep } from "./_components/TutorialStep";
 
 /** Declared by the Onboarding capability in the registry. Named here because
  *  "which setting means first run is over" is a contract between the two
  *  windows, and it is the only settings key the frontend has to know. */
 const ONBOARDING_COMPLETE_KEY = "general.onboarding_complete";
+const ONBOARDING_STEP_INDEX_KEY = "general.onboarding_step_index";
+const TUTORIAL_COMPLETE_KEY = "general.tutorial_complete";
 
 function pickModel(models: readonly ModelReport[]): ModelReport | null {
   return models.find((model) => model.descriptor.is_default) ?? models[0] ?? null;
@@ -70,15 +73,43 @@ export function Onboarding() {
   // match dictation.mode, or it teaches the wrong one. No live subscription —
   // nothing changes settings during first run.
   const settings = useCommand(commands.getSettings, []);
-  // The tour teaches; it has no backend state to derive from, so it is the
-  // one genuinely local step in this flow. See TourStep.
+
+  const savedStepIndex =
+    typeof settings.data?.[ONBOARDING_STEP_INDEX_KEY]?.value === "number"
+      ? (settings.data[ONBOARDING_STEP_INDEX_KEY].value as number)
+      : 0;
+  const savedTutorialComplete =
+    settings.data?.[TUTORIAL_COMPLETE_KEY]?.value === true;
+
+  // Adaptive re-entry: state initialized or restored from saved registry settings
   const [toured, setToured] = useState(false);
+  const [tutorialDone, setTutorialDone] = useState(false);
   const [tested, setTested] = useState(false);
-  /** The invitation is the last screen, after every step that asks for
-   *  something. Local, like the tour: there is no backend state behind it. */
   const [invited, setInvited] = useState(false);
   const [finishError, setFinishError] = useState<AppError | null>(null);
   const [liveStates, setLiveStates] = useState<Readonly<Record<string, ModelState>>>({});
+
+  useEffect(() => {
+    if (savedStepIndex >= 1) {
+      setToured(true);
+    }
+    if (savedTutorialComplete || savedStepIndex >= 4) {
+      setTutorialDone(true);
+    }
+    if (savedStepIndex >= 5) {
+      setTested(true);
+      setInvited(true);
+    }
+  }, [savedStepIndex, savedTutorialComplete]);
+
+  const persistStep = useCallback((stepIdx: number) => {
+    void unwrapCommand(() =>
+      commands.setSetting({
+        key: ONBOARDING_STEP_INDEX_KEY,
+        value: { type: "NUMBER", value: stepIdx },
+      }),
+    );
+  }, []);
 
   useTauriEvent(events.modelStateChanged, (payload) => {
     setLiveStates((current) => ({ ...current, [payload.model_id]: payload.state }));
@@ -99,6 +130,14 @@ export function Onboarding() {
     (registry.data?.capabilities ?? []).map((capability) => capability.hotkey?.default ?? null),
   );
 
+  const handleTutorialDone = useCallback(() => {
+    setTutorialDone(true);
+    void unwrapCommand(() =>
+      commands.setSetting({ key: TUTORIAL_COMPLETE_KEY, value: { type: "BOOL", value: true } }),
+    );
+    persistStep(4);
+  }, [persistStep]);
+
   const finish = useCallback(() => {
     void unwrapCommand(() =>
       commands.setSetting({ key: ONBOARDING_COMPLETE_KEY, value: { type: "BOOL", value: true } }),
@@ -107,21 +146,14 @@ export function Onboarding() {
         setFinishError(result.error);
         return;
       }
+      persistStep(5);
       void getCurrentWindow().close();
     });
-  }, []);
+  }, [persistStep]);
 
   const error = permissions.error ?? models.error ?? registry.error;
 
   return (
-    // NO GLASS PANEL HERE. This window already HAS native Popover vibrancy
-    // behind it (bootstrap.rs applies it), and painting material-elevated on
-    // top was covering that vibrancy with a 72%-opaque surface — which is
-    // exactly why onboarding read as a solid sheet while the rest of the app
-    // read as glass. The dashboard has no wrapper for the same reason: when a
-    // window IS the surface, the web layer's job is to stay out of the way and
-    // let the native material through. The noise layer goes with it; at 3% over
-    // a surface that is now genuinely translucent it was texture on nothing.
     <div className="h-full">
       <div data-tauri-drag-region className="h-[var(--titlebar-height)]" />
       {error ? (
@@ -136,20 +168,51 @@ export function Onboarding() {
       ) : invited ? (
         <InviteStep onFinish={finish} finishError={finishError} />
       ) : !toured ? (
-        <TourStep hotkey={hotkey} mode={mode} onDone={() => setToured(true)} />
+        <TourStep
+          hotkey={hotkey}
+          mode={mode}
+          onDone={() => {
+            setToured(true);
+            persistStep(1);
+          }}
+        />
       ) : !micGranted ? (
         <StepShell
           title="Two permissions"
           description="Murmur runs entirely on your Mac. It needs the microphone to hear you, and accessibility to paste for you."
         >
-          <PermissionStep reports={permissions.data ?? []} onChanged={permissions.reload} />
+          <PermissionStep
+            reports={permissions.data ?? []}
+            onChanged={() => {
+              permissions.reload();
+              persistStep(2);
+            }}
+          />
         </StepShell>
       ) : !modelReady && model ? (
         <StepShell
           title="One model to download"
           description="This runs on your machine, so the model lives on your disk. It is downloaded once."
         >
-          <ModelStep model={model} onChanged={models.reload} />
+          <ModelStep
+            model={model}
+            onChanged={() => {
+              models.reload();
+              persistStep(3);
+            }}
+          />
+        </StepShell>
+      ) : !tutorialDone ? (
+        <StepShell
+          title="Guided Practice"
+          description="Practice dictating a messy thought and watch Murmur turn it into clean formatted text."
+        >
+          <TutorialStep
+            hotkey={hotkey}
+            mode={mode}
+            onComplete={handleTutorialDone}
+            onSkip={handleTutorialDone}
+          />
         </StepShell>
       ) : (
         <StepShell
@@ -163,12 +226,10 @@ export function Onboarding() {
             tested ? (
               <button
                 type="button"
-                onClick={() => setInvited(true)}
-                // Advances to the invitation rather than closing: setup is
-                // finished here, but there is one screen left that asks for
-                // nothing. The inverted fill is the app's one primary style
-                // (docs/04 §1.3) — monochrome, outweighing every secondary by
-                // contrast rather than by a hue the palette does not have.
+                onClick={() => {
+                  setInvited(true);
+                  persistStep(5);
+                }}
                 className="h-[var(--control-height)] rounded-input bg-text-primary px-4 text-body font-medium text-opaque-elevated transition-opacity hover:opacity-90"
               >
                 Start using Murmur
@@ -176,7 +237,14 @@ export function Onboarding() {
             ) : null
           }
         >
-          <HotkeyStep hotkey={hotkey} mode={mode} onDelivered={() => setTested(true)} />
+          <HotkeyStep
+            hotkey={hotkey}
+            mode={mode}
+            onDelivered={() => {
+              setTested(true);
+              persistStep(4);
+            }}
+          />
         </StepShell>
       )}
     </div>

@@ -21,6 +21,8 @@ use crate::types::{HotkeyBinding, KeyModifier, RecordingMode, SettingValue};
 static DICTATION_SHORTCUT: parking_lot::Mutex<Option<Shortcut>> = parking_lot::Mutex::new(None);
 static MODIFIER_TAP: parking_lot::Mutex<Option<crate::adapters::os::ModifierTap>> =
     parking_lot::Mutex::new(None);
+static CACHED_RECORDING_MODE: parking_lot::RwLock<Option<RecordingMode>> =
+    parking_lot::RwLock::new(None);
 
 pub fn release_dictation_binding(app: &AppHandle) {
     *MODIFIER_TAP.lock() = None;
@@ -102,6 +104,9 @@ pub fn watch_settings_for_rebinds(app: &AppHandle) {
         if touched(keys::DICTATION_HOTKEY) {
             rebind_dictation_hotkey(&handler_app);
         }
+        if touched(keys::DICTATION_MODE) {
+            *CACHED_RECORDING_MODE.write() = None;
+        }
         if touched(keys::LAUNCH_AT_LOGIN) {
             apply_launch_at_login(&handler_app);
         }
@@ -181,10 +186,17 @@ pub fn with_binding_state<R>(binding_id: &str, f: impl FnOnce(&mut BindingState)
 }
 
 pub fn on_dictation_hotkey(app: &AppHandle, key_state: ShortcutState) {
+    let span = tracing::span!(tracing::Level::INFO, "hotkey_to_recording", ?key_state);
+    let _enter = span.enter();
+
     let Some(state) = app.try_state::<AppState>() else {
         return;
     };
     let state = state.inner().clone();
+
+    if key_state == ShortcutState::Pressed {
+        state.session.stamp_request();
+    }
 
     #[cfg(target_os = "windows")]
     if key_state == ShortcutState::Pressed {
@@ -200,79 +212,87 @@ pub fn on_dictation_hotkey(app: &AppHandle, key_state: ShortcutState) {
         }
     }
 
-    tauri::async_runtime::spawn(async move {
-        let mode = recording_mode(&state.db);
-        let capturing = state.current_state().is_capturing();
+    let mode = recording_mode(&state.db);
+    let capturing = state.current_state().is_capturing();
 
-        let (should_drop, is_double_tap) = with_binding_state("dictation", |bs| {
-            if key_state == ShortcutState::Pressed {
-                if bs.held {
-                    return (true, false);
-                }
-                bs.held = true;
-                let is_double = bs
-                    .last_press
-                    .map(|prev| prev.elapsed() < std::time::Duration::from_millis(300))
-                    .unwrap_or(false);
-                bs.last_press = Some(std::time::Instant::now());
-                (false, is_double)
-            } else {
-                bs.held = false;
-                (false, false)
+    let (should_drop, is_double_tap) = with_binding_state("dictation", |bs| {
+        if key_state == ShortcutState::Pressed {
+            if bs.held {
+                return (true, false);
             }
-        });
-
-        if should_drop {
-            return;
-        }
-
-        if is_double_tap {
-            tracing::info!("fast double-tap dictation triggered (<300ms)");
-        }
-
-        let event = match (mode, key_state) {
-            (RecordingMode::PushToTalk, ShortcutState::Pressed) => {
-                if !capturing {
-                    SessionEvent::StartRequested
-                } else {
-                    return;
-                }
-            }
-            (RecordingMode::PushToTalk, ShortcutState::Released) => {
-                if capturing {
-                    SessionEvent::StopRequested
-                } else {
-                    return;
-                }
-            }
-            (RecordingMode::Toggle, ShortcutState::Pressed) => {
-                if capturing {
-                    SessionEvent::StopRequested
-                } else {
-                    SessionEvent::StartRequested
-                }
-            }
-            (RecordingMode::Toggle, ShortcutState::Released) => {
-                return;
-            }
-        };
-
-        state.session.stamp_request();
-        if let Err(err) = state.session.send(event).await {
-            tracing::warn!(error = %err, "hotkey event was not delivered");
+            bs.held = true;
+            let is_double = bs
+                .last_press
+                .map(|prev| prev.elapsed() < std::time::Duration::from_millis(300))
+                .unwrap_or(false);
+            bs.last_press = Some(std::time::Instant::now());
+            (false, is_double)
+        } else {
+            bs.held = false;
+            (false, false)
         }
     });
+
+    if should_drop {
+        return;
+    }
+
+    if is_double_tap {
+        tracing::info!("fast double-tap dictation triggered (<300ms)");
+    }
+
+    let event = match (mode, key_state) {
+        (RecordingMode::PushToTalk, ShortcutState::Pressed) => {
+            if !capturing {
+                SessionEvent::StartRequested
+            } else {
+                return;
+            }
+        }
+        (RecordingMode::PushToTalk, ShortcutState::Released) => {
+            if capturing {
+                SessionEvent::StopRequested
+            } else {
+                return;
+            }
+        }
+        (RecordingMode::Toggle, ShortcutState::Pressed) => {
+            if capturing {
+                SessionEvent::StopRequested
+            } else {
+                SessionEvent::StartRequested
+            }
+        }
+        (RecordingMode::Toggle, ShortcutState::Released) => {
+            return;
+        }
+    };
+
+    if !state.session.try_send(event.clone()) {
+        let session = state.session.clone();
+        tauri::async_runtime::spawn(async move {
+            if let Err(err) = session.send(event).await {
+                tracing::warn!(error = %err, "hotkey event was not delivered");
+            }
+        });
+    }
 }
 
 pub fn recording_mode(db: &Database) -> RecordingMode {
+    if let Some(cached) = *CACHED_RECORDING_MODE.read() {
+        return cached;
+    }
+
     let stored = services::settings::get_setting(db, keys::DICTATION_MODE)
         .ok()
         .flatten();
 
-    match stored {
+    let mode = match stored {
         Some(SettingValue::Choice(value)) if value == "push_to_talk" => RecordingMode::PushToTalk,
         _ => RecordingMode::Toggle,
-    }
+    };
+    *CACHED_RECORDING_MODE.write() = Some(mode);
+    mode
 }
 
 pub fn dictation_binding(db: &Database) -> HotkeyBinding {

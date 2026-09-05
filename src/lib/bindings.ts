@@ -35,19 +35,22 @@ export const commands = {
 	setSetting: (input: SetSettingInput) => typedError<null, AppError>(__TAURI_INVOKE("set_setting", { input })),
 	resetSetting: (input: ResetSettingInput) => typedError<null, AppError>(__TAURI_INVOKE("reset_setting", { input })),
 	/**
-	 *
+	 * 
 	 *  * WHAT:  The whole capability table, for the frontend to render from.
 	 *  * WHY:   The frontend reads the SAME declarations the backend enforces. A
 	 *  *        settings section becomes a map over these defs, so adding a setting is
 	 *  *        a registry entry and never a new form component.
 	 *  * WHERE: Called once by the Settings view and the dashboard shell.
-	 *
+	 *  
 	 */
 	getRegistry: () => typedError<RegistrySnapshot, AppError>(__TAURI_INVOKE("get_registry")),
 	listAppProfiles: () => typedError<AppProfile[], AppError>(__TAURI_INVOKE("list_app_profiles")),
 	saveAppProfile: (input: SaveProfileInput) => typedError<null, AppError>(__TAURI_INVOKE("save_app_profile", { input })),
 	deleteAppProfile: (input: DeleteProfileInput) => typedError<null, AppError>(__TAURI_INVOKE("delete_app_profile", { input })),
 	getStats: () => typedError<StatsSummary, AppError>(__TAURI_INVOKE("get_stats")),
+	getReferralStatus: () => typedError<ReferralStatus, AppError>(__TAURI_INVOKE("get_referral_status")),
+	dismissReferralPrompt: () => typedError<null, AppError>(__TAURI_INVOKE("dismiss_referral_prompt")),
+	checkReengagement: () => typedError<boolean, AppError>(__TAURI_INVOKE("check_reengagement")),
 	listDictionary: () => typedError<DictionaryEntry[], AppError>(__TAURI_INVOKE("list_dictionary")),
 	createDictionaryEntry: (input: CreateDictionaryEntryInput) => typedError<DictionaryId, AppError>(__TAURI_INVOKE("create_dictionary_entry", { input })),
 	updateDictionaryEntry: (input: UpdateDictionaryEntryInput) => typedError<null, AppError>(__TAURI_INVOKE("update_dictionary_entry", { input })),
@@ -59,6 +62,7 @@ export const commands = {
 	getModelStatus: (input: ModelIdInput) => typedError<ModelReport, AppError>(__TAURI_INVOKE("get_model_status", { input })),
 	downloadModel: (input: ModelIdInput) => typedError<string, AppError>(__TAURI_INVOKE("download_model", { input })),
 	deleteModel: (input: ModelIdInput) => typedError<null, AppError>(__TAURI_INVOKE("delete_model", { input })),
+	getApiVersion: () => typedError<ApiVersionInfo, AppError>(__TAURI_INVOKE("get_api_version")),
 	checkPermissions: () => typedError<PermissionReport[], AppError>(__TAURI_INVOKE("check_permissions")),
 	requestPermission: (input: PermissionInput) => typedError<PermissionState, AppError>(__TAURI_INVOKE("request_permission", { input })),
 	openPrivacyPane: (input: PermissionInput) => typedError<null, AppError>(__TAURI_INVOKE("open_privacy_pane", { input })),
@@ -67,7 +71,6 @@ export const commands = {
 	wipeAllData: () => typedError<WipeResult, AppError>(__TAURI_INVOKE("wipe_all_data")),
 	checkForUpdate: () => typedError<UpdateCheck, AppError>(__TAURI_INVOKE("check_for_update")),
 	installUpdate: () => typedError<null, AppError>(__TAURI_INVOKE("install_update")),
-	checkReengagement: () => typedError<boolean, AppError>(__TAURI_INVOKE("check_reengagement")),
 };
 
 /** Events */
@@ -93,8 +96,17 @@ export type ActivityDay = {
 	word_count: number,
 };
 
-export type BacktrackOccurred = {
-	message: string,
+/**
+ * 
+ *  * SOURCE OF TRUTH KEYWORDS: ApiVersionInfo, get_api_version, CURRENT_API_VERSION
+ *  * WHAT:  API versioning and contract compatibility report.
+ *  * WHY:   Prevents silent frontend/backend drift during live updates or mismatched releases.
+ *  
+ */
+export type ApiVersionInfo = {
+	api_version: number,
+	app_version: string,
+	min_compatible_version: number,
 };
 
 /**
@@ -163,6 +175,18 @@ export type AudioLevelChanged = {
 
 /**
  * 
+ *  * SOURCE OF TRUTH KEYWORDS: BacktrackOccurred
+ *  * WHAT:  Notifies the frontend that a voice backtrack ("scratch that", "no wait") was detected
+ *  *        and the preceding segment was scrubbed from memory while keeping recording active.
+ *  * WHERE: Emitted by session/actor.rs; consumed by the pill overlay for a brief flash confirmation.
+ *  
+ */
+export type BacktrackOccurred = {
+	message: string,
+};
+
+/**
+ * 
  *  * SOURCE OF TRUTH KEYWORDS: Capability
  *  * WHAT:  One feature of the app, completely described.
  *  * WHERE: The elements of registry::CAPABILITIES.
@@ -196,7 +220,7 @@ export type Capability = {
  */
 export type CapabilityKey = 
 /**  The core loop: hotkey, record, transcribe, deliver. */
-"DICTATION" | "HISTORY" | "STATS" | "DICTIONARY" | "MODELS" | "SETTINGS" | "ONBOARDING" | "UPDATES" | 
+"DICTATION" | "HISTORY" | "STATS" | "INSIGHTS" | "DICTIONARY" | "MODELS" | "SETTINGS" | "ONBOARDING" | "UPDATES" | 
 /**  A page that exists to say there is nothing to pay for. */
 "BILLING";
 
@@ -496,6 +520,8 @@ export type LanguageSupport = { kind: "ALL" } | { kind: "SET"; languages: Langua
 export type LatencyStage = 
 /**  Hotkey event to FSM transition. */
 "HOTKEY_DISPATCH" | 
+/**  Hotkey keydown to first audio sample captured. */
+"CAPTURE_START" | 
 /**  CoreAudio device open — only paid in OnDemand capture mode. */
 "DEVICE_OPEN" | 
 /**  A background chunk decode. Off the critical path; recorded for context. */
@@ -673,11 +699,11 @@ export type OsPermission = "MICROPHONE" |
 "ACCESSIBILITY";
 
 /**
- *
+ * 
  *  * SOURCE OF TRUTH KEYWORDS: PartialTranscript
  *  * WHAT:  Partial transcript preview text decoded from interior chunks while recording.
  *  * WHERE: Emitted by session/actor.rs; consumed by the pill overlay.
- *
+ *  
  */
 export type PartialTranscript = {
 	text: string,
@@ -746,6 +772,23 @@ export type PurgeHistoryInput = {
  *  
  */
 export type RecordingMode = "TOGGLE" | "PUSH_TO_TALK";
+
+/**
+ * 
+ *  * SOURCE OF TRUTH KEYWORDS: ReferralStatus
+ *  * WHAT:  Post-activation referral state and deterministic referral code.
+ *  * WHY:   Triggered only after 50 successful delivered dictations, never during onboarding.
+ *  * WHERE: Produced by services/stats.rs; consumed by get_referral_status IPC.
+ *  
+ */
+export type ReferralStatus = {
+	eligible: boolean,
+	session_count: number,
+	threshold: number,
+	referral_code: string,
+	referral_url: string,
+	prompt_dismissed: boolean,
+};
 
 /**
  * 

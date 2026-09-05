@@ -164,6 +164,7 @@ fn percentile(sorted: &[f64], fraction: f64) -> f64 {
 
 const ALL_STAGES: &[LatencyStage] = &[
     LatencyStage::HotkeyDispatch,
+    LatencyStage::CaptureStart,
     LatencyStage::DeviceOpen,
     LatencyStage::ChunkDecode,
     LatencyStage::TailDecode,

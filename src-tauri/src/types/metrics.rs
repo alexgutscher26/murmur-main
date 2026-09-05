@@ -28,6 +28,8 @@ use super::numeric::TsNumber;
 pub enum LatencyStage {
     /// Hotkey event to FSM transition.
     HotkeyDispatch,
+    /// Hotkey keydown to first audio sample captured.
+    CaptureStart,
     /// CoreAudio device open — only paid in OnDemand capture mode.
     DeviceOpen,
     /// A background chunk decode. Off the critical path; recorded for context.
@@ -49,6 +51,7 @@ impl LatencyStage {
     pub fn as_str(&self) -> &'static str {
         match self {
             LatencyStage::HotkeyDispatch => "hotkey_dispatch",
+            LatencyStage::CaptureStart => "capture_start",
             LatencyStage::DeviceOpen => "device_open",
             LatencyStage::ChunkDecode => "chunk_decode",
             LatencyStage::TailDecode => "tail_decode",
@@ -62,7 +65,10 @@ impl LatencyStage {
 
     /// True for the stages that make up the promised latency budget.
     pub fn is_critical_path(&self) -> bool {
-        !matches!(self, LatencyStage::ChunkDecode | LatencyStage::DeviceOpen)
+        !matches!(
+            self,
+            LatencyStage::ChunkDecode | LatencyStage::DeviceOpen | LatencyStage::CaptureStart
+        )
     }
 }
 

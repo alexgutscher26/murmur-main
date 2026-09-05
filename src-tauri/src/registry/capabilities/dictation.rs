@@ -32,6 +32,7 @@ pub fn dictation_capability() -> Capability {
         }),
         metrics: vec![
             metric(LatencyStage::HotkeyDispatch, "Hotkey", false),
+            metric(LatencyStage::CaptureStart, "Hotkey to audio", false),
             metric(LatencyStage::DeviceOpen, "Microphone open", false),
             metric(LatencyStage::ChunkDecode, "Background decode", false),
             metric(LatencyStage::TailDecode, "Final decode", true),

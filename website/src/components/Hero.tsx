@@ -10,7 +10,6 @@ import {
   WifiOff,
   Wifi,
   Terminal,
-  Check,
   ArrowRight,
   Sparkles,
   Command,
@@ -176,18 +175,18 @@ export function Hero() {
       {/* Subtle Background Grid Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
 
-      {/* Proof Badge */}
+      {/* Proof Badge — the one place the on-device / air-gap claim lives up top */}
       <div className="relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.1] backdrop-blur-xl mb-8 shadow-[0_0_24px_rgba(16,185,129,0.15)] transition-all cursor-default">
         <span className="relative flex h-2 w-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+          <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
         </span>
-        <span className="text-xs font-semibold text-zinc-200 tracking-wide">
-          100% On-Device AI · Zero Cloud Telemetry
+        <span className="text-xs font-semibold text-neutral-200 tracking-wide">
+          100% on-device speech AI, zero cloud telemetry
         </span>
         <span className="text-[11px] font-mono text-emerald-400 pl-2 border-l border-white/[0.1] flex items-center gap-1">
           <ShieldCheck className="w-3 h-3" />
-          Air-Gap Ready
+          Air-gap ready
         </span>
       </div>
 
@@ -197,93 +196,27 @@ export function Hero() {
           Speak freely.
           <span className="block text-gradient-hero mt-1">Keep everything private.</span>
         </h1>
-        <p className="text-base sm:text-xl text-zinc-300 max-w-2xl mx-auto leading-relaxed font-normal">
+        <p className="text-base sm:text-xl text-neutral-300 max-w-2xl mx-auto leading-relaxed font-normal">
           Private, instant AI dictation for macOS and Windows. Whisper speech models decode locally on your GPU—your voice, transcripts, and writing context never leave your machine.
         </p>
       </div>
 
       {/* Primary CTA and Secondary Demo Button */}
-      <div className="relative flex flex-col sm:flex-row items-center gap-3.5 mb-6 z-10">
+      <div className="relative flex flex-col sm:flex-row items-center gap-3.5 mb-14 z-10">
         <a
           href="#download"
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm font-semibold text-black bg-gradient-to-b from-white to-zinc-200 hover:from-white hover:to-white px-8 py-3.5 rounded-full shadow-[0_0_30px_rgba(255,255,255,0.3)] hover:shadow-[0_0_40px_rgba(255,255,255,0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
-          <span>Download Free for {detectedOs === "mac" ? "macOS" : "Windows"}</span>
+          <span>Download free for {detectedOs === "mac" ? "macOS" : "Windows"}</span>
           <ArrowRight className="w-4 h-4 stroke-[2.5]" />
         </a>
         <a
           href="#playground"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm font-semibold text-zinc-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-white/[0.2] backdrop-blur-xl px-7 py-3.5 rounded-full transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm font-semibold text-neutral-300 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-white/[0.2] backdrop-blur-xl px-7 py-3.5 rounded-full transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
           <Sparkles className="w-4 h-4 text-emerald-400" />
-          <span>Try Interactive Lab</span>
+          <span>Try interactive lab</span>
         </a>
-      </div>
-
-      {/* Trust & Differentiation Bar */}
-      <div className="flex items-center gap-4 text-xs font-mono text-zinc-400 mb-12 text-center px-4 flex-wrap justify-center">
-        <span className="flex items-center gap-1.5">
-          <Check className="w-3.5 h-3.5 text-emerald-400" /> Works completely offline
-        </span>
-        <span className="text-zinc-600">·</span>
-        <span className="flex items-center gap-1.5">
-          <Check className="w-3.5 h-3.5 text-emerald-400" /> 0 accounts or subscriptions
-        </span>
-        <span className="text-zinc-600">·</span>
-        <span className="flex items-center gap-1.5">
-          <Check className="w-3.5 h-3.5 text-emerald-400" /> Sub-180ms latency
-        </span>
-      </div>
-
-      {/* 4 Pillars Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-w-5xl w-full px-4 mb-12">
-        <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <Mic className="w-3.5 h-3.5" />
-            </div>
-            <h3 className="text-xs font-bold text-white">Universal Dictation</h3>
-          </div>
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            Push-to-talk pill injects formatted text into any active app at cursor position.
-          </p>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <Cpu className="w-3.5 h-3.5" />
-            </div>
-            <h3 className="text-xs font-bold text-white">GPU Accelerated</h3>
-          </div>
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            DirectML & Metal offload whisper.cpp to VRAM for ~3x faster throughput than cloud.
-          </p>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <ShieldCheck className="w-3.5 h-3.5" />
-            </div>
-            <h3 className="text-xs font-bold text-white">Physical Privacy</h3>
-          </div>
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            0 bytes audio ever leave RAM. Auditable with Wireshark, Little Snitch, or pktmon.
-          </p>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <Zap className="w-3.5 h-3.5" />
-            </div>
-            <h3 className="text-xs font-bold text-white">Smart Clean-up</h3>
-          </div>
-          <p className="text-xs text-zinc-400 leading-relaxed">
-            Strips filler words, auto-punctuates, and formats to match the medium automatically.
-          </p>
-        </div>
       </div>
 
       {/* Interactive Desktop Product Simulator */}
@@ -299,10 +232,10 @@ export function Hero() {
               {pillState === "idle" && (
                 <>
                   <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="motion-safe:animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
                   </span>
-                  <span className="text-xs font-mono text-zinc-300 font-medium group-hover:text-white">
+                  <span className="text-xs font-mono text-neutral-300 font-medium group-hover:text-white">
                     Murmur ready · Click to dictate
                   </span>
                 </>
@@ -319,20 +252,20 @@ export function Hero() {
                       />
                     ))}
                   </div>
-                  <span className="text-xs font-mono text-white font-semibold flex items-center gap-1.5">
+                  <span className="text-xs font-mono text-white font-semibold">
                     Listening on-device...
                   </span>
                   <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                    VAD Active
+                    VAD active
                   </span>
                 </>
               )}
 
               {pillState === "processing" && (
                 <>
-                  <span className="w-3 h-3 rounded-full border-2 border-emerald-400 border-t-transparent animate-spin" />
-                  <span className="text-xs font-mono text-zinc-200 font-medium">
-                    Local GPU inference ({wifiDisabled ? "Air-Gap Mode" : "Direct VRAM"})
+                  <span className="w-3 h-3 rounded-full border-2 border-emerald-400 border-t-transparent motion-safe:animate-spin" />
+                  <span className="text-xs font-mono text-neutral-200 font-medium">
+                    Local GPU inference ({wifiDisabled ? "air-gap mode" : "direct VRAM"})
                   </span>
                 </>
               )}
@@ -341,7 +274,7 @@ export function Hero() {
                 <>
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_#10b981]" />
                   <span className="text-xs font-mono text-white font-semibold">
-                    Injected in 172ms · 0 bytes egress
+                    Injected in 172ms
                   </span>
                 </>
               )}
@@ -367,7 +300,7 @@ export function Hero() {
 
           {/* Wi-Fi Simulator Toggle */}
           <div className="flex items-center gap-2 bg-white/[0.03] border border-white/[0.08] px-3.5 py-1.5 rounded-full text-xs font-mono">
-            <span className="text-zinc-400">Network Simulation:</span>
+            <span className="text-neutral-400">Network simulation:</span>
             <button
               onClick={() => setWifiDisabled(!wifiDisabled)}
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full transition-all font-semibold ${
@@ -379,7 +312,7 @@ export function Hero() {
               {wifiDisabled ? (
                 <>
                   <WifiOff className="w-3.5 h-3.5" />
-                  <span>Airplane Mode (0 Net)</span>
+                  <span>Airplane mode (0 net)</span>
                 </>
               ) : (
                 <>
@@ -399,9 +332,9 @@ export function Hero() {
               <span className="w-3 h-3 rounded-full bg-[#ff5f56] inline-block opacity-80" />
               <span className="w-3 h-3 rounded-full bg-[#ffbd2e] inline-block opacity-80" />
               <span className="w-3 h-3 rounded-full bg-[#27c93f] inline-block opacity-80" />
-              <span className="text-xs font-mono text-zinc-400 ml-2 flex items-center gap-1.5">
-                <Terminal className="w-3.5 h-3.5 text-zinc-500" />
-                Target App: <strong className="text-zinc-200">{selectedApp.name}</strong>
+              <span className="text-xs font-mono text-neutral-400 ml-2 flex items-center gap-1.5">
+                <Terminal className="w-3.5 h-3.5 text-neutral-500" />
+                Target app: <strong className="text-neutral-200">{selectedApp.name}</strong>
               </span>
             </div>
 
@@ -416,7 +349,7 @@ export function Hero() {
                     className={`text-xs px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
                       isSelected
                         ? "bg-white text-black font-semibold shadow-sm"
-                        : "text-zinc-400 hover:text-white hover:bg-white/[0.06]"
+                        : "text-neutral-400 hover:text-white hover:bg-white/[0.06]"
                     }`}
                   >
                     <span className="text-[10px] font-mono opacity-60">{preset.icon}</span>
@@ -432,10 +365,10 @@ export function Hero() {
             {/* Raw Spoken Input Bar */}
             <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.07] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-bold block mb-1">
-                  Audio Input (Messy spoken voice)
+                <span className="text-xs font-semibold text-emerald-400 block mb-1">
+                  What you said, unedited
                 </span>
-                <p className="text-xs sm:text-sm text-zinc-300 font-mono">
+                <p className="text-xs sm:text-sm text-neutral-300 font-mono">
                   &ldquo;{selectedApp.rawSpoken}&rdquo;
                 </p>
               </div>
@@ -446,26 +379,26 @@ export function Hero() {
                 className="self-start sm:self-auto text-xs font-semibold text-white bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.12] px-4 py-2 rounded-lg transition-all disabled:opacity-50 shrink-0 flex items-center gap-1.5"
               >
                 <Mic className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{isSimulating ? "Transcribing..." : "Simulate Dictation"}</span>
+                <span>{isSimulating ? "Transcribing..." : "Simulate dictation"}</span>
               </button>
             </div>
 
             {/* Formatted Output Canvas */}
-            <div className="font-mono text-xs sm:text-sm text-zinc-100 leading-relaxed overflow-x-auto whitespace-pre-wrap p-5 rounded-xl bg-[#060608] border border-white/[0.08] min-h-[200px] shadow-inner relative">
+            <div className="font-mono text-xs sm:text-sm text-neutral-100 leading-relaxed overflow-x-auto whitespace-pre-wrap p-5 rounded-xl bg-[#060608] border border-white/[0.08] min-h-[200px] shadow-inner relative">
               {typedText}
               {isSimulating && (
-                <span className="inline-block w-2 h-4 bg-emerald-400 ml-1 animate-pulse shadow-[0_0_8px_#10b981]" />
+                <span className="inline-block w-2 h-4 bg-emerald-400 ml-1 motion-safe:animate-pulse shadow-[0_0_8px_#10b981]" />
               )}
             </div>
 
-            {/* Bottom Status Bar */}
-            <div className="pt-2 flex items-center justify-between text-xs font-mono text-zinc-400 flex-wrap gap-2">
+            {/* Bottom Status Bar — this is the one place "0 bytes" and latency live */}
+            <div className="pt-2 flex items-center justify-between text-xs font-mono text-neutral-400 flex-wrap gap-2">
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#10b981]" />
                   whisper.cpp DirectML / Metal
                 </span>
-                <span className="text-zinc-500 hidden sm:inline">Model: Whisper Small (190 MB)</span>
+                <span className="text-neutral-500 hidden sm:inline">Model: Whisper Small (190 MB)</span>
               </div>
               <div className="flex items-center gap-4">
                 <span>Latency: ~172ms</span>
