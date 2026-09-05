@@ -549,22 +549,7 @@ export function DictionaryView() {
               <span>Import Codebase…</span>
             </button>
 
-            <button
-              type="button"
-              onClick={() => setActiveTab(activeTab === "packs" ? "all" : "packs")}
-              className={cn(
-                "flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all active:scale-[0.98]",
-                activeTab === "packs"
-                  ? "border-amber-500/50 bg-amber-500/15 text-amber-800 dark:text-amber-200 shadow-xs"
-                  : "border-stone-200/80 bg-stone-50/80 text-stone-700 hover:bg-stone-100 dark:border-stone-800 dark:bg-stone-900/80 dark:text-stone-300 dark:hover:bg-stone-800"
-              )}
-            >
-              <BookOpen className="h-3.5 w-3.5 text-stone-500 dark:text-stone-400" />
-              <span>Vocabulary Packs</span>
-              <span className="rounded-full bg-stone-200/70 dark:bg-stone-800 px-1.5 py-0.2 text-[10px] font-mono">
-                {DOMAIN_PACKS.length}
-              </span>
-            </button>
+
 
             <button
               type="button"
