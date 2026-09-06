@@ -71,8 +71,8 @@ const ECOSYSTEM_LINKS: FooterLink[] = [
     external: true,
   },
   {
-    href: "https://github.com/webprodigies/murmur/blob/main/PRIVACY.md",
-    label: "Air-Gapped Policy",
+    href: "https://github.com/alexgutscher26/murmur-main/blob/main/PRIVACY.md",
+    label: "Air-Gapped Policy (PRIVACY.md)",
     external: true,
   },
 ];
