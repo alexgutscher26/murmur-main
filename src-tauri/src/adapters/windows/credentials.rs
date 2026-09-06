@@ -64,14 +64,26 @@ impl WindowsCredentialStore {
                 &mut cred_ptr,
             )
             .is_ok()
-                && !cred_ptr.is_null()
             {
-                let cred = &*cred_ptr;
-                let blob_size = cred.CredentialBlobSize as usize;
-                let slice = std::slice::from_raw_parts(cred.CredentialBlob, blob_size);
-                let result = slice.to_vec();
-                CredFree(cred_ptr as *const _);
-                Some(result)
+                let result = if let Some(cred) = cred_ptr.as_ref() {
+                    let blob_size = cred.CredentialBlobSize as usize;
+                    if blob_size == 0 {
+                        Some(Vec::new())
+                    } else if cred.CredentialBlob.is_null() {
+                        None
+                    } else {
+                        let slice = std::slice::from_raw_parts(cred.CredentialBlob, blob_size);
+                        Some(slice.to_vec())
+                    }
+                } else {
+                    None
+                };
+
+                if !cred_ptr.is_null() {
+                    CredFree(cred_ptr as *const _);
+                }
+
+                result
             } else {
                 None
             }
