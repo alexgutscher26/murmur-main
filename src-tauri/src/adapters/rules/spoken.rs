@@ -318,7 +318,7 @@ pub fn apply_code_mode_casing(text: &str, style: CaseStyle) -> String {
                 .chars()
                 .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
                 .collect();
-            let clean = w.trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
+            let clean = w.trim_end_matches([',', '.', '!', '?', ';', ':']);
             let lower = clean.to_lowercase();
 
             let is_boundary = CODE_BOUNDARY_WORDS.contains(&lower.as_str())

@@ -43,6 +43,7 @@ pub enum MouseTriggerButton {
 }
 
 impl MouseTriggerButton {
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(val: &str) -> Self {
         match val {
             "mouse_middle" => Self::Middle,
@@ -63,6 +64,14 @@ impl MouseTriggerButton {
             3 => Self::Button5,
             _ => Self::None,
         }
+    }
+}
+
+impl std::str::FromStr for MouseTriggerButton {
+    type Err = std::convert::Infallible;
+
+    fn from_str(val: &str) -> Result<Self, Self::Err> {
+        Ok(Self::from_str(val))
     }
 }
 
@@ -95,8 +104,10 @@ pub fn evaluate_button_flags(
     }
 }
 
+type RawInputCallback = Box<dyn Fn(ShortcutState) + Send + Sync + 'static>;
+
 static TRIGGER: AtomicU8 = AtomicU8::new(0);
-static CALLBACK: parking_lot::Mutex<Option<Box<dyn Fn(ShortcutState) + Send + Sync + 'static>>> =
+static CALLBACK: parking_lot::Mutex<Option<RawInputCallback>> =
     parking_lot::Mutex::new(None);
 
 pub struct MouseRawInputHandle {
@@ -151,13 +162,11 @@ unsafe extern "system" fn raw_input_wndproc(
                     header_size,
                 );
 
-                if status != u32::MAX && status != 0 {
-                    if data.header.dwType == RIM_TYPEMOUSE.0 {
-                        let button_flags = data.data.mouse.Anonymous.Anonymous.usButtonFlags;
-                        if let Some(state) = evaluate_button_flags(trigger, button_flags) {
-                            if let Some(ref cb) = *CALLBACK.lock() {
-                                cb(state);
-                            }
+                if status != u32::MAX && status != 0 && data.header.dwType == RIM_TYPEMOUSE.0 {
+                    let button_flags = data.data.mouse.Anonymous.Anonymous.usButtonFlags;
+                    if let Some(state) = evaluate_button_flags(trigger, button_flags) {
+                        if let Some(ref cb) = *CALLBACK.lock() {
+                            cb(state);
                         }
                     }
                 }

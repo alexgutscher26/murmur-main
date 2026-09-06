@@ -33,7 +33,7 @@ fn format_number_with_commas(n: u64) -> String {
     let mut out = String::with_capacity(len + (len / 3));
 
     for (i, &b) in bytes.iter().enumerate() {
-        if i > 0 && (len - i) % 3 == 0 {
+        if i > 0 && (len - i).is_multiple_of(3) {
             out.push(',');
         }
         out.push(b as char);
@@ -96,7 +96,7 @@ fn scale_val(word: &str) -> Option<u64> {
 
 fn is_number_word(word: &str) -> bool {
     let lower = word.to_lowercase();
-    let clean = lower.trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
+    let clean = lower.trim_end_matches([',', '.', '!', '?', ';', ':']);
     unit_val(clean).is_some()
         || tens_val(clean).is_some()
         || scale_val(clean).is_some()
@@ -142,7 +142,8 @@ fn parse_number_tokens(tokens: &[&str]) -> Option<u64> {
         } else if let Some(val) = tens_val(&clean) {
             current += val;
             has_any = true;
-        } else if let Some(scale) = scale_val(&clean) {
+        } else {
+            let scale = scale_val(&clean)?;
             if scale == 100 {
                 current = if current == 0 { 100 } else { current * 100 };
             } else {
@@ -151,8 +152,6 @@ fn parse_number_tokens(tokens: &[&str]) -> Option<u64> {
                 current = 0;
             }
             has_any = true;
-        } else {
-            return None;
         }
     }
 
@@ -175,7 +174,7 @@ fn normalize_cardinals(text: &str) -> String {
     while i < words.len() {
         let raw_word = words[i];
         let clean = raw_word
-            .trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'))
+            .trim_end_matches([',', '.', '!', '?', ';', ':'])
             .to_lowercase();
 
         // Check if this token starts a number sequence
@@ -196,7 +195,7 @@ fn normalize_cardinals(text: &str) -> String {
                     .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
                     .collect::<String>();
                 let w_clean = w
-                    .trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'))
+                    .trim_end_matches([',', '.', '!', '?', ';', ':'])
                     .to_lowercase();
 
                 if w_clean == "and" {
@@ -214,9 +213,7 @@ fn normalize_cardinals(text: &str) -> String {
                     || scale_val(&w_clean).is_some()
                     || parse_hyphenated_number(&w_clean).is_some()
                 {
-                    num_tokens.push(words[j].trim_end_matches(|c: char| {
-                        matches!(c, ',' | '.' | '!' | '?' | ';' | ':')
-                    }));
+                    num_tokens.push(words[j].trim_end_matches([',', '.', '!', '?', ';', ':']));
                     if !w_punct.is_empty() {
                         trailing_punct = w_punct;
                         j += 1;
@@ -329,7 +326,7 @@ fn normalize_currency(text: &str) -> String {
 
         while j < words.len() {
             let clean = words[j]
-                .trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'))
+                .trim_end_matches([',', '.', '!', '?', ';', ':'])
                 .to_lowercase();
             if is_number_word(&clean) {
                 number_words.push(clean);
@@ -344,7 +341,7 @@ fn normalize_currency(text: &str) -> String {
                 .chars()
                 .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
                 .collect::<String>();
-            let next_clean = words[j].trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':')).to_lowercase();
+            let next_clean = words[j].trim_end_matches([',', '.', '!', '?', ';', ':']).to_lowercase();
 
             if let Some((_, symbol)) = CURRENCIES.iter().find(|(name, _)| *name == next_clean) {
                 let num_tokens: Vec<&str> = number_words.iter().map(|s| s.as_str()).collect();
@@ -358,7 +355,7 @@ fn normalize_currency(text: &str) -> String {
                             .chars()
                             .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
                             .collect::<String>();
-                        let clean_cents_unit = cents_unit.trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
+                        let clean_cents_unit = cents_unit.trim_end_matches([',', '.', '!', '?', ';', ':']);
 
                         if clean_cents_unit == "cents" || clean_cents_unit == "cent" {
                             if let Some(c_val) = parse_number_tokens(&[&cents_word]) {

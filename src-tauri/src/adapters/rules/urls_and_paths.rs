@@ -39,9 +39,9 @@ fn format_spoken_emails(text: &str) -> String {
     while i < words.len() {
         // Look for "... at <domain> dot <tld>"
         if words[i].eq_ignore_ascii_case("at") && i > 0 && i + 2 < words.len() {
-            let prev_word = words[i - 1].trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
-            let domain_part = words[i + 1].trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
-            let dot_word = words[i + 2].trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
+            let prev_word = words[i - 1].trim_end_matches([',', '.', '!', '?', ';', ':']);
+            let domain_part = words[i + 1].trim_end_matches([',', '.', '!', '?', ';', ':']);
+            let dot_word = words[i + 2].trim_end_matches([',', '.', '!', '?', ';', ':']);
 
             if dot_word.eq_ignore_ascii_case("dot") && i + 3 < words.len() {
                 let tld_word = words[i + 3];
@@ -49,7 +49,7 @@ fn format_spoken_emails(text: &str) -> String {
                     .chars()
                     .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
                     .collect::<String>();
-                let clean_tld = tld_word.trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':')).to_lowercase();
+                let clean_tld = tld_word.trim_end_matches([',', '.', '!', '?', ';', ':']).to_lowercase();
 
                 if COMMON_TLDS.contains(&clean_tld.as_str()) && is_valid_ident(prev_word) && is_valid_ident(domain_part) {
                     // Pop previous word from result
@@ -117,7 +117,7 @@ fn format_spoken_urls(text: &str) -> String {
             while j < words.len() {
                 if words[j].eq_ignore_ascii_case("slash") || words[j] == "/" {
                     if j + 1 < words.len() {
-                        let next_segment = words[j + 1].trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
+                        let next_segment = words[j + 1].trim_end_matches([',', '.', '!', '?', ';', ':']);
                         let punct = words[j + 1]
                             .chars()
                             .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
@@ -165,7 +165,7 @@ fn format_spoken_paths(text: &str) -> String {
 
     while i < words.len() {
         let w_lower = words[i].to_lowercase();
-        let clean = w_lower.trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
+        let clean = w_lower.trim_end_matches([',', '.', '!', '?', ';', ':']);
 
         let starts_path = clean == "slash"
             || clean == "tilde"
@@ -179,7 +179,7 @@ fn format_spoken_paths(text: &str) -> String {
 
             while j < words.len() {
                 let token = words[j];
-                let token_clean = token.trim_end_matches(|c: char| matches!(c, ',' | '.' | '!' | '?' | ';' | ':'));
+                let token_clean = token.trim_end_matches([',', '.', '!', '?', ';', ':']);
                 let token_punct = token
                     .chars()
                     .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))

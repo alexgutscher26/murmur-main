@@ -227,18 +227,16 @@ mod windows_pill {
         wparam: WPARAM,
         lparam: LPARAM,
     ) -> LRESULT {
-        if msg == WM_ACTIVATE || msg == WM_ACTIVATEAPP {
-            if IsWindowVisible(hwnd).as_bool() {
-                let _ = SetWindowPos(
-                    hwnd,
-                    HWND_TOPMOST,
-                    0,
-                    0,
-                    0,
-                    0,
-                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
-                );
-            }
+        if (msg == WM_ACTIVATE || msg == WM_ACTIVATEAPP) && IsWindowVisible(hwnd).as_bool() {
+            let _ = SetWindowPos(
+                hwnd,
+                HWND_TOPMOST,
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE,
+            );
         }
 
         let prev = PREV_WNDPROC.load(Ordering::SeqCst);

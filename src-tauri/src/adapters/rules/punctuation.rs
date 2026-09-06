@@ -57,7 +57,7 @@ pub fn normalise_punctuation(text: &str) -> String {
  */
 pub fn strip_trailing_punctuation(text: &str) -> &str {
     let trimmed = text.trim_end();
-    trimmed.trim_end_matches(|c: char| matches!(c, '.' | ',' | '!' | '?' | ';' | ':' | '…' | '‽'))
+    trimmed.trim_end_matches(['.', ',', '!', '?', ';', ':', '…', '‽'])
 }
 
 /**
