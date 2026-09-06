@@ -32,6 +32,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 # Cancel superseded runs on the same branch: the newest push is the one that
 # matters, and a queue of stale builds hides the result that counts.
 concurrency:
