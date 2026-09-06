@@ -15,6 +15,8 @@ import {
   Command,
   Check,
   Mail,
+  Download,
+  CheckCircle2,
 } from "lucide-react";
 
 interface AppPreset {
@@ -205,6 +207,15 @@ export function Hero() {
     setIsSimulating(false);
   };
 
+  const [downloadStarted, setDownloadStarted] = useState(false);
+
+  const handleHeroDownload = () => {
+    setDownloadStarted(true);
+    setTimeout(() => {
+      setDownloadStarted(false);
+    }, 4500);
+  };
+
   return (
     <section className="relative pt-36 pb-24 md:pt-44 md:pb-32 overflow-hidden flex flex-col items-center bg-[#ffffff] text-neutral-900 selection:bg-neutral-900 selection:text-white">
       {/* Subtle Ambient Light Glows */}
@@ -251,13 +262,25 @@ export function Hero() {
           <span>Talk to Sales</span>
         </a>
         <a
-          href="#download"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white text-sm font-semibold shadow-md transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
+          href="/downloads/Murmur_0.1.0_x64-setup.exe"
+          download="Murmur_0.1.0_x64-setup.exe"
+          onClick={handleHeroDownload}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white text-sm font-semibold shadow-md transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
         >
-          <span>Download Free</span>
-          <span className="text-xs text-neutral-400 font-normal">
-            ({detectedOs === "mac" ? "macOS" : "Windows"})
-          </span>
+          {downloadStarted ? (
+            <>
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-pulse" />
+              <span>Downloading Setup (.exe)...</span>
+            </>
+          ) : (
+            <>
+              <Download className="w-4 h-4 text-emerald-400" />
+              <span>Download Free (.exe)</span>
+              <span className="text-xs text-neutral-400 font-normal">
+                Windows 64-bit
+              </span>
+            </>
+          )}
         </a>
       </div>
 

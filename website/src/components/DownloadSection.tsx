@@ -2,11 +2,35 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Download, Terminal, Check, Copy, Laptop, ShieldCheck, Cpu, HardDrive } from "lucide-react";
+import {
+  Download,
+  Terminal,
+  Check,
+  Copy,
+  Laptop,
+  ShieldCheck,
+  Cpu,
+  HardDrive,
+  CheckCircle2,
+} from "lucide-react";
 
 export function DownloadSection() {
   const [detectedOs, setDetectedOs] = useState<"mac" | "windows" | "linux">("mac");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [downloadToast, setDownloadToast] = useState<{
+    title: string;
+    desc: string;
+  } | null>(null);
+
+  const handleDownloadClick = (filename: string, platformName: string) => {
+    setDownloadToast({
+      title: `Downloading Murmur for ${platformName}`,
+      desc: `Your download (${filename}) has started directly. Check your Downloads folder.`,
+    });
+    setTimeout(() => {
+      setDownloadToast(null);
+    }, 6000);
+  };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -94,22 +118,32 @@ export function DownloadSection() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2.5">
-              <a
-                href="https://github.com/webprodigies/murmur/releases/latest"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-center text-xs sm:text-sm font-semibold text-white bg-[#141416] hover:bg-neutral-800 py-3.5 px-4 rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-[0.99]"
+              <button
+                type="button"
+                onClick={() =>
+                  setDownloadToast({
+                    title: "macOS Notarization",
+                    desc: "macOS builds are in automated Apple notarization. In the meantime, you can build from source via git or download the Windows installer.",
+                  })
+                }
+                className="flex-1 text-center text-xs sm:text-sm font-semibold text-white bg-[#141416] hover:bg-neutral-800 py-3.5 px-4 rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
               >
-                Apple Silicon (.dmg)
-              </a>
-              <a
-                href="https://github.com/webprodigies/murmur/releases/latest"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-center text-xs sm:text-sm font-semibold text-neutral-800 hover:bg-neutral-50 bg-white border border-neutral-200/90 py-3.5 px-4 rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-[0.99]"
+                <Download className="w-4 h-4 text-neutral-400" />
+                <span>Apple Silicon (.dmg)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setDownloadToast({
+                    title: "macOS Notarization",
+                    desc: "macOS builds are in automated Apple notarization. In the meantime, you can build from source via git or download the Windows installer.",
+                  })
+                }
+                className="flex-1 text-center text-xs sm:text-sm font-semibold text-neutral-800 hover:bg-neutral-50 bg-white border border-neutral-200/90 py-3.5 px-4 rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
               >
-                Intel Mac (.dmg)
-              </a>
+                <Download className="w-4 h-4 text-neutral-500" />
+                <span>Intel Mac (.dmg)</span>
+              </button>
             </div>
           </div>
 
@@ -141,20 +175,22 @@ export function DownloadSection() {
 
             <div className="flex flex-col sm:flex-row gap-2.5">
               <a
-                href="https://github.com/webprodigies/murmur/releases/latest"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-center text-xs sm:text-sm font-semibold text-white bg-[#141416] hover:bg-neutral-800 py-3.5 px-4 rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-[0.99]"
+                href="/downloads/Murmur_0.1.0_x64-setup.exe"
+                download="Murmur_0.1.0_x64-setup.exe"
+                onClick={() => handleDownloadClick("Murmur_0.1.0_x64-setup.exe", "Windows (.exe)")}
+                className="flex-1 text-center text-xs sm:text-sm font-semibold text-white bg-[#141416] hover:bg-neutral-800 py-3.5 px-4 rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
               >
-                Windows Installer (.exe)
+                <Download className="w-4 h-4 text-emerald-400" />
+                <span>Windows Installer (.exe)</span>
               </a>
               <a
-                href="https://github.com/webprodigies/murmur/releases/latest"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-center text-xs sm:text-sm font-semibold text-neutral-800 hover:bg-neutral-50 bg-white border border-neutral-200/90 py-3.5 px-4 rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-[0.99]"
+                href="/downloads/Murmur_0.1.0_x64_en-US.msi"
+                download="Murmur_0.1.0_x64_en-US.msi"
+                onClick={() => handleDownloadClick("Murmur_0.1.0_x64_en-US.msi", "Windows MSI")}
+                className="flex-1 text-center text-xs sm:text-sm font-semibold text-neutral-800 hover:bg-neutral-50 bg-white border border-neutral-200/90 py-3.5 px-4 rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
               >
-                MSIX Bundle
+                <Download className="w-4 h-4 text-neutral-500" />
+                <span>MSI Package (.msi)</span>
               </a>
             </div>
           </div>
@@ -222,6 +258,27 @@ export function DownloadSection() {
           </div>
         </div>
       </div>
+
+      {/* Direct Download Toast Notification */}
+      {downloadToast && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-2xl bg-neutral-950 text-white border border-neutral-800 shadow-2xl flex items-start gap-3 transition-all duration-300">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+          <div className="flex-1 text-xs">
+            <p className="font-semibold text-sm text-neutral-100 mb-0.5">
+              {downloadToast.title}
+            </p>
+            <p className="text-neutral-300 leading-relaxed">
+              {downloadToast.desc}
+            </p>
+          </div>
+          <button
+            onClick={() => setDownloadToast(null)}
+            className="text-neutral-400 hover:text-white text-xs font-mono px-1.5 py-0.5 rounded hover:bg-neutral-800 transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </section>
   );
 }

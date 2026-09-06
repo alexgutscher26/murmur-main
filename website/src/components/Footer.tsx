@@ -57,9 +57,8 @@ const ECOSYSTEM_LINKS: FooterLink[] = [
     icon: true,
   },
   {
-    href: "https://github.com/webprodigies/murmur/releases",
-    label: "Releases & Changelog",
-    external: true,
+    href: "/downloads/Murmur_0.1.0_x64-setup.exe",
+    label: "Download Windows (.exe)",
   },
   {
     href: "https://github.com/ggerganov/whisper.cpp",
