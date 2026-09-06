@@ -33,8 +33,8 @@ export function DownloadSection() {
       command: "winget install WebProdigies.Murmur",
     },
     {
-      platform: "Linux Shell Script",
-      command: "curl -fsSL https://get.murmur.app | bash",
+      platform: "Source / GitHub Clone",
+      command: "git clone https://github.com/webprodigies/murmur.git",
     },
   ];
 
@@ -201,7 +201,7 @@ export function DownloadSection() {
             <HardDrive className="w-4 h-4 text-emerald-600 shrink-0" />
             <div>
               <span className="font-bold text-neutral-900 block mb-0.5">Disk Space</span>
-              <span className="text-neutral-500">600 MB for default Whisper Small model</span>
+              <span className="text-neutral-500">190 MB for default Whisper Small model</span>
             </div>
           </div>
 

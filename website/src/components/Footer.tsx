@@ -201,7 +201,7 @@ export function Footer() {
               <div className="flex items-center gap-2">
                 <span className="font-bold text-base text-neutral-950 tracking-tight">Murmur</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-mono font-medium">
-                  v0.8.4-local
+                  v0.1.0
                 </span>
               </div>
             </div>
@@ -290,7 +290,7 @@ export function Footer() {
             <div className="hidden sm:flex items-center gap-2 bg-white border border-neutral-200/80 px-3 py-1 rounded-full shadow-sm">
               <span className="text-neutral-500">Shortcut:</span>
               <kbd className="px-1.5 py-0.5 rounded bg-neutral-100 border border-neutral-200/80 text-neutral-800 text-[10px] font-mono font-medium">
-                ⌥ Space / Ctrl+Space
+                ⌥ Space / Alt+Space
               </kbd>
             </div>
 

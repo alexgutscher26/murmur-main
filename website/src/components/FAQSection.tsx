@@ -50,6 +50,11 @@ const FAQS: FAQItem[] = [
     answer:
       "Murmur supports all 99 languages included in OpenAI Whisper models, with automatic language identification enabled by default.",
   },
+  {
+    question: "Which operating systems and hardware are supported?",
+    answer:
+      "Murmur is natively built for macOS 13+ (Apple Silicon M1/M2/M3/M4 with Metal acceleration and Intel x86_64) and Windows 10/11 64-bit (with DirectX 12 / DirectML and CUDA GPU acceleration). Linux support is tracked on our GitHub roadmap.",
+  },
 ];
 
 export function FAQSection() {

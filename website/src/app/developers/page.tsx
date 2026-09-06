@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useState } from "react";
@@ -130,7 +131,7 @@ const COMPARISON_ROWS = [
   },
   {
     feature: "Pricing",
-    murmur: "Free & Open Source / $49 Lifetime",
+    murmur: "Free (MIT) / $89 Lifetime ($49/yr)",
     wispr: "$12/mo / $144/yr recurring",
   },
 ];

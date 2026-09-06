@@ -28,7 +28,7 @@ const CUSTOM_FEATURES: CustomFeature[] = [
   2. Toggle Air-Gap mode
 - **Expected:** Sockets close immediately
 - **Actual:** Verified 0 bytes egress
-- **Environment:** Murmur v1.2 · macOS Sonoma`,
+- **Environment:** Murmur v0.1.0 · macOS Sonoma`,
     description:
       "Define vocal expanders. When you say 'bug template', 'schedule link', or 'invoice address', Murmur replaces the phrase with your structured schema immediately.",
   },
