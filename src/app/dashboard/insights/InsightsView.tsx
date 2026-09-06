@@ -71,11 +71,7 @@ function SpeedometerGauge({ wpm }: { wpm: number }) {
 
   return (
     <div className="relative flex flex-col items-center justify-center pt-2">
-      <svg
-        viewBox="0 0 140 85"
-        className="w-44 overflow-visible"
-        aria-hidden="true"
-      >
+      <svg viewBox="0 0 140 85" className="w-44 overflow-visible" aria-hidden="true">
         <defs>
           <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#0d9488" />
@@ -237,8 +233,7 @@ function CalendarHeatmap({
           {weeks.map((week, wIndex) => (
             <div key={wIndex} className="flex flex-col gap-1">
               {week.map((day, dIndex) => {
-                const isToday =
-                  day.date.toDateString() === new Date().toDateString();
+                const isToday = day.date.toDateString() === new Date().toDateString();
 
                 let bgClass = "bg-stone-200/60 dark:bg-stone-800/80";
                 if (day.level === 1) bgClass = "bg-teal-200 dark:bg-teal-900/60";
@@ -364,7 +359,8 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
     let documents = 0;
     let otherTasks = 0;
 
-    const aiKeywords = /prompt|write|code|summarize|explain|fix|refactor|function|generate|ai|gpt|claude/i;
+    const aiKeywords =
+      /prompt|write|code|summarize|explain|fix|refactor|function|generate|ai|gpt|claude/i;
     const emailKeywords = /dear|regards|subject|sincerely|email|attached|hi team|hello/i;
     const workKeywords = /jira|slack|pr|ticket|review|deploy|meeting|sprint|standup/i;
     const personalKeywords = /hey|dinner|tomorrow|weekend|thanks|lol|call me|love/i;
@@ -737,9 +733,7 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
             <div className="rounded-2xl border border-hairline bg-elevated/70 p-6 backdrop-blur-sm shadow-sm flex flex-col justify-between">
               <div className="flex items-center justify-between pb-2">
                 <div className="flex items-center gap-2.5">
-                  <h3 className="text-xl font-bold text-text-primary">
-                    {streakDays} day streak
-                  </h3>
+                  <h3 className="text-xl font-bold text-text-primary">{streakDays} day streak</h3>
                   <StreakBadge />
                 </div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">
@@ -748,9 +742,7 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
               </div>
 
               {/* Calendar Heatmap */}
-              <CalendarHeatmap
-                activity={stats?.activity ?? []}
-              />
+              <CalendarHeatmap activity={stats?.activity ?? []} />
             </div>
           </div>
         </div>
@@ -826,18 +818,14 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
               <div className="mt-1 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
                 AVG PHRASE LENGTH
               </div>
-              <p className="mt-2 text-xs text-text-secondary">
-                Words per dictated utterance.
-              </p>
+              <p className="mt-2 text-xs text-text-secondary">Words per dictated utterance.</p>
             </div>
           </div>
 
           {/* Power Keywords & Recurring Phrases */}
           <div className="rounded-2xl border border-hairline bg-elevated/70 p-6 backdrop-blur-sm shadow-sm">
             <div className="flex items-center justify-between pb-4">
-              <h3 className="text-lg font-bold text-text-primary">
-                Top Dictated Concepts
-              </h3>
+              <h3 className="text-lg font-bold text-text-primary">Top Dictated Concepts</h3>
               <span className="text-xs text-text-tertiary">
                 Extracted from your recent transcripts
               </span>

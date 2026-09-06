@@ -27,7 +27,8 @@ const BENCHMARKS: BenchmarkMetric[] = [
     cloudBarPercent: 88,
     diffHighlight: "3.2x Faster",
     testMethod: "M3 Max / Windows RTX 4070 · Whisper Base Q5_0 · 15s utterances",
-    description: "Cloud dictation pays a mandatory network round-trip penalty (DNS + TLS handshake + WebSocket upload + cloud inference queue). Murmur decodes inside GPU VRAM immediately.",
+    description:
+      "Cloud dictation pays a mandatory network round-trip penalty (DNS + TLS handshake + WebSocket upload + cloud inference queue). Murmur decodes inside GPU VRAM immediately.",
   },
   {
     id: "sustained-wpm",
@@ -39,7 +40,8 @@ const BENCHMARKS: BenchmarkMetric[] = [
     cloudBarPercent: 65,
     diffHighlight: "Zero Stalls",
     testMethod: "Continuous 5-minute technical monologue · Zero dropped chunks",
-    description: "Parallel ASR chunking prevents input buffer pileups, allowing you to speak as fast as you want without lag, audio loss, or sentence truncation.",
+    description:
+      "Parallel ASR chunking prevents input buffer pileups, allowing you to speak as fast as you want without lag, audio loss, or sentence truncation.",
   },
   {
     id: "technical-wer",
@@ -51,7 +53,8 @@ const BENCHMARKS: BenchmarkMetric[] = [
     cloudBarPercent: 91,
     diffHighlight: "+7.2% Precision",
     testMethod: "500-sample test set of Rust, TypeScript, CLI flags, and API names",
-    description: "On-device phonetic biasing directly steers Whisper's initial beam search with your custom dictionary, preventing generic auto-corrections.",
+    description:
+      "On-device phonetic biasing directly steers Whisper's initial beam search with your custom dictionary, preventing generic auto-corrections.",
   },
   {
     id: "resource-footprint",
@@ -63,7 +66,8 @@ const BENCHMARKS: BenchmarkMetric[] = [
     cloudBarPercent: 85,
     diffHighlight: "Rust Native",
     testMethod: "Rust Tauri Native Binary · Persistent warm model state in VRAM",
-    description: "Engineered in Rust with zero Electron bloat. Whisper weights stay warm in VRAM for instant sub-millisecond invocation.",
+    description:
+      "Engineered in Rust with zero Electron bloat. Whisper weights stay warm in VRAM for instant sub-millisecond invocation.",
   },
   {
     id: "battery-efficiency",
@@ -75,7 +79,8 @@ const BENCHMARKS: BenchmarkMetric[] = [
     cloudBarPercent: 75,
     diffHighlight: "60% Less Battery",
     testMethod: "MacBook Air M2 & ThinkPad X1 Carbon · 60 mins continuous dictation",
-    description: "Avoiding continuous Wi-Fi radio transmission and leveraging Apple Silicon Neural Engine / DirectML saves substantial battery life.",
+    description:
+      "Avoiding continuous Wi-Fi radio transmission and leveraging Apple Silicon Neural Engine / DirectML saves substantial battery life.",
   },
   {
     id: "offline-resilience",
@@ -87,7 +92,8 @@ const BENCHMARKS: BenchmarkMetric[] = [
     cloudBarPercent: 30,
     diffHighlight: "Air-Gap Ready",
     testMethod: "Tested in Airplane Mode & simulated 250ms packet loss network",
-    description: "Zero network dependencies mean your dictation latency is identical whether you are in an office, in a train tunnel, or at 35,000 feet.",
+    description:
+      "Zero network dependencies mean your dictation latency is identical whether you are in an office, in a train tunnel, or at 35,000 feet.",
   },
 ];
 
@@ -95,7 +101,10 @@ export function LatencyBenchmarks() {
   const [activeMetric, setActiveMetric] = useState<BenchmarkMetric>(BENCHMARKS[0]);
 
   return (
-    <section id="benchmarks" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section
+      id="benchmarks"
+      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+    >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
@@ -115,7 +124,8 @@ export function LatencyBenchmarks() {
             Beat the cloud on latency.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Local AI is only compelling if it feels instantaneous. We engineered Murmur in native Rust to outpace cloud WebSocket pipelines at every stage.
+            Local AI is only compelling if it feels instantaneous. We engineered Murmur in native
+            Rust to outpace cloud WebSocket pipelines at every stage.
           </p>
         </div>
 
@@ -133,7 +143,9 @@ export function LatencyBenchmarks() {
                     : "bg-white/80 text-neutral-600 border-neutral-200/80 hover:bg-neutral-50 hover:text-neutral-950"
                 }`}
               >
-                <span className={`text-[10px] font-mono uppercase tracking-wider block mb-1 font-bold ${isSelected ? "text-emerald-700" : "text-emerald-600"}`}>
+                <span
+                  className={`text-[10px] font-mono uppercase tracking-wider block mb-1 font-bold ${isSelected ? "text-emerald-700" : "text-emerald-600"}`}
+                >
                   {m.category}
                 </span>
                 <span className="text-xs font-bold block truncate text-neutral-900">{m.name}</span>
@@ -149,7 +161,9 @@ export function LatencyBenchmarks() {
               <span className="text-xs font-mono text-emerald-700 font-bold block mb-1">
                 {activeMetric.category}
               </span>
-              <h3 className="text-lg sm:text-2xl font-bold text-neutral-950">{activeMetric.name}</h3>
+              <h3 className="text-lg sm:text-2xl font-bold text-neutral-950">
+                {activeMetric.name}
+              </h3>
             </div>
             <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs font-mono font-bold self-start sm:self-auto shadow-sm">
               <Zap className="w-3.5 h-3.5 fill-current text-emerald-600" />
@@ -178,7 +192,8 @@ export function LatencyBenchmarks() {
                   />
                 </div>
                 <span className="text-[11px] font-mono text-emerald-700 flex items-center gap-1 font-medium">
-                  <Check className="w-3 h-3 text-emerald-600" /> Zero network hop · Direct GPU decode
+                  <Check className="w-3 h-3 text-emerald-600" /> Zero network hop · Direct GPU
+                  decode
                 </span>
               </div>
             </div>

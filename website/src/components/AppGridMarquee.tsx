@@ -69,8 +69,8 @@ export function AppGridMarquee() {
           Works instantly anywhere you can place a cursor
         </h2>
         <p className="text-sm sm:text-base text-neutral-600 max-w-xl mx-auto font-normal">
-          No browser plugins, no custom integrations, and zero clipboard overwrites.
-          Murmur simulates native OS keyboard events directly into the frontmost window.
+          No browser plugins, no custom integrations, and zero clipboard overwrites. Murmur
+          simulates native OS keyboard events directly into the frontmost window.
         </p>
       </div>
 
@@ -92,9 +92,7 @@ export function AppGridMarquee() {
                     {app.name}
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </span>
-                  <span className="text-[10px] font-mono text-neutral-500">
-                    {app.category}
-                  </span>
+                  <span className="text-[10px] font-mono text-neutral-500">{app.category}</span>
                 </div>
               </div>
             ))}
@@ -117,9 +115,7 @@ export function AppGridMarquee() {
                     {app.name}
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </span>
-                  <span className="text-[10px] font-mono text-neutral-500">
-                    {app.category}
-                  </span>
+                  <span className="text-[10px] font-mono text-neutral-500">{app.category}</span>
                 </div>
               </div>
             ))}

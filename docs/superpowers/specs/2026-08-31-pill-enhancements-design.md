@@ -9,6 +9,7 @@
 ## 1. Overview & Objectives
 
 This specification defines three interconnected UX improvements for Murmur's floating pill interface:
+
 1. **Real-time word count**: Continuous feedback to the user estimating words spoken during recording (`~12 words so far`), anchored by interior Whisper chunk decodes.
 2. **Animated recording indicator**: An audio-reactive SVG microphone icon with soundwave arcs replacing the static 2s keyframe dot, scaling and pulsing smoothly with `CaptureEvent::Level` values.
 3. **Cancel confirmation**: Clear countdown feedback (`Cancelling in 3...`) when Escape is pressed to arm cancellation, accompanied by the countdown line and a clickable `"Keep recording"` action to prevent accidental loss of dictation.
@@ -20,6 +21,7 @@ This specification defines three interconnected UX improvements for Murmur's flo
 ### 2.1 Real-Time Word Count
 
 #### Data Flow & Estimation Logic
+
 - **Voice-Activity Speech Estimation:**
   - Speech activity is tracked during active recording.
   - A speaking rate baseline (default ~140 WPM, or user-configured baseline WPM) calculates estimated words from accumulated speech duration (`estimated_words = floor(voiced_ms / 60000 * WPM)`).
@@ -35,6 +37,7 @@ This specification defines three interconnected UX improvements for Murmur's flo
 ### 2.2 Animated Mic Recording Indicator
 
 #### Component Architecture (`MicIndicator`)
+
 - Replaces the static `StateDot` on the left of the pill.
 - **Visuals:**
   - Crisp SVG microphone icon with radiating waveform soundwave rings.
@@ -51,6 +54,7 @@ This specification defines three interconnected UX improvements for Murmur's flo
 ### 2.3 Cancel Confirmation with "Keep Recording"
 
 #### Workflow & State
+
 - When the user presses Escape, the session enters `SessionState::CancelPending { remaining_ms, elapsed_ms }`.
 - **Pill Content during `CANCEL_PENDING`:**
   - **Dynamic Countdown Text:** Displays `Cancelling in 3...` (or `2...`, `1...` based on `remaining_ms`).

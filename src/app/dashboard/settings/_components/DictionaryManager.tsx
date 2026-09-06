@@ -21,7 +21,8 @@ const MATCH_LABEL: Readonly<Record<MatchKind, string>> = {
 };
 
 const MATCH_KINDS: readonly MatchKind[] = ["WORD", "WORD_CASE_SENSITIVE", "SUBSTRING"];
-const FIELD_CLASS = "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80";
+const FIELD_CLASS =
+  "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80";
 
 interface DomainPack {
   id: string;
@@ -36,7 +37,8 @@ const DOMAIN_PACKS: readonly DomainPack[] = [
     id: "frontend-react",
     name: "React, Next.js & Web",
     badge: "Developer",
-    description: "Next.js, TypeScript, Tailwind CSS, Zustand, TanStack Query, tRPC, Vite, useEffect, useState.",
+    description:
+      "Next.js, TypeScript, Tailwind CSS, Zustand, TanStack Query, tRPC, Vite, useEffect, useState.",
     entries: [
       { pattern: "next js", replacement: "Next.js" },
       { pattern: "type script", replacement: "TypeScript" },
@@ -53,7 +55,8 @@ const DOMAIN_PACKS: readonly DomainPack[] = [
     id: "backend-rust-go",
     name: "Rust & Systems",
     badge: "Developer",
-    description: "whisper cpp, DirectML, WebAssembly, tokio, serde, Cargo, anyhow, arc mutex, axum.",
+    description:
+      "whisper cpp, DirectML, WebAssembly, tokio, serde, Cargo, anyhow, arc mutex, axum.",
     entries: [
       { pattern: "whisper c p p", replacement: "whisper.cpp" },
       { pattern: "direct m l", replacement: "DirectML" },
@@ -67,7 +70,8 @@ const DOMAIN_PACKS: readonly DomainPack[] = [
     id: "legal-contract",
     name: "Legal & Corporate",
     badge: "Legal",
-    description: "Res judicata, force majeure, indemnity, statutory jurisdiction, privileged work product.",
+    description:
+      "Res judicata, force majeure, indemnity, statutory jurisdiction, privileged work product.",
     entries: [
       { pattern: "force major", replacement: "force majeure" },
       { pattern: "res judicata", replacement: "res judicata" },
@@ -80,7 +84,8 @@ const DOMAIN_PACKS: readonly DomainPack[] = [
     id: "clinical-medical",
     name: "Clinical SOAP & Medical",
     badge: "Healthcare",
-    description: "Common medications and clinical SOAP shorthand (hypertension, acetaminophen, amoxicillin).",
+    description:
+      "Common medications and clinical SOAP shorthand (hypertension, acetaminophen, amoxicillin).",
     entries: [
       { pattern: "h t n", replacement: "HTN (hypertension)" },
       { pattern: "a fib", replacement: "A-fib" },
@@ -113,7 +118,9 @@ export function DictionaryManager() {
       if (pattern.trim().length === 0 || replacement.trim().length === 0) return;
       if (isLimitReached) {
         setGatedFeatureName("Unlimited Custom Vocabulary");
-        setGatedDescription("Free starter tier is limited to 25 custom dictionary words. Upgrade to Pro for unlimited custom jargon, client names, and phonetic replacements.");
+        setGatedDescription(
+          "Free starter tier is limited to 25 custom dictionary words. Upgrade to Pro for unlimited custom jargon, client names, and phonetic replacements.",
+        );
         setProModalOpen(true);
         return;
       }
@@ -133,7 +140,9 @@ export function DictionaryManager() {
     async (pack: DomainPack) => {
       if (!hasDomainPackAccess) {
         setGatedFeatureName(`${pack.name} Vocabulary Pack`);
-        setGatedDescription(`The ${pack.name} pack is part of Murmur Pro domain packs, including specialized phonetic mappings.`);
+        setGatedDescription(
+          `The ${pack.name} pack is part of Murmur Pro domain packs, including specialized phonetic mappings.`,
+        );
         setProModalOpen(true);
         return;
       }
@@ -157,7 +166,10 @@ export function DictionaryManager() {
   );
 
   const update = useCallback(
-    (entry: DictionaryEntry, changes: Partial<Pick<DictionaryEntry, "replacement" | "match_kind" | "enabled">>) => {
+    (
+      entry: DictionaryEntry,
+      changes: Partial<Pick<DictionaryEntry, "replacement" | "match_kind" | "enabled">>,
+    ) => {
       void unwrapCommand(() =>
         commands.updateDictionaryEntry({
           id: entry.id,
@@ -172,12 +184,15 @@ export function DictionaryManager() {
 
   const remove = useCallback(
     (entry: DictionaryEntry) => {
-      void unwrapCommand(() => commands.deleteDictionaryEntry({ id: entry.id })).then(entries.reload);
+      void unwrapCommand(() => commands.deleteDictionaryEntry({ id: entry.id })).then(
+        entries.reload,
+      );
     },
     [entries],
   );
 
-  if (entries.error) return <ErrorSurface error={entries.error} onRetry={entries.reload} size="compact" />;
+  if (entries.error)
+    return <ErrorSurface error={entries.error} onRetry={entries.reload} size="compact" />;
 
   return (
     <div className="flex flex-col gap-4">
@@ -192,7 +207,9 @@ export function DictionaryManager() {
             type="button"
             onClick={() => {
               setGatedFeatureName("Unlimited Custom Vocabulary");
-              setGatedDescription("Free starter tier is limited to 25 custom dictionary words. Upgrade to Pro for unlimited custom jargon, client names, and phonetic replacements.");
+              setGatedDescription(
+                "Free starter tier is limited to 25 custom dictionary words. Upgrade to Pro for unlimited custom jargon, client names, and phonetic replacements.",
+              );
               setProModalOpen(true);
             }}
             className="inline-flex items-center gap-1 text-[11px] font-semibold text-text-primary hover:underline cursor-pointer"
@@ -336,12 +353,15 @@ export function DictionaryManager() {
               onChange={(event) => update(entry, { enabled: event.target.checked })}
               className="accent-[var(--accent)]"
             />
-            <span className="w-40 shrink-0 truncate text-body text-text-secondary">{entry.pattern}</span>
+            <span className="w-40 shrink-0 truncate text-body text-text-secondary">
+              {entry.pattern}
+            </span>
             <input
               defaultValue={entry.replacement}
               aria-label={`Replacement for ${entry.pattern}`}
               onBlur={(event) => {
-                if (event.target.value !== entry.replacement) update(entry, { replacement: event.target.value });
+                if (event.target.value !== entry.replacement)
+                  update(entry, { replacement: event.target.value });
               }}
               className={`${FIELD_CLASS} flex-1`}
             />
@@ -385,4 +405,3 @@ export function DictionaryManager() {
     </div>
   );
 }
-

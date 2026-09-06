@@ -60,7 +60,10 @@ export function FAQSection() {
   };
 
   return (
-    <section id="faq" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section
+      id="faq"
+      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+    >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
@@ -100,7 +103,9 @@ export function FAQSection() {
                   <span className="text-sm sm:text-base font-bold text-neutral-950">
                     {faq.question}
                   </span>
-                  <span className={`p-1.5 rounded-full bg-neutral-100 border border-neutral-200/80 text-neutral-600 transition-transform duration-300 shrink-0 ${isOpen ? "rotate-180 text-neutral-950 bg-neutral-200/70" : ""}`}>
+                  <span
+                    className={`p-1.5 rounded-full bg-neutral-100 border border-neutral-200/80 text-neutral-600 transition-transform duration-300 shrink-0 ${isOpen ? "rotate-180 text-neutral-950 bg-neutral-200/70" : ""}`}
+                  >
                     <ChevronDown className="w-4 h-4" />
                   </span>
                 </button>

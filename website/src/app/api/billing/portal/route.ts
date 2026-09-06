@@ -52,9 +52,10 @@ export async function POST(req: NextRequest) {
     if (!customerId) {
       return NextResponse.json(
         {
-          error: "No active Stripe customer found for this license key or email. If you hold a Lifetime license, no recurring billing exists to manage.",
+          error:
+            "No active Stripe customer found for this license key or email. If you hold a Lifetime license, no recurring billing exists to manage.",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -66,7 +67,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: portalSession.url });
   } catch (err: unknown) {
     console.error("Billing portal error:", err);
-    const message = err instanceof Error ? err.message : "Failed to generate billing portal session";
+    const message =
+      err instanceof Error ? err.message : "Failed to generate billing portal session";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

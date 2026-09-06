@@ -112,12 +112,8 @@ export function ProFeatureModal({
           </span>
         </div>
 
-        <h3 className="text-title font-bold text-text-primary mb-1.5">
-          Unlock {featureName}
-        </h3>
-        <p className="text-body text-text-secondary mb-4 leading-relaxed">
-          {description}
-        </p>
+        <h3 className="text-title font-bold text-text-primary mb-1.5">Unlock {featureName}</h3>
+        <p className="text-body text-text-secondary mb-4 leading-relaxed">{description}</p>
 
         {/* Benefits list */}
         <div className="hairline rounded-input bg-sunken/60 p-3.5 space-y-2 mb-5">
@@ -171,8 +167,14 @@ export function ProFeatureModal({
               <span>Already purchased? Enter your license key</span>
             </button>
           ) : (
-            <form onSubmit={handleActivateKey} className="space-y-2 animate-in fade-in duration-150">
-              <label htmlFor="pro-license-key" className="block text-label text-text-tertiary uppercase tracking-wider text-[10px]">
+            <form
+              onSubmit={handleActivateKey}
+              className="space-y-2 animate-in fade-in duration-150"
+            >
+              <label
+                htmlFor="pro-license-key"
+                className="block text-label text-text-tertiary uppercase tracking-wider text-[10px]"
+              >
                 License Key (LIFETIME-*, PRO-*, STUDENT-*, SWITCHER-*)
               </label>
               <div className="flex gap-2">

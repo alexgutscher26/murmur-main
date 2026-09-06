@@ -51,7 +51,8 @@ export function HowItWorks() {
             How Murmur works in three steps.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            No window switching or manual copying. Speak and your thoughts become structured writing.
+            No window switching or manual copying. Speak and your thoughts become structured
+            writing.
           </p>
         </div>
 
@@ -74,16 +75,16 @@ export function HowItWorks() {
                     </div>
                   </div>
 
-                  <h3 className="text-base font-bold text-neutral-950 mb-2">
-                    {step.title}
-                  </h3>
+                  <h3 className="text-base font-bold text-neutral-950 mb-2">{step.title}</h3>
                   <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed">
                     {step.description}
                   </p>
                 </div>
 
                 <div className="mt-6 pt-3.5 border-t border-neutral-200/80 flex items-center justify-between text-xs font-mono text-neutral-500">
-                  <span className="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80">{step.badge}</span>
+                  <span className="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200/80">
+                    {step.badge}
+                  </span>
                   <span className="text-neutral-400">Step {step.number}</span>
                 </div>
               </div>

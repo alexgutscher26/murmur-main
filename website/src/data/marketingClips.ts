@@ -52,20 +52,27 @@ export const AIRPLANE_MODE_GITHUB_DEMO: MarketingClipCampaign = {
     {
       timestamp: "0:00 - 0:06",
       action: "Turn off Wi-Fi on MacBook / Windows taskbar and enable in-app Air-Gap Mode.",
-      screenDisplay: "Desktop screen with Wi-Fi disconnected icon and Murmur Air-Gap badge glowing green.",
+      screenDisplay:
+        "Desktop screen with Wi-Fi disconnected icon and Murmur Air-Gap badge glowing green.",
       audioVoiceover: "Turning off Wi-Fi completely. Air-Gap Mode is active in Murmur.",
     },
     {
       timestamp: "0:07 - 0:14",
-      action: "Open terminal with active packet monitor (`sudo tcpdump -i en0` or Windows `pktmon`).",
-      screenDisplay: "Terminal window shows packet count: 0 packets captured. Inactive network interface.",
-      audioVoiceover: "Terminal packet monitor is running in real-time. Zero network packets traversing any interface.",
+      action:
+        "Open terminal with active packet monitor (`sudo tcpdump -i en0` or Windows `pktmon`).",
+      screenDisplay:
+        "Terminal window shows packet count: 0 packets captured. Inactive network interface.",
+      audioVoiceover:
+        "Terminal packet monitor is running in real-time. Zero network packets traversing any interface.",
     },
     {
       timestamp: "0:15 - 0:28",
-      action: "Focus empty GitHub issue textarea in browser. Hold Option+Space and dictate the issue seamlessly.",
-      screenDisplay: "Murmur pill appears with audio waveform. Text flows into GitHub issue markdown editor with sub-180ms latency.",
-      audioVoiceover: "Issue title: Memory profile in air-gap mode. Steps to reproduce: disconnect Wi-Fi, dictate five paragraphs. Expected: 0 bytes egress.",
+      action:
+        "Focus empty GitHub issue textarea in browser. Hold Option+Space and dictate the issue seamlessly.",
+      screenDisplay:
+        "Murmur pill appears with audio waveform. Text flows into GitHub issue markdown editor with sub-180ms latency.",
+      audioVoiceover:
+        "Issue title: Memory profile in air-gap mode. Steps to reproduce: disconnect Wi-Fi, dictate five paragraphs. Expected: 0 bytes egress.",
     },
     {
       timestamp: "0:29 - 0:34",

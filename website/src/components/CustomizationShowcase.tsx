@@ -29,7 +29,8 @@ const CUSTOM_FEATURES: CustomFeature[] = [
 - **Expected:** Sockets close immediately
 - **Actual:** Verified 0 bytes egress
 - **Environment:** Murmur v1.2 · macOS Sonoma`,
-    description: "Define vocal expanders. When you say 'bug template', 'schedule link', or 'invoice address', Murmur replaces the phrase with your structured schema immediately.",
+    description:
+      "Define vocal expanders. When you say 'bug template', 'schedule link', or 'invoice address', Murmur replaces the phrase with your structured schema immediately.",
   },
   {
     id: "per-app",
@@ -44,7 +45,8 @@ git commit -m "refactor(auth): update token interceptor and add unit tests"
 // In Slack:
 • Refactored auth token interceptor
 • Added unit tests (all passing)`,
-    description: "Write rules matching window process names. Code editors get conventional commit syntax and CamelCase; Slack gets clean bullet points and mentions.",
+    description:
+      "Write rules matching window process names. Code editors get conventional commit syntax and CamelCase; Slack gets clean bullet points and mentions.",
   },
   {
     id: "portable-dict",
@@ -58,7 +60,8 @@ git commit -m "refactor(auth): update token interceptor and add unit tests"
 ✓ [crate] (Rust package)
 ✓ [Cargo] (Rust package manager)
 Accuracy: 100% phonetic match`,
-    description: "Export and import domain dictionaries as plain JSON or CSV files. Share team dictionaries in your git repo with zero data escaping to a cloud vendor.",
+    description:
+      "Export and import domain dictionaries as plain JSON or CSV files. Share team dictionaries in your git repo with zero data escaping to a cloud vendor.",
   },
   {
     id: "local-automation",
@@ -70,7 +73,8 @@ Accuracy: 100% phonetic match`,
     exampleResult: `1. Increase retention window to 14 days
 2. Export team dictionary to JSON
 3. Provide Little Snitch audit verification recipe`,
-    description: "Chain your dictation into a lightweight local LLM (llama.cpp) for on-device summarization, grammar fixing, or translation before inserting into your cursor.",
+    description:
+      "Chain your dictation into a lightweight local LLM (llama.cpp) for on-device summarization, grammar fixing, or translation before inserting into your cursor.",
   },
 ];
 
@@ -78,7 +82,10 @@ export function CustomizationShowcase() {
   const [activeFeature, setActiveFeature] = useState<CustomFeature>(CUSTOM_FEATURES[0]);
 
   return (
-    <section id="customization" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section
+      id="customization"
+      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+    >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
@@ -98,7 +105,8 @@ export function CustomizationShowcase() {
             Own your customization.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Generic cloud dictation gives you one rigid output style. Murmur gives you complete local automation, vocal snippets, and portable dictionaries.
+            Generic cloud dictation gives you one rigid output style. Murmur gives you complete
+            local automation, vocal snippets, and portable dictionaries.
           </p>
         </div>
 
@@ -119,16 +127,16 @@ export function CustomizationShowcase() {
               >
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <div className="flex items-center gap-2">
-                    <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-emerald-600" : "text-neutral-500"}`} />
+                    <Icon
+                      className={`w-3.5 h-3.5 ${isSelected ? "text-emerald-600" : "text-neutral-500"}`}
+                    />
                     <span className="text-xs font-bold text-neutral-950">{feat.title}</span>
                   </div>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-semibold">
                     {feat.badge}
                   </span>
                 </div>
-                <p className="text-xs text-neutral-500 leading-relaxed font-mono">
-                  {feat.tagline}
-                </p>
+                <p className="text-xs text-neutral-500 leading-relaxed font-mono">{feat.tagline}</p>
               </button>
             );
           })}
@@ -141,7 +149,9 @@ export function CustomizationShowcase() {
               <span className="text-xs font-mono font-semibold text-emerald-700 uppercase tracking-wider block mb-1">
                 Live Configuration Preview
               </span>
-              <h3 className="text-lg sm:text-xl font-bold text-neutral-950">{activeFeature.title}</h3>
+              <h3 className="text-lg sm:text-xl font-bold text-neutral-950">
+                {activeFeature.title}
+              </h3>
             </div>
             <span className="text-[11px] font-mono text-neutral-600 bg-neutral-100 px-3 py-1 rounded-full border border-neutral-200/80">
               100% Local Logic

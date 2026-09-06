@@ -29,7 +29,8 @@ import { usePlan, canUseContextEngine } from "@/lib/plan";
 
 /** Enough history to see the apps someone actually dictates into. */
 const CANDIDATE_SCAN = 200;
-const FIELD_CLASS = "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80";
+const FIELD_CLASS =
+  "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80";
 
 const POPULAR_APP_PRESETS = [
   { bundle_id: "com.microsoft.VSCode", name: "VS Code" },
@@ -68,7 +69,8 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
     const known = new Set((profiles.data ?? []).map((profile) => profile.bundle_id));
     const seen = new Set<string>();
     for (const session of recent.data ?? []) {
-      if (session.app_bundle_id && !known.has(session.app_bundle_id)) seen.add(session.app_bundle_id);
+      if (session.app_bundle_id && !known.has(session.app_bundle_id))
+        seen.add(session.app_bundle_id);
     }
     return [...seen].sort();
   }, [profiles.data, recent.data]);
@@ -89,7 +91,9 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
 
   const remove = useCallback(
     (profile: AppProfile) => {
-      void unwrapCommand(() => commands.deleteAppProfile({ bundle_id: profile.bundle_id })).then(profiles.reload);
+      void unwrapCommand(() => commands.deleteAppProfile({ bundle_id: profile.bundle_id })).then(
+        profiles.reload,
+      );
     },
     [profiles],
   );
@@ -99,7 +103,12 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
       event.preventDefault();
       const trimmed = bundleId.trim();
       if (trimmed.length === 0) return;
-      save({ bundle_id: trimmed, display_name: displayNameFor(trimmed), overrides: {}, enabled: true });
+      save({
+        bundle_id: trimmed,
+        display_name: displayNameFor(trimmed),
+        overrides: {},
+        enabled: true,
+      });
       setBundleId("");
     },
     [bundleId, save],
@@ -112,7 +121,8 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
   const existingBundleIds = new Set((profiles.data ?? []).map((p) => p.bundle_id));
   const availablePresets = POPULAR_APP_PRESETS.filter((p) => !existingBundleIds.has(p.bundle_id));
 
-  if (profiles.error) return <ErrorSurface error={profiles.error} onRetry={profiles.reload} size="compact" />;
+  if (profiles.error)
+    return <ErrorSurface error={profiles.error} onRetry={profiles.reload} size="compact" />;
 
   return (
     <div className="flex flex-col gap-3">
@@ -188,7 +198,10 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
 
       <ul className="flex flex-col">
         {(profiles.data ?? []).map((profile) => (
-          <li key={profile.bundle_id} className="hairline-b flex flex-col gap-2 py-3 last:border-b-0">
+          <li
+            key={profile.bundle_id}
+            className="hairline-b flex flex-col gap-2 py-3 last:border-b-0"
+          >
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -207,7 +220,9 @@ export function AppProfiles({ defs, globals, dynamic, engine, permissions }: App
                 }}
                 className={`${FIELD_CLASS} w-40`}
               />
-              <span className="min-w-0 flex-1 truncate text-caption text-text-tertiary">{profile.bundle_id}</span>
+              <span className="min-w-0 flex-1 truncate text-caption text-text-tertiary">
+                {profile.bundle_id}
+              </span>
               <button
                 type="button"
                 aria-label={`Delete profile for ${profile.display_name}`}

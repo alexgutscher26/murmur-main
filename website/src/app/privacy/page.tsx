@@ -126,21 +126,24 @@ const REPRODUCIBLE_TEST_RECIPES = [
     tool: "Little Snitch / LuLu",
     title: "Real-Time Connection Monitoring",
     command: "lulu --monitor /Applications/Murmur.app",
-    description: "Launch LuLu or Little Snitch in Alert Mode. Start dictating in any application. Notice that zero connection alert prompts appear during voice capture, decode, or text insertion.",
+    description:
+      "Launch LuLu or Little Snitch in Alert Mode. Start dictating in any application. Notice that zero connection alert prompts appear during voice capture, decode, or text insertion.",
   },
   {
     os: "Windows",
     tool: "Pktmon / Wireshark",
     title: "Packet Inspection During Dictation",
-    command: 'pktmon filter add -n murmur && pktmon start --etw',
-    description: "Bind packet monitor to Murmur.exe. Dictate high-entropy paragraphs. Stop the trace and inspect the capture: zero TCP/UDP packets leave your network interface.",
+    command: "pktmon filter add -n murmur && pktmon start --etw",
+    description:
+      "Bind packet monitor to Murmur.exe. Dictate high-entropy paragraphs. Stop the trace and inspect the capture: zero TCP/UDP packets leave your network interface.",
   },
   {
     os: "Linux / Cross-Platform",
     tool: "NetHogs / tcpdump",
     title: "Process Bandwidth Auditing",
     command: "sudo nethogs -d 1",
-    description: "Monitor process bandwidth in real-time. Dictate for several minutes continuously. Murmur will register 0 KB/s upload and 0 KB/s download.",
+    description:
+      "Monitor process bandwidth in real-time. Dictate for several minutes continuously. Murmur will register 0 KB/s upload and 0 KB/s download.",
   },
 ];
 
@@ -165,8 +168,10 @@ export default function PrivacyPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-white/70 leading-relaxed font-normal">
-            Cloud dictation services ask you to trust legal privacy policies while streaming your raw voice to remote servers.
-            Murmur protects your confidential thoughts with physical architecture: <strong className="text-white">your voice never leaves your device.</strong>
+            Cloud dictation services ask you to trust legal privacy policies while streaming your
+            raw voice to remote servers. Murmur protects your confidential thoughts with physical
+            architecture:{" "}
+            <strong className="text-white">your voice never leaves your device.</strong>
           </p>
         </div>
 
@@ -199,7 +204,8 @@ export default function PrivacyPage() {
                 </div>
                 <h3 className="text-sm font-bold text-white mb-1">1. Microphone</h3>
                 <p className="text-xs text-white/60 leading-normal">
-                  OS audio stream captured into temporary volatile RAM buffer (CPAL / WASAPI / CoreAudio).
+                  OS audio stream captured into temporary volatile RAM buffer (CPAL / WASAPI /
+                  CoreAudio).
                 </p>
               </div>
               <span className="text-[10px] font-mono text-emerald-400 mt-4 block">
@@ -214,7 +220,9 @@ export default function PrivacyPage() {
                 </div>
                 <h3 className="text-sm font-bold text-white mb-1">2. Local Whisper Engine</h3>
                 <p className="text-xs text-white/60 leading-normal">
-                  Decoded on-device via <code className="text-emerald-300 text-[11px]">whisper.cpp</code> using native Metal (macOS) or DirectML/CUDA (Windows).
+                  Decoded on-device via{" "}
+                  <code className="text-emerald-300 text-[11px]">whisper.cpp</code> using native
+                  Metal (macOS) or DirectML/CUDA (Windows).
                 </p>
               </div>
               <span className="text-[10px] font-mono text-emerald-400 mt-4 block">
@@ -244,7 +252,8 @@ export default function PrivacyPage() {
                 </div>
                 <h3 className="text-sm font-bold text-white mb-1">4. Direct Insertion</h3>
                 <p className="text-xs text-white/60 leading-normal">
-                  Formatted text is typed directly into your focused cursor via native OS input injection.
+                  Formatted text is typed directly into your focused cursor via native OS input
+                  injection.
                 </p>
               </div>
               <span className="text-[10px] font-mono text-emerald-400 mt-4 block">
@@ -258,7 +267,9 @@ export default function PrivacyPage() {
               <span className="text-emerald-400 font-bold">✓ Net Result:</span>
               <span>Zero audio packets. Zero transcripts in the cloud. No remote logging.</span>
             </div>
-            <span className="font-mono text-[11px] text-white/50">Audit method: Wireshark / LuLu / Little Snitch</span>
+            <span className="font-mono text-[11px] text-white/50">
+              Audit method: Wireshark / LuLu / Little Snitch
+            </span>
           </div>
         </div>
 
@@ -266,9 +277,7 @@ export default function PrivacyPage() {
         <div className="p-6 sm:p-8 rounded-2xl bg-[#181818] border border-[#313131] mb-14">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
             <div>
-              <h2 className="text-xl font-bold text-white">
-                The Murmur Local Data Boundary
-              </h2>
+              <h2 className="text-xl font-bold text-white">The Murmur Local Data Boundary</h2>
               <p className="text-xs sm:text-sm text-white/60">
                 A line-by-line breakdown of every data asset and its storage guarantee.
               </p>
@@ -350,13 +359,18 @@ export default function PrivacyPage() {
               Turn &ldquo;Trust Me&rdquo; into &ldquo;Verify Me&rdquo;
             </h2>
             <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
-              Don&apos;t take our word for it. Here is how security teams, enterprise compliance officers, and power users can independently verify Murmur with network inspection tools:
+              Don&apos;t take our word for it. Here is how security teams, enterprise compliance
+              officers, and power users can independently verify Murmur with network inspection
+              tools:
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-mono">
             {REPRODUCIBLE_TEST_RECIPES.map((recipe, idx) => (
-              <div key={idx} className="p-5 rounded-xl bg-[#1a1a1a] border border-[#313131] flex flex-col justify-between">
+              <div
+                key={idx}
+                className="p-5 rounded-xl bg-[#1a1a1a] border border-[#313131] flex flex-col justify-between"
+              >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
                     <span className="text-[11px] font-bold text-white">{recipe.tool}</span>
@@ -389,8 +403,14 @@ export default function PrivacyPage() {
               <ul className="space-y-2 text-xs text-white/60 list-disc list-inside">
                 <li>Audio streams across public networks to remote GPU endpoints.</li>
                 <li>Requires account creation, authentication tokens, and user IDs.</li>
-                <li>Transcripts and voice snippets may be retained for model fine-tuning unless explicitly opted out.</li>
-                <li>Dependent on third-party uptime, internet bandwidth, and corporate cloud retention policies.</li>
+                <li>
+                  Transcripts and voice snippets may be retained for model fine-tuning unless
+                  explicitly opted out.
+                </li>
+                <li>
+                  Dependent on third-party uptime, internet bandwidth, and corporate cloud retention
+                  policies.
+                </li>
               </ul>
             </div>
 
@@ -403,7 +423,10 @@ export default function PrivacyPage() {
                 <li>0 bytes of audio or transcript leave your physical hardware.</li>
                 <li>Zero accounts, zero logins, zero marketing or crash telemetry.</li>
                 <li>Model weights execute directly in local memory via whisper.cpp.</li>
-                <li>Works completely offline on airplanes, air-gapped workstations, and strict enterprise networks.</li>
+                <li>
+                  Works completely offline on airplanes, air-gapped workstations, and strict
+                  enterprise networks.
+                </li>
               </ul>
             </div>
           </div>
@@ -415,7 +438,8 @@ export default function PrivacyPage() {
             Dictate with total confidence.
           </h2>
           <p className="text-sm text-white/70 max-w-md mx-auto mb-6">
-            Murmur is free, open source, and built for people who value privacy as an absolute guarantee.
+            Murmur is free, open source, and built for people who value privacy as an absolute
+            guarantee.
           </p>
           <div className="flex justify-center gap-3">
             <Link

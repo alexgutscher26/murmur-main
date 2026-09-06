@@ -32,10 +32,7 @@ export function LanguageBreakdown({ languages }: { languages: readonly LanguageC
   return (
     <ul className="flex flex-col">
       {rows.map((row) => (
-        <li
-          key={row.language}
-          className="flex h-[var(--chart-row-height)] items-center gap-3"
-        >
+        <li key={row.language} className="flex h-[var(--chart-row-height)] items-center gap-3">
           <span className="w-[var(--chart-label-gutter)] shrink-0 truncate text-label text-text-secondary">
             {formatLanguage(row.language)}
           </span>

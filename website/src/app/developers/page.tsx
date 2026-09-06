@@ -11,7 +11,8 @@ const DEMO_PRESETS = [
   {
     id: "file-tagging",
     title: "AI IDE File Tagging",
-    spoken: "look at tag file src slash components slash Button dot tsx and add a secondary variant prop",
+    spoken:
+      "look at tag file src slash components slash Button dot tsx and add a secondary variant prop",
     output: "look at @src/components/Button.tsx and add a secondary variant prop",
     target: "Cursor / Windsurf / Claude Code",
     badge: "Context Injection",
@@ -97,13 +98,41 @@ const IDE_INTEGRATIONS = [
 ];
 
 const COMPARISON_ROWS = [
-  { feature: "AI Model Execution", murmur: "100% Local (whisper.cpp / GPU)", wispr: "Cloud Servers (Audio Uploaded)" },
-  { feature: "Codebase Context Privacy", murmur: "Zero Outbound Data / Air-Gap Safe", wispr: "Code & Prompts Streamed Online" },
-  { feature: "Cursor & Windsurf @file Tagging", murmur: "Native Voice Directive", wispr: "Supported (Cloud)" },
-  { feature: "Syntax & Casing Directives", murmur: "camelCase, snake_case, backticks", wispr: "Supported (Cloud)" },
-  { feature: "Developer Snippet Library", murmur: "Included (PRs, APIs, Env Setup)", wispr: "Supported (Cloud)" },
-  { feature: "Codebase Symbol Importer", murmur: "1-Click package.json / Cargo scanner", wispr: "Manual Dictionary Entry" },
-  { feature: "Pricing", murmur: "Free & Open Source / $49 Lifetime", wispr: "$12/mo / $144/yr recurring" },
+  {
+    feature: "AI Model Execution",
+    murmur: "100% Local (whisper.cpp / GPU)",
+    wispr: "Cloud Servers (Audio Uploaded)",
+  },
+  {
+    feature: "Codebase Context Privacy",
+    murmur: "Zero Outbound Data / Air-Gap Safe",
+    wispr: "Code & Prompts Streamed Online",
+  },
+  {
+    feature: "Cursor & Windsurf @file Tagging",
+    murmur: "Native Voice Directive",
+    wispr: "Supported (Cloud)",
+  },
+  {
+    feature: "Syntax & Casing Directives",
+    murmur: "camelCase, snake_case, backticks",
+    wispr: "Supported (Cloud)",
+  },
+  {
+    feature: "Developer Snippet Library",
+    murmur: "Included (PRs, APIs, Env Setup)",
+    wispr: "Supported (Cloud)",
+  },
+  {
+    feature: "Codebase Symbol Importer",
+    murmur: "1-Click package.json / Cargo scanner",
+    wispr: "Manual Dictionary Entry",
+  },
+  {
+    feature: "Pricing",
+    murmur: "Free & Open Source / $49 Lifetime",
+    wispr: "$12/mo / $144/yr recurring",
+  },
 ];
 
 export default function DevelopersPage() {
@@ -130,11 +159,16 @@ export default function DevelopersPage() {
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight max-w-3xl mx-auto leading-tight">
-              Dictation Built for <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/50">Developers</span>
+              Dictation Built for{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/50">
+                Developers
+              </span>
             </h1>
 
             <p className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
-              Ship 4x faster with syntax-smart dictation built for modern engineering workflows. Tag files in Cursor, dictate camelCase, and expand PR checklists hands-free—with zero audio leaving your laptop.
+              Ship 4x faster with syntax-smart dictation built for modern engineering workflows. Tag
+              files in Cursor, dictate camelCase, and expand PR checklists hands-free—with zero
+              audio leaving your laptop.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
@@ -168,7 +202,8 @@ export default function DevelopersPage() {
                   </span>
                 </h2>
                 <p className="text-xs text-white/60 mt-1">
-                  Click any preset below to see how spoken developer cues transform instantly into code.
+                  Click any preset below to see how spoken developer cues transform instantly into
+                  code.
                 </p>
               </div>
 
@@ -247,7 +282,8 @@ export default function DevelopersPage() {
                 Built for Developers Who Live in Their Tools
               </h2>
               <p className="text-sm text-white/60 max-w-xl mx-auto">
-                No awkward typing pauses when pairing with AI coding agents or documenting pull requests.
+                No awkward typing pauses when pairing with AI coding agents or documenting pull
+                requests.
               </p>
             </div>
 
@@ -268,9 +304,12 @@ export default function DevelopersPage() {
           {/* IDE Integrations Banner */}
           <section className="bg-[#121212] border border-[#262626] rounded-2xl p-8 space-y-6">
             <div className="text-center space-y-2">
-              <h2 className="text-xl sm:text-2xl font-bold">Works Seamlessly Across Your Developer Stack</h2>
+              <h2 className="text-xl sm:text-2xl font-bold">
+                Works Seamlessly Across Your Developer Stack
+              </h2>
               <p className="text-xs text-white/60">
-                Murmur injects text directly into the focused window via native OS events. No browser extensions or plugins required.
+                Murmur injects text directly into the focused window via native OS events. No
+                browser extensions or plugins required.
               </p>
             </div>
 
@@ -295,7 +334,8 @@ export default function DevelopersPage() {
                 Murmur vs. Wispr Flow for Developers
               </h2>
               <p className="text-sm text-white/60 max-w-xl mx-auto">
-                Why privacy-conscious engineering teams choose on-device Murmur over cloud subscriptions.
+                Why privacy-conscious engineering teams choose on-device Murmur over cloud
+                subscriptions.
               </p>
             </div>
 
@@ -332,7 +372,8 @@ export default function DevelopersPage() {
                 Ready to Flow 4x Faster at Your Terminal?
               </h2>
               <p className="text-sm text-white/60">
-                Install Murmur in seconds. Works completely offline with zero setup and zero account creation.
+                Install Murmur in seconds. Works completely offline with zero setup and zero account
+                creation.
               </p>
             </div>
 

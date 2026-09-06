@@ -30,7 +30,7 @@ export function useScrollRestoration(key: string, isReady: boolean = true) {
     (e: React.UIEvent<HTMLDivElement>) => {
       scrollPositions.set(key, e.currentTarget.scrollTop);
     },
-    [key]
+    [key],
   );
 
   const resetScroll = useCallback(() => {

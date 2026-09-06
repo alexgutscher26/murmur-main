@@ -130,7 +130,11 @@ export function springFor(name: SpringName): SpringTransition {
 /** The one reduced-motion answer: a fade at the app's smallest duration, never
  *  an instant appearance — see docs/04 §6. */
 export function reducedFade(): FadeTransition {
-  return { type: "tween", duration: readDurationMs("--motion-duration-fast") / 1000, ease: "linear" };
+  return {
+    type: "tween",
+    duration: readDurationMs("--motion-duration-fast") / 1000,
+    ease: "linear",
+  };
 }
 
 /**

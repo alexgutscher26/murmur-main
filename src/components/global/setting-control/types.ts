@@ -92,9 +92,4 @@ export interface CustomSetting extends SettingBase {
 }
 
 export type SettingDef =
-  | ToggleSetting
-  | SelectSetting
-  | NumberSetting
-  | TextSetting
-  | HotkeySetting
-  | CustomSetting;
+  ToggleSetting | SelectSetting | NumberSetting | TextSetting | HotkeySetting | CustomSetting;

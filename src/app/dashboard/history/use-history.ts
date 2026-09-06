@@ -114,5 +114,16 @@ export function useHistory(query: string): HistoryFeed {
     setExhausted(true);
   }, []);
 
-  return { items, error, loading, exhausted, loaded, loadMore, refresh, forget, forgetMany, clearAll };
+  return {
+    items,
+    error,
+    loading,
+    exhausted,
+    loaded,
+    loadMore,
+    refresh,
+    forget,
+    forgetMany,
+    clearAll,
+  };
 }

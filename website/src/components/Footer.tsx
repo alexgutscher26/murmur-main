@@ -207,9 +207,8 @@ export function Footer() {
             </div>
 
             <p className="text-sm text-neutral-600 leading-relaxed max-w-sm">
-              Local speech-to-text for macOS and Windows. Free forever, open
-              source, and your audio never leaves your device. Built with Rust,
-              Tauri 2, and whisper.cpp.
+              Local speech-to-text for macOS and Windows. Free forever, open source, and your audio
+              never leaves your device. Built with Rust, Tauri 2, and whisper.cpp.
             </p>
 
             <ul className="flex flex-wrap items-center gap-2">
@@ -283,7 +282,9 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
-          <p>© {new Date().getFullYear()} Murmur. Zero telemetry, 100% on-device data sovereignty.</p>
+          <p>
+            © {new Date().getFullYear()} Murmur. Zero telemetry, 100% on-device data sovereignty.
+          </p>
 
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 bg-white border border-neutral-200/80 px-3 py-1 rounded-full shadow-sm">

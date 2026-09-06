@@ -50,9 +50,8 @@ export interface PageShellProps {
 
 export function PageShell({ title, actions, children }: PageShellProps) {
   const forwardWheel = (event: WheelEvent<HTMLElement>) => {
-    const scroller = event.currentTarget.parentElement?.querySelector<HTMLElement>(
-      "[data-scroll-area]",
-    );
+    const scroller =
+      event.currentTarget.parentElement?.querySelector<HTMLElement>("[data-scroll-area]");
     if (scroller) scroller.scrollTop += event.deltaY;
   };
 

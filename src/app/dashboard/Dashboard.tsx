@@ -70,9 +70,7 @@ function dictationHotkey(
   for (const capability of registry.capabilities) {
     const hotkey = capability.hotkey;
     if (!hotkey) continue;
-    const override = hotkey.setting_key
-      ? values?.[hotkey.setting_key]
-      : undefined;
+    const override = hotkey.setting_key ? values?.[hotkey.setting_key] : undefined;
     return override?.type === "HOTKEY" ? override.value : hotkey.default;
   }
   return null;
@@ -108,8 +106,7 @@ export function Dashboard() {
     } catch {}
   }, [activateLicense]);
 
-  const isOnboardingIncomplete =
-    settings.data?.["general.onboarding_complete"]?.value !== true;
+  const isOnboardingIncomplete = settings.data?.["general.onboarding_complete"]?.value !== true;
   const savedStepIndex =
     typeof settings.data?.["general.onboarding_step_index"]?.value === "number"
       ? (settings.data["general.onboarding_step_index"].value as number)
@@ -122,8 +119,7 @@ export function Dashboard() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
-      const isInput =
-        target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
+      const isInput = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA";
 
       if (!isInput && e.key === "?") {
         e.preventDefault();
@@ -164,23 +160,13 @@ export function Dashboard() {
   }, [registry.data]);
 
   const metrics = useMemo(
-    () =>
-      (registry.data?.capabilities ?? []).flatMap(
-        (capability) => capability.metrics,
-      ),
+    () => (registry.data?.capabilities ?? []).flatMap((capability) => capability.metrics),
     [registry.data],
   );
 
   // Known dashboard routes matching the sidebar navigation
   const knownRoutes = useMemo(
-    () =>
-      new Set([
-        "dictation",
-        "insights",
-        "dictionary",
-        "settings",
-        "billing",
-      ]),
+    () => new Set(["dictation", "insights", "dictionary", "settings", "billing"]),
     [],
   );
 
@@ -342,11 +328,10 @@ export function Dashboard() {
               <button
                 type="button"
                 onClick={() => {
-                  const url =
-                    referralStatus.data?.referral_url || "https://murmur.app/pricing";
-                  void unwrapCommand(() =>
-                    commands.copyText({ text: url }),
-                  ).then(() => showToast("Personal referral link copied to clipboard!"));
+                  const url = referralStatus.data?.referral_url || "https://murmur.app/pricing";
+                  void unwrapCommand(() => commands.copyText({ text: url })).then(() =>
+                    showToast("Personal referral link copied to clipboard!"),
+                  );
                 }}
                 className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors cursor-pointer"
                 title="Invite friends & get Pro packs"
@@ -404,7 +389,8 @@ export function Dashboard() {
                     </span>
                   </div>
                   <p className="text-[11px] text-amber-800/80 dark:text-amber-400/80">
-                    You have incomplete onboarding steps. Resume where you left off to complete guided practice.
+                    You have incomplete onboarding steps. Resume where you left off to complete
+                    guided practice.
                   </p>
                 </div>
               </div>
@@ -447,7 +433,8 @@ export function Dashboard() {
                     </span>
                   </div>
                   <p className="text-[11px] text-emerald-800/90 dark:text-emerald-300/90 leading-tight mt-0.5">
-                    You've built a solid local dictation habit. Invite colleagues or friends: they get a welcome discount, and you unlock free Pro developer packs.
+                    You've built a solid local dictation habit. Invite colleagues or friends: they
+                    get a welcome discount, and you unlock free Pro developer packs.
                   </p>
                 </div>
               </div>
@@ -528,14 +515,8 @@ export function Dashboard() {
       )}
 
       {/* ── Global Modals ────────────────────────────────────────────────── */}
-      <ShortcutsModal
-        isOpen={showShortcuts}
-        onClose={() => setShowShortcuts(false)}
-      />
-      <ChangelogModal
-        isOpen={showChangelog}
-        onClose={() => setShowChangelog(false)}
-      />
+      <ShortcutsModal isOpen={showShortcuts} onClose={() => setShowShortcuts(false)} />
+      <ChangelogModal isOpen={showChangelog} onClose={() => setShowChangelog(false)} />
     </div>
   );
 }

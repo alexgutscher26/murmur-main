@@ -17,10 +17,7 @@ export async function POST(req: NextRequest) {
     const { licenseKey } = body as { licenseKey?: string };
 
     if (!licenseKey || typeof licenseKey !== "string") {
-      return NextResponse.json(
-        { valid: false, message: "Missing license key." },
-        { status: 400 }
-      );
+      return NextResponse.json({ valid: false, message: "Missing license key." }, { status: 400 });
     }
 
     const cleanKey = licenseKey.trim().toUpperCase();
@@ -96,9 +93,10 @@ export async function POST(req: NextRequest) {
             isLifetime: false,
             status: sub.status === "past_due" ? "past_due" : "active",
             expiresAt: periodEndMs,
-            message: sub.status === "past_due"
-              ? "Payment is past due in Stripe."
-              : "Active recurring subscription.",
+            message:
+              sub.status === "past_due"
+                ? "Payment is past due in Stripe."
+                : "Active recurring subscription.",
           });
         }
       } catch (stripeErr) {
@@ -140,7 +138,7 @@ export async function POST(req: NextRequest) {
     console.error("License verification error:", err);
     return NextResponse.json(
       { valid: false, message: "Internal verification error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -85,7 +85,7 @@ export default async function BlogPostPage({ params }: Props) {
               className="p-4 rounded-xl bg-[#141414] border border-[#313131] font-mono text-xs text-white/90 overflow-x-auto my-6 leading-relaxed"
             >
               <code>{codeBuffer.join("\n")}</code>
-            </pre>
+            </pre>,
           );
           codeBuffer = [];
           inCodeBlock = false;
@@ -111,13 +111,16 @@ export default async function BlogPostPage({ params }: Props) {
           r
             .split("|")
             .filter((_, cIdx, arr) => cIdx > 0 && cIdx < arr.length - 1)
-            .map((c) => c.trim())
+            .map((c) => c.trim()),
         );
         const header = rows[0];
         const body = rows.slice(2);
 
         elements.push(
-          <div key={`table-${idx}`} className="my-6 rounded-xl border border-[#313131] overflow-x-auto bg-[#141414]">
+          <div
+            key={`table-${idx}`}
+            className="my-6 rounded-xl border border-[#313131] overflow-x-auto bg-[#141414]"
+          >
             <table className="w-full text-left text-xs border-collapse font-mono">
               <thead>
                 <tr className="bg-[#1f1f1f] border-b border-[#313131] text-white/90">
@@ -140,7 +143,7 @@ export default async function BlogPostPage({ params }: Props) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </div>,
         );
         tableBuffer = [];
         inTable = false;
@@ -149,37 +152,51 @@ export default async function BlogPostPage({ params }: Props) {
       // Headings
       if (line.startsWith("## ")) {
         elements.push(
-          <h2 key={idx} className="text-2xl sm:text-3xl font-bold text-white mt-12 mb-5 tracking-tight">
+          <h2
+            key={idx}
+            className="text-2xl sm:text-3xl font-bold text-white mt-12 mb-5 tracking-tight"
+          >
             {formatInlineMarkdown(line.replace("## ", ""))}
-          </h2>
+          </h2>,
         );
       } else if (line.startsWith("### ")) {
         elements.push(
-          <h3 key={idx} className="text-xl sm:text-2xl font-bold text-white mt-10 mb-4 tracking-tight">
+          <h3
+            key={idx}
+            className="text-xl sm:text-2xl font-bold text-white mt-10 mb-4 tracking-tight"
+          >
             {formatInlineMarkdown(line.replace("### ", ""))}
-          </h3>
+          </h3>,
         );
       } else if (line.startsWith("#### ")) {
         elements.push(
           <h4 key={idx} className="text-base sm:text-lg font-bold text-emerald-400 mt-6 mb-2">
             {formatInlineMarkdown(line.replace("#### ", ""))}
-          </h4>
+          </h4>,
         );
       } else if (line.startsWith("---")) {
         elements.push(<hr key={idx} className="border-[#272727] my-8" />);
       } else if (line.startsWith("- ")) {
         elements.push(
-          <li key={idx} className="text-xs sm:text-sm text-white/80 leading-relaxed ml-4 list-disc mb-2">
+          <li
+            key={idx}
+            className="text-xs sm:text-sm text-white/80 leading-relaxed ml-4 list-disc mb-2"
+          >
             {formatInlineMarkdown(line.replace("- ", ""))}
-          </li>
+          </li>,
         );
       } else if (/^\d+\.\s/.test(line)) {
         const match = line.match(/^(\d+\.)\s(.*)$/);
         elements.push(
-          <div key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-white/80 leading-relaxed mb-2.5 ml-1">
-            <span className="font-mono text-emerald-400 font-semibold shrink-0">{match ? match[1] : ""}</span>
+          <div
+            key={idx}
+            className="flex items-start gap-2.5 text-xs sm:text-sm text-white/80 leading-relaxed mb-2.5 ml-1"
+          >
+            <span className="font-mono text-emerald-400 font-semibold shrink-0">
+              {match ? match[1] : ""}
+            </span>
             <div>{formatInlineMarkdown(match ? match[2] : line)}</div>
-          </div>
+          </div>,
         );
       } else if (line.startsWith("> ")) {
         elements.push(
@@ -188,13 +205,13 @@ export default async function BlogPostPage({ params }: Props) {
             className="p-4 my-6 rounded-xl bg-[#141414] border-l-2 border-emerald-400 text-xs sm:text-sm italic text-white/90"
           >
             {formatInlineMarkdown(line.replace("> ", ""))}
-          </blockquote>
+          </blockquote>,
         );
       } else if (line.trim().length > 0) {
         elements.push(
           <p key={idx} className="text-xs sm:text-sm text-white/80 leading-relaxed mb-4">
             {formatInlineMarkdown(line)}
-          </p>
+          </p>,
         );
       }
     });
@@ -219,9 +236,7 @@ export default async function BlogPostPage({ params }: Props) {
             Blog
           </Link>
           <span>/</span>
-          <span className="text-emerald-400 truncate max-w-[240px]">
-            {post.category}
-          </span>
+          <span className="text-emerald-400 truncate max-w-[240px]">{post.category}</span>
         </nav>
 
         {/* Article Header */}
@@ -239,9 +254,7 @@ export default async function BlogPostPage({ params }: Props) {
             {post.title}
           </h1>
 
-          <p className="text-base sm:text-lg text-white/70 leading-relaxed">
-            {post.description}
-          </p>
+          <p className="text-base sm:text-lg text-white/70 leading-relaxed">{post.description}</p>
 
           {/* Author Badge */}
           <div className="flex items-center gap-3 mt-6 pt-6 border-t border-[#272727]">
@@ -249,12 +262,8 @@ export default async function BlogPostPage({ params }: Props) {
               {post.author.avatar}
             </div>
             <div>
-              <span className="text-xs font-semibold text-white block">
-                {post.author.name}
-              </span>
-              <span className="text-[11px] font-mono text-white/40">
-                {post.author.role}
-              </span>
+              <span className="text-xs font-semibold text-white block">{post.author.name}</span>
+              <span className="text-[11px] font-mono text-white/40">{post.author.role}</span>
             </div>
           </div>
         </header>
@@ -267,7 +276,10 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
           <ul className="space-y-2">
             {post.keyTakeaways.map((takeaway, idx) => (
-              <li key={idx} className="text-xs sm:text-sm text-white/80 leading-relaxed flex items-start gap-2">
+              <li
+                key={idx}
+                className="text-xs sm:text-sm text-white/80 leading-relaxed flex items-start gap-2"
+              >
                 <span className="text-emerald-400 font-mono">0{idx + 1}.</span>
                 <span>{takeaway}</span>
               </li>
@@ -288,7 +300,10 @@ export default async function BlogPostPage({ params }: Props) {
             </span>
             <div className="space-y-2">
               {post.shortFormHooks.map((hook, hIdx) => (
-                <div key={hIdx} className="p-3 rounded-lg bg-[#1f1f1f] text-xs font-mono text-white/90 border border-[#272727]">
+                <div
+                  key={hIdx}
+                  className="p-3 rounded-lg bg-[#1f1f1f] text-xs font-mono text-white/90 border border-[#272727]"
+                >
                   &quot;{hook}&quot;
                 </div>
               ))}
@@ -302,7 +317,8 @@ export default async function BlogPostPage({ params }: Props) {
             Experience 100% On-Device Voice Typing
           </h2>
           <p className="text-xs sm:text-sm text-white/70 max-w-md mx-auto mb-6 leading-relaxed">
-            Murmur runs locally on your Mac or Windows PC. No cloud transcription, no audio uploads, zero subscriptions.
+            Murmur runs locally on your Mac or Windows PC. No cloud transcription, no audio uploads,
+            zero subscriptions.
           </p>
           <a
             href="/#download"
@@ -314,9 +330,7 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Related Articles */}
         <div className="pt-12 border-t border-[#272727]">
-          <h3 className="text-base font-bold text-white mb-6">
-            Related Guides & Analyses
-          </h3>
+          <h3 className="text-base font-bold text-white mb-6">Related Guides & Analyses</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {otherPosts.map((other: BlogPost) => (
               <Link
@@ -330,9 +344,7 @@ export default async function BlogPostPage({ params }: Props) {
                 <h4 className="text-xs sm:text-sm font-bold text-white line-clamp-2 mb-2">
                   {other.title}
                 </h4>
-                <span className="text-[11px] font-mono text-white/40">
-                  {other.readTime}
-                </span>
+                <span className="text-[11px] font-mono text-white/40">{other.readTime}</span>
               </Link>
             ))}
           </div>

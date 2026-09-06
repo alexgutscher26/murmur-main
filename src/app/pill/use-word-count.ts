@@ -41,7 +41,8 @@ export function useWordCount(live: boolean): WordCountResult {
   useTauriEvent(events.audioLevelChanged, (payload) => {
     if (!live) return;
     const now = performance.now();
-    const dt = lastSampleTimeRef.current !== null ? Math.min(now - lastSampleTimeRef.current, 200) : 50;
+    const dt =
+      lastSampleTimeRef.current !== null ? Math.min(now - lastSampleTimeRef.current, 200) : 50;
     lastSampleTimeRef.current = now;
 
     const rms = payload.level.rms ?? payload.level.peak ?? 0;
@@ -53,9 +54,7 @@ export function useWordCount(live: boolean): WordCountResult {
   });
 
   const formatted =
-    estimatedWords > 0
-      ? `~${estimatedWords} ${estimatedWords === 1 ? "word" : "words"}`
-      : "";
+    estimatedWords > 0 ? `~${estimatedWords} ${estimatedWords === 1 ? "word" : "words"}` : "";
 
   return {
     estimatedWords,

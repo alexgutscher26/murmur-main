@@ -215,7 +215,9 @@ export async function checkRemoteLicenseStatus(key: string): Promise<Subscriptio
           isLifetime: data.isLifetime || false,
           status: data.status || (data.valid ? "active" : "canceled"),
           expiresAt: data.expiresAt || null,
-          message: data.message || (data.valid ? "Subscription Active" : "Subscription Expired or Canceled"),
+          message:
+            data.message ||
+            (data.valid ? "Subscription Active" : "Subscription Expired or Canceled"),
         };
       }
     } catch {

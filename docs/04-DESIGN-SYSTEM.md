@@ -7,7 +7,7 @@ Exact values, so the look is decided once here rather than improvised per compon
 ## 1. Principles
 
 1. **Real glass, not CSS glass.** Native `NSVisualEffectView` vibrancy is the material. The web layer contributes only the border, the inner highlight, and the noise. `backdrop-filter` is a fallback, and it looks like an imitation of glass — never the primary.
-2. **One elevated surface per view, and it has to earn it.** Content sits directly on the material by default. Exactly one card may float on the panel — the one holding the thing the view exists to show — and it is the `glass-elevated` material with `--radius-card`, so the layering reads as depth. A *grid* of cards on glass is what makes this look like a Windows Vista widget, not the existence of a card: repeat the surface and none of them is elevated any more, they are just boxes. Secondary content is grouped by spacing and a hairline, never by giving it a surface of its own.
+2. **One elevated surface per view, and it has to earn it.** Content sits directly on the material by default. Exactly one card may float on the panel — the one holding the thing the view exists to show — and it is the `glass-elevated` material with `--radius-card`, so the layering reads as depth. A _grid_ of cards on glass is what makes this look like a Windows Vista widget, not the existence of a card: repeat the surface and none of them is elevated any more, they are just boxes. Secondary content is grouped by spacing and a hairline, never by giving it a surface of its own.
 3. **Silent until you speak.** This is the idea the whole interface is built from, and it is why Murmur looks like itself rather than like every other app. At rest there is NO colour anywhere — the app is warm graphite glass, type and shadow, and nothing else. Saturation exists only while a session is live, and it leaves when the session does. A coloured control on an idle screen is a bug, not a decoration.
 4. **Depth comes from layering, not from colour.** Elevation is translucency, radius and shadow: a panel, a card floating on it, a hairline catching light at the top edge. If a surface needs to stand out and the answer reaches for a hue, the answer is wrong.
 5. **Motion is physics, not duration.** Springs, not eases. Nothing in the app moves linearly.
@@ -34,32 +34,31 @@ Exact values, so the look is decided once here rather than improvised per compon
 > orange) to a true red (hue ≈4°) so it cannot be mistaken for the theme that was rejected. Use it
 > as a MARK — text, icon, dot — never as a wash bigger than the pill's failure tint.
 
-
 Defined as CSS custom properties on `:root`, redefined under `@media (prefers-color-scheme: dark)`. **Never write a hex value in a component.**
 
 ### Light
 
 ```css
---surface-glass:      rgba(252, 250, 247, 0.55);   /* warm, never pure white */
---surface-elevated:   rgba(255, 254, 252, 0.72);
---surface-sunken:     rgba(40, 34, 28, 0.04);     /* hover */
+--surface-glass: rgba(252, 250, 247, 0.55); /* warm, never pure white */
+--surface-elevated: rgba(255, 254, 252, 0.72);
+--surface-sunken: rgba(40, 34, 28, 0.04); /* hover */
 --surface-sunken-strong: rgba(40, 34, 28, 0.07); /* press, and a selected nav item */
---border-hairline:    rgba(40, 34, 28, 0.09);
---border-highlight:   rgba(255, 255, 255, 0.70);   /* top inner edge */
---text-primary:       rgba(28, 24, 20, 0.90);
---text-secondary:     rgba(28, 24, 20, 0.54);
---text-tertiary:      rgba(28, 24, 20, 0.32);
---accent:             rgba(28, 24, 20, 0.90);      /* INK. there is no accent hue */
---accent-soft:        rgba(40, 34, 28, 0.06);
---success:            rgba(28, 24, 20, 0.90);      /* no hue: the shape says done */
---success-soft:       rgba(40, 34, 28, 0.06);
---warning:            rgba(28, 24, 20, 0.54);      /* no hue: the line says counting */
---warning-soft:       rgba(40, 34, 28, 0.06);
---danger:             #A8342C;                     /* the ONLY colour in the app */
---danger-soft:        rgba(168, 52, 44, 0.10);
---shadow-pill:        0 12px 40px rgba(28, 24, 20, 0.16);
---shadow-panel:       0 24px 64px rgba(28, 24, 20, 0.14);
---shadow-card:        0 8px 24px rgba(28, 24, 20, 0.10);
+--border-hairline: rgba(40, 34, 28, 0.09);
+--border-highlight: rgba(255, 255, 255, 0.7); /* top inner edge */
+--text-primary: rgba(28, 24, 20, 0.9);
+--text-secondary: rgba(28, 24, 20, 0.54);
+--text-tertiary: rgba(28, 24, 20, 0.32);
+--accent: rgba(28, 24, 20, 0.9); /* INK. there is no accent hue */
+--accent-soft: rgba(40, 34, 28, 0.06);
+--success: rgba(28, 24, 20, 0.9); /* no hue: the shape says done */
+--success-soft: rgba(40, 34, 28, 0.06);
+--warning: rgba(28, 24, 20, 0.54); /* no hue: the line says counting */
+--warning-soft: rgba(40, 34, 28, 0.06);
+--danger: #a8342c; /* the ONLY colour in the app */
+--danger-soft: rgba(168, 52, 44, 0.1);
+--shadow-pill: 0 12px 40px rgba(28, 24, 20, 0.16);
+--shadow-panel: 0 24px 64px rgba(28, 24, 20, 0.14);
+--shadow-card: 0 8px 24px rgba(28, 24, 20, 0.1);
 ```
 
 **Two sunken steps, and they are the app's entire interaction feedback.** `--surface-sunken` is
@@ -73,8 +72,8 @@ component looked defensible.
 there is no ember, so the list collapses to one row and is kept because a one-row list is still
 easier to check than re-deriving the rule at each call site:
 
-| Allowed | Because |
-|---|---|
+| Allowed                                                             | Because                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------- |
 | `--danger` on a destructive control, and on the pill's failed state | Losing this distinction is a safety regression, not a style choice. |
 
 Everything else is monochrome, including every case that used to be ember: the pill's waveform and
@@ -86,43 +85,43 @@ chart. A primary action that needs more weight than a secondary one gets it from
 ### Dark
 
 ```css
---surface-glass:      rgba(36, 33, 30, 0.58);   /* warm graphite, not blue-grey */
---surface-elevated:   rgba(52, 48, 44, 0.72);
---surface-sunken:     rgba(252, 250, 247, 0.04);     /* hover */
+--surface-glass: rgba(36, 33, 30, 0.58); /* warm graphite, not blue-grey */
+--surface-elevated: rgba(52, 48, 44, 0.72);
+--surface-sunken: rgba(252, 250, 247, 0.04); /* hover */
 --surface-sunken-strong: rgba(252, 250, 247, 0.08); /* press, and a selected nav item */
---border-hairline:    rgba(252, 250, 247, 0.10);
---border-highlight:   rgba(252, 250, 247, 0.13);
---text-primary:       rgba(252, 250, 247, 0.92);
---text-secondary:     rgba(252, 250, 247, 0.56);
---text-tertiary:      rgba(252, 250, 247, 0.34);
---accent:             rgba(252, 250, 247, 0.92);   /* INK. there is no accent hue */
---accent-soft:        rgba(252, 250, 247, 0.08);
---success:            rgba(252, 250, 247, 0.92);   /* no hue: the shape says done */
---success-soft:       rgba(252, 250, 247, 0.08);
---warning:            rgba(252, 250, 247, 0.56);   /* no hue: the line says counting */
---warning-soft:       rgba(252, 250, 247, 0.08);
---danger:             #E2685C;                     /* the ONLY colour in the app */
---danger-soft:        rgba(226, 104, 92, 0.14);
---shadow-pill:        0 12px 40px rgba(0, 0, 0, 0.50);
---shadow-panel:       0 24px 64px rgba(0, 0, 0, 0.46);
---shadow-card:        0 8px 24px rgba(0, 0, 0, 0.34);
+--border-hairline: rgba(252, 250, 247, 0.1);
+--border-highlight: rgba(252, 250, 247, 0.13);
+--text-primary: rgba(252, 250, 247, 0.92);
+--text-secondary: rgba(252, 250, 247, 0.56);
+--text-tertiary: rgba(252, 250, 247, 0.34);
+--accent: rgba(252, 250, 247, 0.92); /* INK. there is no accent hue */
+--accent-soft: rgba(252, 250, 247, 0.08);
+--success: rgba(252, 250, 247, 0.92); /* no hue: the shape says done */
+--success-soft: rgba(252, 250, 247, 0.08);
+--warning: rgba(252, 250, 247, 0.56); /* no hue: the line says counting */
+--warning-soft: rgba(252, 250, 247, 0.08);
+--danger: #e2685c; /* the ONLY colour in the app */
+--danger-soft: rgba(226, 104, 92, 0.14);
+--shadow-pill: 0 12px 40px rgba(0, 0, 0, 0.5);
+--shadow-panel: 0 24px 64px rgba(0, 0, 0, 0.46);
+--shadow-card: 0 8px 24px rgba(0, 0, 0, 0.34);
 ```
 
 **Two hues exist in this app, and both are earned.** Ember is the live colour: recording, the cancel ring, the waveform. It is warm because the surface is warm, and it is the only thing on screen with saturation while you are speaking. The muted brick is failure, and nothing else. Delivered has NO hue at all — a checkmark at full text weight reads as done without spending a colour on it, and green here would be the third hue that made the old palette feel like a bootstrap theme.
 
 **State → color mapping.** The only permitted uses of non-accent color:
 
-| State | Color |
-|---|---|
-| Idle | no colour at all |
-| Arming / Recording | ink — the waveform's MOTION is the signal |
-| Cancel armed | ink — the LINE draining is the signal |
-| Failed | `--danger` (true red) |
-| Not ready yet (transient) | no colour: it is not a failure |
+| State                     | Color                                     |
+| ------------------------- | ----------------------------------------- |
+| Idle                      | no colour at all                          |
+| Arming / Recording        | ink — the waveform's MOTION is the signal |
+| Cancel armed              | ink — the LINE draining is the signal     |
+| Failed                    | `--danger` (true red)                     |
+| Not ready yet (transient) | no colour: it is not a failure            |
 
 **A failure the user can simply retry in a moment is not drawn as a failure.** `ENGINE_NOT_READY` — the engine still warming in the seconds after launch — is the single most likely failure a NEW user will ever see, on their very first keypress, and it is temporary by definition. Painting the pill red there says the app is broken; it is not, it is seven seconds old. Transient failures keep `--accent` and read "not yet", not "something is wrong". The distinction is made on `ErrorCode`, which is the field the frontend is meant to branch on — never on message text.
 
-Each has a `-soft` variant at the same alpha as `--accent-soft`. The solid colour is for a mark the eye goes to — a dot, a ring, a checkmark, a line of text. The soft one is for tinting a whole surface, which is what §7 means when it says the pill *turns* `--danger`: at full strength over vibrancy that would be a red box, and the pill is an indicator, not an alert.
+Each has a `-soft` variant at the same alpha as `--accent-soft`. The solid colour is for a mark the eye goes to — a dot, a ring, a checkmark, a line of text. The soft one is for tinting a whole surface, which is what §7 means when it says the pill _turns_ `--danger`: at full strength over vibrancy that would be a red box, and the pill is an indicator, not an alert.
 
 ---
 
@@ -130,11 +129,11 @@ Each has a `-soft` variant at the same alpha as `--accent-soft`. The solid colou
 
 Three, and only three.
 
-| Token | Native material | Used for |
-|---|---|---|
-| `glass-pill` | `NSVisualEffectMaterial::HudWindow` | The pill overlay |
-| `glass-panel` | `NSVisualEffectMaterial::Sidebar` | Dashboard window background |
-| `glass-elevated` | `NSVisualEffectMaterial::Popover` | Menus, sheets, dropdowns |
+| Token            | Native material                     | Used for                    |
+| ---------------- | ----------------------------------- | --------------------------- |
+| `glass-pill`     | `NSVisualEffectMaterial::HudWindow` | The pill overlay            |
+| `glass-panel`    | `NSVisualEffectMaterial::Sidebar`   | Dashboard window background |
+| `glass-elevated` | `NSVisualEffectMaterial::Popover`   | Menus, sheets, dropdowns    |
 
 Every glass surface gets the same three-part treatment:
 
@@ -142,7 +141,9 @@ Every glass surface gets the same three-part treatment:
 .glass {
   background: var(--surface-glass);
   border: 0.5px solid var(--border-hairline);
-  box-shadow: inset 0 0.5px 0 var(--border-highlight), var(--shadow-panel);
+  box-shadow:
+    inset 0 0.5px 0 var(--border-highlight),
+    var(--shadow-panel);
 }
 ```
 
@@ -176,15 +177,15 @@ Borders are **0.5px**, not 1px. On a Retina display 0.5px is a true hairline; 1p
 
 System font stack (`-apple-system` → SF Pro). Never ship a webfont — it costs a network request or a bundle, and SF is what makes it feel native.
 
-| Role | Size | Weight | Tracking | Line height |
-|---|---|---|---|---|
-| Display (the big stat number) | 40px | 600 | -0.02em | 44px |
-| Title | 22px | 600 | -0.01em | 28px |
-| Heading | 16px | 600 | -0.01em | 22px |
-| Body | 13px | 400 | 0 | 18px |
-| Label | 12px | 500 | 0 | 16px |
-| Caption | 11px | 400 | 0.01em | 14px |
-| Mono (transcripts, hotkeys) | 12px | 400 | SF Mono | 18px |
+| Role                          | Size | Weight | Tracking | Line height |
+| ----------------------------- | ---- | ------ | -------- | ----------- |
+| Display (the big stat number) | 40px | 600    | -0.02em  | 44px        |
+| Title                         | 22px | 600    | -0.01em  | 28px        |
+| Heading                       | 16px | 600    | -0.01em  | 22px        |
+| Body                          | 13px | 400    | 0        | 18px        |
+| Label                         | 12px | 500    | 0        | 16px        |
+| Caption                       | 11px | 400    | 0.01em   | 14px        |
+| Mono (transcripts, hotkeys)   | 12px | 400    | SF Mono  | 18px        |
 
 Line heights are absolute, not multipliers: a row of glass UI has to sit on the same baseline grid whatever size the text is, and a unitless multiplier drifts off it at 11px and 13px.
 
@@ -196,14 +197,14 @@ Numbers in stats and the pill timer use `font-variant-numeric: tabular-nums`. Wi
 
 Springs only. Reference values (Framer Motion syntax; a CSS spring equivalent is fine):
 
-| Motion | Spring | Note |
-|---|---|---|
-| Pill appear | none — **instant** | A fade-in delays the only feedback that the keypress registered |
-| Pill exit | not a spring — see below | Owned by the WINDOW, not the document |
-| State change | `stiffness: 300, damping: 25` | Colour morph. **Not width** — see §7 |
-| Panel / sheet | `stiffness: 260, damping: 26` | |
-| Waveform bars | no spring | Driven directly by audio RMS at 60fps |
-| Countdown line | linear | The one exception — a decreasing timer must be linear or it lies about remaining time |
+| Motion         | Spring                        | Note                                                                                  |
+| -------------- | ----------------------------- | ------------------------------------------------------------------------------------- |
+| Pill appear    | none — **instant**            | A fade-in delays the only feedback that the keypress registered                       |
+| Pill exit      | not a spring — see below      | Owned by the WINDOW, not the document                                                 |
+| State change   | `stiffness: 300, damping: 25` | Colour morph. **Not width** — see §7                                                  |
+| Panel / sheet  | `stiffness: 260, damping: 26` |                                                                                       |
+| Waveform bars  | no spring                     | Driven directly by audio RMS at 60fps                                                 |
+| Countdown line | linear                        | The one exception — a decreasing timer must be linear or it lies about remaining time |
 
 **The pill's own motion is not in this table, and must never be put back into it.** The pill's glass is a native `NSVisualEffectView` sized to its window, so anything CSS moves — a scale, a translate, a width morph — slides out from under the glass and reveals it. The pill appears instantly and leaves by animating the WINDOW: `--pill-exit-duration-ms` (160) and `--pill-exit-travel` (8), read out of `tokens.css` by `src-tauri/src/tray.rs` so the motion and the design stay one fact. The travel direction carries the outcome — **up for committed, down for cancelled** — which is the whole reason the exit is animated at all, since nothing else on screen distinguishes the two once the pill is gone. Failed rises too: it is not a discarded recording, and dropping it would read as the words being thrown away.
 
@@ -241,9 +242,9 @@ Framer needs numbers, and a component may not carry one. Every spring in the tab
 ```
 
 - **Size:** 176×36pt for every live state — arming, recording and cancel-armed alike. **Nothing resizes during a dictation.** The operator asked for the pill to be smaller and more minimal, and the height is where that reads: 44→36 is the change you feel. The contents were retuned to match — 20 waveform bars rather than 24, a 16pt bar height, 12pt padding and an 8pt gap — so the pill got smaller without anything inside it getting cramped.
-- **The window is the pill.** The NSPanel is sized to `--pill-width`/`--pill-height` exactly and its vibrancy carries `--radius-pill`, so every pixel of the window is painted glass in the pill's shape. Two consequences bind everything else here: the pill fills the window and **never animates its own size or transform** (object motion — arriving, resizing, leaving — belongs to the window, in Rust; only motion *inside* the pill belongs to CSS), and the pill has **no CSS drop shadow**, because a shadow has nowhere to fall and is clipped by the window bounds. Its shadow is the native window shadow. `src-tauri/src/tray.rs` `include_str!`s `tokens.css` and parses these values at startup, so the window has no second copy of them to disagree with. **Change a token and the window follows — there is no Rust number to edit and no test to re-green.** Delete a token the pill needs and it is a build-time panic naming it.
+- **The window is the pill.** The NSPanel is sized to `--pill-width`/`--pill-height` exactly and its vibrancy carries `--radius-pill`, so every pixel of the window is painted glass in the pill's shape. Two consequences bind everything else here: the pill fills the window and **never animates its own size or transform** (object motion — arriving, resizing, leaving — belongs to the window, in Rust; only motion _inside_ the pill belongs to CSS), and the pill has **no CSS drop shadow**, because a shadow has nowhere to fall and is clipped by the window bounds. Its shadow is the native window shadow. `src-tauri/src/tray.rs` `include_str!`s `tokens.css` and parses these values at startup, so the window has no second copy of them to disagree with. **Change a token and the window follows — there is no Rust number to edit and no test to re-green.** Delete a token the pill needs and it is a build-time panic naming it.
 - **Position:** bottom-center, 96pt above the bottom edge of the screen containing the cursor. Multi-monitor: follow the active screen. Position is decided **once per appearance** — and that is enforced by an `is_visible()` gate in `set_pill_visible`, not by intent. State is emitted several times a second, so positioning unconditionally makes the pill chase the pointer between displays mid-sentence. A comment describing that intent is not a mechanism; the gate is.
-- **State dot:** 8pt, ink (`--danger` only on a real failure), with a 2s breathing pulse (opacity 0.6→1) while recording. Boxed to one line-height so it sits on the *first line* of a two-line failure and dead-centre in every single-line state.
+- **State dot:** 8pt, ink (`--danger` only on a real failure), with a 2s breathing pulse (opacity 0.6→1) while recording. Boxed to one line-height so it sits on the _first line_ of a two-line failure and dead-centre in every single-line state.
 - **Waveform:** 20 bars, 2pt wide, 2pt gap, max height 16pt, driven by windowed RMS — 78pt intrinsic, which is the number the pill width is built around. Bars scroll right-to-left. Minimum bar height 2pt so it never looks dead during a pause.
 - **Waveform input scaling.** The RMS arriving from the audio thread is linear 0..1, and real speech sits between roughly 0.05 and 0.3 — so a bar drawn at `height = rms` is a flat line for the entire recording. Two values map the audio range onto the visual one:
 
@@ -253,11 +254,12 @@ Framer needs numbers, and a component may not carry one. Every spring in the tab
   ```
 
   `level = clamp((rms / ceiling) ^ gamma)`. The ceiling sits just above normal speech so the loud end has somewhere to go before it pins; the gamma is there because loudness is perceived logarithmically, and a linear map spends most of the bar's height on a range no one ever speaks in. Together they put 0.05 at roughly a third height and 0.3 near full — a visible, moving waveform across the range a person actually talks at.
+
 - **Timer:** `M:SS`, tabular numerals, `--text-secondary`, in a **reserved 34pt box** rather than a measured one. A minute rolling over must not steal width from the waveform mid-recording.
-- **Arming** draws *exactly* what recording draws — resting waveform, unpulsed dot, `0:00`. It is normally under 100ms, and a distinct label for a tenth of a second is not information, it is a flicker: the pill would appear, flash a word, and reshape before the eye resolved any of it. The pill arrives already in its working shape and comes alive as sound reaches it. A genuine stall surfaces as Failed.
+- **Arming** draws _exactly_ what recording draws — resting waveform, unpulsed dot, `0:00`. It is normally under 100ms, and a distinct label for a tenth of a second is not information, it is a flicker: the pill would appear, flash a word, and reshape before the eye resolved any of it. The pill arrives already in its working shape and comes alive as sound reaches it. A genuine stall surfaces as Failed.
 - **Cancel armed:** the waveform is replaced by a **countdown line** in the same slot — full width, `--countdown-line-height` (3pt), starting full and draining to zero. Not a ring: the operator asked for a line, and the ring it replaces was genuinely broken, not merely ugly. **There is no label beside it.** A countdown the user armed himself with a keypress does not need a caption telling him he armed it, and dropping it is what lets the line occupy the whole middle slot so the swap reads as the waveform changing mode rather than a new widget appearing next to one. A second Escape refills the line with a spring and returns the waveform.
-- **The line is driven by `remaining_ms`, never by a local timer, and the animation is created ONCE.** The ring failed because its effect depended on `durationMs` — which *was* `remaining_ms`, a value Rust re-emits several times a second — so every tick cancelled the running animation and restarted a fresh full-to-empty drain. It never progressed and it flickered: two clocks disagreeing. Later ticks may only SEEK the running animation, and only when they disagree with it by more than 120ms, so ordinary tick jitter costs nothing and a real correction still lands. **Never read the countdown's duration as a constant** — it is configurable, and a skip-countdown setting exists.
-- **Failed:** 360×56pt, same `--radius-pill`. The pill turns `--danger` (the soft variant — at full strength over vibrancy this is a red box, and the pill is an indicator, not an alert) and shows the reason **on up to two lines, never truncated**. Failure is a sentence, not a status: the corpus it must seat runs to 100 characters (*"Murmur heard nothing at all. Check that the right input device is selected and that it is not muted."*). Measured at `--text-label`, every message in that corpus wraps to at most two lines at 340pt; 360pt is that threshold plus room for the copy to grow a few words without a redesign. Height is two line-boxes plus 12pt above and below — at 16pt it reads as a dialog rather than as the pill grown, which is visible the moment the two are put side by side. Content is **centred, not top-aligned**, or a one-line message floats at the top of the box. **The whole point of this state is that he finds out why nothing arrived, and a truncated sentence is a failure that failed twice.** The size is fixed rather than fitted to the line count, because only the webview can measure text and only Rust can size the window — a fitted height would need a round trip and would show a frame at the wrong size.
+- **The line is driven by `remaining_ms`, never by a local timer, and the animation is created ONCE.** The ring failed because its effect depended on `durationMs` — which _was_ `remaining_ms`, a value Rust re-emits several times a second — so every tick cancelled the running animation and restarted a fresh full-to-empty drain. It never progressed and it flickered: two clocks disagreeing. Later ticks may only SEEK the running animation, and only when they disagree with it by more than 120ms, so ordinary tick jitter costs nothing and a real correction still lands. **Never read the countdown's duration as a constant** — it is configurable, and a skip-countdown setting exists.
+- **Failed:** 360×56pt, same `--radius-pill`. The pill turns `--danger` (the soft variant — at full strength over vibrancy this is a red box, and the pill is an indicator, not an alert) and shows the reason **on up to two lines, never truncated**. Failure is a sentence, not a status: the corpus it must seat runs to 100 characters (_"Murmur heard nothing at all. Check that the right input device is selected and that it is not muted."_). Measured at `--text-label`, every message in that corpus wraps to at most two lines at 340pt; 360pt is that threshold plus room for the copy to grow a few words without a redesign. Height is two line-boxes plus 12pt above and below — at 16pt it reads as a dialog rather than as the pill grown, which is visible the moment the two are put side by side. Content is **centred, not top-aligned**, or a one-line message floats at the top of the box. **The whole point of this state is that he finds out why nothing arrived, and a truncated sentence is a failure that failed twice.** The size is fixed rather than fitted to the line count, because only the webview can measure text and only Rust can size the window — a fitted height would need a round trip and would show a frame at the wrong size.
 - **Not ready yet:** a failure with a transient code — currently `ENGINE_NOT_READY` — keeps `--accent` and shows its reason plainly. Same layout as Failed, none of the alarm. See the note under §2.
 - **There is no Finalizing and no Delivered.** Releasing the hotkey ends capture instantly; transcription and pasting continue in the background with nothing on screen. The pill is gone the moment the key is up. It does not report a word count — the operator asked for that removal specifically — and it does not linger to congratulate itself. **Failed re-appears** a second or two later if the background half could not finish, which is the only reason the pill is ever seen again after a release.
 - **IDLE never blanks the view.** Rust hides the window on IDLE and the same transition also reaches the webview over IPC; those do not land on the same frame. A view that cleared on IDLE would leave an empty glass capsule on screen until the native hide caught up — a grey blob flashing at the end of every dictation. The view renders the last state that had something to say and lets the window take it away.
@@ -309,7 +311,6 @@ reported it.
   and as `tray.rs` reading `tokens.css`. Adding a capability with an unmapped icon now fails
   `cargo test` with the route and the icon name in the message.
 
-
 ### The page header, the scroll fades, and no scrollbars
 
 - **One header component, every page** (`PageShell`). The page title lives here, not inline in each
@@ -319,17 +320,17 @@ reported it.
   the lights at a fixed inset from the window's TOP-LEFT, spanning roughly 20–72pt. They know
   nothing about our sidebar and cannot be moved from CSS, so the header accommodates them, never the
   reverse.
-  - *Vertically:* the title sits in `--traffic-light-band` (28pt, the standard macOS title bar,
+  - _Vertically:_ the title sits in `--traffic-light-band` (28pt, the standard macOS title bar,
     which puts the button centres at 14pt) — **not** centred in the taller `--page-header-height`,
     which dropped it a few pixels below them. `--text-title-line` is also 28pt, so the title fits
     the band exactly. **If the title still sits off the lights on device, that token is the one
     number to change.**
-  - *Horizontally:* the rail's divider now starts BELOW the header band. The lights are wider than
+  - _Horizontally:_ the rail's divider now starts BELOW the header band. The lights are wider than
     the 56pt rail, so a full-height divider ran straight through the middle of the button cluster
     and made them read as something trying and failing to fit inside the sidebar. Above the band
     there is no seam at all — the top of the window is one continuous surface across rail and
     content, which is what a title bar looks like and what lets the lights simply sit in it.
-- **The header is the drag region**, and it is deliberately generous. The old one lived *inside*
+- **The header is the drag region**, and it is deliberately generous. The old one lived _inside_
   each page's scroller, so it slid away the moment anyone scrolled and took the draggable surface
   with it — which is why the window was reported as hard to grab. Interactive children opt out with
   `data-tauri-drag-region={false}` or they drag the window instead of firing.
@@ -350,7 +351,6 @@ reported it.
   never the scrolling — wheel, trackpad, keyboard paging and `scrollTop` are untouched.
 - A scroller nested below its own chrome (DataList, under its toolbar) overrides `--fade-size-top`
   so it fades at its own edge instead of reaching up into somebody else's header.
-
 
 ```
 +--------------------------------------------------+
@@ -404,7 +404,7 @@ Every list and stat has a designed empty state. A blank panel reads as broken.
 
 - Every interactive element reachable by keyboard, with a visible `--accent` focus ring.
 - The pill is marked as a status/live region so VoiceOver announces state changes rather than staying silent.
-- Text contrast meets 4.5:1 against the *effective* background — glass over a bright desktop is the worst case, which is why `--surface-glass` sits at 55% rather than lower. **Verify against a white desktop background, not a neutral gray one.**
+- Text contrast meets 4.5:1 against the _effective_ background — glass over a bright desktop is the worst case, which is why `--surface-glass` sits at 55% rather than lower. **Verify against a white desktop background, not a neutral gray one.**
 - Full `prefers-reduced-motion` and `prefers-reduced-transparency` support. Under reduced transparency, glass becomes an opaque solid surface — that is a supported look, not a degraded one.
 
 ---
@@ -536,7 +536,7 @@ The §4 scale is a 4px grid, so it is published as Tailwind's spacing base (`--s
 
 ## 12. Identity
 
-The app had no identity, and that is why it read as an MVP: nothing on screen was specific to *this* product.
+The app had no identity, and that is why it read as an MVP: nothing on screen was specific to _this_ product.
 
 ### The mark
 
@@ -553,7 +553,6 @@ three-dot row immediately after the tour's read as progress resetting.
 (`mark-bars`, five bars at ratios 0.25 / 0.5 / 0.75) so a size change stays a token change. The SVG
 is 2pt bars, 2pt gaps, heights 6/12/18/12/6 on a 24 grid — the same ratios. Every logo in the
 running app is the `Mark` component; there is no second drawing and no image file in `src/`.
-
 
 **The waveform at rest.** Five rounded vertical bars, centre-weighted, in the proportions the pill already draws while listening — tall in the middle, short at the edges. It is the app's signature object, so the identity costs nothing to introduce and is recognised immediately once the user has seen the pill once.
 

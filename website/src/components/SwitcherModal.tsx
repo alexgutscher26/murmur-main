@@ -90,7 +90,8 @@ export function SwitcherModal({ isOpen, onClose, defaultPlan = "lifetime" }: Swi
             Switch from Cloud to 100% Local
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-            Migrating from Wispr Flow or Superwhisper? Get an instant discount and stop paying cloud compute markups for on-device voice processing.
+            Migrating from Wispr Flow or Superwhisper? Get an instant discount and stop paying cloud
+            compute markups for on-device voice processing.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
@@ -171,7 +172,10 @@ export function SwitcherModal({ isOpen, onClose, defaultPlan = "lifetime" }: Swi
 
             {/* Email input */}
             <div>
-              <label htmlFor="switcher-email" className="block text-xs font-semibold text-neutral-800 mb-1">
+              <label
+                htmlFor="switcher-email"
+                className="block text-xs font-semibold text-neutral-800 mb-1"
+              >
                 Your Email Address
               </label>
               <input
@@ -187,8 +191,12 @@ export function SwitcherModal({ isOpen, onClose, defaultPlan = "lifetime" }: Swi
 
             {/* Optional proof or receipt note */}
             <div>
-              <label htmlFor="switcher-proof" className="block text-xs font-semibold text-neutral-800 mb-1">
-                Receipt Note or Previous Account Email <span className="text-neutral-400 font-normal">(optional)</span>
+              <label
+                htmlFor="switcher-proof"
+                className="block text-xs font-semibold text-neutral-800 mb-1"
+              >
+                Receipt Note or Previous Account Email{" "}
+                <span className="text-neutral-400 font-normal">(optional)</span>
               </label>
               <input
                 id="switcher-proof"
@@ -203,7 +211,9 @@ export function SwitcherModal({ isOpen, onClose, defaultPlan = "lifetime" }: Swi
             {/* Guarantee note */}
             <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200 flex items-center gap-2.5 text-xs text-neutral-600">
               <ShieldCheck className="size-4 text-emerald-600 shrink-0" />
-              <span>Instant coupon auto-applied. Instant license issued upon checkout completion.</span>
+              <span>
+                Instant coupon auto-applied. Instant license issued upon checkout completion.
+              </span>
             </div>
 
             {error && (

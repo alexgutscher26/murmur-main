@@ -36,7 +36,10 @@ const METRIC_OPTIONS: readonly SegmentOption<ActivityMetric>[] = [
   { value: "latency", label: "Latency" },
 ];
 
-function useChartBox(): [RefObject<HTMLDivElement | null>, { width: number; height: number } | null] {
+function useChartBox(): [
+  RefObject<HTMLDivElement | null>,
+  { width: number; height: number } | null,
+] {
   const ref = useRef<HTMLDivElement | null>(null);
   const [box, setBox] = useState<{ width: number; height: number } | null>(null);
 
@@ -45,7 +48,11 @@ function useChartBox(): [RefObject<HTMLDivElement | null>, { width: number; heig
     if (!element) return;
     const observer = new ResizeObserver((entries) => {
       const rect = entries[0]?.contentRect;
-      setBox(rect && rect.width > 0 && rect.height > 0 ? { width: rect.width, height: rect.height } : null);
+      setBox(
+        rect && rect.width > 0 && rect.height > 0
+          ? { width: rect.width, height: rect.height }
+          : null,
+      );
     });
     observer.observe(element);
     return () => observer.disconnect();
@@ -67,11 +74,7 @@ interface Series {
   peak: number;
 }
 
-function buildSeries(
-  data: readonly DataPoint[],
-  width: number,
-  height: number,
-): Series | null {
+function buildSeries(data: readonly DataPoint[], width: number, height: number): Series | null {
   if (data.length < 2) return null;
 
   const values = data.map((d) => d.value);
@@ -135,9 +138,12 @@ export function ActivityChart({ days, latency }: ActivityChartProps) {
     }
     if (metric === "latency") {
       // Estimate daily processing latency in ms (p50 baseline / word load)
-      const p50 = latency?.find((l) => l.stage === "TAIL_DECODE" || l.stage === "TOTAL_FINALIZE")?.p50_ms ?? 250;
+      const p50 =
+        latency?.find((l) => l.stage === "TAIL_DECODE" || l.stage === "TOTAL_FINALIZE")?.p50_ms ??
+        250;
       return visibleDays.map((d) => {
-        const factor = d.word_count > 0 ? Math.min(3, 1 + (d.word_count / d.session_count || 1) / 50) : 1;
+        const factor =
+          d.word_count > 0 ? Math.min(3, 1 + (d.word_count / d.session_count || 1) / 50) : 1;
         return {
           date: d.date,
           value: Math.round(p50 * factor),
@@ -163,12 +169,7 @@ export function ActivityChart({ days, latency }: ActivityChartProps) {
           value={metric}
           onChange={setMetric}
         />
-        <SegmentedControl
-          label="Range"
-          options={RANGE_OPTIONS}
-          value={range}
-          onChange={setRange}
-        />
+        <SegmentedControl label="Range" options={RANGE_OPTIONS} value={range} onChange={setRange} />
       </div>
 
       <div className="h-[var(--chart-height)] w-full py-[var(--chart-inset)]">
@@ -188,7 +189,12 @@ export function ActivityChart({ days, latency }: ActivityChartProps) {
                 className="[stroke-width:var(--chart-line-width)]"
               />
               {last ? (
-                <circle cx={last.x} cy={last.y} fill="currentColor" className="[r:var(--chart-point-size)]" />
+                <circle
+                  cx={last.x}
+                  cy={last.y}
+                  fill="currentColor"
+                  className="[r:var(--chart-point-size)]"
+                />
               ) : null}
             </svg>
           ) : null}

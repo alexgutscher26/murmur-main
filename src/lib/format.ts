@@ -34,7 +34,11 @@ export function formatCompactDuration(ms: number): string {
   return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`;
 }
 
-const RELATIVE_STEPS: readonly [limit: number, divisor: number, unit: Intl.RelativeTimeFormatUnit][] = [
+const RELATIVE_STEPS: readonly [
+  limit: number,
+  divisor: number,
+  unit: Intl.RelativeTimeFormatUnit,
+][] = [
   [60_000, 1_000, "second"],
   [3_600_000, 60_000, "minute"],
   [86_400_000, 3_600_000, "hour"],

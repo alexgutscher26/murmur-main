@@ -19,7 +19,8 @@ import type { HotkeyCapture } from "@/components/global";
 /** Apple's canonical order: Control, Option, Shift, Command. */
 const MODIFIER_ORDER: readonly KeyModifier[] = ["CONTROL", "OPTION", "SHIFT", "COMMAND"];
 
-const isMac = typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform || "");
+const isMac =
+  typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform || "");
 
 const MODIFIER_GLYPH: Readonly<Record<KeyModifier, string>> = isMac
   ? {

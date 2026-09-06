@@ -64,7 +64,9 @@ export function InviteStep({
         <div className="hairline w-full rounded-card bg-sunken/40 p-3.5 transition-colors">
           <div className="flex items-center justify-between gap-3">
             <div className="flex flex-col gap-0.5">
-              <span className="text-label text-text-primary font-medium">Your Dictation Shortcut</span>
+              <span className="text-label text-text-primary font-medium">
+                Your Dictation Shortcut
+              </span>
               <span className="text-caption text-text-secondary">
                 {isPushToTalk
                   ? "Hold to speak, release to paste"
@@ -86,9 +88,12 @@ export function InviteStep({
               <ShieldCheck className="size-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-label text-text-primary font-medium">100% On-Device &amp; Private</span>
+              <span className="text-label text-text-primary font-medium">
+                100% On-Device &amp; Private
+              </span>
               <span className="text-caption text-text-secondary">
-                Audio is transcribed locally on your computer. Nothing is ever uploaded to the cloud.
+                Audio is transcribed locally on your computer. Nothing is ever uploaded to the
+                cloud.
               </span>
             </div>
           </div>
@@ -98,7 +103,9 @@ export function InviteStep({
               <Laptop className="size-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-label text-text-primary font-medium">Transcribes Everywhere</span>
+              <span className="text-label text-text-primary font-medium">
+                Transcribes Everywhere
+              </span>
               <span className="text-caption text-text-secondary">
                 Works instantly across all code editors, browsers, messaging apps, and notes.
               </span>

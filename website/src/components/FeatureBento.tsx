@@ -73,7 +73,10 @@ const JOBS = [
 
 export function FeatureBento() {
   return (
-    <section id="features" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section
+      id="features"
+      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+    >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
@@ -93,7 +96,8 @@ export function FeatureBento() {
             Features that solve real daily jobs.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Built for developers, lawyers, healthcare professionals, and founders who cannot—and will not—stream sensitive voice data to the cloud.
+            Built for developers, lawyers, healthcare professionals, and founders who cannot—and
+            will not—stream sensitive voice data to the cloud.
           </p>
         </div>
 
@@ -142,4 +146,3 @@ export function FeatureBento() {
     </section>
   );
 }
-

@@ -15,7 +15,15 @@
  *        envelope. Bar count and sizes come from tokens.css.
  */
 
-import { useCallback, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type Ref } from "react";
+import {
+  useCallback,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Ref,
+} from "react";
 import { cn } from "@/lib/utils";
 import { readNumberToken, readPxToken } from "@/lib/motion";
 
@@ -39,7 +47,9 @@ const clamp01 = (value: number): number => (value < 0 ? 0 : value > 1 ? 1 : valu
 
 export function Waveform({ values, bars, className, ref }: WaveformProps) {
   const [tokenBars] = useState(() => readNumberToken("--waveform-bars"));
-  const [minScale] = useState(() => readPxToken("--waveform-bar-min") / readPxToken("--waveform-bar-max"));
+  const [minScale] = useState(
+    () => readPxToken("--waveform-bar-min") / readPxToken("--waveform-bar-max"),
+  );
 
   const barCount = bars ?? tokenBars;
   const indices = useMemo(() => Array.from({ length: barCount }, (_, index) => index), [barCount]);
@@ -88,7 +98,10 @@ export function Waveform({ values, bars, className, ref }: WaveformProps) {
   return (
     <div
       aria-hidden="true"
-      className={cn("flex items-end gap-[var(--waveform-bar-gap)] h-[var(--waveform-bar-max)]", className)}
+      className={cn(
+        "flex items-end gap-[var(--waveform-bar-gap)] h-[var(--waveform-bar-max)]",
+        className,
+      )}
     >
       {indices.map((index) => (
         <span

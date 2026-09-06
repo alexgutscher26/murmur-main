@@ -46,7 +46,6 @@ export function StepShell({ title, description, children, action }: StepShellPro
       <div className="w-full max-w-96">{children}</div>
 
       {action ? <div className="flex items-center gap-2">{action}</div> : null}
-
     </section>
   );
 }

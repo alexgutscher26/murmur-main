@@ -46,7 +46,10 @@ export function ExportAction({ onError }: { onError: (error: AppError | null) =>
         }
         const meta = FORMAT_META[format];
         const stamp = new Date().toISOString().slice(0, 10);
-        const outcome = await saveTextFile(`murmur-history-${stamp}.${meta.extension}`, result.data);
+        const outcome = await saveTextFile(
+          `murmur-history-${stamp}.${meta.extension}`,
+          result.data,
+        );
 
         // Cancelling is a decision, not a failure: nothing is shown, and the
         // format buttons stay open so a change of mind costs one click.
@@ -62,7 +65,11 @@ export function ExportAction({ onError }: { onError: (error: AppError | null) =>
 
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className={cn(BUTTON_CLASS, "flex items-center gap-2")}>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className={cn(BUTTON_CLASS, "flex items-center gap-2")}
+      >
         <Download className="size-4" />
         Export
       </button>
@@ -82,7 +89,11 @@ export function ExportAction({ onError }: { onError: (error: AppError | null) =>
           {busy === format ? "Exporting…" : FORMAT_META[format].label}
         </button>
       ))}
-      <button type="button" onClick={() => setOpen(false)} className={cn(BUTTON_CLASS, "text-text-secondary")}>
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        className={cn(BUTTON_CLASS, "text-text-secondary")}
+      >
         Cancel
       </button>
     </span>

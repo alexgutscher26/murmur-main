@@ -75,10 +75,11 @@ export function CountdownLine({ remainingMs, state, label, className }: Countdow
     if (state === "draining") {
       const total = Math.max(0, remainingRef.current);
       totalRef.current = total;
-      const animation = fill.animate(
-        [{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }],
-        { duration: total, easing: "linear", fill: "forwards" },
-      );
+      const animation = fill.animate([{ transform: "scaleX(1)" }, { transform: "scaleX(0)" }], {
+        duration: total,
+        easing: "linear",
+        fill: "forwards",
+      });
       animationRef.current = animation;
     } else {
       // A second Escape: nothing was lost, so the line springs back to full

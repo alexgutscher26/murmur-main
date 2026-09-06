@@ -41,8 +41,7 @@ export function BillingView() {
   const referralStatus = useCommand(commands.getReferralStatus, []);
 
   const handleCopyReferral = () => {
-    const url =
-      referralStatus.data?.referral_url || "https://murmur.app/pricing";
+    const url = referralStatus.data?.referral_url || "https://murmur.app/pricing";
     void unwrapCommand(() => commands.copyText({ text: url })).then(() => {
       setCopiedReferral(true);
       setTimeout(() => setCopiedReferral(false), 2000);
@@ -139,7 +138,8 @@ export function BillingView() {
       price: "$0",
       period: "forever",
       subtext: "100% on-device · Zero cloud needed",
-      description: "Fast local dictation for individuals. Experience sub-200ms transcription directly on your hardware.",
+      description:
+        "Fast local dictation for individuals. Experience sub-200ms transcription directly on your hardware.",
       features: [
         { name: "100% on-device Whisper Base model", included: true },
         { name: "Sub-200ms instantaneous transcription", included: true },
@@ -164,7 +164,8 @@ export function BillingView() {
         proBilling === "lifetime"
           ? "Pay once · Own forever · 1 yr updates included"
           : "Equivalent to $4.08/mo · Continuous updates",
-      description: "For professionals who write daily and want peak accuracy, custom jargon, and context awareness.",
+      description:
+        "For professionals who write daily and want peak accuracy, custom jargon, and context awareness.",
       features: [
         { name: "Everything included in Free", included: true },
         { name: "Whisper Large v3 Turbo & Medium models", included: true },
@@ -185,7 +186,8 @@ export function BillingView() {
       price: "$15",
       period: "/ seat / mo",
       subtext: "Billed annually · Commercial license",
-      description: "Admin deployment, shared organizational vocabularies, and compliance guarantees for teams.",
+      description:
+        "Admin deployment, shared organizational vocabularies, and compliance guarantees for teams.",
       features: [
         { name: "Everything in Pro included for all seats", included: true },
         { name: "Admin deployment via MSIX & PKG installers", included: true },
@@ -205,8 +207,11 @@ export function BillingView() {
           <div className="flex items-center gap-3">
             <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
             <div className="text-caption text-text-secondary">
-              <span className="font-semibold text-text-primary block">Subscription Ended or Canceled</span>
-              Your subscription has ended. You have been switched to the Free Starter tier (100% on-device Whisper Base).
+              <span className="font-semibold text-text-primary block">
+                Subscription Ended or Canceled
+              </span>
+              Your subscription has ended. You have been switched to the Free Starter tier (100%
+              on-device Whisper Base).
             </div>
           </div>
           <button
@@ -239,8 +244,8 @@ export function BillingView() {
             {tier === "starter"
               ? "You are using the Free tier with on-device Whisper Base model and sub-200ms latency."
               : tier === "pro"
-              ? "All Pro features unlocked: Large v3 Turbo, Smart Context Engine, and Filler Word Stripper."
-              : "Team organization license active with centralized dictionary sync and fleet management."}
+                ? "All Pro features unlocked: Large v3 Turbo, Smart Context Engine, and Filler Word Stripper."
+                : "Team organization license active with centralized dictionary sync and fleet management."}
           </p>
         </div>
 
@@ -280,7 +285,8 @@ export function BillingView() {
               </span>
             </div>
             <p className="text-caption text-text-secondary">
-              Get 40% off Pro Annual ($29/yr) or $20 off Pro Lifetime ($69) with proof of subscription. Zero cloud compute taxes.
+              Get 40% off Pro Annual ($29/yr) or $20 off Pro Lifetime ($69) with proof of
+              subscription. Zero cloud compute taxes.
             </p>
           </div>
         </div>
@@ -307,7 +313,8 @@ export function BillingView() {
               </span>
             </div>
             <p className="text-caption text-text-secondary">
-              Get 50% off Pro Lifetime ($44) or Annual ($24/yr) with a .edu email or public GitHub repository.
+              Get 50% off Pro Lifetime ($44) or Annual ($24/yr) with a .edu email or public GitHub
+              repository.
             </p>
           </div>
         </div>
@@ -338,7 +345,8 @@ export function BillingView() {
               </span>
             </div>
             <p className="text-caption text-text-secondary">
-              Share your invite link with friends or colleagues. They receive a welcome discount, and you unlock developer prompt packs.
+              Share your invite link with friends or colleagues. They receive a welcome discount,
+              and you unlock developer prompt packs.
             </p>
           </div>
         </div>
@@ -509,8 +517,8 @@ export function BillingView() {
                 isPro
                   ? "bg-elevated ring-1 ring-text-primary shadow-xs"
                   : isActive
-                  ? "bg-elevated ring-1 ring-[var(--border-hairline)]"
-                  : "bg-surface"
+                    ? "bg-elevated ring-1 ring-[var(--border-hairline)]"
+                    : "bg-surface"
               }`}
             >
               <div>
@@ -534,13 +542,9 @@ export function BillingView() {
                     <span className="text-display font-bold font-mono text-text-primary">
                       {plan.price}
                     </span>
-                    <span className="text-caption font-mono text-text-tertiary">
-                      {plan.period}
-                    </span>
+                    <span className="text-caption font-mono text-text-tertiary">{plan.period}</span>
                   </div>
-                  <p className="text-[11px] font-mono text-text-tertiary mt-0.5">
-                    {plan.subtext}
-                  </p>
+                  <p className="text-[11px] font-mono text-text-tertiary mt-0.5">{plan.subtext}</p>
                 </div>
 
                 <p className="text-caption text-text-secondary leading-relaxed mb-4">
@@ -595,7 +599,7 @@ export function BillingView() {
                     type="button"
                     onClick={() =>
                       handleOpenLink(
-                        "mailto:sales@murmur.app?subject=Team%20Inquiry%20from%20Desktop%20App"
+                        "mailto:sales@murmur.app?subject=Team%20Inquiry%20from%20Desktop%20App",
                       )
                     }
                     className="hairline w-full text-center text-caption font-semibold py-2 rounded-input bg-sunken text-text-primary transition-colors hover:bg-sunken-strong"
@@ -631,7 +635,8 @@ export function BillingView() {
               </span>
             </div>
             <p className="text-caption text-text-secondary">
-              Eligible students, researchers (.edu), and GitHub OSS maintainers (50+ ★) get 50% off ($44 Lifetime or $24/yr).
+              Eligible students, researchers (.edu), and GitHub OSS maintainers (50+ ★) get 50% off
+              ($44 Lifetime or $24/yr).
             </p>
           </div>
         </div>
@@ -639,7 +644,7 @@ export function BillingView() {
           type="button"
           onClick={() =>
             handleOpenLink(
-              "mailto:support@murmur.app?subject=Student%2FOSS%20Discount%20Request&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20a%20student%20%2F%20OSS%20maintainer%20applying%20for%20the%2050%25%20grant.%0A%0AProof%20of%20enrollment%20or%20GitHub%20profile%3A%20%0A%0AThank%20you!"
+              "mailto:support@murmur.app?subject=Student%2FOSS%20Discount%20Request&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20a%20student%20%2F%20OSS%20maintainer%20applying%20for%20the%2050%25%20grant.%0A%0AProof%20of%20enrollment%20or%20GitHub%20profile%3A%20%0A%0AThank%20you!",
             )
           }
           className="hairline h-8 rounded-input bg-sunken px-3 text-caption font-semibold text-text-primary transition-colors hover:bg-sunken-strong shrink-0"

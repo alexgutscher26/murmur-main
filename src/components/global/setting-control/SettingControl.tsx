@@ -11,7 +11,13 @@
 import { useState } from "react";
 import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { HotkeyControl, NumberControl, SelectControl, TextControl, ToggleControl } from "./controls";
+import {
+  HotkeyControl,
+  NumberControl,
+  SelectControl,
+  TextControl,
+  ToggleControl,
+} from "./controls";
 import type { SettingDef } from "./types";
 
 export interface SettingControlProps {
@@ -40,10 +46,15 @@ export function SettingControl({ setting, className }: SettingControlProps) {
   const [showTooltip, setShowTooltip] = useState(false);
 
   return (
-    <div className={cn("flex items-center gap-4 py-3", setting.disabled && "opacity-50", className)}>
+    <div
+      className={cn("flex items-center gap-4 py-3", setting.disabled && "opacity-50", className)}
+    >
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5 relative">
-          <label htmlFor={setting.id} className="text-body text-text-primary text-stone-900 dark:text-white">
+          <label
+            htmlFor={setting.id}
+            className="text-body text-text-primary text-stone-900 dark:text-white"
+          >
             {setting.label}
           </label>
           {setting.description && (

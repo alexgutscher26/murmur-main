@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     if (tier !== "pro_lifetime" && tier !== "pro_annual") {
       return NextResponse.json(
         { error: "Invalid tier specified. Expected 'pro_lifetime' or 'pro_annual'." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

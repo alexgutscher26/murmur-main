@@ -65,8 +65,16 @@ export function RepoImporterModal({ isOpen, onClose, onImported }: RepoImporterM
     let match: RegExpExecArray | null;
     while ((match = pascalRegex.exec(sourceText)) !== null) {
       const symbol = match[0];
-      if (["String", "Boolean", "Number", "Array", "Object", "Function", "True", "False"].includes(symbol)) continue;
-      const phonetic = symbol.replace(/([A-Z])/g, " $1").trim().toLowerCase();
+      if (
+        ["String", "Boolean", "Number", "Array", "Object", "Function", "True", "False"].includes(
+          symbol,
+        )
+      )
+        continue;
+      const phonetic = symbol
+        .replace(/([A-Z])/g, " $1")
+        .trim()
+        .toLowerCase();
       if (!terms.has(symbol)) {
         terms.set(symbol, {
           pattern: phonetic,
@@ -83,7 +91,10 @@ export function RepoImporterModal({ isOpen, onClose, onImported }: RepoImporterM
       const symbol = match[0];
       // Must contain at least one uppercase letter
       if (/[A-Z]/.test(symbol)) {
-        const phonetic = symbol.replace(/([A-Z])/g, " $1").trim().toLowerCase();
+        const phonetic = symbol
+          .replace(/([A-Z])/g, " $1")
+          .trim()
+          .toLowerCase();
         if (!terms.has(symbol)) {
           terms.set(symbol, {
             pattern: phonetic,
@@ -189,7 +200,11 @@ export function RepoImporterModal({ isOpen, onClose, onImported }: RepoImporterM
           {extracted.length === 0 ? (
             <div className="space-y-3">
               <p className="text-caption text-text-secondary leading-relaxed">
-                Paste your project's <code className="rounded bg-sunken px-1 font-mono text-[11px]">package.json</code>, <code className="rounded bg-sunken px-1 font-mono text-[11px]">Cargo.toml</code>, or TypeScript/Python source code below. Murmur will automatically extract your identifiers and phonetic triggers.
+                Paste your project's{" "}
+                <code className="rounded bg-sunken px-1 font-mono text-[11px]">package.json</code>,{" "}
+                <code className="rounded bg-sunken px-1 font-mono text-[11px]">Cargo.toml</code>, or
+                TypeScript/Python source code below. Murmur will automatically extract your
+                identifiers and phonetic triggers.
               </p>
               <textarea
                 value={sourceText}

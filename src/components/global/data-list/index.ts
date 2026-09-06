@@ -8,5 +8,14 @@
  * WHERE: Re-exported by src/components/global/index.ts.
  */
 
-export { DataList, type DataListProps, type DataListSearch, type DataListRowArgs } from "./DataList";
-export { useVirtualWindow, type VirtualWindow, type VirtualWindowOptions } from "./use-virtual-window";
+export {
+  DataList,
+  type DataListProps,
+  type DataListSearch,
+  type DataListRowArgs,
+} from "./DataList";
+export {
+  useVirtualWindow,
+  type VirtualWindow,
+  type VirtualWindowOptions,
+} from "./use-virtual-window";

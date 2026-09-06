@@ -55,7 +55,12 @@ export function GlassPanel({
 }: GlassPanelProps) {
   return (
     <div
-      className={cn("relative isolate overflow-hidden", MATERIAL_CLASS[material], RADIUS_CLASS[radius], className)}
+      className={cn(
+        "relative isolate overflow-hidden",
+        MATERIAL_CLASS[material],
+        RADIUS_CLASS[radius],
+        className,
+      )}
       {...rest}
     >
       {noise ? <span aria-hidden="true" className="glass-noise absolute inset-0 -z-10" /> : null}

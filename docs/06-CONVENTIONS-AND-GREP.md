@@ -38,7 +38,7 @@ Every file opens with one. Every non-obvious block gets one too.
 
 Four lines, each doing a different job:
 
-**KEYWORDS** is the index. 5–10 specific symbols this file *owns* — types,
+**KEYWORDS** is the index. 5–10 specific symbols this file _owns_ — types,
 functions, constants, variants. Specific is the whole point: `Session` matches
 everything and therefore finds nothing. If a symbol is defined here, it belongs
 on this line; if it is merely used here, it does not, or every file becomes a
@@ -64,8 +64,8 @@ pnpm sot <keyword>       # → the list of files whose SOT line mentions it
 pnpm sot:show <keyword>  # → the same, with each matching header printed
 ```
 
-`pnpm sot` is `grep -l` with the index applied: it answers *where could this
-live*, and it answers it in one screen instead of forty. You then narrow to the
+`pnpm sot` is `grep -l` with the index applied: it answers _where could this
+live_, and it answers it in one screen instead of forty. You then narrow to the
 one or two files that look right and read only those. That is the entire
 navigation model, and it is why context cost stays flat as the codebase grows.
 
@@ -112,7 +112,7 @@ per handler. Both exist so that adding feature number forty is an entry and a
 handler, not a new pattern and six new places to remember.
 
 **Ports and adapters.** Anything third-party or swappable sits behind a trait
-that declares its capabilities. Callers branch on what an adapter *can do*, never
+that declares its capabilities. Callers branch on what an adapter _can do_, never
 on which adapter it is, which is what keeps a second engine from rippling
 through the call sites.
 

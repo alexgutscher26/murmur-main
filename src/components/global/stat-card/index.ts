@@ -5,4 +5,10 @@
  * WHERE: Re-exported by src/components/global/index.ts.
  */
 
-export { StatCard, type StatCardProps, type StatDelta, type StatTone, type StatCardSize } from "./StatCard";
+export {
+  StatCard,
+  type StatCardProps,
+  type StatDelta,
+  type StatTone,
+  type StatCardSize,
+} from "./StatCard";

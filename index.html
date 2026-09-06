@@ -18,7 +18,11 @@
     <script>
       (function () {
         var t = localStorage.getItem("murmur_theme_preference");
-        var isDark = t === "dark" || (t !== "light" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        var isDark =
+          t === "dark" ||
+          (t !== "light" &&
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
         if (t === "dark" || t === "light") {
           document.documentElement.setAttribute("data-theme", t);
         }

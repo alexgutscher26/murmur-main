@@ -156,12 +156,36 @@ const CREATOR_PILLARS = [
 ];
 
 const CREATOR_COMPARISONS = [
-  { feature: "Script & Idea Privacy", murmur: "100% On-Device (0 bytes cloud upload)", wispr: "Cloud streaming (Sent to servers)" },
-  { feature: "Offline & Airplane Mode", murmur: "Full functionality without Wi-Fi", wispr: "Requires active Internet connection" },
-  { feature: "Scriptwriting & Hook Templates", murmur: "Built-in voice macros (YouTube, Substack, Reels)", wispr: "Standard AI rewriting" },
-  { feature: "AI Prompt Context Capacity", murmur: "Unlimited words, zero cloud throttle", wispr: "Cloud token limits & tiers" },
-  { feature: "Audio Retention Policy", murmur: "Instantly freed from RAM (0 storage)", wispr: "Cloud server audio logs" },
-  { feature: "Pricing Model", murmur: "Free Starter / $49 Lifetime perpetual", wispr: "$12/month ($144/year recurring)" },
+  {
+    feature: "Script & Idea Privacy",
+    murmur: "100% On-Device (0 bytes cloud upload)",
+    wispr: "Cloud streaming (Sent to servers)",
+  },
+  {
+    feature: "Offline & Airplane Mode",
+    murmur: "Full functionality without Wi-Fi",
+    wispr: "Requires active Internet connection",
+  },
+  {
+    feature: "Scriptwriting & Hook Templates",
+    murmur: "Built-in voice macros (YouTube, Substack, Reels)",
+    wispr: "Standard AI rewriting",
+  },
+  {
+    feature: "AI Prompt Context Capacity",
+    murmur: "Unlimited words, zero cloud throttle",
+    wispr: "Cloud token limits & tiers",
+  },
+  {
+    feature: "Audio Retention Policy",
+    murmur: "Instantly freed from RAM (0 storage)",
+    wispr: "Cloud server audio logs",
+  },
+  {
+    feature: "Pricing Model",
+    murmur: "Free Starter / $49 Lifetime perpetual",
+    wispr: "$12/month ($144/year recurring)",
+  },
 ];
 
 export default function CreatorsPage() {
@@ -188,11 +212,16 @@ export default function CreatorsPage() {
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight max-w-3xl mx-auto leading-tight">
-              Turn Thoughts into Content, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/50">4x Faster</span>
+              Turn Thoughts into Content,{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/50">
+                4x Faster
+              </span>
             </h1>
 
             <p className="text-lg sm:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
-              Murmur gives creators hours back every week by replacing typing, editing, and creative friction with your natural voice. Draft scripts, generate viral hooks, and prompt AI without touching a keyboard.
+              Murmur gives creators hours back every week by replacing typing, editing, and creative
+              friction with your natural voice. Draft scripts, generate viral hooks, and prompt AI
+              without touching a keyboard.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
@@ -223,7 +252,8 @@ export default function CreatorsPage() {
                   </span>
                 </h2>
                 <p className="text-xs text-white/60 mt-1">
-                  Click a creator workflow below to see spoken voice triggers expand into structured content schemas.
+                  Click a creator workflow below to see spoken voice triggers expand into structured
+                  content schemas.
                 </p>
               </div>
 
@@ -327,13 +357,21 @@ export default function CreatorsPage() {
                 🛡️
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Why Top Creators Refuse Cloud Transcription</h3>
-                <p className="text-xs text-white/60">Your unreleased scripts and brand deals are your livelihood.</p>
+                <h3 className="text-lg font-bold text-white">
+                  Why Top Creators Refuse Cloud Transcription
+                </h3>
+                <p className="text-xs text-white/60">
+                  Your unreleased scripts and brand deals are your livelihood.
+                </p>
               </div>
             </div>
 
             <p className="text-sm text-white/80 leading-relaxed max-w-3xl">
-              Cloud dictation services upload your voice, audio recordings, and confidential draft text to external servers where they can be retained or used for third-party AI training. <strong>Murmur never touches the Internet.</strong> Your video ideas, client NDAs, sponsor pricing negotiations, and private creative drafts exist solely in your computer's memory.
+              Cloud dictation services upload your voice, audio recordings, and confidential draft
+              text to external servers where they can be retained or used for third-party AI
+              training. <strong>Murmur never touches the Internet.</strong> Your video ideas, client
+              NDAs, sponsor pricing negotiations, and private creative drafts exist solely in your
+              computer's memory.
             </p>
 
             <div className="flex flex-wrap gap-4 pt-2">

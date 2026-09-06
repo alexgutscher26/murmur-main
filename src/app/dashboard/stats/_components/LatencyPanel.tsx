@@ -75,7 +75,9 @@ export function LatencyPanel({ metrics, latency }: LatencyPanelProps) {
               <td className="text-right text-body tabular-nums text-text-primary">
                 {formatLatency(entry?.p95_ms ?? null)}
               </td>
-              <td className="text-right text-caption tabular-nums text-text-tertiary">{entry?.sample_count ?? 0}</td>
+              <td className="text-right text-caption tabular-nums text-text-tertiary">
+                {entry?.sample_count ?? 0}
+              </td>
             </tr>
           );
         })}

@@ -32,14 +32,14 @@ export function ToggleControl({ setting }: { setting: ToggleSetting }) {
       onClick={() => setting.onChange(!setting.value)}
       className={cn(
         "relative inline-flex h-6 w-11 shrink-0 cursor-default rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] disabled:opacity-50",
-        setting.value ? "bg-[var(--accent)]" : "bg-[var(--surface-sunken-strong)]"
+        setting.value ? "bg-[var(--accent)]" : "bg-[var(--surface-sunken-strong)]",
       )}
     >
       <span
         aria-hidden="true"
         className={cn(
           "pointer-events-none inline-block size-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
-          setting.value ? "translate-x-5" : "translate-x-0"
+          setting.value ? "translate-x-5" : "translate-x-0",
         )}
       />
     </button>
@@ -86,7 +86,11 @@ export function NumberControl({ setting }: { setting: NumberSetting }) {
         onChange={(e) => setting.onChange(parseFloat(e.target.value) || 0)}
         className="hairline h-8 w-20 rounded-input bg-sunken px-2 text-right font-mono text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80 focus:outline-none focus:ring-1 focus:ring-text-primary disabled:opacity-50"
       />
-      {setting.unit && <span className="text-caption text-text-secondary text-stone-500 dark:text-stone-400">{setting.unit}</span>}
+      {setting.unit && (
+        <span className="text-caption text-text-secondary text-stone-500 dark:text-stone-400">
+          {setting.unit}
+        </span>
+      )}
     </div>
   );
 }
@@ -115,7 +119,9 @@ function isModifierCode(code: string): boolean {
 }
 
 function isModifierOnlyValue(val: string): boolean {
-  return val === "⌥" || val === "Alt" || val === "Ctrl" || val === "⌃" || val === "⌘" || val === "Cmd";
+  return (
+    val === "⌥" || val === "Alt" || val === "Ctrl" || val === "⌃" || val === "⌘" || val === "Cmd"
+  );
 }
 
 export function formatHotkey(c: HotkeyCapture): string[] {
@@ -142,7 +148,10 @@ function detectConflict(capture: HotkeyCapture): string | null {
   const key = capture.code;
   const isCmdOrCtrl = capture.meta || capture.ctrl;
 
-  if (isCmdOrCtrl && (key === "KeyC" || key === "KeyV" || key === "KeyX" || key === "KeyA" || key === "KeyZ")) {
+  if (
+    isCmdOrCtrl &&
+    (key === "KeyC" || key === "KeyV" || key === "KeyX" || key === "KeyA" || key === "KeyZ")
+  ) {
     return "Conflicts with clipboard shortcut. Try Option/Alt+Space or Option+` instead.";
   }
   if (isCmdOrCtrl && (key === "KeyQ" || key === "KeyW" || key === "KeyN")) {
@@ -221,11 +230,7 @@ export function HotkeyControl({ setting }: { setting: HotkeySetting }) {
         event.preventDefault();
         event.stopPropagation();
         const mouseCode =
-          event.button === 1
-            ? "MouseMiddle"
-            : event.button === 3
-            ? "MouseBack"
-            : "MouseForward";
+          event.button === 1 ? "MouseMiddle" : event.button === 3 ? "MouseBack" : "MouseForward";
 
         commit({
           key: mouseCode,
@@ -266,9 +271,10 @@ export function HotkeyControl({ setting }: { setting: HotkeySetting }) {
     };
   }, [armed, setting]);
 
-  const gestureHint = setting.value && isModifierOnlyValue(setting.value)
-    ? `Tap ${setting.value} to start dictating, and again to stop.`
-    : null;
+  const gestureHint =
+    setting.value && isModifierOnlyValue(setting.value)
+      ? `Tap ${setting.value} to start dictating, and again to stop.`
+      : null;
 
   return (
     <div className="flex flex-col items-end gap-1">
@@ -284,7 +290,7 @@ export function HotkeyControl({ setting }: { setting: HotkeySetting }) {
         }}
         className={cn(
           "hairline h-8 min-w-28 rounded-input px-2.5 transition-colors disabled:opacity-50",
-          armed ? "bg-accent-soft ring-1 ring-[var(--accent)]" : "bg-sunken hover:bg-sunken-strong"
+          armed ? "bg-accent-soft ring-1 ring-[var(--accent)]" : "bg-sunken hover:bg-sunken-strong",
         )}
       >
         {armed || !setting.value ? (
@@ -303,7 +309,7 @@ export function HotkeyControl({ setting }: { setting: HotkeySetting }) {
         </span>
       )}
 
-      {hint ?? gestureHint ? (
+      {(hint ?? gestureHint) ? (
         <span className="max-w-64 text-right text-caption text-text-tertiary">
           {hint ?? gestureHint}
         </span>

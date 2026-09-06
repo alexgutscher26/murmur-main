@@ -33,7 +33,8 @@ const COMMUNITY_PACKS = [
     category: "Developer",
     badge: "Free Pack",
     downloads: "2.4k installs",
-    description: "Conventional commit prefixes (feat:, fix:), CamelCase symbol conversion, and pull request markdown schemas.",
+    description:
+      "Conventional commit prefixes (feat:, fix:), CamelCase symbol conversion, and pull request markdown schemas.",
     example: "“insert pr template” → Markdown checklist with test coverage & reviewers",
   },
   {
@@ -41,7 +42,8 @@ const COMMUNITY_PACKS = [
     category: "Legal",
     badge: "Free Pack",
     downloads: "1.1k installs",
-    description: "Confidentiality headers, Latin maxims (res judicata, habeas corpus), statutory formats, and client intake schemas.",
+    description:
+      "Confidentiality headers, Latin maxims (res judicata, habeas corpus), statutory formats, and client intake schemas.",
     example: "“insert privileged header” → CONFIDENTIAL ATTORNEY-CLIENT PRIVILEGED",
   },
   {
@@ -49,7 +51,8 @@ const COMMUNITY_PACKS = [
     category: "Operations",
     badge: "Free Pack",
     downloads: "1.8k installs",
-    description: "Empathetic ticket signoffs, refund policy explanations, and structured reproduction step checklists.",
+    description:
+      "Empathetic ticket signoffs, refund policy explanations, and structured reproduction step checklists.",
     example: "“insert refund snippet” → Formatted policy reply with order ID prompt",
   },
   {
@@ -57,7 +60,8 @@ const COMMUNITY_PACKS = [
     category: "Healthcare",
     badge: "Free Pack",
     downloads: "950 installs",
-    description: "Subjective, Objective, Assessment, Plan (SOAP) layout with 400+ common medication phonetic mappings.",
+    description:
+      "Subjective, Objective, Assessment, Plan (SOAP) layout with 400+ common medication phonetic mappings.",
     example: "“insert soap template” → Formatted clinical chart headers",
   },
 ];
@@ -163,7 +167,8 @@ function PricingContent() {
       price: "$0",
       period: "forever",
       subtext: "100% on-device · Zero cloud needed",
-      description: "Fast local dictation for individuals. Experience sub-200ms transcription directly on your hardware.",
+      description:
+        "Fast local dictation for individuals. Experience sub-200ms transcription directly on your hardware.",
       features: [
         "100% on-device Whisper Base model",
         "Sub-200ms instantaneous transcription",
@@ -187,7 +192,8 @@ function PricingContent() {
       price: proPrice,
       period: proPeriod,
       subtext: proSubtext,
-      description: "For professionals who write daily and want peak accuracy, custom jargon, and context awareness.",
+      description:
+        "For professionals who write daily and want peak accuracy, custom jargon, and context awareness.",
       features: [
         "Everything in Free, plus:",
         "Whisper Large v3 Turbo & Medium models",
@@ -212,7 +218,8 @@ function PricingContent() {
       price: "$15",
       period: "/ seat / mo",
       subtext: "Billed annually · Commercial license",
-      description: "Admin deployment, shared organizational vocabularies, and compliance guarantees for teams.",
+      description:
+        "Admin deployment, shared organizational vocabularies, and compliance guarantees for teams.",
       features: [
         "Everything in Pro included for all seats",
         "Admin deployment via MSIX & PKG installers",
@@ -228,7 +235,10 @@ function PricingContent() {
   ];
 
   return (
-    <main id="main-content" className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white overflow-x-hidden relative">
+    <main
+      id="main-content"
+      className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white overflow-x-hidden relative"
+    >
       {/* Background glow & subtle texture */}
       <div className="absolute inset-0 pointer-events-none -z-10 flex items-center justify-center overflow-hidden">
         <div className="absolute -top-32 w-[700px] h-[600px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-[100px] pointer-events-none" />
@@ -253,7 +263,8 @@ function PricingContent() {
             <span className="block text-gradient-hero mt-1">Own your software forever.</span>
           </h1>
           <p className="text-base sm:text-lg text-neutral-600 leading-relaxed font-normal max-w-2xl mx-auto">
-            Zero cloud compute markups. Choose Free forever, purchase a perpetual Pro license to own on your machine, or deploy across your team.
+            Zero cloud compute markups. Choose Free forever, purchase a perpetual Pro license to own
+            on your machine, or deploy across your team.
           </p>
         </div>
 
@@ -277,7 +288,8 @@ function PricingContent() {
                   $10 Off Any Pro Tier + Developer Prompt Pack Included
                 </h2>
                 <p className="text-xs text-emerald-800/90 mt-0.5">
-                  Your invite bonus is active. Select Lifetime ($79) or Annual ($39/yr) below to check out.
+                  Your invite bonus is active. Select Lifetime ($79) or Annual ($39/yr) below to
+                  check out.
                 </p>
               </div>
             </div>
@@ -300,13 +312,18 @@ function PricingContent() {
                 Migrating from Wispr Flow or Superwhisper?
               </h2>
               <p className="text-xs sm:text-sm text-neutral-600 mt-0.5">
-                Stop paying $120–$180/year in cloud compute taxes for voice data that can run locally.
+                Stop paying $120–$180/year in cloud compute taxes for voice data that can run
+                locally.
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
               <div className="text-right">
-                <span className="block text-[11px] font-mono text-neutral-400 line-through">$89 / $49</span>
-                <span className="block text-sm font-bold font-mono text-emerald-700">Save up to 40%</span>
+                <span className="block text-[11px] font-mono text-neutral-400 line-through">
+                  $89 / $49
+                </span>
+                <span className="block text-sm font-bold font-mono text-emerald-700">
+                  Save up to 40%
+                </span>
               </div>
               <button
                 type="button"
@@ -321,24 +338,36 @@ function PricingContent() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 text-xs">
             <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-neutral-50/60 border border-neutral-200/60">
-              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[11px] shrink-0">1</span>
+              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[11px] shrink-0">
+                1
+              </span>
               <div>
                 <span className="font-semibold text-neutral-900 block">40% Off Annual Pass</span>
-                <span className="text-[11px] text-neutral-500">Pay only $29 for your entire first year (reg. $49).</span>
+                <span className="text-[11px] text-neutral-500">
+                  Pay only $29 for your entire first year (reg. $49).
+                </span>
               </div>
             </div>
             <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-neutral-50/60 border border-neutral-200/60">
-              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[11px] shrink-0">2</span>
+              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[11px] shrink-0">
+                2
+              </span>
               <div>
                 <span className="font-semibold text-neutral-900 block">$20 Off Pro Lifetime</span>
-                <span className="text-[11px] text-neutral-500">Pay $69 once instead of $89 and own it forever.</span>
+                <span className="text-[11px] text-neutral-500">
+                  Pay $69 once instead of $89 and own it forever.
+                </span>
               </div>
             </div>
             <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-neutral-50/60 border border-neutral-200/60">
-              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[11px] shrink-0">3</span>
+              <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[11px] shrink-0">
+                3
+              </span>
               <div>
                 <span className="font-semibold text-neutral-900 block">Frictionless Switch</span>
-                <span className="text-[11px] text-neutral-500">Fast email verification with receipt or active screenshot.</span>
+                <span className="text-[11px] text-neutral-500">
+                  Fast email verification with receipt or active screenshot.
+                </span>
               </div>
             </div>
           </div>
@@ -387,11 +416,13 @@ function PricingContent() {
                 <div className="flex items-center justify-between gap-2 mb-4">
                   <h3 className="text-lg font-bold text-neutral-950">{tier.name}</h3>
                   {tier.badge && (
-                    <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full border ${
-                      tier.isPrimary
-                        ? "bg-emerald-50 text-emerald-800 border-emerald-200/90 font-semibold"
-                        : "bg-neutral-100 text-neutral-700 border-neutral-200/80 font-medium"
-                    }`}>
+                    <span
+                      className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full border ${
+                        tier.isPrimary
+                          ? "bg-emerald-50 text-emerald-800 border-emerald-200/90 font-semibold"
+                          : "bg-neutral-100 text-neutral-700 border-neutral-200/80 font-medium"
+                      }`}
+                    >
                       {tier.badge}
                     </span>
                   )}
@@ -399,7 +430,9 @@ function PricingContent() {
 
                 <div className="mb-4">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold font-mono text-neutral-950 tracking-tight">{tier.price}</span>
+                    <span className="text-4xl font-bold font-mono text-neutral-950 tracking-tight">
+                      {tier.price}
+                    </span>
                     <span className="text-xs text-neutral-500 font-mono">{tier.period}</span>
                   </div>
                   <p className="text-[12px] text-neutral-500 font-mono mt-1">{tier.subtext}</p>
@@ -424,7 +457,9 @@ function PricingContent() {
               {tier.id === "pro" ? (
                 <button
                   type="button"
-                  onClick={() => handleCheckout(proBilling === "lifetime" ? "pro_lifetime" : "pro_annual")}
+                  onClick={() =>
+                    handleCheckout(proBilling === "lifetime" ? "pro_lifetime" : "pro_annual")
+                  }
                   disabled={checkoutLoading}
                   className="w-full py-3 rounded-full text-xs sm:text-sm font-semibold text-center transition-all bg-neutral-900 text-white hover:bg-neutral-800 shadow-md hover:shadow-lg cursor-pointer disabled:opacity-50"
                 >
@@ -458,17 +493,22 @@ function PricingContent() {
                 Student & Open Source Developer Grant
               </h2>
               <p className="mt-2 text-sm text-neutral-600 max-w-xl">
-                We support researchers, students, and open-source creators who push the boundaries of knowledge and open software. Enjoy a flat 50% discount on any Pro license.
+                We support researchers, students, and open-source creators who push the boundaries
+                of knowledge and open software. Enjoy a flat 50% discount on any Pro license.
               </p>
             </div>
 
             <div className="shrink-0 flex flex-col items-start md:items-end gap-1.5 p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
-              <span className="text-xs font-mono text-neutral-500 uppercase tracking-wider">Flat Grant Rate</span>
+              <span className="text-xs font-mono text-neutral-500 uppercase tracking-wider">
+                Flat Grant Rate
+              </span>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold font-mono text-emerald-700">50% OFF</span>
                 <span className="text-xs text-neutral-600 font-sans">Pro Lifetime & Annual</span>
               </div>
-              <span className="text-[11px] font-mono text-neutral-400">Lifetime: $44 · Annual: $24/yr</span>
+              <span className="text-[11px] font-mono text-neutral-400">
+                Lifetime: $44 · Annual: $24/yr
+              </span>
             </div>
           </div>
 
@@ -479,14 +519,17 @@ function PricingContent() {
                 <div className="flex items-center gap-2.5 mb-2.5">
                   <span className="text-2xl">🎓</span>
                   <div>
-                    <h3 className="text-sm font-bold text-neutral-950">Students & Academic Faculty</h3>
+                    <h3 className="text-sm font-bold text-neutral-950">
+                      Students & Academic Faculty
+                    </h3>
                     <span className="text-[11px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60 font-semibold">
                       Verified via .edu or student ID
                     </span>
                   </div>
                 </div>
                 <p className="text-xs text-neutral-600 leading-relaxed mb-4">
-                  For high school, undergraduate, and graduate students, professors, and academic researchers writing theses, papers, or lab notes.
+                  For high school, undergraduate, and graduate students, professors, and academic
+                  researchers writing theses, papers, or lab notes.
                 </p>
                 <ul className="text-xs text-neutral-700 space-y-1.5 mb-4">
                   <li className="flex items-center gap-2">
@@ -529,7 +572,8 @@ function PricingContent() {
                   </div>
                 </div>
                 <p className="text-xs text-neutral-600 leading-relaxed mb-4">
-                  For contributors and maintainers creating free software for the community. We sponsor your dictation tooling so you can ship code faster.
+                  For contributors and maintainers creating free software for the community. We
+                  sponsor your dictation tooling so you can ship code faster.
                 </p>
                 <ul className="text-xs text-neutral-700 space-y-1.5 mb-4">
                   <li className="flex items-center gap-2">
@@ -563,9 +607,14 @@ function PricingContent() {
           <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-600">
             <div className="flex items-center gap-2">
               <span className="text-base">⚡</span>
-              <span><strong>Fast Verification:</strong> Codes are typically approved and emailed back within 12 hours. No complicated bureaucratic paperwork.</span>
+              <span>
+                <strong>Fast Verification:</strong> Codes are typically approved and emailed back
+                within 12 hours. No complicated bureaucratic paperwork.
+              </span>
             </div>
-            <span className="font-mono text-emerald-700 font-semibold text-[11px] shrink-0">12hr turn-around</span>
+            <span className="font-mono text-emerald-700 font-semibold text-[11px] shrink-0">
+              12hr turn-around
+            </span>
           </div>
         </div>
 
@@ -579,13 +628,21 @@ function PricingContent() {
               Public Voice-Command & Vocabulary Packs
             </h2>
             <p className="text-xs sm:text-sm text-neutral-600">
-              Export your shortcuts or install curated community packs in one click. Your team can sync vocabularies via plain <code className="text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200/60 font-mono">.murmur/pack.json</code> files.
+              Export your shortcuts or install curated community packs in one click. Your team can
+              sync vocabularies via plain{" "}
+              <code className="text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200/60 font-mono">
+                .murmur/pack.json
+              </code>{" "}
+              files.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-6">
             {COMMUNITY_PACKS.map((pack, idx) => (
-              <div key={idx} className="p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:border-neutral-300 transition-all">
+              <div
+                key={idx}
+                className="p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.03)] flex flex-col justify-between hover:border-neutral-300 transition-all"
+              >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-1.5">
                     <span className="text-xs font-bold text-neutral-900">{pack.title}</span>
@@ -593,7 +650,9 @@ function PricingContent() {
                       {pack.category}
                     </span>
                   </div>
-                  <p className="text-xs text-neutral-600 leading-relaxed mb-3">{pack.description}</p>
+                  <p className="text-xs text-neutral-600 leading-relaxed mb-3">
+                    {pack.description}
+                  </p>
                 </div>
                 <div className="p-2.5 rounded-xl bg-neutral-50 border border-neutral-200/70 text-[11px] font-mono text-neutral-700 truncate">
                   {pack.example}
@@ -603,8 +662,13 @@ function PricingContent() {
           </div>
 
           <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-700">
-            <span>🎁 <strong>Referral Program:</strong> Dictate 50 times → Unlock your personal invite link to give friends free Pro packs.</span>
-            <span className="font-mono text-emerald-700 font-semibold text-[11px]">Zero spam · Triggered post-activation</span>
+            <span>
+              🎁 <strong>Referral Program:</strong> Dictate 50 times → Unlock your personal invite
+              link to give friends free Pro packs.
+            </span>
+            <span className="font-mono text-emerald-700 font-semibold text-[11px]">
+              Zero spam · Triggered post-activation
+            </span>
           </div>
         </div>
 
@@ -613,7 +677,9 @@ function PricingContent() {
 
         {/* FAQs */}
         <div className="max-w-3xl w-full text-left mb-16">
-          <h2 className="text-2xl sm:text-3xl font-bold text-neutral-950 mb-6 text-center tracking-[-0.03em]">Pricing & Licensing FAQ</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-neutral-950 mb-6 text-center tracking-[-0.03em]">
+            Pricing & Licensing FAQ
+          </h2>
           <div className="space-y-3">
             {PRICING_FAQS.map((faq, idx) => {
               const isOpen = openFaqIndex === idx;
@@ -627,7 +693,9 @@ function PricingContent() {
                     className="w-full p-5 text-left flex items-center justify-between gap-4 hover:bg-neutral-50/50 transition-colors"
                   >
                     <h3 className="text-sm font-bold text-neutral-950">{faq.question}</h3>
-                    <span className={`w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs text-neutral-600 shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}>
+                    <span
+                      className={`w-6 h-6 rounded-full bg-neutral-100 flex items-center justify-center text-xs text-neutral-600 shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                    >
                       ▼
                     </span>
                   </button>

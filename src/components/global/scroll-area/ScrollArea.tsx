@@ -53,12 +53,11 @@ export function ScrollArea({
       data-fade-bottom={hasBelow}
       style={
         headerInset
-          ? {
+          ? ({
               // Content must dissolve completely before it reaches the title,
               // not slide behind it and show through.
-              "--fade-size-top":
-                "calc(var(--page-header-height) + var(--scroll-fade-size))",
-            } as CSSProperties
+              "--fade-size-top": "calc(var(--page-header-height) + var(--scroll-fade-size))",
+            } as CSSProperties)
           : undefined
       }
       className={cn("scroll-fade min-h-0 flex-1 overflow-y-auto", className)}

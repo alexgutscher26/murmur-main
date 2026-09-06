@@ -17,7 +17,8 @@ export default function NotFound() {
       </h1>
 
       <p className="text-white/70 text-sm max-w-sm mb-8 leading-relaxed">
-        The requested page does not exist or has been moved. Return to the Murmur homepage to download the app.
+        The requested page does not exist or has been moved. Return to the Murmur homepage to
+        download the app.
       </p>
 
       <Link

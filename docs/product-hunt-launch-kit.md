@@ -6,16 +6,16 @@ This document is the operational package and submission asset kit for the offici
 
 ## 1. Submission Listing Metadata
 
-| Field | Content | Constraints / Notes |
-|:---|:---|:---|
-| **Product Name** | `Murmur` | Brand name |
-| **Tagline** | `Fast, private on-device voice dictation for macOS & Windows` | **59 characters** (Limit: 60 chars) |
-| **Short Description** | `Murmur turns speech into clean, formatted text in any desktop app—running 100% locally on your GPU via whisper.cpp. No cloud audio uploads, no accounts, and sub-180ms latency. Dictate code, notes, and emails with complete privacy.` | **230 characters** (Strict Limit: 260 chars) |
-| **Categories / Topics** | `Productivity`, `Open Source`, `Artificial Intelligence`, `Developer Tools`, `Privacy` | Primary tags on Product Hunt |
-| **Website URL** | `https://murmur.app` | Canonical landing page |
-| **GitHub Repo** | `https://github.com/webprodigies/murmur` | Open Source (MIT) |
-| **Pricing Type** | `Free + Paid Options` | Free core tier + perpetual lifetime & pro options |
-| **Platforms Supported** | `macOS (Apple Silicon & Intel)`, `Windows 10/11` | Cross-platform desktop apps |
+| Field                   | Content                                                                                                                                                                                                                                  | Constraints / Notes                               |
+| :---------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------ |
+| **Product Name**        | `Murmur`                                                                                                                                                                                                                                 | Brand name                                        |
+| **Tagline**             | `Fast, private on-device voice dictation for macOS & Windows`                                                                                                                                                                            | **59 characters** (Limit: 60 chars)               |
+| **Short Description**   | `Murmur turns speech into clean, formatted text in any desktop app—running 100% locally on your GPU via whisper.cpp. No cloud audio uploads, no accounts, and sub-180ms latency. Dictate code, notes, and emails with complete privacy.` | **230 characters** (Strict Limit: 260 chars)      |
+| **Categories / Topics** | `Productivity`, `Open Source`, `Artificial Intelligence`, `Developer Tools`, `Privacy`                                                                                                                                                   | Primary tags on Product Hunt                      |
+| **Website URL**         | `https://murmur.app`                                                                                                                                                                                                                     | Canonical landing page                            |
+| **GitHub Repo**         | `https://github.com/webprodigies/murmur`                                                                                                                                                                                                 | Open Source (MIT)                                 |
+| **Pricing Type**        | `Free + Paid Options`                                                                                                                                                                                                                    | Free core tier + perpetual lifetime & pro options |
+| **Platforms Supported** | `macOS (Apple Silicon & Intel)`, `Windows 10/11`                                                                                                                                                                                         | Cross-platform desktop apps                       |
 
 ---
 
@@ -34,26 +34,29 @@ This document is the operational package and submission asset kit for the offici
 ## 3. Visual Assets & Media Specifications
 
 ### Screenshot 1: Universal Floating Pill & Real-Time Waveform
+
 - **Filename:** `murmur-ph-01-floating-pill.png`
 - **Resolution:** `1270 × 760 px` (Standard Product Hunt gallery format, 16:10)
 - **Visual Composition:**
   - Background: Split-screen showing VS Code (Rust codebase) on the left and Notion (Meeting notes document) on the right.
   - Center Foreground: Murmur's floating island pill displaying real-time green audio waveform bars.
-  - Callout Badge 1: *"Hold ⌥ Space / Alt+Space anywhere & speak naturally"*
-  - Callout Badge 2: *"Sub-180ms end-to-end insertion latency"*
-  - Callout Badge 3: *"Zero clipboard pollution or typing lag"*
+  - Callout Badge 1: _"Hold ⌥ Space / Alt+Space anywhere & speak naturally"_
+  - Callout Badge 2: _"Sub-180ms end-to-end insertion latency"_
+  - Callout Badge 3: _"Zero clipboard pollution or typing lag"_
 
 ### Screenshot 2: Hardware Acceleration & Air-Gap Kill-Switch
+
 - **Filename:** `murmur-ph-02-hardware-airgap.png`
 - **Resolution:** `1270 × 760 px`
 - **Visual Composition:**
   - Background: Murmur Settings Window on dark glassmorphic UI.
   - Active Section: Whisper Model selector showing **Base Q5_0 (142MB)** and **Small Q5_0 (466MB)** stored permanently on local disk.
-  - Hardware Acceleration Pill: *"DirectML / Apple Metal GPU Active — 0.16x RTF"*
-  - Prominent Switch: **Air-Gap Mode (ENABLED)** with badge: *"0 bytes outbound network egress"*.
-  - Callout: *"Audited with Little Snitch & Wireshark: Zero telemetry sockets."*
+  - Hardware Acceleration Pill: _"DirectML / Apple Metal GPU Active — 0.16x RTF"_
+  - Prominent Switch: **Air-Gap Mode (ENABLED)** with badge: _"0 bytes outbound network egress"_.
+  - Callout: _"Audited with Little Snitch & Wireshark: Zero telemetry sockets."_
 
 ### Screenshot 3: App-Aware Context Engine & Custom Vocabulary
+
 - **Filename:** `murmur-ph-03-context-vocabulary.png`
 - **Resolution:** `1270 × 760 px`
 - **Visual Composition:**
@@ -61,16 +64,17 @@ This document is the operational package and submission asset kit for the offici
   - Features Highlighted:
     - **Code Mode:** Automatic backtick formatting for inline code, `camelCase` and `snake_case` conversion.
     - **Phonetic Custom Dictionary:** Table showing terms like `kubectl`, `PostgreSQL`, `serde_json`, and `Tauri` mapped to phonetic triggers.
-    - **Filler Word Purge:** Demonstration showing raw speech *"Um, so basically we should like, merge this PR"* converted to *"Merge this PR."*
+    - **Filler Word Purge:** Demonstration showing raw speech _"Um, so basically we should like, merge this PR"_ converted to _"Merge this PR."_
 
 ### Demo GIF: 14-Second Air-Gap Proof Loop
+
 - **Filename:** `murmur-ph-demo-airgap.gif`
 - **Resolution:** `1280 × 720 px` (60 fps, optimized palette < 4.8MB)
 - **Storyboard:**
-  1. *Seconds 0–3:* Cursor clicks Wi-Fi icon in OS menu bar and toggles it **OFF**. A terminal running `sudo tcpdump -i en0` or Windows `pktmon` is visible in the corner showing **0 packets**.
-  2. *Seconds 3–8:* User presses and holds the global shortcut over an empty GitHub Issue textarea. Live voice dictation waveform activates.
-  3. *Seconds 8–11:* Shortcut is released. Formatted markdown with code blocks and bullet points immediately populates the textarea.
-  4. *Seconds 11–14:* Terminal packet monitor zooms in, confirming **0.00 KB** emitted and zero dropped frames.
+  1. _Seconds 0–3:_ Cursor clicks Wi-Fi icon in OS menu bar and toggles it **OFF**. A terminal running `sudo tcpdump -i en0` or Windows `pktmon` is visible in the corner showing **0 packets**.
+  2. _Seconds 3–8:_ User presses and holds the global shortcut over an empty GitHub Issue textarea. Live voice dictation waveform activates.
+  3. _Seconds 8–11:_ Shortcut is released. Formatted markdown with code blocks and bullet points immediately populates the textarea.
+  4. _Seconds 11–14:_ Terminal packet monitor zooms in, confirming **0.00 KB** emitted and zero dropped frames.
 
 ---
 
@@ -82,7 +86,7 @@ This document is the operational package and submission asset kit for the offici
 - **Twitter / X:** `@webprodigies`
 - **GitHub:** `https://github.com/webprodigies/murmur`
 - **Bio (Profile Text):**
-  > *"Systems engineer obsessed with local-first software, latency optimization, and data sovereignty. Built Murmur to prove that local AI on modern GPUs is faster, cheaper, and fundamentally more private than cloud streaming."*
+  > _"Systems engineer obsessed with local-first software, latency optimization, and data sovereignty. Built Murmur to prove that local AI on modern GPUs is faster, cheaper, and fundamentally more private than cloud streaming."_
 
 ---
 
@@ -101,6 +105,7 @@ So we set out to build what dictation should have been from day one:
 **Murmur** — a fast, polished voice dictation app that runs 100% locally on your computer.
 
 ### What Makes Murmur Different:
+
 ⚡ **Instant Sub-180ms Latency:** Audio is decoded directly on your GPU via `whisper.cpp` (Apple Silicon Metal & Windows DirectML). It is actually faster than cloud round-trips because there is zero network handshake.
 🔒 **Air-Gapped Privacy:** Audio stays in RAM and is purged the instant text is typed at your cursor. Zero telemetry, zero analytics SDKs, and zero cloud accounts required.
 🎯 **App-Aware Formatting:** Murmur recognizes whether you are in VS Code, Notion, Slack, or an email client and applies appropriate casing and punctuation automatically.
@@ -108,6 +113,7 @@ So we set out to build what dictation should have been from day one:
 💻 **Native Performance:** Built in Rust and Tauri 2 with an idle memory footprint of less than 45MB.
 
 ### Our Launch Gift to the Community:
+
 Murmur is **free and open source (MIT)**. You can download it today and use it with unlimited words forever.
 
 For power users who want advanced model switching (Whisper Medium/Large) and custom workflow profiles, we are offering **25% off** our Core Lifetime perpetual license and Pro tier with coupon code **HUNTER25** for the next 72 hours!

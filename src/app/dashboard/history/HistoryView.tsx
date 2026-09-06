@@ -111,7 +111,10 @@ export function HistoryView({ hotkey, mode }: HistoryViewProps) {
         if (result.status !== "ok") return;
         setCopiedId(session.id);
         window.clearTimeout(copyTimer.current);
-        copyTimer.current = window.setTimeout(() => setCopiedId(null), readDurationMs("--feedback-hold"));
+        copyTimer.current = window.setTimeout(
+          () => setCopiedId(null),
+          readDurationMs("--feedback-hold"),
+        );
       });
     },
     [selecting, toggleSelect],
@@ -186,7 +189,10 @@ export function HistoryView({ hotkey, mode }: HistoryViewProps) {
         <div className="mx-6 mb-2 flex items-center justify-between rounded-card bg-surface px-4 py-2.5 text-caption hairline">
           <div className="flex items-center gap-2 text-text-primary font-medium">
             <EyeOff className="size-4 text-warning" />
-            <span>Incognito Mode Active: Dictations are delivered directly and immediately discarded. Zero transcripts are saved to disk.</span>
+            <span>
+              Incognito Mode Active: Dictations are delivered directly and immediately discarded.
+              Zero transcripts are saved to disk.
+            </span>
           </div>
           <button
             type="button"
@@ -252,9 +258,7 @@ export function HistoryView({ hotkey, mode }: HistoryViewProps) {
               <button type="button" onClick={toggleSelectAll} className={BUTTON_CLASS}>
                 {allSelected ? "Deselect all" : "Select all"}
               </button>
-              <span className="text-caption text-text-secondary">
-                {selectedIds.size} selected
-              </span>
+              <span className="text-caption text-text-secondary">{selectedIds.size} selected</span>
               <button
                 type="button"
                 disabled={selectedIds.size === 0}
@@ -269,9 +273,7 @@ export function HistoryView({ hotkey, mode }: HistoryViewProps) {
                     : "text-text-primary hover:text-danger",
                 )}
               >
-                {confirmDelete === "selected"
-                  ? `Delete ${selectedIds.size}`
-                  : "Delete selected"}
+                {confirmDelete === "selected" ? `Delete ${selectedIds.size}` : "Delete selected"}
               </button>
               <button
                 type="button"
@@ -319,11 +321,7 @@ export function HistoryView({ hotkey, mode }: HistoryViewProps) {
               </button>
               <ExportAction onError={setExportError} />
               {feed.items.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={() => setSelecting(true)}
-                  className={BUTTON_CLASS}
-                >
+                <button type="button" onClick={() => setSelecting(true)} className={BUTTON_CLASS}>
                   Select
                 </button>
               ) : null}
@@ -337,7 +335,9 @@ export function HistoryView({ hotkey, mode }: HistoryViewProps) {
             <NoTranscriptionsYet hotkey={hotkey} mode={mode} />
           )
         }
-        noResults={<EmptyState headline="Nothing matches that" description="Try a shorter search." />}
+        noResults={
+          <EmptyState headline="Nothing matches that" description="Try a shorter search." />
+        }
         footer={
           feed.loading && feed.items.length > 0 ? (
             <Skeleton className="h-[var(--row-height)] rounded-none" />
@@ -345,10 +345,7 @@ export function HistoryView({ hotkey, mode }: HistoryViewProps) {
         }
       />
       {playbackSession ? (
-        <SessionPlaybackModal
-          session={playbackSession}
-          onClose={() => setPlaybackSession(null)}
-        />
+        <SessionPlaybackModal session={playbackSession} onClose={() => setPlaybackSession(null)} />
       ) : null}
     </section>
   );

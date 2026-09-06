@@ -35,7 +35,12 @@ export interface VirtualWindow {
   viewportHeight: number;
 }
 
-export function useVirtualWindow({ count, rowHeight, overscan, containerRef }: VirtualWindowOptions): VirtualWindow {
+export function useVirtualWindow({
+  count,
+  rowHeight,
+  overscan,
+  containerRef,
+}: VirtualWindowOptions): VirtualWindow {
   const [scrollTop, setScrollTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
 

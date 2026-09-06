@@ -43,9 +43,10 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
     if (normalizedDiscount === "STUDENT-50" || normalizedDiscount === "OSS-50") {
       return {
         tier,
-        name: normalizedDiscount === "STUDENT-50"
-          ? "Murmur Pro Lifetime (Student & Academic Grant)"
-          : "Murmur Pro Lifetime (Open Source Maintainer Grant)",
+        name:
+          normalizedDiscount === "STUDENT-50"
+            ? "Murmur Pro Lifetime (Student & Academic Grant)"
+            : "Murmur Pro Lifetime (Open Source Maintainer Grant)",
         amountCents: 4400, // $44.00 (50% off)
         currency: "usd",
         discountApplied: "Academic / OSS 50% Grant",
@@ -91,9 +92,10 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
   if (normalizedDiscount === "STUDENT-50" || normalizedDiscount === "OSS-50") {
     return {
       tier,
-      name: normalizedDiscount === "STUDENT-50"
-        ? "Murmur Pro Annual Pass (Student Grant)"
-        : "Murmur Pro Annual Pass (Open Source Grant)",
+      name:
+        normalizedDiscount === "STUDENT-50"
+          ? "Murmur Pro Annual Pass (Student Grant)"
+          : "Murmur Pro Annual Pass (Open Source Grant)",
       amountCents: 2400, // $24.00 / yr (50% off)
       currency: "usd",
       interval: "year",

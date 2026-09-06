@@ -18,7 +18,7 @@ But don't create blindly. You have to know whether something that already facili
 
 The whole codebase carries a `SOURCE OF TRUTH KEYWORDS` line at the top of each file and code block precisely so you can find things without reading everything. This is what keeps context pollution at zero and stops us from burning through session limits.
 
-Before creating any type, function, constant, or component, grep for it by keyword — and you must grep with `-l`. That gives you the list of *files* where the thing could live; you then narrow to where it's most likely to be and read only those files. It's the fastest path that also protects the context window. If the keyword search turns up nothing, search the codebase normally. If you find it, follow what's already there.
+Before creating any type, function, constant, or component, grep for it by keyword — and you must grep with `-l`. That gives you the list of _files_ where the thing could live; you then narrow to where it's most likely to be and read only those files. It's the fastest path that also protects the context window. If the keyword search turns up nothing, search the codebase normally. If you find it, follow what's already there.
 
 Two commands do this for you. They are read-only navigation, they are part of the architecture, and they are the one authorised exception to §8's no-scripts rule:
 
@@ -35,7 +35,7 @@ Never create a duplicate type, function, component, or block of code because gre
 
 Dependencies point **downward only**. An upward import fails the build.
 
-1. **Registry — the single source of truth for what the app *has*.** `src-tauri/src/registry/`. Every capability, setting, permission requirement, nav item, hotkey and metric is one entry. Adding a feature is an entry, not a new pattern. If you are writing a `match` on a feature name anywhere outside `registry/`, the branch belongs in the registry instead.
+1. **Registry — the single source of truth for what the app _has_.** `src-tauri/src/registry/`. Every capability, setting, permission requirement, nav item, hotkey and metric is one entry. Adding a feature is an entry, not a new pattern. If you are writing a `match` on a feature name anywhere outside `registry/`, the branch belongs in the registry instead.
 2. **Command factory — the heart of the app.** `src-tauri/src/ipc/factory.rs`. Every IPC command goes through it. It already does a ton of heavy lifting: input validation, permission preflight, reentrancy guarding, tracing, error mapping and metrics are all handled there, so don't re-check any of it in a handler. Never write `#[tauri::command]` directly.
 3. **Commands and pipeline** consume the factory and hold business logic — validation decisions, orchestration, sequencing. Because the factory already covered the cross-cutting concerns, a handler should only contain logic specific to the task at hand.
 4. **Ports** are traits for anything swappable. Traits and capability structs only — no logic, ever.

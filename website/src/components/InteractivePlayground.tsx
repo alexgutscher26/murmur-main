@@ -100,15 +100,15 @@ export function InteractivePlayground() {
   const [isCopied, setIsCopied] = useState(false);
   const [isLiveMic, setIsLiveMic] = useState(false);
   const [liveTranscript, setLiveTranscript] = useState("");
-  const [audioLevels, setAudioLevels] = useState<number[]>([12, 28, 45, 80, 50, 30, 15, 60, 40, 20]);
+  const [audioLevels, setAudioLevels] = useState<number[]>([
+    12, 28, 45, 80, 50, 30, 15, 60, 40, 20,
+  ]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isPlaying || isLiveMic) {
       interval = setInterval(() => {
-        setAudioLevels(
-          Array.from({ length: 16 }, () => Math.floor(Math.random() * 55) + 12)
-        );
+        setAudioLevels(Array.from({ length: 16 }, () => Math.floor(Math.random() * 55) + 12));
       }, 80);
     } else {
       setAudioLevels([10, 14, 18, 22, 18, 14, 10, 14, 18, 14, 10, 14, 16, 12, 14, 10]);
@@ -142,7 +142,10 @@ export function InteractivePlayground() {
       return;
     }
 
-    if (typeof window !== "undefined" && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+    if (
+      typeof window !== "undefined" &&
+      ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)
+    ) {
       try {
         // @ts-expect-error WebkitSpeechRecognition
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -185,7 +188,9 @@ export function InteractivePlayground() {
     setIsLiveMic(true);
     setLiveTranscript("Simulating microphone audio capture...");
     setTimeout(() => {
-      setLiveTranscript("Murmur transcribed: Local speech recognition is fast, private, and powerful.");
+      setLiveTranscript(
+        "Murmur transcribed: Local speech recognition is fast, private, and powerful.",
+      );
       setIsLiveMic(false);
     }, 3000);
   };
@@ -198,7 +203,10 @@ export function InteractivePlayground() {
   };
 
   return (
-    <section id="playground" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section
+      id="playground"
+      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+    >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
@@ -218,7 +226,8 @@ export function InteractivePlayground() {
             Test Murmur in your browser.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Experience how Murmur turns unstructured messy speech into formatted writing while stripping filler words with zero cloud latency.
+            Experience how Murmur turns unstructured messy speech into formatted writing while
+            stripping filler words with zero cloud latency.
           </p>
         </div>
 
@@ -273,7 +282,9 @@ export function InteractivePlayground() {
                       : "bg-white hover:bg-neutral-50 text-neutral-800 border border-neutral-200/90 shadow-sm"
                   }`}
                 >
-                  <Mic className={`w-3.5 h-3.5 ${isLiveMic ? "text-white motion-safe:animate-pulse" : "text-emerald-600"}`} />
+                  <Mic
+                    className={`w-3.5 h-3.5 ${isLiveMic ? "text-white motion-safe:animate-pulse" : "text-emerald-600"}`}
+                  />
                   <span>{isLiveMic ? "Stop microphone" : "Test live with microphone"}</span>
                 </button>
               </div>
@@ -283,13 +294,20 @@ export function InteractivePlayground() {
             <div className="p-5 rounded-2xl bg-white border border-neutral-200/90 shadow-[0_12px_40px_-12px_rgba(0,0,0,0.06)]">
               <div className="flex items-center gap-2 mb-3">
                 <Cpu className="w-3.5 h-3.5 text-emerald-600" aria-hidden="true" />
-                <span className="text-xs font-semibold text-neutral-800">Local system telemetry</span>
+                <span className="text-xs font-semibold text-neutral-800">
+                  Local system telemetry
+                </span>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {TELEMETRY.map(({ label, getValue, accent }) => (
-                  <div key={label} className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80">
+                  <div
+                    key={label}
+                    className="p-3 rounded-xl bg-neutral-50 border border-neutral-200/80"
+                  >
                     <span className="text-neutral-500 block text-[10px] font-mono">{label}</span>
-                    <span className={`font-bold text-sm ${accent ? "text-emerald-700" : "text-neutral-900"}`}>
+                    <span
+                      className={`font-bold text-sm ${accent ? "text-emerald-700" : "text-neutral-900"}`}
+                    >
                       {getValue(activeScenario)}
                     </span>
                   </div>
@@ -327,7 +345,9 @@ export function InteractivePlayground() {
                         setDisplayedText(activeScenario.cleanTranscription);
                       }}
                       className={`text-xs px-3 py-1 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 ${
-                        mode === "clean" ? "bg-white text-neutral-950 font-semibold shadow-sm border border-neutral-200/70" : "text-neutral-600 hover:text-neutral-950"
+                        mode === "clean"
+                          ? "bg-white text-neutral-950 font-semibold shadow-sm border border-neutral-200/70"
+                          : "text-neutral-600 hover:text-neutral-950"
                       }`}
                     >
                       Clean text
@@ -338,7 +358,9 @@ export function InteractivePlayground() {
                         setDisplayedText(activeScenario.smartFormatted);
                       }}
                       className={`text-xs px-3 py-1 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 ${
-                        mode === "formatted" ? "bg-white text-neutral-950 font-semibold shadow-sm border border-neutral-200/70" : "text-neutral-600 hover:text-neutral-950"
+                        mode === "formatted"
+                          ? "bg-white text-neutral-950 font-semibold shadow-sm border border-neutral-200/70"
+                          : "text-neutral-600 hover:text-neutral-950"
                       }`}
                     >
                       Smart format

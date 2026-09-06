@@ -167,12 +167,8 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
                 {category.items.map((item, itemIdx) => (
                   <div key={itemIdx} className="p-3 flex items-center justify-between gap-4">
                     <div className="min-w-0 flex-1">
-                      <p className="text-caption font-semibold text-text-primary">
-                        {item.label}
-                      </p>
-                      <p className="text-[11px] text-text-secondary truncate">
-                        {item.description}
-                      </p>
+                      <p className="text-caption font-semibold text-text-primary">{item.label}</p>
+                      <p className="text-[11px] text-text-secondary truncate">{item.description}</p>
                     </div>
 
                     <div className="shrink-0 flex items-center gap-1.5">
@@ -199,7 +195,9 @@ export function ShortcutsModal({ isOpen, onClose }: ShortcutsModalProps) {
 
         {/* Modal Footer */}
         <div className="hairline border-t border-[var(--border-hairline)] px-5 py-3 bg-surface flex items-center justify-between text-caption text-text-secondary">
-          <span>Press <kbd className="font-mono font-bold">Esc</kbd> or click outside to dismiss</span>
+          <span>
+            Press <kbd className="font-mono font-bold">Esc</kbd> or click outside to dismiss
+          </span>
           <button
             type="button"
             onClick={onClose}

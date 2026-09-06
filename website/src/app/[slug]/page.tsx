@@ -134,7 +134,10 @@ export default async function HighIntentSeoPage({ params }: Props) {
         {/* Key Stats Row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-14">
           {page.keyStats.map((stat, idx) => (
-            <div key={idx} className="p-4 rounded-xl bg-[#141414] border border-[#272727] text-left">
+            <div
+              key={idx}
+              className="p-4 rounded-xl bg-[#141414] border border-[#272727] text-left"
+            >
               <span className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 block mb-1">
                 {stat.label}
               </span>
@@ -153,7 +156,9 @@ export default async function HighIntentSeoPage({ params }: Props) {
               <span className="text-xs font-mono text-amber-400 uppercase tracking-wider font-semibold block mb-2">
                 The Cloud Compromise
               </span>
-              <h3 className="text-base font-bold text-white mb-2">The Problem with Cloud Dictation</h3>
+              <h3 className="text-base font-bold text-white mb-2">
+                The Problem with Cloud Dictation
+              </h3>
               <p className="text-xs sm:text-sm text-white/70 leading-relaxed font-sans">
                 {page.coreProblem}
               </p>
@@ -240,9 +245,7 @@ export default async function HighIntentSeoPage({ params }: Props) {
             <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest block mb-1">
               Real Workflow Outcome ({page.socialProofClip.platform})
             </span>
-            <p className="text-sm font-semibold text-white italic">
-              {page.socialProofClip.quote}
-            </p>
+            <p className="text-sm font-semibold text-white italic">{page.socialProofClip.quote}</p>
           </div>
           <span className="text-[11px] font-mono px-3 py-1.5 rounded-lg bg-[#242424] text-white/70 border border-[#383838] shrink-0">
             {page.socialProofClip.context}

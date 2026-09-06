@@ -4,9 +4,25 @@ import { useEffect, useRef, useState } from "react";
 import { Cpu, ShieldCheck, Zap, Sparkles } from "lucide-react";
 
 const TAGLINE_WORDS = [
-  "Your", "voice", "is", "your", "fastest", "tool.",
-  "Turn", "unfiltered", "thoughts", "into", "pristine", "writing,",
-  "code,", "and", "decisions", "without", "touching", "the", "cloud."
+  "Your",
+  "voice",
+  "is",
+  "your",
+  "fastest",
+  "tool.",
+  "Turn",
+  "unfiltered",
+  "thoughts",
+  "into",
+  "pristine",
+  "writing,",
+  "code,",
+  "and",
+  "decisions",
+  "without",
+  "touching",
+  "the",
+  "cloud.",
 ];
 
 const PHILOSOPHY_PILLARS = [
@@ -96,7 +112,8 @@ export function TaglineReveal() {
           <p className="text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-bold leading-[1.15] tracking-[-0.035em] flex flex-wrap justify-center gap-x-3.5 gap-y-2">
             {TAGLINE_WORDS.map((word, idx) => {
               const isActive = idx <= activeWordsCount;
-              const isCloudHighlight = word.toLowerCase().includes("cloud") || word.toLowerCase().includes("touching");
+              const isCloudHighlight =
+                word.toLowerCase().includes("cloud") || word.toLowerCase().includes("touching");
               return (
                 <span
                   key={idx}
@@ -116,7 +133,8 @@ export function TaglineReveal() {
         </div>
 
         <p className="mt-8 text-base sm:text-lg text-neutral-600 max-w-2xl leading-relaxed font-normal">
-          Whisper AI inference runs directly on your Apple Silicon Neural Engine or Windows DirectML GPU with zero cloud subscriptions, zero telemetry, and complete offline privacy.
+          Whisper AI inference runs directly on your Apple Silicon Neural Engine or Windows DirectML
+          GPU with zero cloud subscriptions, zero telemetry, and complete offline privacy.
         </p>
 
         {/* 3 Philosophy Pillars matching the Hero's card style */}

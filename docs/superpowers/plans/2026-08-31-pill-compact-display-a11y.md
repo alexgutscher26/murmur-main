@@ -9,6 +9,7 @@
 ### Task 1: Add `ui.pill_compact` Setting & Tokens
 
 **Files:**
+
 - Modify: `src-tauri/src/registry/keys.rs`
 - Modify: `src-tauri/src/registry/mod.rs`
 - Modify: `src/styles/tokens.css`
@@ -22,6 +23,7 @@
 ### Task 2: Implement Multi-Display Foreground Window Detection in `tray.rs`
 
 **Files:**
+
 - Modify: `src-tauri/src/tray.rs`
 
 - [ ] **Step 1: Detect display of foreground window or cursor in `fit_pill_to_state`**
@@ -33,6 +35,7 @@
 ### Task 3: Implement Compact Mode & Screen Reader Announcements in `Pill.tsx`
 
 **Files:**
+
 - Modify: `src/app/pill/Pill.tsx`
 
 - [ ] **Step 1: Render compact pill layout when `ui.pill_compact` is enabled**
@@ -44,6 +47,7 @@
 ### Task 4: Full Suite Verification & Update `TODO.md`
 
 **Files:**
+
 - Modify: `TODO.md:L93-L95`
 
 - [ ] **Step 1: Run full verification suite (`cargo check --tests`, `bun run typecheck`, `bun run build`)**

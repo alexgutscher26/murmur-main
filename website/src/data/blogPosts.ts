@@ -25,7 +25,12 @@ export const BLOG_POSTS: BlogPost[] = [
     date: "2026-08-28",
     readTime: "7 min read",
     category: "Comparisons",
-    keywords: ["best Wispr Flow alternative Mac","private voice dictation macOS","offline speech to text Mac","local whisper dictation"],
+    keywords: [
+      "best Wispr Flow alternative Mac",
+      "private voice dictation macOS",
+      "offline speech to text Mac",
+      "local whisper dictation",
+    ],
     author: {
       name: "Alex Gutscher",
       role: "Lead Systems Engineer",
@@ -33,13 +38,13 @@ export const BLOG_POSTS: BlogPost[] = [
     },
     shortFormHooks: [
       "Your voice dictation app may be uploading every spoken word. Mine does not.",
-      "Cloud transcription is convenient. Local transcription is a completely different privacy model."
-],
+      "Cloud transcription is convenient. Local transcription is a completely different privacy model.",
+    ],
     keyTakeaways: [
       "Wispr Flow streams audio to remote AWS endpoints, introducing network latency and third-party compliance risk.",
       "Apple Silicon Metal offloading drops whisper.cpp real-time factor to 0.18x with 168ms p99 latency.",
-      "Murmur injects text via macOS accessibility APIs directly, preventing clipboard history leaks."
-],
+      "Murmur injects text via macOS accessibility APIs directly, preventing clipboard history leaks.",
+    ],
     content: `
 ## The Architectural Flaw of Cloud Voice Typing on macOS
 
@@ -185,7 +190,12 @@ Don't take any vendor's privacy claims at face value—including ours. Here is h
     date: "2026-08-25",
     readTime: "8 min read",
     category: "Privacy & Security",
-    keywords: ["local speech to text vs cloud transcription","voice dictation privacy","what leaves your computer dictation","audio cloud security packet capture"],
+    keywords: [
+      "local speech to text vs cloud transcription",
+      "voice dictation privacy",
+      "what leaves your computer dictation",
+      "audio cloud security packet capture",
+    ],
     author: {
       name: "Alex Gutscher",
       role: "Security & Audio Architecture",
@@ -193,13 +203,13 @@ Don't take any vendor's privacy claims at face value—including ours. Here is h
     },
     shortFormHooks: [
       "We ran Wireshark while dictating into cloud apps and captured 42MB of audio payloads.",
-      "Privacy policies are legal promises. Local ring buffers are architectural guarantees."
-],
+      "Privacy policies are legal promises. Local ring buffers are architectural guarantees.",
+    ],
     keyTakeaways: [
       "Cloud dictation payloads include 16kHz PCM/Opus streams, device fingerprints, and cloud vendor telemetry.",
       "Murmur processes speech in zero-copy RAM buffers that are overwritten with zeros immediately post-decode.",
-      "On-device latency beats cloud latency by 2.8× (172ms vs 480ms) by eliminating network RTT and cloud queues."
-],
+      "On-device latency beats cloud latency by 2.8× (172ms vs 480ms) by eliminating network RTT and cloud queues.",
+    ],
     content: `
 ## Dissecting the Cloud Audio Payload: Opus Frames, API Tokens, and Telemetry
 
@@ -376,7 +386,12 @@ When an application physically contains no network socket initialization code, z
     date: "2026-08-20",
     readTime: "7 min read",
     category: "Guides",
-    keywords: ["dictate private client notes","HIPAA voice dictation","legal dictation speech to text","air-gapped voice transcription"],
+    keywords: [
+      "dictate private client notes",
+      "HIPAA voice dictation",
+      "legal dictation speech to text",
+      "air-gapped voice transcription",
+    ],
     author: {
       name: "Alex Gutscher",
       role: "Compliance & Systems Architect",
@@ -384,13 +399,13 @@ When an application physically contains no network socket initialization code, z
     },
     shortFormHooks: [
       "I built voice typing for people who cannot send client conversations to the cloud.",
-      "How to dictate sensitive therapy and legal notes without violating privilege."
-],
+      "How to dictate sensitive therapy and legal notes without violating privilege.",
+    ],
     keyTakeaways: [
       "Third-party cloud sub-processors risk waiving attorney-client privilege and violating HIPAA without BAAs.",
       "Murmur bypasses clipboard copy-paste, preventing confidential transcripts from being logged by clipboard managers.",
-      "Phonetic vocabulary biasing drops legal and medical jargon word error rate from 18.4% to 1.8% locally."
-],
+      "Phonetic vocabulary biasing drops legal and medical jargon word error rate from 18.4% to 1.8% locally.",
+    ],
     content: `
 ## The Legal Reality: Why Cloud Sub-Processors Compromise Privilege
 
@@ -518,7 +533,12 @@ For 95% of practitioners, \`Whisper Small\` with phonetic vocabulary biasing off
     date: "2026-08-15",
     readTime: "8 min read",
     category: "Engineering",
-    keywords: ["best offline dictation software Windows","offline speech to text Windows 11","DirectML whisper Windows","local voice typing PC"],
+    keywords: [
+      "best offline dictation software Windows",
+      "offline speech to text Windows 11",
+      "DirectML whisper Windows",
+      "local voice typing PC",
+    ],
     author: {
       name: "Alex Gutscher",
       role: "Windows Native & DirectML Engineer",
@@ -526,13 +546,13 @@ For 95% of practitioners, \`Whisper Small\` with phonetic vocabulary biasing off
     },
     shortFormHooks: [
       "I tested local AI dictation on a normal Windows laptop—here is the real speed and accuracy.",
-      "A demo of voice dictation with Wi-Fi turned completely off."
-],
+      "A demo of voice dictation with Wi-Fi turned completely off.",
+    ],
     keyTakeaways: [
       "DirectML unlocks unified GPU acceleration across NVIDIA, AMD, and Intel hardware on Windows 10 & 11.",
       "Murmur achieves 0.12x to 0.22x real-time factor with sub-180ms latency on modern Windows laptops.",
-      "Dispatches UTF-16 Unicode events directly, avoiding keyboard hook watchdogs and scan code mangling."
-],
+      "Dispatches UTF-16 Unicode events directly, avoiding keyboard hook watchdogs and scan code mangling.",
+    ],
     content: `
 ## The Graveyard of Windows Speech Recognition
 
@@ -636,7 +656,12 @@ Synthesizing keystrokes across Windows applications (Notepad, VS Code, Slack, WS
     date: "2026-08-10",
     readTime: "7 min read",
     category: "Guides",
-    keywords: ["voice dictation for coding","speech to text VS Code Cursor","voice typing programming private","local voice coding whisper"],
+    keywords: [
+      "voice dictation for coding",
+      "speech to text VS Code Cursor",
+      "voice typing programming private",
+      "local voice coding whisper",
+    ],
     author: {
       name: "Alex Gutscher",
       role: "Developer Experience & Systems",
@@ -644,13 +669,13 @@ Synthesizing keystrokes across Windows applications (Notepad, VS Code, Slack, WS
     },
     shortFormHooks: [
       "Why typing git commit messages and PRs by voice is 3x faster—and how to do it without cloud leaks.",
-      "Dictating code comments and architecture decisions locally in VS Code and Cursor."
-],
+      "Dictating code comments and architecture decisions locally in VS Code and Cursor.",
+    ],
     keyTakeaways: [
       "Software engineers spend 40% of their workday typing English in PR descriptions, issues, and commit messages.",
       "Speaking internal API keys, database schemas, and microservice names into cloud SaaS leaks intellectual property.",
-      "Murmur's AST-aware local post-processor formats conventional commits, camelCase, and code syntax in 2ms."
-],
+      "Murmur's AST-aware local post-processor formats conventional commits, camelCase, and code syntax in 2ms.",
+    ],
     content: `
 ## The Infosec Hazard: What Happens When You Dictate Internal Architecture
 
@@ -755,7 +780,12 @@ We implemented an active-window context sniffer. Murmur checks the window class 
     date: "2026-08-01",
     readTime: "9 min read",
     category: "Comparisons",
-    keywords: ["Murmur vs Wispr Flow","Wispr Flow comparison","Wispr Flow privacy review","local vs cloud dictation"],
+    keywords: [
+      "Murmur vs Wispr Flow",
+      "Wispr Flow comparison",
+      "Wispr Flow privacy review",
+      "local vs cloud dictation",
+    ],
     author: {
       name: "Alex Gutscher",
       role: "Core Systems Engineer",
@@ -763,13 +793,13 @@ We implemented an active-window context sniffer. Murmur checks the window class 
     },
     shortFormHooks: [
       "Cloud tools protect data with policies and controls. We protect it by keeping your dictation on your device in the first place.",
-      "Wispr Flow vs Murmur: What actually happens when you speak into your microphone?"
-],
+      "Wispr Flow vs Murmur: What actually happens when you speak into your microphone?",
+    ],
     keyTakeaways: [
       "Wispr Flow offers convenient cloud-hosted features, but streams continuous microphone audio to remote servers.",
       "Murmur runs 100% in local RAM, producing 0 outbound network packets with 172ms p99 tail latency.",
-      "Air-gapped operation means Murmur works at 35,000 feet on airplanes with zero internet access."
-],
+      "Air-gapped operation means Murmur works at 35,000 feet on airplanes with zero internet access.",
+    ],
     content: `
 ## The Fundamental Divergence: Centralized Server Farms vs On-Device Silicon
 

@@ -42,8 +42,8 @@ function InviteContent() {
         <span className="block text-gradient-hero mt-1">100% Private AI Dictation.</span>
       </h1>
       <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
-        Experience sub-200ms instantaneous speech-to-text running directly on your computer's CPU and GPU.
-        Audio never touches the cloud. Never leaves RAM.
+        Experience sub-200ms instantaneous speech-to-text running directly on your computer's CPU
+        and GPU. Audio never touches the cloud. Never leaves RAM.
       </p>
 
       {/* Referral Reward Card */}
@@ -70,7 +70,11 @@ function InviteContent() {
                 title="Copy referral code"
                 className="text-neutral-400 hover:text-neutral-800 transition-colors cursor-pointer"
               >
-                {copied ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
+                {copied ? (
+                  <Check className="size-3.5 text-emerald-600" />
+                ) : (
+                  <Copy className="size-3.5" />
+                )}
               </button>
             </div>
           </div>
@@ -93,7 +97,8 @@ function InviteContent() {
               <span>Pro Pack Unlocked</span>
             </div>
             <p className="text-neutral-500 text-[11px] leading-relaxed">
-              Whisper Large v3 Turbo, automatic filler word removal, and Smart Context Engine included.
+              Whisper Large v3 Turbo, automatic filler word removal, and Smart Context Engine
+              included.
             </p>
           </div>
 
@@ -134,7 +139,8 @@ function InviteContent() {
           </div>
           <h3 className="text-sm font-bold text-neutral-950 mb-1">Sub-200ms Latency</h3>
           <p className="text-xs text-neutral-600 leading-relaxed">
-            Words inject instantly as you finish speaking. Faster than cloud-streaming dictation with zero buffering.
+            Words inject instantly as you finish speaking. Faster than cloud-streaming dictation
+            with zero buffering.
           </p>
         </div>
 
@@ -144,7 +150,8 @@ function InviteContent() {
           </div>
           <h3 className="text-sm font-bold text-neutral-950 mb-1">100% Local Processing</h3>
           <p className="text-xs text-neutral-600 leading-relaxed">
-            Uses local whisper.cpp with Metal (macOS) and DirectML (Windows) hardware acceleration. Audio never leaves RAM.
+            Uses local whisper.cpp with Metal (macOS) and DirectML (Windows) hardware acceleration.
+            Audio never leaves RAM.
           </p>
         </div>
 
@@ -154,7 +161,8 @@ function InviteContent() {
           </div>
           <h3 className="text-sm font-bold text-neutral-950 mb-1">Own Your Software</h3>
           <p className="text-xs text-neutral-600 leading-relaxed">
-            Free forever tier or perpetual Lifetime license. Say goodbye to $15/month subscriptions for simple voice-to-text.
+            Free forever tier or perpetual Lifetime license. Say goodbye to $15/month subscriptions
+            for simple voice-to-text.
           </p>
         </div>
       </div>
@@ -166,7 +174,9 @@ export default function InvitePage() {
   return (
     <main className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white relative overflow-x-hidden">
       <Navbar />
-      <Suspense fallback={<div className="pt-40 text-center text-neutral-500">Loading invite...</div>}>
+      <Suspense
+        fallback={<div className="pt-40 text-center text-neutral-500">Loading invite...</div>}
+      >
         <InviteContent />
       </Suspense>
       <Footer />

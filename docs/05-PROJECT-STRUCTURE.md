@@ -116,37 +116,37 @@ directory.
 
 ## 2. Where things go — the decision table
 
-| If you are writing… | It goes in | Never in |
-|---|---|---|
-| A new feature's metadata | `registry/mod.rs` | scattered constants |
-| Business logic | `ipc/commands/` or `pipeline/` | services, components |
-| A SQL query | `services/` | commands, pipeline |
-| A trait for something swappable | `ports/` | adapters |
-| A third-party integration | `adapters/<name>/` | ports, services |
-| A shared type | `types/` | inline in the module |
-| A component used in 2+ routes | `components/global/` | duplicated per route |
-| A component used in 1 route | `app/<route>/_components/` | `components/global/` |
-| UI-only state | `stores/` | React context, prop drilling |
-| Domain state | Rust, pushed as events | Zustand |
-| A color, size, spring | `styles/tokens.css` | the component |
+| If you are writing…             | It goes in                     | Never in                     |
+| ------------------------------- | ------------------------------ | ---------------------------- |
+| A new feature's metadata        | `registry/mod.rs`              | scattered constants          |
+| Business logic                  | `ipc/commands/` or `pipeline/` | services, components         |
+| A SQL query                     | `services/`                    | commands, pipeline           |
+| A trait for something swappable | `ports/`                       | adapters                     |
+| A third-party integration       | `adapters/<name>/`             | ports, services              |
+| A shared type                   | `types/`                       | inline in the module         |
+| A component used in 2+ routes   | `components/global/`           | duplicated per route         |
+| A component used in 1 route     | `app/<route>/_components/`     | `components/global/`         |
+| UI-only state                   | `stores/`                      | React context, prop drilling |
+| Domain state                    | Rust, pushed as events         | Zustand                      |
+| A color, size, spring           | `styles/tokens.css`            | the component                |
 
 ---
 
 ## 3. Naming
 
-| Kind | Convention | Example |
-|---|---|---|
-| Rust module | `snake_case` | `session/machine.rs` |
-| Rust type | `PascalCase` | `TranscriptionEngine` |
-| Rust trait method | `snake_case` | `transcribe()` |
-| React component file | `PascalCase.tsx` | `StatCard.tsx` |
-| React component folder | `kebab-case/` | `stat-card/` |
-| Hook | `use-*.ts` | `use-session.ts` |
-| Store | `*.store.ts` | `ui.store.ts` |
-| Service | plural noun | `sessions.rs` |
-| Migration | `NNN_verb_noun.sql` | `001_create_sessions.sql` |
-| IPC command | `verb_noun` | `start_recording` |
-| Event | `noun:verb` | `session:state-changed` |
+| Kind                   | Convention          | Example                   |
+| ---------------------- | ------------------- | ------------------------- |
+| Rust module            | `snake_case`        | `session/machine.rs`      |
+| Rust type              | `PascalCase`        | `TranscriptionEngine`     |
+| Rust trait method      | `snake_case`        | `transcribe()`            |
+| React component file   | `PascalCase.tsx`    | `StatCard.tsx`            |
+| React component folder | `kebab-case/`       | `stat-card/`              |
+| Hook                   | `use-*.ts`          | `use-session.ts`          |
+| Store                  | `*.store.ts`        | `ui.store.ts`             |
+| Service                | plural noun         | `sessions.rs`             |
+| Migration              | `NNN_verb_noun.sql` | `001_create_sessions.sql` |
+| IPC command            | `verb_noun`         | `start_recording`         |
+| Event                  | `noun:verb`         | `session:state-changed`   |
 
 ---
 
@@ -164,7 +164,7 @@ Same format as the guardrail boilerplate, because it is what makes `grep -l` wor
  * WHERE: Owned by session/actor.rs; driven by ipc/commands/session.rs and
  *        the hotkey handler; read by the pill via session:state-changed.
  */
-``` 
+```
 
 5–10 specific keywords. The next agent greps for a symbol, gets a short file list, and reads only those files. Skipping this is what turns a clean codebase into one nobody can navigate.
 

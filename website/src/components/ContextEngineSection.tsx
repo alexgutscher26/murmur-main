@@ -75,7 +75,10 @@ export function ContextEngineSection() {
     "hey mark we just merged the auth token rotation fix to main let me know if staging looks good thanks";
 
   return (
-    <section id="context" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section
+      id="context"
+      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+    >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
@@ -95,7 +98,8 @@ export function ContextEngineSection() {
             One voice input. Formatted for every app.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Murmur senses the frontmost active window and shapes tone, punctuation, and layout to fit the medium.
+            Murmur senses the frontmost active window and shapes tone, punctuation, and layout to
+            fit the medium.
           </p>
         </div>
 
@@ -132,10 +136,14 @@ export function ContextEngineSection() {
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-white" : "text-emerald-600"}`} />
+                    <Icon
+                      className={`w-3.5 h-3.5 ${isSelected ? "text-white" : "text-emerald-600"}`}
+                    />
                     <span className="text-xs font-bold block">{app.name}</span>
                   </div>
-                  <span className={`text-[10px] font-mono block ${isSelected ? "text-neutral-400" : "text-neutral-500"}`}>
+                  <span
+                    className={`text-[10px] font-mono block ${isSelected ? "text-neutral-400" : "text-neutral-500"}`}
+                  >
                     {app.category}
                   </span>
                 </button>

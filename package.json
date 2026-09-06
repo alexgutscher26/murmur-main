@@ -14,7 +14,9 @@
     "sot:show": "node scripts/sot.mjs --show",
     "sot:validate": "node scripts/sot.mjs --validate",
     "website:dev": "bun --cwd website dev",
-    "website:build": "bun --cwd website build"
+    "website:build": "bun --cwd website build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -41,6 +43,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
+    "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3",
     "typescript": "~5.8.3",
     "vite": "^7.0.4"

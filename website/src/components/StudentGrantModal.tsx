@@ -1,7 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { X, GraduationCap, GitPullRequest, ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  X,
+  GraduationCap,
+  GitPullRequest,
+  ArrowRight,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 import { PlanTierKey } from "@/lib/stripe";
 
 interface StudentGrantModalProps {
@@ -10,7 +17,11 @@ interface StudentGrantModalProps {
   defaultTab?: "student" | "oss";
 }
 
-export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: StudentGrantModalProps) {
+export function StudentGrantModal({
+  isOpen,
+  onClose,
+  defaultTab = "student",
+}: StudentGrantModalProps) {
   const [activeTab, setActiveTab] = useState<"student" | "oss">(defaultTab);
   const [plan, setPlan] = useState<"lifetime" | "annual">("lifetime");
 
@@ -30,7 +41,8 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
 
   if (!isOpen) return null;
 
-  const isEduEmail = studentEmail.toLowerCase().includes(".edu") || studentEmail.toLowerCase().includes(".ac.");
+  const isEduEmail =
+    studentEmail.toLowerCase().includes(".edu") || studentEmail.toLowerCase().includes(".ac.");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +120,8 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
             Apply for Academic or OSS Sponsorship
           </h2>
           <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-            We support students, educators, and open-source contributors with a permanent 50% discount.
+            We support students, educators, and open-source contributors with a permanent 50%
+            discount.
           </p>
 
           {/* Tab switcher */}
@@ -204,7 +217,10 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="student-name" className="block text-xs font-semibold text-neutral-800 mb-1">
+                    <label
+                      htmlFor="student-name"
+                      className="block text-xs font-semibold text-neutral-800 mb-1"
+                    >
                       Full Name
                     </label>
                     <input
@@ -218,7 +234,10 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
                     />
                   </div>
                   <div>
-                    <label htmlFor="student-inst" className="block text-xs font-semibold text-neutral-800 mb-1">
+                    <label
+                      htmlFor="student-inst"
+                      className="block text-xs font-semibold text-neutral-800 mb-1"
+                    >
                       University / School
                     </label>
                     <input
@@ -235,7 +254,10 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label htmlFor="student-email" className="block text-xs font-semibold text-neutral-800">
+                    <label
+                      htmlFor="student-email"
+                      className="block text-xs font-semibold text-neutral-800"
+                    >
                       Academic Email (.edu or university domain)
                     </label>
                     {isEduEmail && (
@@ -262,7 +284,10 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="oss-name" className="block text-xs font-semibold text-neutral-800 mb-1">
+                    <label
+                      htmlFor="oss-name"
+                      className="block text-xs font-semibold text-neutral-800 mb-1"
+                    >
                       Full Name
                     </label>
                     <input
@@ -276,7 +301,10 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
                     />
                   </div>
                   <div>
-                    <label htmlFor="oss-email" className="block text-xs font-semibold text-neutral-800 mb-1">
+                    <label
+                      htmlFor="oss-email"
+                      className="block text-xs font-semibold text-neutral-800 mb-1"
+                    >
                       Email for License Delivery
                     </label>
                     <input
@@ -293,7 +321,10 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="oss-profile" className="block text-xs font-semibold text-neutral-800 mb-1">
+                    <label
+                      htmlFor="oss-profile"
+                      className="block text-xs font-semibold text-neutral-800 mb-1"
+                    >
                       GitHub Profile URL
                     </label>
                     <input
@@ -307,7 +338,10 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
                     />
                   </div>
                   <div>
-                    <label htmlFor="oss-repo" className="block text-xs font-semibold text-neutral-800 mb-1">
+                    <label
+                      htmlFor="oss-repo"
+                      className="block text-xs font-semibold text-neutral-800 mb-1"
+                    >
                       Open Source Project URL
                     </label>
                     <input
@@ -332,7 +366,8 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
             )}
 
             <div className="p-3 rounded-xl bg-neutral-50 border border-neutral-200 text-[11px] text-neutral-600">
-              ⚡ <strong>Instant 50% Verification:</strong> Your discount is applied directly at checkout with no waiting or complex approval delays.
+              ⚡ <strong>Instant 50% Verification:</strong> Your discount is applied directly at
+              checkout with no waiting or complex approval delays.
             </div>
 
             {/* CTA Button */}
@@ -345,9 +380,7 @@ export function StudentGrantModal({ isOpen, onClose, defaultTab = "student" }: S
                 <span>Redirecting to Checkout...</span>
               ) : (
                 <>
-                  <span>
-                    Claim 50% Grant & Checkout ({plan === "lifetime" ? "$44" : "$24/yr"})
-                  </span>
+                  <span>Claim 50% Grant & Checkout ({plan === "lifetime" ? "$44" : "$24/yr"})</span>
                   <ArrowRight className="size-4" />
                 </>
               )}

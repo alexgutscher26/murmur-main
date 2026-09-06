@@ -78,8 +78,7 @@ export function Onboarding() {
     typeof settings.data?.[ONBOARDING_STEP_INDEX_KEY]?.value === "number"
       ? (settings.data[ONBOARDING_STEP_INDEX_KEY].value as number)
       : 0;
-  const savedTutorialComplete =
-    settings.data?.[TUTORIAL_COMPLETE_KEY]?.value === true;
+  const savedTutorialComplete = settings.data?.[TUTORIAL_COMPLETE_KEY]?.value === true;
 
   // Adaptive re-entry: state initialized or restored from saved registry settings
   const [toured, setToured] = useState(false);
@@ -166,12 +165,7 @@ export function Onboarding() {
           }}
         />
       ) : invited ? (
-        <InviteStep
-          onFinish={finish}
-          finishError={finishError}
-          hotkey={hotkey}
-          mode={mode}
-        />
+        <InviteStep onFinish={finish} finishError={finishError} hotkey={hotkey} mode={mode} />
       ) : !toured ? (
         <TourStep
           hotkey={hotkey}

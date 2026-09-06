@@ -5,4 +5,9 @@
  * WHERE: Re-exported by src/components/global/index.ts.
  */
 
-export { GlassPanel, type GlassPanelProps, type GlassMaterial, type GlassRadius } from "./GlassPanel";
+export {
+  GlassPanel,
+  type GlassPanelProps,
+  type GlassMaterial,
+  type GlassRadius,
+} from "./GlassPanel";

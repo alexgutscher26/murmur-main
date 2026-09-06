@@ -24,7 +24,10 @@ export function SettingsBackup() {
   const profilesQuery = useCommand(commands.listAppProfiles, []);
   const dictionaryQuery = useCommand(commands.listDictionary, []);
 
-  const [statusMessage, setStatusMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const [statusMessage, setStatusMessage] = useState<{
+    text: string;
+    type: "success" | "error";
+  } | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -92,17 +95,13 @@ export function SettingsBackup() {
               pattern: entry.pattern,
               replacement: entry.replacement,
               match_kind: entry.match_kind,
-            })
+            }),
           );
         }
       }
 
       // Reload queries
-      await Promise.all([
-        settingsQuery.reload(),
-        profilesQuery.reload(),
-        dictionaryQuery.reload(),
-      ]);
+      await Promise.all([settingsQuery.reload(), profilesQuery.reload(), dictionaryQuery.reload()]);
 
       setStatusMessage({
         text: "Settings, profiles, and dictionary restored successfully.",
@@ -122,9 +121,7 @@ export function SettingsBackup() {
     <div className="hairline rounded-card bg-surface p-4 flex flex-col gap-3">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h4 className="text-body font-semibold text-text-primary">
-            Settings Backup & Migration
-          </h4>
+          <h4 className="text-body font-semibold text-text-primary">Settings Backup & Migration</h4>
           <p className="text-caption text-text-secondary">
             Export all global preferences, per-app profiles, and custom dictionary to a JSON file.
           </p>

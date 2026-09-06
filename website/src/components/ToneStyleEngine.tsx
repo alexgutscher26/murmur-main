@@ -17,7 +17,8 @@ const EXAMPLES: ExamplePrompt[] = [
     category: "Casual Message",
     rawSpoken: "hey are you free for lunch tomorrow let's do 12 if that works for you",
     tones: {
-      formal: "Good afternoon. Are you available for lunch tomorrow? 12:00 PM would work well if your schedule permits.",
+      formal:
+        "Good afternoon. Are you available for lunch tomorrow? 12:00 PM would work well if your schedule permits.",
       casual: "Hey, are you free for lunch tomorrow? Let’s do 12 if that works for you.",
       very_casual: "hey free for lunch tmrw? 12 works if you’re down 👍",
       concise: "• Lunch tomorrow at 12:00 PM — let me know if that works.",
@@ -27,23 +28,32 @@ const EXAMPLES: ExamplePrompt[] = [
   {
     id: "status-update",
     category: "Project Status",
-    rawSpoken: "we just merged the auth token fix to main tests are passing please test staging when you can",
+    rawSpoken:
+      "we just merged the auth token fix to main tests are passing please test staging when you can",
     tones: {
-      formal: "I am writing to confirm that the authentication token patch has been merged into the main branch. All automated tests have passed. Please review the staging environment at your earliest convenience.",
-      casual: "We just merged the auth token fix to main and all tests are passing. Please check staging whenever you get a chance!",
+      formal:
+        "I am writing to confirm that the authentication token patch has been merged into the main branch. All automated tests have passed. Please review the staging environment at your earliest convenience.",
+      casual:
+        "We just merged the auth token fix to main and all tests are passing. Please check staging whenever you get a chance!",
       very_casual: "auth token fix is on main, tests green. test staging when u can 🚀",
-      concise: "• Auth token fix merged to main\n• Unit & integration tests: Green\n• Action item: Staging sanity test",
-      developer: 'git commit -m "fix(auth): resolve token refresh rotation and verify staging build"',
+      concise:
+        "• Auth token fix merged to main\n• Unit & integration tests: Green\n• Action item: Staging sanity test",
+      developer:
+        'git commit -m "fix(auth): resolve token refresh rotation and verify staging build"',
     },
   },
   {
     id: "meeting-followup",
     category: "Client Follow-up",
-    rawSpoken: "thanks for your time today sending over the draft agreement let me know if you need any changes",
+    rawSpoken:
+      "thanks for your time today sending over the draft agreement let me know if you need any changes",
     tones: {
-      formal: "Thank you for your time during our discussion today. I have attached the draft agreement for your review. Please let me know if any amendments are required.",
-      casual: "Thanks for your time today! Sending over the draft agreement now—let me know if you'd like any changes.",
-      very_casual: "great chatting today! sent the draft agreement over, let me know if anything needs a tweak",
+      formal:
+        "Thank you for your time during our discussion today. I have attached the draft agreement for your review. Please let me know if any amendments are required.",
+      casual:
+        "Thanks for your time today! Sending over the draft agreement now—let me know if you'd like any changes.",
+      very_casual:
+        "great chatting today! sent the draft agreement over, let me know if anything needs a tweak",
       concise: "• Attached: Draft agreement\n• Status: Awaiting client review & sign-off",
       developer: "docs(agreement): shared v1 draft for review & signoff",
     },
@@ -63,7 +73,10 @@ export function ToneStyleEngine() {
   const [selectedExample, setSelectedExample] = useState<ExamplePrompt>(EXAMPLES[0]);
 
   return (
-    <section id="tone-style" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section
+      id="tone-style"
+      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+    >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
@@ -83,7 +96,8 @@ export function ToneStyleEngine() {
             Make Murmur sound like you.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Murmur adapts to how you write in different apps. Set a different style for messages, work chats, emails, and code editors—computed 100% locally on your machine.
+            Murmur adapts to how you write in different apps. Set a different style for messages,
+            work chats, emails, and code editors—computed 100% locally on your machine.
           </p>
         </div>
 
@@ -149,7 +163,9 @@ export function ToneStyleEngine() {
                   <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                   Formatted as {TONE_OPTIONS.find((t) => t.id === activeTone)?.label}
                 </span>
-                <span className="text-[11px] font-mono text-neutral-500">100% On-Device Rewrite</span>
+                <span className="text-[11px] font-mono text-neutral-500">
+                  100% On-Device Rewrite
+                </span>
               </div>
 
               <AnimatePresence mode="wait">

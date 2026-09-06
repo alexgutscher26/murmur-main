@@ -14,8 +14,7 @@ export default function BlogIndexPage() {
   const categories = ["All", "Comparisons", "Privacy & Security", "Guides", "Engineering"];
 
   const filteredPosts = BLOG_POSTS.filter((post) => {
-    const matchesCategory =
-      selectedCategory === "All" || post.category === selectedCategory;
+    const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -42,7 +41,8 @@ export default function BlogIndexPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-white/70 leading-relaxed font-normal">
-            Technical breakdowns, fair comparison benchmarks, and workflows for air-gapped, on-device voice dictation.
+            Technical breakdowns, fair comparison benchmarks, and workflows for air-gapped,
+            on-device voice dictation.
           </p>
         </div>
 
@@ -52,28 +52,35 @@ export default function BlogIndexPage() {
             <span className="text-xs font-mono text-emerald-400 uppercase tracking-wider font-semibold">
               Content Strategy & High-Impact Hooks
             </span>
-            <span className="text-[11px] font-mono text-white/40">
-              Battle-tested angles
-            </span>
+            <span className="text-[11px] font-mono text-white/40">Battle-tested angles</span>
           </div>
-          <h2 className="text-base font-bold text-white mb-3">
-            Core Short-Form Narrative Hooks
-          </h2>
+          <h2 className="text-base font-bold text-white mb-3">Core Short-Form Narrative Hooks</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono text-white/80">
             <div className="p-3 rounded-lg bg-[#1f1f1f] border border-[#313131]">
-              <span className="text-emerald-400 block font-semibold mb-1">1. The Privacy Contrast</span>
-              &quot;Your voice dictation app may be uploading every spoken word. Mine does not.&quot;
+              <span className="text-emerald-400 block font-semibold mb-1">
+                1. The Privacy Contrast
+              </span>
+              &quot;Your voice dictation app may be uploading every spoken word. Mine does
+              not.&quot;
             </div>
             <div className="p-3 rounded-lg bg-[#1f1f1f] border border-[#313131]">
-              <span className="text-emerald-400 block font-semibold mb-1">2. The High-Trust Persona</span>
-              &quot;I built voice typing for people who cannot send client conversations to the cloud.&quot;
+              <span className="text-emerald-400 block font-semibold mb-1">
+                2. The High-Trust Persona
+              </span>
+              &quot;I built voice typing for people who cannot send client conversations to the
+              cloud.&quot;
             </div>
             <div className="p-3 rounded-lg bg-[#1f1f1f] border border-[#313131]">
-              <span className="text-emerald-400 block font-semibold mb-1">3. The Architecture Angle</span>
-              &quot;Cloud transcription is convenient. Local transcription is a completely different privacy model.&quot;
+              <span className="text-emerald-400 block font-semibold mb-1">
+                3. The Architecture Angle
+              </span>
+              &quot;Cloud transcription is convenient. Local transcription is a completely different
+              privacy model.&quot;
             </div>
             <div className="p-3 rounded-lg bg-[#1f1f1f] border border-[#313131]">
-              <span className="text-emerald-400 block font-semibold mb-1">4. The Offline Proof</span>
+              <span className="text-emerald-400 block font-semibold mb-1">
+                4. The Offline Proof
+              </span>
               &quot;A demo of voice dictation with Wi-Fi turned completely off.&quot;
             </div>
           </div>
@@ -123,9 +130,7 @@ export default function BlogIndexPage() {
                   <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-[#222222] text-emerald-400 border border-[#313131]">
                     {post.category}
                   </span>
-                  <span className="text-[11px] font-mono text-white/40">
-                    {post.readTime}
-                  </span>
+                  <span className="text-[11px] font-mono text-white/40">{post.readTime}</span>
                 </div>
 
                 <h2 className="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors mb-2.5 leading-snug">

@@ -88,7 +88,9 @@ export function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
               <ShieldCheck className="size-4" />
             </div>
             <div>
-              <h2 className="text-body font-semibold text-text-primary">Privacy & Local Architecture</h2>
+              <h2 className="text-body font-semibold text-text-primary">
+                Privacy & Local Architecture
+              </h2>
               <p className="text-caption text-text-secondary">What data stays on your machine</p>
             </div>
           </div>
@@ -104,7 +106,8 @@ export function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           <div className="rounded-input bg-sunken/60 p-3 text-caption text-text-secondary leading-relaxed border border-[var(--border-hairline)]">
-            Murmur is engineered as a zero-cloud utility. Your speech is processed locally on your machine and never leaves your computer.
+            Murmur is engineered as a zero-cloud utility. Your speech is processed locally on your
+            machine and never leaves your computer.
           </div>
 
           <div className="space-y-3">
@@ -123,7 +126,9 @@ export function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
                       {pt.badge}
                     </span>
                   </div>
-                  <p className="mt-1 text-caption text-text-secondary leading-normal">{pt.description}</p>
+                  <p className="mt-1 text-caption text-text-secondary leading-normal">
+                    {pt.description}
+                  </p>
                 </div>
               </div>
             ))}

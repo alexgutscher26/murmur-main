@@ -14,35 +14,35 @@
  *        src-tauri/src/. Depends on nothing outside the Node standard library.
  */
 
-import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join, relative, extname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { dirname } from 'node:path'
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join, relative, extname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { dirname } from "node:path";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 /** Directories that hold authored source. Generated output is excluded below. */
-const SEARCH_ROOTS = ['src', 'src-tauri/src', 'scripts']
-const SOURCE_EXTENSIONS = new Set(['.rs', '.ts', '.tsx', '.mjs', '.js', '.css', '.sql'])
-const IGNORED_DIRS = new Set(['node_modules', 'target', 'dist', '.git', 'gen'])
+const SEARCH_ROOTS = ["src", "src-tauri/src", "scripts"];
+const SOURCE_EXTENSIONS = new Set([".rs", ".ts", ".tsx", ".mjs", ".js", ".css", ".sql"]);
+const IGNORED_DIRS = new Set(["node_modules", "target", "dist", ".git", "gen"]);
 
 /**
  * Generated files carry headers too, but they are never the answer to "where
  * should I put this" — pointing an agent at a generated file invites an edit
  * that the next build silently reverts.
  */
-const GENERATED = [/bindings\.ts$/, /registry\.generated\.ts$/]
+const GENERATED = [/bindings\.ts$/, /registry\.generated\.ts$/];
 
-const SOT_MARKER = 'SOURCE OF TRUTH KEYWORDS:'
+const SOT_MARKER = "SOURCE OF TRUTH KEYWORDS:";
 /** A header section ends where the next labelled section begins. */
-const SECTION_LABEL = /^\s*(?:\*|\/\/|--)?\s*(WHAT|WHY|WHERE)\s*:/i
+const SECTION_LABEL = /^\s*(?:\*|\/\/|--)?\s*(WHAT|WHY|WHERE)\s*:/i;
 /**
  * Strips the comment furniture from a captured line. Covers Rust's inner and
  * outer doc forms (`/*!`, `/**`, `//!`, `///`) as well as plain `*`, `//` and
  * SQL's `--`, because the header has to read identically in every language the
  * repository uses.
  */
-const COMMENT_PREFIX = /^\s*(?:\*\/|\*|\/\*[*!]?|\/\/[!/]?|--)?\s?/
+const COMMENT_PREFIX = /^\s*(?:\*\/|\*|\/\*[*!]?|\/\/[!/]?|--)?\s?/;
 
 /**
  * WHAT:  Walks the search roots and yields every authored source file path.
@@ -50,29 +50,29 @@ const COMMENT_PREFIX = /^\s*(?:\*\/|\*|\/\*[*!]?|\/\/[!/]?|--)?\s?/
  *        script must run with zero installs so it works on a fresh clone.
  */
 function collectSourceFiles(dir, out = []) {
-  let entries
+  let entries;
   try {
-    entries = readdirSync(dir)
+    entries = readdirSync(dir);
   } catch {
-    return out
+    return out;
   }
   for (const entry of entries) {
-    if (IGNORED_DIRS.has(entry)) continue
-    const full = join(dir, entry)
-    let stats
+    if (IGNORED_DIRS.has(entry)) continue;
+    const full = join(dir, entry);
+    let stats;
     try {
-      stats = statSync(full)
+      stats = statSync(full);
     } catch {
-      continue
+      continue;
     }
     if (stats.isDirectory()) {
-      collectSourceFiles(full, out)
+      collectSourceFiles(full, out);
     } else if (SOURCE_EXTENSIONS.has(extname(entry))) {
-      const rel = relative(ROOT, full)
-      if (!GENERATED.some((pattern) => pattern.test(rel))) out.push(full)
+      const rel = relative(ROOT, full);
+      if (!GENERATED.some((pattern) => pattern.test(rel))) out.push(full);
     }
   }
-  return out
+  return out;
 }
 
 /**
@@ -82,49 +82,49 @@ function collectSourceFiles(dir, out = []) {
  *        makes a wrapped keyword findable.
  */
 function parseSotHeaders(filePath) {
-  const text = readFileSync(filePath, 'utf8')
-  const lines = text.split('\n')
-  const headers = []
+  const text = readFileSync(filePath, "utf8");
+  const lines = text.split("\n");
+  const headers = [];
 
   for (let i = 0; i < lines.length; i++) {
-    const markerAt = lines[i].indexOf(SOT_MARKER)
-    if (markerAt === -1) continue
+    const markerAt = lines[i].indexOf(SOT_MARKER);
+    if (markerAt === -1) continue;
 
-    const keywordParts = [lines[i].slice(markerAt + SOT_MARKER.length)]
-    const block = [lines[i]]
+    const keywordParts = [lines[i].slice(markerAt + SOT_MARKER.length)];
+    const block = [lines[i]];
 
     // Keywords continue until the next labelled section or the comment ends.
-    let j = i + 1
+    let j = i + 1;
     for (; j < lines.length; j++) {
-      const line = lines[j]
-      if (SECTION_LABEL.test(line) || line.includes('*/') || line.trim() === '') break
-      keywordParts.push(line.replace(COMMENT_PREFIX, ''))
-      block.push(line)
+      const line = lines[j];
+      if (SECTION_LABEL.test(line) || line.includes("*/") || line.trim() === "") break;
+      keywordParts.push(line.replace(COMMENT_PREFIX, ""));
+      block.push(line);
     }
     // Keep the WHAT/WHY/WHERE body for --show.
     for (; j < lines.length; j++) {
-      const line = lines[j]
-      block.push(line)
-      if (line.includes('*/')) break
-      if (block.length > 40) break
+      const line = lines[j];
+      block.push(line);
+      if (line.includes("*/")) break;
+      if (block.length > 40) break;
     }
 
     const keywords = keywordParts
-      .join(' ')
-      .split(',')
-      .map((k) => k.replace(COMMENT_PREFIX, '').trim())
-      .filter(Boolean)
+      .join(" ")
+      .split(",")
+      .map((k) => k.replace(COMMENT_PREFIX, "").trim())
+      .filter(Boolean);
 
-    headers.push({ keywords, block, line: i + 1 })
-    i = j
+    headers.push({ keywords, block, line: i + 1 });
+    i = j;
   }
-  return headers
+  return headers;
 }
 
 /** Case-insensitive substring match, so `sot session` finds `SessionMachine`. */
 function matchKeyword(keywords, query) {
-  const needle = query.toLowerCase()
-  return keywords.some((k) => k.toLowerCase().includes(needle))
+  const needle = query.toLowerCase();
+  return keywords.some((k) => k.toLowerCase().includes(needle));
 }
 
 /**
@@ -135,79 +135,84 @@ function matchKeyword(keywords, query) {
  * WHERE: Invoked via `pnpm sot:validate` or the pre-commit hook.
  */
 function validateSotHeaders() {
-  const rustFiles = collectSourceFiles(join(ROOT, 'src-tauri/src')).filter(
-    (f) => extname(f) === '.rs'
-  )
-  const violations = []
+  const rustFiles = collectSourceFiles(join(ROOT, "src-tauri/src")).filter(
+    (f) => extname(f) === ".rs",
+  );
+  const violations = [];
 
   for (const file of rustFiles) {
-    const text = readFileSync(file, 'utf8')
-    const lineCount = text.split('\n').length
+    const text = readFileSync(file, "utf8");
+    const lineCount = text.split("\n").length;
     if (lineCount > 50 && !text.includes(SOT_MARKER)) {
-      violations.push({ file: relative(ROOT, file), lineCount })
+      violations.push({ file: relative(ROOT, file), lineCount });
     }
   }
 
   if (violations.length > 0) {
-    console.error('❌ SOT Keyword Validation Failed:')
+    console.error("❌ SOT Keyword Validation Failed:");
     for (const v of violations) {
-      console.error(`   - ${v.file} (${v.lineCount} lines) is missing "${SOT_MARKER}" header`)
+      console.error(`   - ${v.file} (${v.lineCount} lines) is missing "${SOT_MARKER}" header`);
     }
-    console.error(`\nFound ${violations.length} Rust file(s) over 50 lines missing SOT headers.`)
-    console.error('See CLAUDE.md §6 for header requirements.')
-    process.exit(1)
+    console.error(`\nFound ${violations.length} Rust file(s) over 50 lines missing SOT headers.`);
+    console.error("See CLAUDE.md §6 for header requirements.");
+    process.exit(1);
   }
 
-  console.log(`✅ SOT validation passed: all ${rustFiles.length} Rust files checked (files > 50 lines have headers).`)
-  process.exit(0)
+  console.log(
+    `✅ SOT validation passed: all ${rustFiles.length} Rust files checked (files > 50 lines have headers).`,
+  );
+  process.exit(0);
 }
 
 function main() {
-  const argv = process.argv.slice(2)
-  if (argv.includes('--validate')) {
-    validateSotHeaders()
-    return
+  const argv = process.argv.slice(2);
+  if (argv.includes("--validate")) {
+    validateSotHeaders();
+    return;
   }
 
-  const show = argv.includes('--show')
-  const query = argv.filter((a) => a !== '--show').join(' ').trim()
+  const show = argv.includes("--show");
+  const query = argv
+    .filter((a) => a !== "--show")
+    .join(" ")
+    .trim();
 
   if (!query) {
-    console.error('Usage: pnpm sot <keyword>        # files that own the symbol')
-    console.error('       pnpm sot:show <keyword>   # the same, with headers')
-    console.error('       pnpm sot:validate         # validate SOT headers in Rust files')
-    process.exit(1)
+    console.error("Usage: pnpm sot <keyword>        # files that own the symbol");
+    console.error("       pnpm sot:show <keyword>   # the same, with headers");
+    console.error("       pnpm sot:validate         # validate SOT headers in Rust files");
+    process.exit(1);
   }
 
-  const files = SEARCH_ROOTS.flatMap((root) => collectSourceFiles(join(ROOT, root)))
-  const hits = []
+  const files = SEARCH_ROOTS.flatMap((root) => collectSourceFiles(join(ROOT, root)));
+  const hits = [];
 
   for (const file of files) {
-    const matched = parseSotHeaders(file).filter((h) => matchKeyword(h.keywords, query))
-    if (matched.length) hits.push({ file: relative(ROOT, file), headers: matched })
+    const matched = parseSotHeaders(file).filter((h) => matchKeyword(h.keywords, query));
+    if (matched.length) hits.push({ file: relative(ROOT, file), headers: matched });
   }
 
   if (!hits.length) {
-    console.log(`No SOURCE OF TRUTH header claims "${query}".`)
-    console.log('Search the codebase normally before creating it — and give the')
-    console.log('new thing its own SOT header so the next agent finds it.')
-    process.exit(0)
+    console.log(`No SOURCE OF TRUTH header claims "${query}".`);
+    console.log("Search the codebase normally before creating it — and give the");
+    console.log("new thing its own SOT header so the next agent finds it.");
+    process.exit(0);
   }
 
   if (!show) {
-    for (const hit of hits) console.log(hit.file)
-    console.log(`\n${hits.length} file(s). Read the header before opening the file.`)
-    return
+    for (const hit of hits) console.log(hit.file);
+    console.log(`\n${hits.length} file(s). Read the header before opening the file.`);
+    return;
   }
 
   for (const hit of hits) {
-    console.log(`\n\x1b[1m${hit.file}\x1b[0m`)
+    console.log(`\n\x1b[1m${hit.file}\x1b[0m`);
     for (const header of hit.headers) {
-      console.log(`  \x1b[2m:${header.line}\x1b[0m`)
-      for (const line of header.block) console.log(`  ${line}`)
+      console.log(`  \x1b[2m:${header.line}\x1b[0m`);
+      for (const line of header.block) console.log(`  ${line}`);
     }
   }
-  console.log(`\n${hits.length} file(s).`)
+  console.log(`\n${hits.length} file(s).`);
 }
 
-main()
+main();

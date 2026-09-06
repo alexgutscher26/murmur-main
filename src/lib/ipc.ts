@@ -41,7 +41,9 @@ export function toAppError(cause: unknown): AppError {
 }
 
 /** Await a command and get its value or its AppError — no throw, no union. */
-export async function unwrapCommand<T>(run: () => Promise<CommandResult<T>>): Promise<CommandResult<T>> {
+export async function unwrapCommand<T>(
+  run: () => Promise<CommandResult<T>>,
+): Promise<CommandResult<T>> {
   try {
     const res = await run();
     if (res.status === "error") {
@@ -60,7 +62,10 @@ export async function unwrapCommand<T>(run: () => Promise<CommandResult<T>>): Pr
  *        stale answer. Without it, a slow first call lands after a fast reload
  *        and the view shows the older data with no way to tell.
  */
-export function useCommand<T>(command: () => Promise<CommandResult<T>>, deps: DependencyList): CommandState<T> {
+export function useCommand<T>(
+  command: () => Promise<CommandResult<T>>,
+  deps: DependencyList,
+): CommandState<T> {
   const [state, setState] = useState<{ data: T | null; error: AppError | null; loading: boolean }>({
     data: null,
     error: null,
@@ -84,7 +89,8 @@ export function useCommand<T>(command: () => Promise<CommandResult<T>>, deps: De
       }
 
       const detail = result.error.detail ?? "";
-      const isUnmanaged = detail.includes("state not managed") || result.error.message.includes("state not managed");
+      const isUnmanaged =
+        detail.includes("state not managed") || result.error.message.includes("state not managed");
 
       if (isUnmanaged && attempt < 20) {
         setTimeout(() => {

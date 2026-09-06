@@ -163,7 +163,9 @@ export function AbbreviationManager({
             className="flex items-center gap-1 rounded-lg border border-stone-200 bg-white px-2.5 py-1 text-xs font-medium text-stone-700 shadow-2xs hover:bg-stone-50 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700/80 transition-colors"
           >
             <span>{isOpen ? "Hide list" : "Manage"}</span>
-            <ChevronDown className={cn("size-3.5 transition-transform duration-150", isOpen && "rotate-180")} />
+            <ChevronDown
+              className={cn("size-3.5 transition-transform duration-150", isOpen && "rotate-180")}
+            />
           </button>
         </div>
       </div>
@@ -185,7 +187,7 @@ export function AbbreviationManager({
                         "rounded font-mono text-[11px] font-semibold px-1.5 py-0.5 transition-colors",
                         isOptedOut
                           ? "bg-stone-200/50 text-stone-400 line-through dark:bg-stone-800/40 dark:text-stone-500"
-                          : "bg-stone-200/80 text-stone-900 dark:bg-stone-800 dark:text-stone-100"
+                          : "bg-stone-200/80 text-stone-900 dark:bg-stone-800 dark:text-stone-100",
                       )}
                     >
                       {abbr.needle}
@@ -196,7 +198,7 @@ export function AbbreviationManager({
                         "rounded font-mono text-[11px] font-bold px-1.5 py-0.5 transition-colors",
                         isOptedOut
                           ? "bg-stone-100 text-stone-400 dark:bg-stone-800/20 dark:text-stone-500"
-                          : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
+                          : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20",
                       )}
                     >
                       {abbr.replacement}
@@ -215,14 +217,14 @@ export function AbbreviationManager({
                   aria-label={`Toggle abbreviation expansion for ${abbr.needle}`}
                   className={cn(
                     "relative inline-flex h-5 w-9 shrink-0 cursor-default rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]",
-                    !isOptedOut ? "bg-[var(--accent)]" : "bg-[var(--surface-sunken-strong)]"
+                    !isOptedOut ? "bg-[var(--accent)]" : "bg-[var(--surface-sunken-strong)]",
                   )}
                 >
                   <span
                     aria-hidden="true"
                     className={cn(
                       "pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-2xs ring-0 transition duration-200 ease-in-out",
-                      !isOptedOut ? "translate-x-4" : "translate-x-0"
+                      !isOptedOut ? "translate-x-4" : "translate-x-0",
                     )}
                   />
                 </button>

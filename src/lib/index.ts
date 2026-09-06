@@ -22,7 +22,13 @@ export {
   type FadeTransition,
   type MotionTransition,
 } from "./motion";
-export { useCommand, unwrapCommand, toAppError, type CommandResult, type CommandState } from "./ipc";
+export {
+  useCommand,
+  unwrapCommand,
+  toAppError,
+  type CommandResult,
+  type CommandState,
+} from "./ipc";
 export { useTauriEvent, type TauriEventChannel } from "./use-event";
 export {
   formatClock,

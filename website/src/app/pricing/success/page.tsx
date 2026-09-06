@@ -63,7 +63,8 @@ function SuccessContent() {
         You're all set! Own your software forever.
       </h1>
       <p className="text-sm sm:text-base text-neutral-600 max-w-xl mx-auto mb-10">
-        Thank you for supporting 100% private, on-device voice dictation. Your personal license key has been generated and is ready to activate.
+        Thank you for supporting 100% private, on-device voice dictation. Your personal license key
+        has been generated and is ready to activate.
       </p>
 
       {/* Main License Key Card */}
@@ -129,7 +130,9 @@ function SuccessContent() {
                 1
               </span>
               <span className="font-semibold text-neutral-900 block">Open Murmur Desktop</span>
-              <span className="text-neutral-500 text-[11px]">Launch Murmur on your Mac or Windows machine.</span>
+              <span className="text-neutral-500 text-[11px]">
+                Launch Murmur on your Mac or Windows machine.
+              </span>
             </div>
 
             <div className="p-3 rounded-xl bg-neutral-50/70 border border-neutral-200/70">
@@ -137,7 +140,9 @@ function SuccessContent() {
                 2
               </span>
               <span className="font-semibold text-neutral-900 block">Go to Billing View</span>
-              <span className="text-neutral-500 text-[11px]">Click "Billing" in the sidebar navigation or press ⌘,.</span>
+              <span className="text-neutral-500 text-[11px]">
+                Click "Billing" in the sidebar navigation or press ⌘,.
+              </span>
             </div>
 
             <div className="p-3 rounded-xl bg-neutral-50/70 border border-neutral-200/70">
@@ -145,7 +150,9 @@ function SuccessContent() {
                 3
               </span>
               <span className="font-semibold text-neutral-900 block">Paste Key & Unlock</span>
-              <span className="text-neutral-500 text-[11px]">Paste your key into "Activate License Key" and press Enter.</span>
+              <span className="text-neutral-500 text-[11px]">
+                Paste your key into "Activate License Key" and press Enter.
+              </span>
             </div>
           </div>
         </div>
@@ -155,8 +162,12 @@ function SuccessContent() {
       <div className="p-6 sm:p-7 rounded-3xl bg-neutral-50 border border-neutral-200/90 text-left mb-10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div>
-            <h3 className="text-base font-bold text-neutral-950">Don't have the desktop app installed yet?</h3>
-            <p className="text-xs text-neutral-600 mt-0.5">Download the latest native release for macOS or Windows.</p>
+            <h3 className="text-base font-bold text-neutral-950">
+              Don't have the desktop app installed yet?
+            </h3>
+            <p className="text-xs text-neutral-600 mt-0.5">
+              Download the latest native release for macOS or Windows.
+            </p>
           </div>
           <Link
             href="/#download"
@@ -179,9 +190,15 @@ function SuccessContent() {
       <div className="p-4 rounded-2xl bg-white border border-neutral-200 text-xs text-neutral-500 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <ShieldCheck className="size-4 text-emerald-600" />
-          <span>Receipt Reference: <span className="font-mono text-neutral-700">{sessionId.slice(0, 24)}...</span></span>
+          <span>
+            Receipt Reference:{" "}
+            <span className="font-mono text-neutral-700">{sessionId.slice(0, 24)}...</span>
+          </span>
         </div>
-        <Link href="/pricing" className="text-neutral-700 hover:text-neutral-950 font-medium underline">
+        <Link
+          href="/pricing"
+          className="text-neutral-700 hover:text-neutral-950 font-medium underline"
+        >
           Return to Pricing Page →
         </Link>
       </div>
@@ -193,7 +210,11 @@ export default function PricingSuccessPage() {
   return (
     <main className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white relative overflow-x-hidden">
       <Navbar />
-      <Suspense fallback={<div className="pt-40 text-center text-neutral-500">Loading order receipt...</div>}>
+      <Suspense
+        fallback={
+          <div className="pt-40 text-center text-neutral-500">Loading order receipt...</div>
+        }
+      >
         <SuccessContent />
       </Suspense>
       <Footer />

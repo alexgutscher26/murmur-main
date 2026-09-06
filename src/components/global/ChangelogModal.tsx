@@ -127,9 +127,7 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
         <div className="hairline border-b border-[var(--border-hairline)] px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="size-5 text-text-primary" />
-            <h3 className="text-body font-bold text-text-primary">
-              What's New in Murmur
-            </h3>
+            <h3 className="text-body font-bold text-text-primary">What's New in Murmur</h3>
           </div>
           <button
             type="button"
@@ -159,9 +157,7 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
                 </div>
               </div>
 
-              <h4 className="text-body font-semibold text-text-primary">
-                {rel.title}
-              </h4>
+              <h4 className="text-body font-semibold text-text-primary">{rel.title}</h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {rel.highlights.map((item, itemIdx) => (

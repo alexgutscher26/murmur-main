@@ -38,7 +38,13 @@ export interface ErrorSurfaceProps {
   className?: string;
 }
 
-export function ErrorSurface({ error, onRetry, onOpenSettings, size, className }: ErrorSurfaceProps) {
+export function ErrorSurface({
+  error,
+  onRetry,
+  onOpenSettings,
+  size,
+  className,
+}: ErrorSurfaceProps) {
   const action = error.action;
 
   const run = (): void => {
@@ -70,7 +76,11 @@ export function ErrorSurface({ error, onRetry, onOpenSettings, size, className }
     <EmptyState
       size={size}
       className={className}
-      icon={<TriangleAlert className={cn("size-6", error.recoverable ? "text-warning" : "text-danger")} />}
+      icon={
+        <TriangleAlert
+          className={cn("size-6", error.recoverable ? "text-warning" : "text-danger")}
+        />
+      }
       headline={error.message}
       description={error.detail ?? undefined}
       action={

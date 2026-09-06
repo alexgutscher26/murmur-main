@@ -17,16 +17,20 @@ const BADGE_PRESETS: BadgeOption[] = [
   {
     id: "shield-default",
     name: "Dictated with Murmur (Brand)",
-    badgeUrl: "https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white",
-    markdown: "[![Dictated with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://murmur.app)",
+    badgeUrl:
+      "https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white",
+    markdown:
+      "[![Dictated with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://murmur.app)",
     html: `<a href="https://murmur.app" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white" alt="Dictated with Murmur" /></a>`,
     category: "badge",
   },
   {
     id: "shield-privacy",
     name: "100% Local Dictation (Privacy Shield)",
-    badgeUrl: "https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white",
-    markdown: "[![100% Local Dictation](https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white)](https://murmur.app/privacy)",
+    badgeUrl:
+      "https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white",
+    markdown:
+      "[![100% Local Dictation](https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white)](https://murmur.app/privacy)",
     html: `<a href="https://murmur.app/privacy" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white" alt="100% Local Dictation" /></a>`,
     category: "badge",
   },
@@ -34,7 +38,8 @@ const BADGE_PRESETS: BadgeOption[] = [
     id: "shield-dark",
     name: "Monochrome Dark",
     badgeUrl: "https://img.shields.io/badge/dictation-local%20whisper-18181B?style=flat-square",
-    markdown: "[![Murmur](https://img.shields.io/badge/dictation-local%20whisper-18181B?style=flat-square)](https://murmur.app)",
+    markdown:
+      "[![Murmur](https://img.shields.io/badge/dictation-local%20whisper-18181B?style=flat-square)](https://murmur.app)",
     html: `<a href="https://murmur.app" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/dictation-local%20whisper-18181B?style=flat-square" alt="Murmur" /></a>`,
     category: "badge",
   },
@@ -56,7 +61,8 @@ const SNIPPET_MACROS = [
   {
     voiceTrigger: "pr template",
     title: "Pull Request Checklist",
-    preview: "### 🚀 Pull Request\n**Summary:** ...\n**Key Changes:** ...\n**Testing Checklist:** ...",
+    preview:
+      "### 🚀 Pull Request\n**Summary:** ...\n**Key Changes:** ...\n**Testing Checklist:** ...",
     schema: `### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed`,
   },
   {
@@ -90,7 +96,8 @@ export function BadgeGenerator() {
           "Made with Local Dictation" Badges & Macros
         </h2>
         <p className="mt-3 text-base text-neutral-600 max-w-2xl mx-auto">
-          Add exportable badges to your READMEs, PRs, and documentation. Use voice trigger words to instantly insert markdown schemas.
+          Add exportable badges to your READMEs, PRs, and documentation. Use voice trigger words to
+          instantly insert markdown schemas.
         </p>
       </div>
 
@@ -114,7 +121,9 @@ export function BadgeGenerator() {
                       : "border-neutral-200/80 bg-white hover:border-neutral-300 hover:bg-neutral-50/50"
                   }`}
                 >
-                  <div className="text-xs font-medium text-neutral-700 mb-2 truncate">{preset.name}</div>
+                  <div className="text-xs font-medium text-neutral-700 mb-2 truncate">
+                    {preset.name}
+                  </div>
                   <img src={preset.badgeUrl} alt={preset.name} className="h-5" />
                 </button>
               ))}
@@ -157,7 +166,10 @@ export function BadgeGenerator() {
                   <span>Subtle Italicized Footer</span>
                   <button
                     onClick={() =>
-                      handleCopy("_Dictated privately on-device with [Murmur](https://murmur.app)_", "footer")
+                      handleCopy(
+                        "_Dictated privately on-device with [Murmur](https://murmur.app)_",
+                        "footer",
+                      )
                     }
                     className="text-emerald-700 hover:text-emerald-800 font-semibold"
                   >
@@ -165,7 +177,8 @@ export function BadgeGenerator() {
                   </button>
                 </div>
                 <div className="p-3 bg-neutral-50 border border-neutral-200/80 rounded-xl text-xs text-neutral-600 italic">
-                  _Dictated privately on-device with <span className="text-neutral-900 font-medium underline">Murmur</span>_
+                  _Dictated privately on-device with{" "}
+                  <span className="text-neutral-900 font-medium underline">Murmur</span>_
                 </div>
               </div>
             </div>
@@ -177,10 +190,14 @@ export function BadgeGenerator() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🎁</span>
-                  <h4 className="text-base font-bold text-neutral-950">Post-Activation Referral Program</h4>
+                  <h4 className="text-base font-bold text-neutral-950">
+                    Post-Activation Referral Program
+                  </h4>
                 </div>
                 <p className="mt-1 text-xs text-neutral-600 leading-relaxed">
-                  Earn lifetime rewards & Pro pack unlocks. Prompt triggers only after <strong>50 successful dictations</strong> (never during onboarding) when you've already experienced the value.
+                  Earn lifetime rewards & Pro pack unlocks. Prompt triggers only after{" "}
+                  <strong>50 successful dictations</strong> (never during onboarding) when you've
+                  already experienced the value.
                 </p>
               </div>
               <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-100/70 text-emerald-800 border border-emerald-200/90 whitespace-nowrap">
@@ -211,7 +228,8 @@ export function BadgeGenerator() {
               <span>🎙️</span> Voice-Triggered Macros
             </h3>
             <p className="text-xs text-neutral-600 mt-1">
-              Speak these trigger words during dictation to instantly expand structured markdown schemas:
+              Speak these trigger words during dictation to instantly expand structured markdown
+              schemas:
             </p>
           </div>
 

@@ -22,10 +22,34 @@ interface Milestone {
 }
 
 const MILESTONES: Milestone[] = [
-  { days: 7, label: "Week Sprint", badge: "7d+", icon: Zap, color: "text-amber-500 bg-amber-500/10 border-amber-500/30" },
-  { days: 30, label: "Monthly Builder", badge: "30d+", icon: Flame, color: "text-orange-500 bg-orange-500/10 border-orange-500/30" },
-  { days: 90, label: "Quarterly Pro", badge: "90d+", icon: Gem, color: "text-purple-500 bg-purple-500/10 border-purple-500/30" },
-  { days: 365, label: "Annual Master", badge: "365d+", icon: Trophy, color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/30" },
+  {
+    days: 7,
+    label: "Week Sprint",
+    badge: "7d+",
+    icon: Zap,
+    color: "text-amber-500 bg-amber-500/10 border-amber-500/30",
+  },
+  {
+    days: 30,
+    label: "Monthly Builder",
+    badge: "30d+",
+    icon: Flame,
+    color: "text-orange-500 bg-orange-500/10 border-orange-500/30",
+  },
+  {
+    days: 90,
+    label: "Quarterly Pro",
+    badge: "90d+",
+    icon: Gem,
+    color: "text-purple-500 bg-purple-500/10 border-purple-500/30",
+  },
+  {
+    days: 365,
+    label: "Annual Master",
+    badge: "365d+",
+    icon: Trophy,
+    color: "text-yellow-500 bg-yellow-500/10 border-yellow-500/30",
+  },
 ];
 
 interface StreakHeaderBadgeProps {
@@ -81,7 +105,7 @@ export function StreakHeaderBadge({ className }: StreakHeaderBadgeProps = {}) {
           "flex h-7 items-center gap-1.5 rounded-full px-2.5 text-caption font-medium transition-all select-none",
           streakDays > 0
             ? "bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 dark:bg-amber-500/15 dark:text-amber-400 dark:hover:bg-amber-500/25 border border-amber-500/20"
-            : "bg-stone-200/50 text-stone-600 hover:bg-stone-200/80 dark:bg-stone-800/40 dark:text-stone-400 dark:hover:bg-stone-800/70 border border-stone-300/40 dark:border-stone-700/40"
+            : "bg-stone-200/50 text-stone-600 hover:bg-stone-200/80 dark:bg-stone-800/40 dark:text-stone-400 dark:hover:bg-stone-800/70 border border-stone-300/40 dark:border-stone-700/40",
         )}
       >
         <Flame
@@ -89,18 +113,16 @@ export function StreakHeaderBadge({ className }: StreakHeaderBadgeProps = {}) {
             "h-3.5 w-3.5 transition-transform",
             streakDays > 0
               ? "text-amber-500 dark:text-amber-400 fill-amber-500/30 animate-pulse"
-              : "text-stone-400 dark:text-stone-500"
+              : "text-stone-400 dark:text-stone-500",
           )}
         />
-        <span className="tabular-nums font-semibold tracking-tight">
-          {streakDays}d
-        </span>
+        <span className="tabular-nums font-semibold tracking-tight">{streakDays}d</span>
 
         {currentMilestone && (
           <span
             className={cn(
               "ml-0.5 inline-flex items-center rounded-full px-1.5 py-0.2 text-[10px] font-bold tracking-tight border",
-              currentMilestone.color
+              currentMilestone.color,
             )}
           >
             {currentMilestone.badge}
@@ -123,7 +145,7 @@ export function StreakHeaderBadge({ className }: StreakHeaderBadgeProps = {}) {
                   "flex h-8 w-8 items-center justify-center rounded-lg",
                   streakDays > 0
                     ? "bg-amber-500/15 text-amber-500 dark:bg-amber-500/20 dark:text-amber-400"
-                    : "bg-stone-100 text-stone-400 dark:bg-stone-800 dark:text-stone-500"
+                    : "bg-stone-100 text-stone-400 dark:bg-stone-800 dark:text-stone-500",
                 )}
               >
                 <Flame className="h-4 w-4 fill-current" />
@@ -137,7 +159,7 @@ export function StreakHeaderBadge({ className }: StreakHeaderBadgeProps = {}) {
                     <span
                       className={cn(
                         "rounded-full px-1.5 py-0.2 text-[9px] font-bold border",
-                        currentMilestone.color
+                        currentMilestone.color,
                       )}
                     >
                       {currentMilestone.label}
@@ -154,9 +176,7 @@ export function StreakHeaderBadge({ className }: StreakHeaderBadgeProps = {}) {
           {/* Today's Goal Progress */}
           <div className="mt-3 rounded-lg bg-stone-50 p-2.5 dark:bg-stone-800/50">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-medium text-stone-700 dark:text-stone-300">
-                Today's Goal
-              </span>
+              <span className="font-medium text-stone-700 dark:text-stone-300">Today's Goal</span>
               {isGoalMetToday ? (
                 <span className="flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
                   <CheckCircle2 className="h-3 w-3" />
@@ -174,20 +194,24 @@ export function StreakHeaderBadge({ className }: StreakHeaderBadgeProps = {}) {
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-300",
-                  isGoalMetToday
-                    ? "bg-emerald-500"
-                    : "bg-amber-500"
+                  isGoalMetToday ? "bg-emerald-500" : "bg-amber-500",
                 )}
                 style={{ width: `${overallProgress}%` }}
               />
             </div>
 
             <div className="mt-2 flex items-center justify-between text-[11px] text-stone-500 dark:text-stone-400">
-              <span className={cn(sessionsGoalMet && "font-medium text-emerald-600 dark:text-emerald-400")}>
+              <span
+                className={cn(
+                  sessionsGoalMet && "font-medium text-emerald-600 dark:text-emerald-400",
+                )}
+              >
                 {todaySessions} / 3 sessions
               </span>
               <span className="text-stone-300 dark:text-stone-600">•</span>
-              <span className={cn(wordsGoalMet && "font-medium text-emerald-600 dark:text-emerald-400")}>
+              <span
+                className={cn(wordsGoalMet && "font-medium text-emerald-600 dark:text-emerald-400")}
+              >
                 {todayWords} / 100 words
               </span>
             </div>
@@ -218,13 +242,11 @@ export function StreakHeaderBadge({ className }: StreakHeaderBadgeProps = {}) {
                       "flex flex-col items-center justify-center rounded-lg py-1.5 border transition-all text-center",
                       isUnlocked
                         ? cn(m.color, "shadow-xs")
-                        : "border-dashed border-stone-200 bg-stone-50/50 text-stone-400 dark:border-stone-800 dark:bg-stone-800/20 dark:text-stone-600"
+                        : "border-dashed border-stone-200 bg-stone-50/50 text-stone-400 dark:border-stone-800 dark:bg-stone-800/20 dark:text-stone-600",
                     )}
                   >
                     <Icon className="h-3 w-3 mb-0.5" />
-                    <span className="text-[10px] font-bold leading-tight">
-                      {m.badge}
-                    </span>
+                    <span className="text-[10px] font-bold leading-tight">{m.badge}</span>
                     <span className="text-[9px] leading-tight opacity-75 truncate max-w-[56px]">
                       {m.days}d
                     </span>

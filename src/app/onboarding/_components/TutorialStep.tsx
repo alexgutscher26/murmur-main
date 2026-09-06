@@ -73,12 +73,9 @@ const SCENARIOS: Record<Scenario, ScenarioData> = {
     title: "Git Commit Message",
     category: "Engineering",
     icon: Terminal,
-    promptText:
-      "Uh basically fix the audio buffer race condition and uh add unit tests for it",
-    rawText:
-      "Uh basically fix the audio buffer race condition and uh add unit tests for it",
-    cleanText:
-      "fix: prevent audio buffer race condition and add unit tests",
+    promptText: "Uh basically fix the audio buffer race condition and uh add unit tests for it",
+    rawText: "Uh basically fix the audio buffer race condition and uh add unit tests for it",
+    cleanText: "fix: prevent audio buffer race condition and add unit tests",
     strippedFillers: ["Uh", "basically", "uh"],
     dummyAppTitle: "💻 Terminal — git commit",
     timeSavedSeconds: 19,
@@ -86,12 +83,7 @@ const SCENARIOS: Record<Scenario, ScenarioData> = {
   },
 };
 
-export function TutorialStep({
-  hotkey,
-  mode,
-  onComplete,
-  onSkip,
-}: TutorialStepProps) {
+export function TutorialStep({ hotkey, mode, onComplete, onSkip }: TutorialStepProps) {
   const [scenario, setScenario] = useState<Scenario>("email");
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [pastedText, setPastedText] = useState("");
@@ -139,7 +131,8 @@ export function TutorialStep({
               Interactive Dictation Practice
             </div>
             <div className="text-xs text-text-secondary">
-              Step {step} of 4 • {step === 1 ? "Speak" : step === 2 ? "Clean" : step === 3 ? "Paste" : "Summary"}
+              Step {step} of 4 •{" "}
+              {step === 1 ? "Speak" : step === 2 ? "Clean" : step === 3 ? "Paste" : "Summary"}
             </div>
           </div>
         </div>
@@ -417,7 +410,8 @@ export function TutorialStep({
           <div className="flex items-center gap-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-200/60 dark:border-purple-900/40 p-3 text-xs text-purple-900 dark:text-purple-200">
             <Flame className="size-4 shrink-0 text-purple-600 dark:text-purple-400" />
             <span>
-              You speak <strong>4.6× faster</strong> than you type. Murmur cleans up your thoughts so you never have to re-edit.
+              You speak <strong>4.6× faster</strong> than you type. Murmur cleans up your thoughts
+              so you never have to re-edit.
             </span>
           </div>
 

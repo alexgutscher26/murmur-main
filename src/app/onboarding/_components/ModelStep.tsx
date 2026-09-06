@@ -39,15 +39,20 @@ export function ModelStep({ model, onChanged }: ModelStepProps) {
   });
 
   const start = useCallback(() => {
-    void unwrapCommand(() => commands.downloadModel({ model_id: model.descriptor.id })).then(onChanged);
+    void unwrapCommand(() => commands.downloadModel({ model_id: model.descriptor.id })).then(
+      onChanged,
+    );
   }, [model.descriptor.id, onChanged]);
 
   const { descriptor, state } = model;
 
   if (state.kind === "DOWNLOADING" || progress !== null) {
-    const received = progress?.received_bytes ?? (state.kind === "DOWNLOADING" ? state.received_bytes : 0);
+    const received =
+      progress?.received_bytes ?? (state.kind === "DOWNLOADING" ? state.received_bytes : 0);
     const total = progress?.total_bytes ?? descriptor.size_bytes;
-    const eta = progress ? formatEta(Math.max(0, total - received), progress.bytes_per_second) : null;
+    const eta = progress
+      ? formatEta(Math.max(0, total - received), progress.bytes_per_second)
+      : null;
 
     return (
       <ProgressBar

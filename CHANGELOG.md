@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2026-08-31
 
 ### Added
+
 - **100% On-Device Whisper Inference**:
   - `small-q5_1` (190 MB) as the new default Starter tier model for fast, low-memory transcription.
   - `base-q5_1` (90 MB) for instant lightweight decodes on constrained hardware.
@@ -45,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Team tier ($15/user/mo) with centralized team dictionary sync and fleet management.
 
 ### Fixed
+
 - Fixed dark theme contrast and window translucency by applying dynamic `background: var(--surface-glass)` and explicit `color-scheme` declarations.
 - Corrected type signature of `descriptor_for` in `http_models/catalog.rs`.
 - Fixed desktop billing view to use native design system tokens (`bg-surface`, `hairline`, `text-text-primary`).

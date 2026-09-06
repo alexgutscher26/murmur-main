@@ -10,15 +10,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  FastForward,
-  Pause,
-  Play,
-  RotateCcw,
-  Volume2,
-  VolumeX,
-  X,
-} from "lucide-react";
+import { FastForward, Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide-react";
 import { formatCompactDuration, formatRelativeTime } from "@/lib/format";
 import { GlassPanel } from "@/components/global";
 import type { SessionSummary } from "@/lib/bindings";
@@ -84,7 +76,16 @@ export function SessionPlaybackModal({ session, onClose }: SessionPlaybackModalP
         }
       }
     }
-  }, [isPlaying, currentTimeMs, totalDurationMs, isMuted, activeWordIndex, words, playbackRate, session.language]);
+  }, [
+    isPlaying,
+    currentTimeMs,
+    totalDurationMs,
+    isMuted,
+    activeWordIndex,
+    words,
+    playbackRate,
+    session.language,
+  ]);
 
   // Main playback timer loop
   useEffect(() => {
@@ -189,7 +190,8 @@ export function SessionPlaybackModal({ session, onClose }: SessionPlaybackModalP
               ) : null}
             </div>
             <p className="text-caption text-text-secondary">
-              {formatRelativeTime(session.started_at_ms)} · {formatCompactDuration(totalDurationMs)} · {words.length} words
+              {formatRelativeTime(session.started_at_ms)} · {formatCompactDuration(totalDurationMs)}{" "}
+              · {words.length} words
             </p>
           </div>
           <button
@@ -276,7 +278,11 @@ export function SessionPlaybackModal({ session, onClose }: SessionPlaybackModalP
               onClick={togglePlay}
               className="flex size-9 items-center justify-center rounded-full bg-text-primary text-opaque-elevated transition-transform active:scale-90"
             >
-              {isPlaying ? <Pause className="size-4 fill-current" /> : <Play className="size-4 fill-current ml-0.5" />}
+              {isPlaying ? (
+                <Pause className="size-4 fill-current" />
+              ) : (
+                <Play className="size-4 fill-current ml-0.5" />
+              )}
             </button>
 
             <button

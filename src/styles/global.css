@@ -313,7 +313,6 @@
   }
 }
 
-
 /**
  * WHAT:  The smart scroll fade (docs/04 §8) — the top and bottom edges of a
  *        scroll container dissolving when, and only when, content is hidden
@@ -410,4 +409,3 @@ select {
   background-color: #ffffff;
   color: #1c1917;
 }
-

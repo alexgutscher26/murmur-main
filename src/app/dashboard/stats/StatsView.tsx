@@ -15,22 +15,8 @@
  */
 
 import { useState, useMemo, useCallback, useRef } from "react";
-import {
-  Check,
-  Copy,
-  Play,
-  Trash2,
-  ChevronDown,
-  Search,
-  Flag,
-  MoreVertical,
-} from "lucide-react";
-import {
-  commands,
-  type HotkeyBinding,
-  type MetricDef,
-  type SessionSummary,
-} from "@/lib/bindings";
+import { Check, Copy, Play, Trash2, ChevronDown, Search, Flag, MoreVertical } from "lucide-react";
+import { commands, type HotkeyBinding, type MetricDef, type SessionSummary } from "@/lib/bindings";
 import { useCommand, unwrapCommand } from "@/lib/ipc";
 import { formatCompactDuration, formatCount } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -72,22 +58,12 @@ function formatTime(ms: number): string {
 function formatGroupLabel(ms: number): string {
   const now = new Date();
   const d = new Date(ms);
-  const today = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-  ).getTime();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   const yesterday = today - 86_400_000;
-  const dayStart = new Date(
-    d.getFullYear(),
-    d.getMonth(),
-    d.getDate(),
-  ).getTime();
+  const dayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   if (dayStart === today) return "TODAY";
   if (dayStart === yesterday) return "YESTERDAY";
-  return d
-    .toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" })
-    .toUpperCase();
+  return d.toLocaleDateString([], { month: "long", day: "numeric", year: "numeric" }).toUpperCase();
 }
 
 function dayKey(ms: number): string {
@@ -126,24 +102,16 @@ function personaFrom(totalWords: number): {
   title: string;
   subtitle: string;
 } {
-  if (totalWords >= 100_000)
-    return { title: "Voice Architect", subtitle: "Top 1% of dictators" };
-  if (totalWords >= 25_000)
-    return { title: "Power Dictator", subtitle: "Prolific speaker" };
-  if (totalWords >= 5_000)
-    return { title: "API Advocate", subtitle: "Fast, accurate speaker" };
-  if (totalWords >= 1_000)
-    return { title: "Daily Driver", subtitle: "Consistent habit" };
+  if (totalWords >= 100_000) return { title: "Voice Architect", subtitle: "Top 1% of dictators" };
+  if (totalWords >= 25_000) return { title: "Power Dictator", subtitle: "Prolific speaker" };
+  if (totalWords >= 5_000) return { title: "API Advocate", subtitle: "Fast, accurate speaker" };
+  if (totalWords >= 1_000) return { title: "Daily Driver", subtitle: "Consistent habit" };
   return { title: "API Advocate", subtitle: "Getting started" };
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-export function StatsView({
-  metrics,
-  hotkey,
-  mode,
-}: StatsViewProps) {
+export function StatsView({ metrics, hotkey, mode }: StatsViewProps) {
   const stats = useCommand(commands.getStats, []);
   const feed = useHistory("");
 
@@ -169,17 +137,20 @@ export function StatsView({
     });
   }, []);
 
-  const play = useCallback((session: SessionSummary) => {
-    const text = textOf(session);
-    if (!text) return;
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      window.speechSynthesis.speak(utterance);
-    } else {
-      copy(session);
-    }
-  }, [copy]);
+  const play = useCallback(
+    (session: SessionSummary) => {
+      const text = textOf(session);
+      if (!text) return;
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        window.speechSynthesis.speak(utterance);
+      } else {
+        copy(session);
+      }
+    },
+    [copy],
+  );
 
   const toggleFlag = useCallback((id: string) => {
     setFlaggedIds((prev) => {
@@ -192,9 +163,7 @@ export function StatsView({
 
   const remove = useCallback(
     (session: SessionSummary) => {
-      void unwrapCommand(() =>
-        commands.deleteHistoryEntry({ id: session.id }),
-      ).then((result) => {
+      void unwrapCommand(() => commands.deleteHistoryEntry({ id: session.id })).then((result) => {
         if (result.status === "ok") {
           feed.forget(session.id);
           stats.reload();
@@ -208,9 +177,7 @@ export function StatsView({
   const groups = useMemo(() => {
     const activeItems = feed.items;
     const filtered = searchQuery.trim()
-      ? activeItems.filter((s) =>
-          textOf(s).toLowerCase().includes(searchQuery.toLowerCase()),
-        )
+      ? activeItems.filter((s) => textOf(s).toLowerCase().includes(searchQuery.toLowerCase()))
       : activeItems;
     return groupByDay(filtered);
   }, [feed.items, searchQuery]);
@@ -252,10 +219,7 @@ export function StatsView({
         />
       )}
 
-      <div
-        data-scroll-area
-        className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-6"
-      >
+      <div data-scroll-area className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-6">
         {/* ── Greeting Header ────────────────────────────────────────────── */}
         <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white mb-6">
           Welcome back, Alex
@@ -271,9 +235,7 @@ export function StatsView({
               <div className="relative z-10 p-6 max-w-md">
                 <h2 className="text-[17px] font-medium tracking-tight text-white mb-1">
                   Make Murmur sound like{" "}
-                  <span className="font-serif italic font-normal text-amber-100 text-xl">
-                    you
-                  </span>
+                  <span className="font-serif italic font-normal text-amber-100 text-xl">you</span>
                 </h2>
                 <p className="text-xs text-stone-400 font-normal mb-4">
                   Set up different writing styles for different apps.
@@ -324,159 +286,157 @@ export function StatsView({
                 </div>
               ) : (
                 groups.map((group, groupIdx) => (
-                <section key={group.key} className="flex flex-col">
-                  {/* Date Header + Search Button */}
-                  <div className="flex items-center justify-between pb-2 px-1">
-                    <span className="text-[11px] font-bold tracking-wider text-stone-400 uppercase">
-                      {group.label}
-                    </span>
-                    {groupIdx === 0 && (
-                      <div className="flex items-center gap-2">
-                        {searchOpen ? (
-                          <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Filter text…"
-                            autoFocus
-                            onBlur={() => !searchQuery && setSearchOpen(false)}
-                            className="h-6 rounded-md border border-stone-200 bg-white px-2 text-xs text-stone-900 shadow-xs focus:outline-hidden dark:border-stone-800 dark:bg-stone-900 dark:text-white"
-                          />
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => setSearchOpen(true)}
-                            className="p-1 text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
-                            title="Search transcripts"
-                          >
-                            <Search className="h-3.5 w-3.5" />
-                          </button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card Container for Rows */}
-                  <div className="rounded-2xl border border-stone-200/70 dark:border-stone-800/80 bg-[#fdfcfb] dark:bg-stone-900/40 divide-y divide-stone-100 dark:divide-stone-800/60 overflow-hidden shadow-xs">
-                    {group.sessions.map((session) => {
-                      const line = firstLine(session);
-                      const isFlagged = flaggedIds.has(session.id);
-                      const isMenuOpen = menuOpenId === session.id;
-
-                      return (
-                        <div
-                          key={session.id}
-                          className="group relative flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-stone-50/70 dark:hover:bg-stone-800/40 min-h-[46px]"
-                        >
-                          {/* Time Column */}
-                          <span className="w-18 shrink-0 text-xs tabular-nums text-stone-400 dark:text-stone-500 font-normal">
-                            {formatTime(session.started_at_ms)}
-                          </span>
-
-                          {/* Transcript text */}
-                          <span
-                            className={cn(
-                              "min-w-0 flex-1 truncate text-xs font-normal",
-                              line
-                                ? "text-stone-800 dark:text-stone-200"
-                                : "text-stone-300 dark:text-stone-600 italic",
-                            )}
-                          >
-                            {line || "No text"}
-                          </span>
-
-                          {/* Quick action buttons (revealed on hover) */}
-                          <div className="flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {/* Play Audio */}
+                  <section key={group.key} className="flex flex-col">
+                    {/* Date Header + Search Button */}
+                    <div className="flex items-center justify-between pb-2 px-1">
+                      <span className="text-[11px] font-bold tracking-wider text-stone-400 uppercase">
+                        {group.label}
+                      </span>
+                      {groupIdx === 0 && (
+                        <div className="flex items-center gap-2">
+                          {searchOpen ? (
+                            <input
+                              type="text"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              placeholder="Filter text…"
+                              autoFocus
+                              onBlur={() => !searchQuery && setSearchOpen(false)}
+                              className="h-6 rounded-md border border-stone-200 bg-white px-2 text-xs text-stone-900 shadow-xs focus:outline-hidden dark:border-stone-800 dark:bg-stone-900 dark:text-white"
+                            />
+                          ) : (
                             <button
                               type="button"
-                              onClick={() => play(session)}
-                              title="Play"
-                              className="rounded p-1 text-stone-400 hover:bg-stone-200/50 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-white transition-colors"
+                              onClick={() => setSearchOpen(true)}
+                              className="p-1 text-stone-400 hover:text-stone-700 dark:hover:text-stone-300 transition-colors"
+                              title="Search transcripts"
                             >
-                              <Play className="h-3.5 w-3.5" />
+                              <Search className="h-3.5 w-3.5" />
                             </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
-                            {/* Copy Text */}
-                            <button
-                              type="button"
-                              onClick={() => copy(session)}
-                              title="Copy"
-                              className="rounded p-1 text-stone-400 hover:bg-stone-200/50 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-white transition-colors"
-                            >
-                              {copiedId === session.id ? (
-                                <Check className="h-3.5 w-3.5 text-teal-600" />
-                              ) : (
-                                <Copy className="h-3.5 w-3.5" />
-                              )}
-                            </button>
+                    {/* Card Container for Rows */}
+                    <div className="rounded-2xl border border-stone-200/70 dark:border-stone-800/80 bg-[#fdfcfb] dark:bg-stone-900/40 divide-y divide-stone-100 dark:divide-stone-800/60 overflow-hidden shadow-xs">
+                      {group.sessions.map((session) => {
+                        const line = firstLine(session);
+                        const isFlagged = flaggedIds.has(session.id);
+                        const isMenuOpen = menuOpenId === session.id;
 
-                            {/* Flag */}
-                            <button
-                              type="button"
-                              onClick={() => toggleFlag(session.id)}
-                              title="Flag"
+                        return (
+                          <div
+                            key={session.id}
+                            className="group relative flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-stone-50/70 dark:hover:bg-stone-800/40 min-h-[46px]"
+                          >
+                            {/* Time Column */}
+                            <span className="w-18 shrink-0 text-xs tabular-nums text-stone-400 dark:text-stone-500 font-normal">
+                              {formatTime(session.started_at_ms)}
+                            </span>
+
+                            {/* Transcript text */}
+                            <span
                               className={cn(
-                                "rounded p-1 transition-colors",
-                                isFlagged
-                                  ? "text-amber-600 bg-amber-50 dark:bg-amber-950/40"
-                                  : "text-stone-400 hover:bg-stone-200/50 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-white",
+                                "min-w-0 flex-1 truncate text-xs font-normal",
+                                line
+                                  ? "text-stone-800 dark:text-stone-200"
+                                  : "text-stone-300 dark:text-stone-600 italic",
                               )}
                             >
-                              <Flag className="h-3.5 w-3.5" />
-                            </button>
+                              {line || "No text"}
+                            </span>
 
-                            {/* More Options Menu */}
-                            <div className="relative">
+                            {/* Quick action buttons (revealed on hover) */}
+                            <div className="flex shrink-0 items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {/* Play Audio */}
                               <button
                                 type="button"
-                                onClick={() =>
-                                  setMenuOpenId(isMenuOpen ? null : session.id)
-                                }
-                                title="More"
+                                onClick={() => play(session)}
+                                title="Play"
                                 className="rounded p-1 text-stone-400 hover:bg-stone-200/50 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-white transition-colors"
                               >
-                                <MoreVertical className="h-3.5 w-3.5" />
+                                <Play className="h-3.5 w-3.5" />
                               </button>
 
-                              {isMenuOpen && (
-                                <div
-                                  onMouseLeave={() => setMenuOpenId(null)}
-                                  className="absolute right-0 top-7 z-30 w-36 rounded-xl border border-stone-200 bg-white p-1 shadow-lg dark:border-stone-700 dark:bg-[#1c1917]"
+                              {/* Copy Text */}
+                              <button
+                                type="button"
+                                onClick={() => copy(session)}
+                                title="Copy"
+                                className="rounded p-1 text-stone-400 hover:bg-stone-200/50 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-white transition-colors"
+                              >
+                                {copiedId === session.id ? (
+                                  <Check className="h-3.5 w-3.5 text-teal-600" />
+                                ) : (
+                                  <Copy className="h-3.5 w-3.5" />
+                                )}
+                              </button>
+
+                              {/* Flag */}
+                              <button
+                                type="button"
+                                onClick={() => toggleFlag(session.id)}
+                                title="Flag"
+                                className={cn(
+                                  "rounded p-1 transition-colors",
+                                  isFlagged
+                                    ? "text-amber-600 bg-amber-50 dark:bg-amber-950/40"
+                                    : "text-stone-400 hover:bg-stone-200/50 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-white",
+                                )}
+                              >
+                                <Flag className="h-3.5 w-3.5" />
+                              </button>
+
+                              {/* More Options Menu */}
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  onClick={() => setMenuOpenId(isMenuOpen ? null : session.id)}
+                                  title="More"
+                                  className="rounded p-1 text-stone-400 hover:bg-stone-200/50 hover:text-stone-800 dark:hover:bg-stone-800 dark:hover:text-white transition-colors"
                                 >
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      copy(session);
-                                      setMenuOpenId(null);
-                                    }}
-                                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-stone-700 hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-stone-800"
+                                  <MoreVertical className="h-3.5 w-3.5" />
+                                </button>
+
+                                {isMenuOpen && (
+                                  <div
+                                    onMouseLeave={() => setMenuOpenId(null)}
+                                    className="absolute right-0 top-7 z-30 w-36 rounded-xl border border-stone-200 bg-white p-1 shadow-lg dark:border-stone-700 dark:bg-[#1c1917]"
                                   >
-                                    <Copy className="h-3 w-3" />
-                                    <span>Copy raw</span>
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      remove(session);
-                                      setMenuOpenId(null);
-                                    }}
-                                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
-                                  >
-                                    <Trash2 className="h-3 w-3" />
-                                    <span>Delete</span>
-                                  </button>
-                                </div>
-                              )}
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        copy(session);
+                                        setMenuOpenId(null);
+                                      }}
+                                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-stone-700 hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-stone-800"
+                                    >
+                                      <Copy className="h-3 w-3" />
+                                      <span>Copy raw</span>
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        remove(session);
+                                        setMenuOpenId(null);
+                                      }}
+                                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                      <span>Delete</span>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              ))
-            )}
+                        );
+                      })}
+                    </div>
+                  </section>
+                ))
+              )}
 
               {/* Load More sentinel */}
               {!feed.exhausted && feed.loaded && groups.length > 0 && (
@@ -499,10 +459,7 @@ export function StatsView({
                   >
                     <span>Advanced telemetry & latency</span>
                     <ChevronDown
-                      className={cn(
-                        "h-4 w-4 transition-transform",
-                        showMoreStats && "rotate-180",
-                      )}
+                      className={cn("h-4 w-4 transition-transform", showMoreStats && "rotate-180")}
                     />
                   </button>
 
@@ -516,9 +473,7 @@ export function StatsView({
                           },
                           {
                             label: "Time Spoken",
-                            value: formatCompactDuration(
-                              data.total_speaking_ms,
-                            ),
+                            value: formatCompactDuration(data.total_speaking_ms),
                           },
                           {
                             label: "This Week",
@@ -548,10 +503,7 @@ export function StatsView({
                         <ActivityChart days={data.activity} />
                       )}
                       {data.latency && data.latency.length > 0 && (
-                        <LatencyPanel
-                          metrics={metrics}
-                          latency={data.latency}
-                        />
+                        <LatencyPanel metrics={metrics} latency={data.latency} />
                       )}
                       {data.languages && data.languages.length > 0 && (
                         <LanguageBreakdown languages={data.languages} />
@@ -571,9 +523,7 @@ export function StatsView({
                 <span className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
                   {formatCount(totalWords)}
                 </span>
-                <span className="text-xs font-medium text-stone-500">
-                  total words
-                </span>
+                <span className="text-xs font-medium text-stone-500">total words</span>
               </div>
 
               <div className="flex items-baseline gap-2">
@@ -587,9 +537,7 @@ export function StatsView({
                 <span className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
                   {streakDays}
                 </span>
-                <span className="text-xs font-medium text-stone-500">
-                  day streak
-                </span>
+                <span className="text-xs font-medium text-stone-500">day streak</span>
               </div>
             </div>
 
@@ -599,9 +547,7 @@ export function StatsView({
                 <div className="text-sm font-bold text-stone-900 dark:text-white">
                   Voice Profile
                 </div>
-                <div className="text-xs text-stone-500 mt-0.5">
-                  {persona.title}
-                </div>
+                <div className="text-xs text-stone-500 mt-0.5">{persona.title}</div>
               </div>
 
               <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-white dark:bg-stone-800 p-0.5 border border-stone-200/40 shadow-xs">

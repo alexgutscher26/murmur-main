@@ -62,7 +62,8 @@ export const DOMAIN_PACKS: readonly DomainPack[] = [
     name: "React, Next.js & Web",
     badge: "Developer",
     badgeType: "developer",
-    description: "Next.js, TypeScript, Tailwind CSS, Zustand, TanStack Query, tRPC, Vite, useEffect, useState.",
+    description:
+      "Next.js, TypeScript, Tailwind CSS, Zustand, TanStack Query, tRPC, Vite, useEffect, useState.",
     entries: [
       { pattern: "next js", replacement: "Next.js" },
       { pattern: "type script", replacement: "TypeScript" },
@@ -85,7 +86,8 @@ export const DOMAIN_PACKS: readonly DomainPack[] = [
     name: "Backend, Python & Rust",
     badge: "Developer",
     badgeType: "developer",
-    description: "FastAPI, PyTorch, PostgreSQL, SQLite, Prisma, Docker, Tokio, Cargo, Serde, async/await.",
+    description:
+      "FastAPI, PyTorch, PostgreSQL, SQLite, Prisma, Docker, Tokio, Cargo, Serde, async/await.",
     entries: [
       { pattern: "fast a p i", replacement: "FastAPI" },
       { pattern: "pie torch", replacement: "PyTorch" },
@@ -110,7 +112,8 @@ export const DOMAIN_PACKS: readonly DomainPack[] = [
     name: "Git, DevOps & Cloud",
     badge: "Developer",
     badgeType: "developer",
-    description: "GitHub Actions, CI/CD, Terraform, Cloudflare Workers, AWS, Kubernetes, pull request, merge conflict.",
+    description:
+      "GitHub Actions, CI/CD, Terraform, Cloudflare Workers, AWS, Kubernetes, pull request, merge conflict.",
     entries: [
       { pattern: "git hub actions", replacement: "GitHub Actions" },
       { pattern: "c i c d", replacement: "CI/CD" },
@@ -126,7 +129,8 @@ export const DOMAIN_PACKS: readonly DomainPack[] = [
     name: "Legal & Compliance",
     badge: "Pro",
     badgeType: "pro",
-    description: "Force majeure, indemnification, jurisdiction, GDPR, HIPAA, affidavit, subpoena, non-disclosure.",
+    description:
+      "Force majeure, indemnification, jurisdiction, GDPR, HIPAA, affidavit, subpoena, non-disclosure.",
     entries: [
       { pattern: "force major", replacement: "force majeure" },
       { pattern: "g d p r", replacement: "GDPR" },
@@ -163,20 +167,177 @@ interface WordMetadata {
 }
 
 const COMMON_STOPWORDS = new Set([
-  "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", "with",
-  "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we", "say", "her",
-  "she", "or", "an", "will", "my", "one", "all", "would", "there", "their", "what", "so", "up",
-  "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", "time",
-  "no", "just", "him", "know", "take", "people", "into", "year", "your", "good", "some", "could",
-  "them", "see", "other", "than", "then", "now", "look", "only", "come", "its", "over", "think",
-  "also", "back", "after", "use", "two", "how", "our", "work", "first", "well", "way", "even",
-  "new", "want", "because", "any", "these", "give", "day", "most", "us", "is", "are", "was", "were",
-  "been", "being", "has", "had", "did", "does", "doing", "very", "much", "more", "here", "where",
-  "why", "again", "please", "thank", "thanks", "hello", "hi", "hey", "yes", "yeah", "okay", "sure",
-  "today", "tomorrow", "yesterday", "going", "need", "should", "really", "something", "everything",
-  "anything", "nothing", "said", "got", "always", "around", "still", "off", "next", "last", "right",
-  "left", "don't", "dont", "can't", "cant", "won't", "wont", "it's", "its", "i'm", "im", "you're",
-  "youre", "we're", "were", "they're", "theyre", "i've", "ive", "we've", "weve", "let's", "lets"
+  "the",
+  "be",
+  "to",
+  "of",
+  "and",
+  "a",
+  "in",
+  "that",
+  "have",
+  "i",
+  "it",
+  "for",
+  "not",
+  "on",
+  "with",
+  "he",
+  "as",
+  "you",
+  "do",
+  "at",
+  "this",
+  "but",
+  "his",
+  "by",
+  "from",
+  "they",
+  "we",
+  "say",
+  "her",
+  "she",
+  "or",
+  "an",
+  "will",
+  "my",
+  "one",
+  "all",
+  "would",
+  "there",
+  "their",
+  "what",
+  "so",
+  "up",
+  "out",
+  "if",
+  "about",
+  "who",
+  "get",
+  "which",
+  "go",
+  "me",
+  "when",
+  "make",
+  "can",
+  "like",
+  "time",
+  "no",
+  "just",
+  "him",
+  "know",
+  "take",
+  "people",
+  "into",
+  "year",
+  "your",
+  "good",
+  "some",
+  "could",
+  "them",
+  "see",
+  "other",
+  "than",
+  "then",
+  "now",
+  "look",
+  "only",
+  "come",
+  "its",
+  "over",
+  "think",
+  "also",
+  "back",
+  "after",
+  "use",
+  "two",
+  "how",
+  "our",
+  "work",
+  "first",
+  "well",
+  "way",
+  "even",
+  "new",
+  "want",
+  "because",
+  "any",
+  "these",
+  "give",
+  "day",
+  "most",
+  "us",
+  "is",
+  "are",
+  "was",
+  "were",
+  "been",
+  "being",
+  "has",
+  "had",
+  "did",
+  "does",
+  "doing",
+  "very",
+  "much",
+  "more",
+  "here",
+  "where",
+  "why",
+  "again",
+  "please",
+  "thank",
+  "thanks",
+  "hello",
+  "hi",
+  "hey",
+  "yes",
+  "yeah",
+  "okay",
+  "sure",
+  "today",
+  "tomorrow",
+  "yesterday",
+  "going",
+  "need",
+  "should",
+  "really",
+  "something",
+  "everything",
+  "anything",
+  "nothing",
+  "said",
+  "got",
+  "always",
+  "around",
+  "still",
+  "off",
+  "next",
+  "last",
+  "right",
+  "left",
+  "don't",
+  "dont",
+  "can't",
+  "cant",
+  "won't",
+  "wont",
+  "it's",
+  "its",
+  "i'm",
+  "im",
+  "you're",
+  "youre",
+  "we're",
+  "were",
+  "they're",
+  "theyre",
+  "i've",
+  "ive",
+  "we've",
+  "weve",
+  "let's",
+  "lets",
 ]);
 
 export const DEFAULT_SUGGESTED_CHIPS = ["Murmur", "Whisper", "Vite", "Tauri", "React"];
@@ -185,7 +346,7 @@ export const SUGGESTED_CHIPS = DEFAULT_SUGGESTED_CHIPS;
 export function extractLearnedSuggestions(
   sessions: readonly SessionSummary[],
   existingTerms: ReadonlySet<string>,
-  maxCount = 5
+  maxCount = 5,
 ): string[] {
   const scores = new Map<string, number>();
   const originalCasing = new Map<string, string>();
@@ -228,7 +389,10 @@ export function extractLearnedSuggestions(
 
       scores.set(lower, (scores.get(lower) ?? 0) + score);
 
-      if (!originalCasing.has(lower) || (/[A-Z]/.test(token) && !/[A-Z]/.test(originalCasing.get(lower)!))) {
+      if (
+        !originalCasing.has(lower) ||
+        (/[A-Z]/.test(token) && !/[A-Z]/.test(originalCasing.get(lower)!))
+      ) {
         originalCasing.set(lower, token);
       }
     }
@@ -249,7 +413,10 @@ export function extractLearnedSuggestions(
   if (results.length < maxCount) {
     for (const def of DEFAULT_SUGGESTED_CHIPS) {
       if (results.length >= maxCount) break;
-      if (!existingTerms.has(def.toLowerCase()) && !results.some((r) => r.toLowerCase() === def.toLowerCase())) {
+      if (
+        !existingTerms.has(def.toLowerCase()) &&
+        !results.some((r) => r.toLowerCase() === def.toLowerCase())
+      ) {
         results.push(def);
       }
     }
@@ -282,17 +449,20 @@ function saveLocalMeta(meta: Record<string, WordMetadata>) {
 
 function GoldenSparkleIcon({ className }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      className={cn("inline-block shrink-0", className)}
-    >
+    <svg viewBox="0 0 24 24" fill="none" className={cn("inline-block shrink-0", className)}>
       <path
         d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z"
         fill="url(#sparkle-gradient)"
       />
       <defs>
-        <linearGradient id="sparkle-gradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="sparkle-gradient"
+          x1="2"
+          y1="2"
+          x2="22"
+          y2="22"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop stopColor="#f59e0b" />
           <stop offset="1" stopColor="#ea580c" />
         </linearGradient>
@@ -414,8 +584,6 @@ export function DictionaryView() {
     [entries.data],
   );
 
-
-
   const handleDismissBanner = () => {
     setBannerDismissed(true);
     try {
@@ -479,7 +647,9 @@ export function DictionaryView() {
     }
 
     const existing = (entries.data ?? []).some(
-      (e) => e.replacement.toLowerCase() === chip.toLowerCase() || e.pattern.toLowerCase() === chip.toLowerCase()
+      (e) =>
+        e.replacement.toLowerCase() === chip.toLowerCase() ||
+        e.pattern.toLowerCase() === chip.toLowerCase(),
     );
     if (existing) {
       showToast(`"${chip}" is already in your dictionary`);
@@ -492,7 +662,7 @@ export function DictionaryView() {
           pattern: chip,
           replacement: chip,
           match_kind: "WORD",
-        })
+        }),
       );
       setMeta((prev) => {
         const updated = {
@@ -522,10 +692,10 @@ export function DictionaryView() {
       sortMode === "default"
         ? "Alphabetical (A-Z)"
         : sortMode === "az"
-        ? "Alphabetical (Z-A)"
-        : sortMode === "za"
-        ? "Favorites first"
-        : "Default order";
+          ? "Alphabetical (Z-A)"
+          : sortMode === "za"
+            ? "Favorites first"
+            : "Default order";
     showToast(`Sorted: ${nextMode}`);
   };
 
@@ -538,9 +708,7 @@ export function DictionaryView() {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       list = list.filter(
-        (e) =>
-          e.replacement.toLowerCase().includes(q) ||
-          e.pattern.toLowerCase().includes(q)
+        (e) => e.replacement.toLowerCase().includes(q) || e.pattern.toLowerCase().includes(q),
       );
     }
 
@@ -560,11 +728,11 @@ export function DictionaryView() {
     // Sort
     if (sortMode === "az") {
       list.sort((a, b) =>
-        a.replacement.localeCompare(b.replacement, undefined, { sensitivity: "base" })
+        a.replacement.localeCompare(b.replacement, undefined, { sensitivity: "base" }),
       );
     } else if (sortMode === "za") {
       list.sort((a, b) =>
-        b.replacement.localeCompare(a.replacement, undefined, { sensitivity: "base" })
+        b.replacement.localeCompare(a.replacement, undefined, { sensitivity: "base" }),
       );
     } else if (sortMode === "starred") {
       list.sort((a, b) => {
@@ -653,7 +821,7 @@ export function DictionaryView() {
                   "pb-2.5 text-xs font-medium transition-colors relative",
                   activeTab === "all"
                     ? "text-stone-900 dark:text-white font-semibold"
-                    : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"
+                    : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200",
                 )}
               >
                 All
@@ -669,7 +837,7 @@ export function DictionaryView() {
                   "pb-2.5 text-xs font-medium transition-colors relative",
                   activeTab === "personal"
                     ? "text-stone-900 dark:text-white font-semibold"
-                    : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"
+                    : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200",
                 )}
               >
                 Personal
@@ -685,7 +853,7 @@ export function DictionaryView() {
                   "pb-2.5 text-xs font-medium transition-colors relative",
                   activeTab === "team"
                     ? "text-stone-900 dark:text-white font-semibold"
-                    : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"
+                    : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200",
                 )}
               >
                 Shared with team
@@ -701,7 +869,7 @@ export function DictionaryView() {
                   "pb-2.5 text-xs font-medium transition-colors relative flex items-center gap-1.5",
                   activeTab === "packs"
                     ? "text-stone-900 dark:text-white font-semibold"
-                    : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200"
+                    : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200",
                 )}
               >
                 <span>Vocabulary Packs</span>
@@ -747,7 +915,7 @@ export function DictionaryView() {
                         "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
                         searchOpen || searchQuery
                           ? "bg-stone-100 text-stone-900 dark:bg-stone-800 dark:text-white"
-                          : "text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300"
+                          : "text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300",
                       )}
                     >
                       <Search className="h-3.5 w-3.5" />
@@ -768,7 +936,7 @@ export function DictionaryView() {
                       title="Refresh entries"
                       className={cn(
                         "flex h-7 w-7 items-center justify-center rounded-lg text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:text-stone-500 dark:hover:bg-stone-800 dark:hover:text-stone-300 transition-colors",
-                        isRefreshing && "animate-spin text-stone-700 dark:text-stone-200"
+                        isRefreshing && "animate-spin text-stone-700 dark:text-stone-200",
                       )}
                     >
                       <RotateCw className="h-3.5 w-3.5" />
@@ -817,7 +985,8 @@ export function DictionaryView() {
                   <span>Curated Developer & Domain Vocabulary Packs</span>
                 </h3>
                 <p className="mt-1 text-xs text-stone-500 dark:text-stone-400 max-w-xl leading-relaxed">
-                  1-click install specialized vocabulary sets for web frameworks, backend systems, DevOps pipelines, legal contracts, and SaaS metrics.
+                  1-click install specialized vocabulary sets for web frameworks, backend systems,
+                  DevOps pipelines, legal contracts, and SaaS metrics.
                 </p>
               </div>
 
@@ -855,7 +1024,7 @@ export function DictionaryView() {
                               "rounded-full px-2 py-0.5 text-[10px] font-mono font-medium",
                               pack.badgeType === "pro"
                                 ? "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60"
-                                : "bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900/50"
+                                : "bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300 border border-blue-200/60 dark:border-blue-900/50",
                             )}
                           >
                             {pack.badge}
@@ -897,8 +1066,8 @@ export function DictionaryView() {
                           installed
                             ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 cursor-default"
                             : hasDomainPackAccess
-                            ? "bg-stone-900 text-white hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white shadow-xs"
-                            : "border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+                              ? "bg-stone-900 text-white hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white shadow-xs"
+                              : "border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200",
                         )}
                       >
                         {installed ? (
@@ -1014,7 +1183,8 @@ export function DictionaryView() {
             {bannerDismissed && (
               <div className="flex items-center justify-between px-1 text-xs text-stone-400 dark:text-stone-500">
                 <span className="text-[11px]">
-                  {displayedEntries.length} custom vocabulary term{displayedEntries.length === 1 ? "" : "s"}
+                  {displayedEntries.length} custom vocabulary term
+                  {displayedEntries.length === 1 ? "" : "s"}
                 </span>
                 <button
                   type="button"
@@ -1044,15 +1214,15 @@ export function DictionaryView() {
                     {searchQuery
                       ? "No terms match your search"
                       : activeTab === "team"
-                      ? "No team shared words yet"
-                      : "No words in dictionary"}
+                        ? "No team shared words yet"
+                        : "No words in dictionary"}
                   </h3>
                   <p className="mt-1 text-xs text-stone-500 dark:text-stone-400 max-w-sm">
                     {searchQuery
                       ? `Clear your query "${searchQuery}" or add this term as a new replacement.`
                       : activeTab === "team"
-                      ? "Share custom jargon and acronyms with your entire team so everyone stays aligned."
-                      : "Add your first unique term, name, or company jargon above."}
+                        ? "Share custom jargon and acronyms with your entire team so everyone stays aligned."
+                        : "Add your first unique term, name, or company jargon above."}
                   </p>
                   <button
                     type="button"
@@ -1087,9 +1257,7 @@ export function DictionaryView() {
                         <span className="text-xs font-medium text-stone-800 dark:text-stone-200 select-text truncate">
                           {term}
                         </span>
-                        {hasSparkle && (
-                          <GoldenSparkleIcon className="h-3.5 w-3.5 drop-shadow-xs" />
-                        )}
+                        {hasSparkle && <GoldenSparkleIcon className="h-3.5 w-3.5 drop-shadow-xs" />}
                         {entry.pattern !== entry.replacement && (
                           <span className="text-[10px] text-stone-400 dark:text-stone-500 font-mono">
                             (heard as: {entry.pattern})
@@ -1131,13 +1299,13 @@ export function DictionaryView() {
                             "flex h-7 w-7 items-center justify-center rounded-lg transition-colors",
                             isStarred
                               ? "text-amber-500 hover:text-amber-600"
-                              : "text-stone-400 hover:bg-stone-200/60 hover:text-amber-500 dark:hover:bg-stone-700/60"
+                              : "text-stone-400 hover:bg-stone-200/60 hover:text-amber-500 dark:hover:bg-stone-700/60",
                           )}
                         >
                           <Star
                             className={cn(
                               "h-3.5 w-3.5",
-                              isStarred && "fill-amber-400 text-amber-500"
+                              isStarred && "fill-amber-400 text-amber-500",
                             )}
                           />
                         </button>
@@ -1193,7 +1361,7 @@ export function DictionaryView() {
                 pattern: heardAs || word,
                 replacement: word,
                 match_kind: matchKind,
-              })
+              }),
             );
             setMeta((prev) => {
               const updated = {
@@ -1228,7 +1396,7 @@ export function DictionaryView() {
                 replacement: word,
                 match_kind: matchKind,
                 enabled: true,
-              })
+              }),
             );
             setMeta((prev) => {
               const updated = {
@@ -1322,9 +1490,7 @@ function WordModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in">
       <div className="w-full max-w-md overflow-hidden rounded-2xl border border-stone-200 bg-white p-6 shadow-2xl dark:border-stone-800 dark:bg-[#1c1a17]">
         <div className="flex items-center justify-between pb-4 border-b border-stone-100 dark:border-stone-800/80">
-          <h2 className="text-base font-bold text-stone-900 dark:text-white">
-            {title}
-          </h2>
+          <h2 className="text-base font-bold text-stone-900 dark:text-white">{title}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -1402,7 +1568,7 @@ function WordModal({
                   "flex items-center justify-center gap-2 rounded-xl border py-2 text-xs font-medium transition-colors",
                   scope === "personal"
                     ? "border-stone-900 bg-stone-900 text-white dark:border-white dark:bg-white dark:text-stone-900"
-                    : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
+                    : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800",
                 )}
               >
                 <User className="h-3.5 w-3.5" />
@@ -1415,7 +1581,7 @@ function WordModal({
                   "flex items-center justify-center gap-2 rounded-xl border py-2 text-xs font-medium transition-colors",
                   scope === "team"
                     ? "border-stone-900 bg-stone-900 text-white dark:border-white dark:bg-white dark:text-stone-900"
-                    : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800"
+                    : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-800",
                 )}
               >
                 <Users className="h-3.5 w-3.5" />
@@ -1434,9 +1600,24 @@ function WordModal({
               onChange={(e) => setMatchKind(e.target.value as MatchKind)}
               className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-900 focus:border-stone-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
             >
-              <option value="WORD" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">Whole word (recommended)</option>
-              <option value="WORD_CASE_SENSITIVE" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">Whole word (case sensitive)</option>
-              <option value="SUBSTRING" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">Anywhere (substring)</option>
+              <option
+                value="WORD"
+                className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100"
+              >
+                Whole word (recommended)
+              </option>
+              <option
+                value="WORD_CASE_SENSITIVE"
+                className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100"
+              >
+                Whole word (case sensitive)
+              </option>
+              <option
+                value="SUBSTRING"
+                className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100"
+              >
+                Anywhere (substring)
+              </option>
             </select>
           </div>
 
@@ -1503,9 +1684,7 @@ function DictionaryChangelogModal({
   const loadHistory = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await unwrapCommand(() =>
-        commands.listDictionaryChangelog({ limit: 100 })
-      );
+      const res = await unwrapCommand(() => commands.listDictionaryChangelog({ limit: 100 }));
       if (res.status === "ok") {
         setHistory(res.data);
       }
@@ -1526,7 +1705,7 @@ function DictionaryChangelogModal({
     setUndoingId(item.id);
     try {
       const res = await unwrapCommand(() =>
-        commands.undoDictionaryChange({ changelog_id: item.id })
+        commands.undoDictionaryChange({ changelog_id: item.id }),
       );
       if (res.status === "ok") {
         showToast(`Undid change for "${item.pattern}"`);
@@ -1615,7 +1794,8 @@ function DictionaryChangelogModal({
             </div>
           ) : history.length === 0 ? (
             <div className="py-12 text-center text-xs text-stone-400 dark:text-stone-500">
-              No dictionary changes recorded yet. Changes you make will appear here with one-click undo.
+              No dictionary changes recorded yet. Changes you make will appear here with one-click
+              undo.
             </div>
           ) : (
             history.map((item) => {
@@ -1625,8 +1805,8 @@ function DictionaryChangelogModal({
               const badgeColor = isAdded
                 ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
                 : isUpdated
-                ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
-                : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800";
+                  ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800"
+                  : "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800";
 
               const actionLabel = isAdded ? "Added" : isUpdated ? "Updated" : "Deleted";
 
@@ -1648,7 +1828,7 @@ function DictionaryChangelogModal({
                       <span
                         className={cn(
                           "rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider",
-                          badgeColor
+                          badgeColor,
                         )}
                       >
                         {actionLabel}

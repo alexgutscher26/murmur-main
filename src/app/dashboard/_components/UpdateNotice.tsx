@@ -298,11 +298,7 @@ export function UpdateNotice() {
           >
             <Sparkles className="h-3.5 w-3.5 text-emerald-500" />
             <span>What&apos;s new</span>
-            {showNotes ? (
-              <ChevronDown className="h-3 w-3" />
-            ) : (
-              <ChevronUp className="h-3 w-3" />
-            )}
+            {showNotes ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
           </button>
 
           {/* Install and restart button */}

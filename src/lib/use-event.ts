@@ -21,7 +21,10 @@ export interface TauriEventChannel<T> {
   listen: (callback: (event: { payload: T }) => void) => Promise<() => void>;
 }
 
-export function useTauriEvent<T>(channel: TauriEventChannel<T>, onEvent: (payload: T) => void): void {
+export function useTauriEvent<T>(
+  channel: TauriEventChannel<T>,
+  onEvent: (payload: T) => void,
+): void {
   const handlerRef = useRef(onEvent);
   handlerRef.current = onEvent;
 

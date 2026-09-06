@@ -29,7 +29,13 @@ import { useSettings } from "../use-settings";
 import { formatBytes } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { useTheme, type ThemeChoice } from "@/lib/theme";
-import { ErrorSurface, SettingControl, Skeleton, EmptyState, ProFeatureModal } from "@/components/global";
+import {
+  ErrorSurface,
+  SettingControl,
+  Skeleton,
+  EmptyState,
+  ProFeatureModal,
+} from "@/components/global";
 import type { SettingOption } from "@/components/global";
 import { PermissionNotice } from "./_components/PermissionNotice";
 import { ModelManager } from "./_components/ModelManager";
@@ -83,7 +89,9 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
         navigateTo("dictionary");
         return;
       }
-      const target = containerRef.current.querySelector(`[data-section="${section.toLowerCase()}"]`);
+      const target = containerRef.current.querySelector(
+        `[data-section="${section.toLowerCase()}"]`,
+      );
       if (target) {
         target.scrollIntoView({ behavior: "smooth" });
       }
@@ -114,8 +122,12 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
     const engineName = engine.data?.display_name ?? "the selected engine";
     const languageOptions: SettingOption[] = (languages.data ?? []).map((language) => ({
       value: language.code,
-      label: language.supported ? language.label : `${language.label} — not supported by ${engineName}`,
-      description: language.supported ? undefined : `${engineName} cannot transcribe ${language.label}.`,
+      label: language.supported
+        ? language.label
+        : `${language.label} — not supported by ${engineName}`,
+      description: language.supported
+        ? undefined
+        : `${engineName} cannot transcribe ${language.label}.`,
       disabled: !language.supported,
     }));
     return { INPUT_DEVICES: deviceOptions, MODELS: modelOptions, LANGUAGES: languageOptions };
@@ -164,7 +176,7 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
         def.label.toLowerCase().includes(query) ||
         def.description.toLowerCase().includes(query) ||
         def.key.toLowerCase().includes(query) ||
-        SECTION_LABEL[def.section]?.toLowerCase().includes(query)
+        SECTION_LABEL[def.section]?.toLowerCase().includes(query),
     );
   }, [allDefs, searchQuery]);
 
@@ -290,10 +302,12 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
 
           {/* Per-App Profiles Section */}
           <section data-section="profiles" className="flex flex-col gap-1 pt-4">
-            <h2 className="text-base font-semibold text-stone-900 dark:text-white">Per-app profiles</h2>
+            <h2 className="text-base font-semibold text-stone-900 dark:text-white">
+              Per-app profiles
+            </h2>
             <p className="text-xs text-stone-500 dark:text-stone-400">
-              Settings that apply only while a particular app is in front. Anything a profile does not override keeps
-              following the global setting.
+              Settings that apply only while a particular app is in front. Anything a profile does
+              not override keeps following the global setting.
             </p>
             <AppProfiles
               defs={allDefs}
@@ -389,7 +403,9 @@ function SettingsSection({
       {title === "General" && (
         <div className="flex items-center justify-between py-3 border-b border-stone-200/60 dark:border-stone-800/80">
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Interface theme</p>
+            <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+              Interface theme
+            </p>
             <p className="text-xs text-stone-500 dark:text-stone-400">
               Follow system appearance or force light or dark mode.
             </p>
@@ -410,7 +426,7 @@ function SettingsSection({
                   "flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all",
                   theme === opt.id
                     ? "bg-white text-stone-900 shadow-xs dark:bg-stone-800 dark:text-white"
-                    : "text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white"
+                    : "text-stone-500 hover:text-stone-900 dark:text-stone-400 dark:hover:text-white",
                 )}
               >
                 {opt.icon}
@@ -456,9 +472,12 @@ function SettingsSection({
         <>
           <div className="flex items-center justify-between py-3 border-b border-stone-200/60 dark:border-stone-800/80">
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">Calibrate typing speed</p>
+              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                Calibrate typing speed
+              </p>
               <p className="text-xs text-stone-500 dark:text-stone-400">
-                Measure your speech pace or take a typing test to accurately benchmark your baseline speed.
+                Measure your speech pace or take a typing test to accurately benchmark your baseline
+                speed.
               </p>
             </div>
             <button
@@ -471,7 +490,9 @@ function SettingsSection({
           </div>
           <div className="flex items-center justify-between py-3 border-b border-stone-200/60 dark:border-stone-800/80">
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">First-run setup</p>
+              <p className="text-sm font-medium text-stone-900 dark:text-stone-100">
+                First-run setup
+              </p>
               <p className="text-xs text-stone-500 dark:text-stone-400">
                 Redo microphone permissions, audio calibration, and the dictation hotkey test.
               </p>
@@ -507,7 +528,9 @@ function SettingsSection({
             aria-expanded={showAdvanced}
             className="flex w-fit items-center gap-1 py-2 text-label text-text-secondary transition-colors hover:text-text-primary"
           >
-            <ChevronDown className={cn("size-4 transition-transform", showAdvanced && "rotate-180")} />
+            <ChevronDown
+              className={cn("size-4 transition-transform", showAdvanced && "rotate-180")}
+            />
             Advanced
           </button>
           {showAdvanced

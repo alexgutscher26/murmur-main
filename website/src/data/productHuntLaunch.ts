@@ -54,18 +54,13 @@ export const PRODUCT_HUNT_LAUNCH: ProductHuntListing = {
   tagline: "Fast, private on-device voice dictation for macOS & Windows",
   description:
     "Murmur turns speech into clean, formatted text in any desktop app—running 100% locally on your GPU via whisper.cpp. No cloud audio uploads, no accounts, and sub-180ms latency. Dictate code, notes, and emails with complete privacy.",
-  topics: [
-    "Productivity",
-    "Open Source",
-    "Artificial Intelligence",
-    "Developer Tools",
-    "Privacy",
-  ],
+  topics: ["Productivity", "Open Source", "Artificial Intelligence", "Developer Tools", "Privacy"],
   pricingType: "Free + Paid Options",
   couponCode: {
     code: "HUNTER25",
     discountPercent: 25,
-    description: "25% off Murmur Core Lifetime perpetual license ($49 → $36.75) and Pro Annual ($49/yr → $36.75/yr)",
+    description:
+      "25% off Murmur Core Lifetime perpetual license ($49 → $36.75) and Pro Annual ($49/yr → $36.75/yr)",
     targetTiers: ["Core Lifetime", "Pro Annual"],
   },
   maker: {
@@ -82,7 +77,8 @@ export const PRODUCT_HUNT_LAUNCH: ProductHuntListing = {
     {
       id: "screenshot-1-floating-pill",
       title: "Universal Floating Pill & Real-Time Waveform",
-      caption: "Hold ⌥ Space / Alt+Space anywhere. Dictate naturally into VS Code, Notion, Slack, or Obsidian with sub-180ms text insertion.",
+      caption:
+        "Hold ⌥ Space / Alt+Space anywhere. Dictate naturally into VS Code, Notion, Slack, or Obsidian with sub-180ms text insertion.",
       dimensions: "1270x760 (16:10 aspect ratio)",
       visualCallouts: [
         "Dynamic audio waveform matching vocal cadence",
@@ -94,7 +90,8 @@ export const PRODUCT_HUNT_LAUNCH: ProductHuntListing = {
     {
       id: "screenshot-2-hardware-model-selector",
       title: "Local Hardware Acceleration & Air-Gap Switch",
-      caption: "Run quantized OpenAI Whisper models (Base, Small, Medium) locally via Apple Metal GPU or Windows DirectML with zero telemetry.",
+      caption:
+        "Run quantized OpenAI Whisper models (Base, Small, Medium) locally via Apple Metal GPU or Windows DirectML with zero telemetry.",
       dimensions: "1270x760 (16:10 aspect ratio)",
       visualCallouts: [
         "1-click model download and permanent local storage",
@@ -106,7 +103,8 @@ export const PRODUCT_HUNT_LAUNCH: ProductHuntListing = {
     {
       id: "screenshot-3-context-dictionary",
       title: "App-Aware Context Formatting & Custom Vocabulary",
-      caption: "Automatic casing and punctuation rules for IDEs, documents, and chat apps, paired with a custom phonetic dictionary for code acronyms.",
+      caption:
+        "Automatic casing and punctuation rules for IDEs, documents, and chat apps, paired with a custom phonetic dictionary for code acronyms.",
       dimensions: "1270x760 (16:10 aspect ratio)",
       visualCallouts: [
         "Code Mode: camelCase, snake_case, and markdown backticks",

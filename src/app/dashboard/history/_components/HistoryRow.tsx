@@ -60,7 +60,8 @@ export function HistoryRow({ session, selectable, selected, onToggleSelect }: Hi
   // an ORPHANED session was RECOVERED — recovery finished transcribing it and
   // it may well have text — so telling the user it did not finish would
   // contradict the transcript sitting on the line above.
-  const reason = session.error_message ?? (session.outcome === "FAILED" ? "The recording did not finish" : null);
+  const reason =
+    session.error_message ?? (session.outcome === "FAILED" ? "The recording did not finish" : null);
 
   const meta = [
     session.duration_ms !== null ? formatClock(session.duration_ms) : null,
@@ -95,7 +96,9 @@ export function HistoryRow({ session, selectable, selected, onToggleSelect }: Hi
 
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <div className="flex min-w-0 items-center gap-2">
-          <span className={cn("truncate text-body", line ? "text-text-primary" : "text-text-tertiary")}>
+          <span
+            className={cn("truncate text-body", line ? "text-text-primary" : "text-text-tertiary")}
+          >
             {line ?? "No transcript"}
           </span>
           {session.outcome !== "DELIVERED" ? (
@@ -109,7 +112,9 @@ export function HistoryRow({ session, selectable, selected, onToggleSelect }: Hi
             metadata and is what docs/04 §9 calls "what was lost" — a long failure
             message must never be the thing that pushes it off the row. */}
         <span className="flex min-w-0 items-baseline gap-1 text-caption text-text-tertiary">
-          {reason ? <span className={cn("truncate", OUTCOME_TONE[session.outcome])}>{reason}</span> : null}
+          {reason ? (
+            <span className={cn("truncate", OUTCOME_TONE[session.outcome])}>{reason}</span>
+          ) : null}
           {meta.length > 0 ? (
             <span className="shrink-0">
               {reason ? "· " : null}

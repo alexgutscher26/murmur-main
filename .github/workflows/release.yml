@@ -238,7 +238,6 @@ jobs:
           # able to build the app; only a release needs to be signable.
           args: --target universal-apple-darwin --config '{"bundle":{"createUpdaterArtifacts":true}}'
 
-
       # A bundle whose signature does not VERIFY is not a signable failure —
       # it builds, it launches, and macOS quietly refuses to trust it. That is
       # not hypothetical: every build for a day signed only the inner

@@ -41,7 +41,7 @@ Most users will find a permanently-lit mic indicator unacceptable in a backgroun
 
 **Resolution: make it a setting, and do not default to always-on.**
 
-- **Default — On-demand.** The stream opens when the hotkey fires. CoreAudio device-open latency is roughly 20–80ms **[VERIFY on the target machine]**. Mitigate by opening the stream on key *down* and starting the FSM immediately, so the open overlaps with the user's reaction time before they actually begin speaking. In practice people do not start talking for ~200ms after pressing a key, which covers it.
+- **Default — On-demand.** The stream opens when the hotkey fires. CoreAudio device-open latency is roughly 20–80ms **[VERIFY on the target machine]**. Mitigate by opening the stream on key _down_ and starting the FSM immediately, so the open overlaps with the user's reaction time before they actually begin speaking. In practice people do not start talking for ~200ms after pressing a key, which covers it.
 - **Optional — Instant mode.** Keeps the stream warm and gives a true pre-roll. The settings toggle must say plainly that the macOS microphone indicator stays lit. Some users will happily take that trade; it must be their choice.
 
 Measure the real device-open latency in phase 1 and record it in this file. If it lands under ~50ms, on-demand is strictly correct and Instant mode is a power-user nicety. If it is over 150ms, on-demand will clip syllables and Instant mode needs to be offered much more prominently during onboarding.
@@ -56,11 +56,11 @@ Whisper's encoder always processes a **30-second mel spectrogram**. whisper.cpp 
 
 > **A 1-second chunk costs almost as much to encode as a 25-second chunk.**
 
-So the instinct — "chunk small for low latency" — makes the app dramatically *slower*, because you pay a near-full encoder pass per chunk. Chunking at 1s would be roughly 10× the total compute of chunking at 10s.
+So the instinct — "chunk small for low latency" — makes the app dramatically _slower_, because you pay a near-full encoder pass per chunk. Chunking at 1s would be roughly 10× the total compute of chunking at 10s.
 
 **Two things fix this, and both are required:**
 
-**(a) Chunk at 8–15 seconds, at VAD silence boundaries.** Not at 1s. The chunks are transcribed in the background while the user keeps talking, so their individual latency is invisible. Only the *tail* matters.
+**(a) Chunk at 8–15 seconds, at VAD silence boundaries.** Not at 1s. The chunks are transcribed in the background while the user keeps talking, so their individual latency is invisible. Only the _tail_ matters.
 
 **(b) Use `audio_ctx` to shrink the encoder for the tail.** `whisper_full_params.audio_ctx` truncates the encoder's context window. The default 1500 corresponds to the full 30 seconds. Setting it proportional to the actual audio length gives a large, roughly linear speedup — this is the same trick whisper.cpp's own `stream` example uses. Scale it to the fragment duration with headroom:
 
@@ -74,18 +74,18 @@ audio_ctx ≈ clamp(ceil(duration_seconds / 30 * 1500) + 128, 256, 1500)
 
 ### 2.2 Whisper parameters — get these wrong and it is slow, wrong, or both
 
-| Parameter | Value | Why |
-|---|---|---|
-| `translate` | **`false`** | Defaults can bite here. If true, every language is translated to English — which silently destroys the entire multilingual requirement. |
-| `language` | pinned code, or `auto` | Auto-detect runs on the first window and costs a beat. Pinning is faster and more accurate. |
-| `no_context` | **`true`** | Between chunks. Carrying decoder context across chunk boundaries causes repetition loops and hallucination drift. This is the #1 cause of "it repeated the same sentence 40 times". |
-| `temperature` | `0.0` | Deterministic. |
-| `temperature_inc` | **`0.0`** | **Critical for latency.** By default, whisper retries failed decodes at progressively higher temperatures — up to 6 extra passes. That is a latency bomb: a normal 200ms decode becomes 1.4s with no warning. Disabling it means an occasional lower-quality segment instead of an occasional catastrophic stall. Correct trade for this product. |
-| `suppress_blank` | `true` | Reduces empty-output artifacts. |
-| `no_timestamps` | `true` | We do not use word timings. Skipping them is free speed. |
-| `n_threads` | physical cores − 2 | Leave headroom for the UI and audio threads. Do **not** use logical core count. |
-| `print_progress` / `print_realtime` / `print_special` / `print_timestamps` | `false` | Otherwise whisper.cpp writes to stdout on every call. |
-| `no_speech_thold` | ~0.6 | Works with the VAD gate against hallucination. |
+| Parameter                                                                  | Value                  | Why                                                                                                                                                                                                                                                                                                                                               |
+| -------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `translate`                                                                | **`false`**            | Defaults can bite here. If true, every language is translated to English — which silently destroys the entire multilingual requirement.                                                                                                                                                                                                           |
+| `language`                                                                 | pinned code, or `auto` | Auto-detect runs on the first window and costs a beat. Pinning is faster and more accurate.                                                                                                                                                                                                                                                       |
+| `no_context`                                                               | **`true`**             | Between chunks. Carrying decoder context across chunk boundaries causes repetition loops and hallucination drift. This is the #1 cause of "it repeated the same sentence 40 times".                                                                                                                                                               |
+| `temperature`                                                              | `0.0`                  | Deterministic.                                                                                                                                                                                                                                                                                                                                    |
+| `temperature_inc`                                                          | **`0.0`**              | **Critical for latency.** By default, whisper retries failed decodes at progressively higher temperatures — up to 6 extra passes. That is a latency bomb: a normal 200ms decode becomes 1.4s with no warning. Disabling it means an occasional lower-quality segment instead of an occasional catastrophic stall. Correct trade for this product. |
+| `suppress_blank`                                                           | `true`                 | Reduces empty-output artifacts.                                                                                                                                                                                                                                                                                                                   |
+| `no_timestamps`                                                            | `true`                 | We do not use word timings. Skipping them is free speed.                                                                                                                                                                                                                                                                                          |
+| `n_threads`                                                                | physical cores − 2     | Leave headroom for the UI and audio threads. Do **not** use logical core count.                                                                                                                                                                                                                                                                   |
+| `print_progress` / `print_realtime` / `print_special` / `print_timestamps` | `false`                | Otherwise whisper.cpp writes to stdout on every call.                                                                                                                                                                                                                                                                                             |
+| `no_speech_thold`                                                          | ~0.6                   | Works with the VAD gate against hallucination.                                                                                                                                                                                                                                                                                                    |
 
 ### `no_timestamps` — the table above was WRONG, and the fix is `false`
 
@@ -95,10 +95,10 @@ half-true — on real speech it is both slower and catastrophically wrong.
 
 Same utterance, same machine:
 
-| `no_timestamps` | Tail decode | Output |
-|---|---|---|
-| `true` | 340 ms | **1019 characters — the sentence repeated 24 times** |
-| `false` | **113 ms** | 41 characters, correct |
+| `no_timestamps` | Tail decode | Output                                               |
+| --------------- | ----------- | ---------------------------------------------------- |
+| `true`          | 340 ms      | **1019 characters — the sentence repeated 24 times** |
+| `false`         | **113 ms**  | 41 characters, correct                               |
 
 **Why**, and this is the part worth carrying to any other whisper.cpp project:
 the timestamp tokens are how the decoder knows when to STOP. Remove them and it
@@ -122,6 +122,7 @@ Whisper accepts an initial prompt (up to ~224 tokens) that biases decoding towar
 This is far better than replacement alone, because replacement cannot fix "clod code" → "Claude Code" if the model heard something that does not match the pattern at all.
 
 **Implement both layers:**
+
 1. Dictionary terms injected as `initial_prompt` → improves recognition.
 2. Post-hoc replacement table → catches what the prompt missed.
 
@@ -132,8 +133,9 @@ Keep the prompt under the token budget — prioritize the most recently used ter
 Whisper reliably invents text when fed silence or noise. The outputs are well-known and repetitive: "Thank you.", "Thanks for watching!", "Please subscribe", subtitle-credit strings, and their equivalents in other languages (this is training-data contamination from subtitled video).
 
 **Three defenses, all needed:**
+
 1. **VAD gate.** Never send a chunk with no detected speech to the model at all. This eliminates most of it.
-2. **Blocklist.** A per-language list of known hallucination phrases, dropped when they are the *entire* segment content. Never drop them mid-sentence — "thank you" is a real thing people say.
+2. **Blocklist.** A per-language list of known hallucination phrases, dropped when they are the _entire_ segment content. Never drop them mid-sentence — "thank you" is a real thing people say.
 3. **Thresholds.** A per-segment `no_speech_probability` filter, applied by us on the returned segments.
 
 **Correction, measured during the build — `entropy_thold` is inert here.** This
@@ -167,11 +169,11 @@ Enable `whisper-rs` with both the `metal` and `coreml` features. If the Core ML 
 
 Base URL: `https://huggingface.co/ggerganov/whisper.cpp/resolve/main/`
 
-| File | Approx size | Role |
-|---|---|---|
-| `ggml-large-v3-turbo-q5_0.bin` | ~574MB | Default model |
-| `ggml-large-v3-turbo-encoder.mlmodelc.zip` | ~?MB | Core ML encoder for the above |
-| `ggml-small-q5_1.bin` | ~190MB | Low-RAM alternative |
+| File                                       | Approx size | Role                          |
+| ------------------------------------------ | ----------- | ----------------------------- |
+| `ggml-large-v3-turbo-q5_0.bin`             | ~574MB      | Default model                 |
+| `ggml-large-v3-turbo-encoder.mlmodelc.zip` | ~?MB        | Core ML encoder for the above |
+| `ggml-small-q5_1.bin`                      | ~190MB      | Low-RAM alternative           |
 
 Downloads must be **resumable** (HTTP range requests), **checksum-verified** before use, and written to a temp path then atomically renamed. A half-written model file that passes an existence check is a support nightmare — verify by hash, never by presence.
 
@@ -185,7 +187,7 @@ When any application has secure text entry enabled — a password field in 1Pass
 
 The user experiences this as "sometimes the paste just doesn't work" and will report it as a random bug.
 
-**Handle it explicitly:** call `IsSecureEventInputEnabled()` before attempting injection. If true, skip the keystroke, deliver to the clipboard only, and tell the user why: *"Text copied — another app is blocking keystrokes (a password field is focused somewhere)."* One line of code, one class of bug report eliminated.
+**Handle it explicitly:** call `IsSecureEventInputEnabled()` before attempting injection. If true, skip the keystroke, deliver to the clipboard only, and tell the user why: _"Text copied — another app is blocking keystrokes (a password field is focused somewhere)."_ One line of code, one class of bug report eliminated.
 
 ### 3.2 Paste timing — two races, both real
 
@@ -200,6 +202,7 @@ restore previous clipboard
 Both delays are required. The exact values need measuring **[VERIFY]** — they vary by target app, and Electron apps are the slowest.
 
 `CGEventPost` details that matter:
+
 - Set `CGEventFlags::CGEventFlagCommand` on **both** the keydown and the keyup event. Setting it only on keydown works in some apps and not others.
 - Use `CGEventTapLocation::HID` (not `Session` or `AnnotatedSession`) for the widest compatibility.
 - The keycode for `V` is `9`.
@@ -261,11 +264,11 @@ The app should not appear in the Dock or the ⌘-Tab switcher. Set `LSUIElement`
 
 Three thread domains, and they must not blur:
 
-| Domain | What runs there | Rule |
-|---|---|---|
-| CoreAudio realtime thread | cpal input callback | Copy into ring buffer, nothing else (§1.1) |
-| ASR worker (dedicated `std::thread`) | whisper inference | **Never** on tokio. A 200ms blocking inference on a tokio worker stalls every IPC command. |
-| Tokio runtime | IPC commands, DB, events | Never blocks |
+| Domain                               | What runs there          | Rule                                                                                       |
+| ------------------------------------ | ------------------------ | ------------------------------------------------------------------------------------------ |
+| CoreAudio realtime thread            | cpal input callback      | Copy into ring buffer, nothing else (§1.1)                                                 |
+| ASR worker (dedicated `std::thread`) | whisper inference        | **Never** on tokio. A 200ms blocking inference on a tokio worker stalls every IPC command. |
+| Tokio runtime                        | IPC commands, DB, events | Never blocks                                                                               |
 
 **Own the session state in an actor, not a mutex.** A single task owns the FSM and receives commands over a bounded `mpsc` channel; everything else sends messages. `Arc<Mutex<SessionState>>` shared across the audio drain, the ASR worker, the hotkey handler and the IPC layer is how you get a deadlock at 2am that reproduces once a week. The actor pattern makes that structurally impossible and costs nothing here.
 
@@ -289,7 +292,7 @@ Use **bounded** channels everywhere. An unbounded queue in front of an ASR worke
 - **Rule pipeline: table tests.** Every enhancement rule gets input/output pairs. This is the cheapest, highest-value test suite in the project — rules are pure functions.
 - **FSM: exhaustive transition tests**, including "kill the process in state X, relaunch, assert recovery".
 - **Latency benchmark** over the fixed corpus, printing p50/p95 per stage. Runs in CI, fails on a 15% p95 regression.
-- **Do not write tests for whisper's accuracy itself.** Test *your* pipeline. Model accuracy is the model's business.
+- **Do not write tests for whisper's accuracy itself.** Test _your_ pipeline. Model accuracy is the model's business.
 
 ---
 
@@ -310,23 +313,23 @@ Measured on the build machine: **M4 Max, macOS 15.7.3, `large-v3-turbo-q5_0`, Me
 
 **2. Tail-decode time with reduced `audio_ctx` — ANSWERED. The trick works, and it is worth 5.5×.**
 
-| `audio_ctx` | Tail decode |
-|---|---|
-| 256 (scaled to the fragment) | **53 ms** |
-| 1500 (full 30s window) | 294 ms |
+| `audio_ctx`                  | Tail decode |
+| ---------------------------- | ----------- |
+| 256 (scaled to the fragment) | **53 ms**   |
+| 1500 (full 30s window)       | 294 ms      |
 
 Measured realtime factor: **34.8×**. Both numbers assume the language is pinned — see below, because that turns out to matter more than `audio_ctx` does.
 
 **2b. Pin the language before the tail. This is the single biggest latency finding.**
 
-| Tail decode, after an interior chunk | |
-|---|---|
-| Language pinned | **54 ms** |
-| `LanguageHint::Auto` | **333 ms** |
+| Tail decode, after an interior chunk |            |
+| ------------------------------------ | ---------- |
+| Language pinned                      | **54 ms**  |
+| `LanguageHint::Auto`                 | **333 ms** |
 
 `Auto` on its own misses the p50 < 300 ms budget on the tail decode alone — and `Auto` is the `Default` impl, so the naive wiring is the slow one.
 
-**Cause**, and it is not guessable: whisper.cpp assigns `state->exp_n_audio_ctx` **after** it runs the language-detection encoder pass. So detection reuses the *previous* call's `audio_ctx` — and after a full-context interior chunk, that is 1500. The tail pays a full 30-second encode purely to work out what language it is in, discarding the entire benefit above.
+**Cause**, and it is not guessable: whisper.cpp assigns `state->exp_n_audio_ctx` **after** it runs the language-detection encoder pass. So detection reuses the _previous_ call's `audio_ctx` — and after a full-context interior chunk, that is 1500. The tail pays a full 30-second encode purely to work out what language it is in, discarding the entire benefit above.
 
 **Therefore: detect once on the first interior chunk, then pin for the rest of the session, including the tail.** `TranscriptSegment.language` already carries the detected code, so this costs nothing but the sequencing. Auto-detect stays available; it just stops being paid for on the critical path.
 
@@ -338,7 +341,7 @@ Not "not worth it" — actively harmful, for a reason that has nothing to do wit
 - Falling back to full context to use it puts the tail at **469 ms**, versus 53 ms on Metal alone.
 - And the encoder is a **1.17 GB** download on top of the model.
 
-It stays behind an off-by-default cargo feature. Anyone who turns it on gets a slower app and a silent failure mode, so the flag exists to be *findable*, not to be used.
+It stays behind an off-by-default cargo feature. Anyone who turns it on gets a slower app and a silent failure mode, so the flag exists to be _findable_, not to be used.
 
 **1. CoreAudio device-open latency** — still to measure, and it needs a human. It is measurable in-process (the `DeviceOpen` stage is already timed into `session_metrics`), so the honest way to answer it is to use the app for a day and read the number off the dashboard's latency panel rather than to synthesise it. Drives the §1.4 on-demand vs Instant default: under ~50 ms on-demand is strictly correct; over ~150 ms and Instant mode needs to be offered prominently during onboarding.
 

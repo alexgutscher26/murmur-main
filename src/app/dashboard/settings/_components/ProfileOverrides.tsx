@@ -77,8 +77,13 @@ export function ProfileOverrides({
         <div key={def.key} className="flex items-center gap-2">
           <SettingControl
             className="flex-1"
-            setting={toControlSetting(def, profile.overrides[def.key], dynamic, engine, permissions, (value) =>
-              setOverride(def.key, value),
+            setting={toControlSetting(
+              def,
+              profile.overrides[def.key],
+              dynamic,
+              engine,
+              permissions,
+              (value) => setOverride(def.key, value),
             )}
           />
           <button
@@ -105,7 +110,10 @@ export function ProfileOverrides({
           onChange={(event) => addOverride(event.target.value)}
           className="hairline h-8 w-fit rounded-input bg-sunken px-2 text-body text-stone-900 dark:text-stone-100 dark:bg-stone-800"
         >
-          <option value="" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">
+          <option
+            value=""
+            className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100"
+          >
             Add an override…
           </option>
           {available.map((def) => (

@@ -39,7 +39,10 @@ export function DownloadSection() {
   ];
 
   return (
-    <section id="download" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section
+      id="download"
+      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+    >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
@@ -51,15 +54,14 @@ export function DownloadSection() {
         <div className="text-center max-w-2xl mx-auto mb-14">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-4 transition-transform hover:scale-[1.02] cursor-default">
             <Download className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="text-xs font-mono font-medium text-neutral-800">
-              Ready to Dictate
-            </span>
+            <span className="text-xs font-mono font-medium text-neutral-800">Ready to Dictate</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
             Download Murmur. Free forever.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            No credit card, account, or cloud telemetry required. Installs and runs in under 60 seconds.
+            No credit card, account, or cloud telemetry required. Installs and runs in under 60
+            seconds.
           </p>
         </div>
 
@@ -86,7 +88,8 @@ export function DownloadSection() {
                 macOS 13.0 or later (Apple Silicon & Intel)
               </span>
               <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mb-6">
-                Native Metal GPU acceleration on Apple Silicon (M1, M2, M3, M4) and Intel Macs. Runs quietly in your menu bar.
+                Native Metal GPU acceleration on Apple Silicon (M1, M2, M3, M4) and Intel Macs. Runs
+                quietly in your menu bar.
               </p>
             </div>
 
@@ -131,7 +134,8 @@ export function DownloadSection() {
                 Windows 10 & 11 (64-bit)
               </span>
               <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mb-6">
-                Native DirectML & CUDA acceleration for NVIDIA, AMD, and Intel GPUs. Operates seamlessly in your system tray.
+                Native DirectML & CUDA acceleration for NVIDIA, AMD, and Intel GPUs. Operates
+                seamlessly in your system tray.
               </p>
             </div>
 
@@ -171,9 +175,7 @@ export function DownloadSection() {
                 key={idx}
                 className="p-3.5 rounded-xl bg-white border border-neutral-200/80 shadow-sm flex flex-col justify-between gap-2.5"
               >
-                <span className="text-[11px] font-mono text-neutral-500">
-                  {item.platform}
-                </span>
+                <span className="text-[11px] font-mono text-neutral-500">{item.platform}</span>
                 <div className="flex items-center justify-between gap-2 font-mono text-xs text-neutral-900 bg-neutral-100/80 p-2.5 rounded-lg border border-neutral-200/80">
                   <span className="truncate">{item.command}</span>
                   <button

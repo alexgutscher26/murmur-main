@@ -246,7 +246,16 @@ export function DataList<T>({
           break;
       }
     },
-    [clampedActive, filtered, height, moveActive, onActivate, query, setQuery, window_.viewportHeight],
+    [
+      clampedActive,
+      filtered,
+      height,
+      moveActive,
+      onActivate,
+      query,
+      setQuery,
+      window_.viewportHeight,
+    ],
   );
 
   const rows: ReactNode[] = [];

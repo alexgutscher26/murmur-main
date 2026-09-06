@@ -3,7 +3,7 @@
 # 🎙️ Murmur
 
 **Instant, 100% private, local speech-to-text for macOS & Windows.**  
-*Press a hotkey, speak naturally, release — your words are transcribed and pasted before you can look up.*
+_Press a hotkey, speak naturally, release — your words are transcribed and pasted before you can look up._
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/alexgutscher26/murmur)
@@ -54,15 +54,15 @@ No accounts, no monthly cloud subscriptions, no word limits, and **zero audio ev
 
 ## 📊 Why Murmur? (Comparison)
 
-| Feature | Murmur | Cloud Dictation (Wispr Flow, etc.) | MacWhisper / Superwhisper |
-| :--- | :---: | :---: | :---: |
-| **Privacy / Audio Egress** | **100% On-Device (Zero Egress)** | Audio sent to cloud APIs | Often on-device, but closed-source |
-| **Cross-Platform** | **macOS & Windows** | Web / Limited desktop | Mostly macOS only |
-| **Inference Latency** | **Streaming (`p50 < 300ms`)** | Network lag (~1.5s – 3.0s) | Post-speech batch decode (~1s–5s) |
-| **Price** | **Free & Open Source (MIT)** | $10 – $20 / month | $30+ paid license or subscription |
-| **Audio / Word Limits** | **Unlimited** | Tiered quotas / monthly caps | Model-gated |
-| **Clipboard Restoration** | **Yes (Preserved)** | Often overwrites clipboard | Inconsistent |
-| **Extensible Architecture** | **Tauri v2 + Rust + React 19** | Closed SaaS | Proprietary closed binary |
+| Feature                     |              Murmur              | Cloud Dictation (Wispr Flow, etc.) |     MacWhisper / Superwhisper      |
+| :-------------------------- | :------------------------------: | :--------------------------------: | :--------------------------------: |
+| **Privacy / Audio Egress**  | **100% On-Device (Zero Egress)** |      Audio sent to cloud APIs      | Often on-device, but closed-source |
+| **Cross-Platform**          |       **macOS & Windows**        |       Web / Limited desktop        |         Mostly macOS only          |
+| **Inference Latency**       |  **Streaming (`p50 < 300ms`)**   |     Network lag (~1.5s – 3.0s)     | Post-speech batch decode (~1s–5s)  |
+| **Price**                   |   **Free & Open Source (MIT)**   |         $10 – $20 / month          | $30+ paid license or subscription  |
+| **Audio / Word Limits**     |          **Unlimited**           |    Tiered quotas / monthly caps    |            Model-gated             |
+| **Clipboard Restoration**   |       **Yes (Preserved)**        |     Often overwrites clipboard     |            Inconsistent            |
+| **Extensible Architecture** |  **Tauri v2 + Rust + React 19**  |            Closed SaaS             |     Proprietary closed binary      |
 
 ---
 
@@ -93,6 +93,7 @@ flowchart LR
 ```
 
 ### Core Architecture Highlights
+
 1. **The Registry (`src-tauri/src/registry/`)**: Single source of truth defining every capability, setting, hotkey, permission, and metric.
 2. **The Command Factory (`src-tauri/src/ipc/factory.rs`)**: Single entry point for all IPC commands, enforcing validation schemas, permission preflights, reentrancy guards, error mapping, and tracing.
 3. **Type-Safe IPC (`tauri-specta`)**: Rust types automatically generate `src/lib/bindings.ts` on test/build. No manual DTO sync or hand-written TypeScript IPC wrappers.
@@ -104,11 +105,13 @@ flowchart LR
 ### Windows
 
 #### Option A: Windows Package Manager (WinGet)
+
 ```powershell
 winget install WebProdigies.Murmur
 ```
 
 #### Option B: Standalone Installer
+
 Download the latest `.msi` or `.exe` installer from [GitHub Releases](https://github.com/alexgutscher26/murmur/releases).
 
 ---
@@ -124,6 +127,7 @@ Download the latest `.msi` or `.exe` installer from [GitHub Releases](https://gi
 ## 🛠️ Developer Guide
 
 ### System Requirements
+
 - **macOS**: macOS 13 (Ventura) or later (Apple Silicon M-series or Intel x86_64).
 - **Windows**: Windows 10/11 (64-bit).
 - **Tooling**:
@@ -203,10 +207,12 @@ pnpm tauri build
 ```
 
 The resulting binaries will be placed in `src-tauri/target/release/bundle/`:
+
 - **macOS**: `.app` and `.dmg`
 - **Windows**: `.msi` and `.exe`
 
 #### Signing Updater Archives (Optional)
+
 To sign release updater archives with your private key:
 
 ```bash
@@ -219,20 +225,22 @@ TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" \
 
 ## 🔒 Permissions & Privacy Model
 
-| Permission | Why It's Needed | Fallback if Denied |
-| :--- | :--- | :--- |
-| **Microphone** | Audio capture during dictation. | Dictation cannot operate. (Required) |
+| Permission        | Why It's Needed                                                 | Fallback if Denied                                                 |
+| :---------------- | :-------------------------------------------------------------- | :----------------------------------------------------------------- |
+| **Microphone**    | Audio capture during dictation.                                 | Dictation cannot operate. (Required)                               |
 | **Accessibility** | Simulates `⌘V` / `Ctrl+V` to paste text into the active window. | Text is cleanly copied to the system clipboard for manual pasting. |
 
 > [!NOTE]  
 > **macOS Code Signing & Accessibility:**  
-> macOS binds Accessibility permissions to the app's bundle identifier *and* its cryptographic signature. In development, ad-hoc signatures change on rebuild, causing macOS to occasionally require re-granting Accessibility. This does not occur in distributed release builds. Refer to `docs/03 §3.4` for details on configuring a local development certificate.
+> macOS binds Accessibility permissions to the app's bundle identifier _and_ its cryptographic signature. In development, ad-hoc signatures change on rebuild, causing macOS to occasionally require re-granting Accessibility. This does not occur in distributed release builds. Refer to `docs/03 §3.4` for details on configuring a local development certificate.
 
 ### Zero Network Egress Guarantee
+
 Murmur does **not** collect telemetry, user recordings, or text snippets. The only optional network interactions are:
+
 1. One-time GGML model download during onboarding or when switching models in Settings.
 2. Optional automated check for app updates via GitHub Releases.  
-Both can be audited, monitored, or disabled entirely.
+   Both can be audited, monitored, or disabled entirely.
 
 ---
 
@@ -244,19 +252,23 @@ Showcase your local, private AI dictation workflow in your open-source projects,
 
 ```markdown
 <!-- Flat Square Badge -->
+
 [![Dictated with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://github.com/alexgutscher26/murmur)
 
 <!-- 100% Local Privacy Badge -->
+
 [![100% Local Dictation](https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white)](https://github.com/alexgutscher26/murmur)
 ```
 
 ### Pull Request & Issue Footer
+
 ```markdown
 ---
+
 _Dictated privately on-device with [Murmur](https://github.com/alexgutscher26/murmur)_
 ```
 
-*(For full badge options, HTML embeds, and voice-triggered templates, see [`docs/badges.md`](docs/badges.md).)*
+_(For full badge options, HTML embeds, and voice-triggered templates, see [`docs/badges.md`](docs/badges.md).)_
 
 ---
 

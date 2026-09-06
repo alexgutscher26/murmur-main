@@ -84,7 +84,9 @@ export function HotkeyStep({
   return (
     <div className="flex flex-col items-center gap-3">
       {hotkey ? <Keycap keys={glyphsForBinding(hotkey)} /> : null}
-      <p className={alarming ? "text-body text-danger" : "text-body text-text-secondary"}>{status}</p>
+      <p className={alarming ? "text-body text-danger" : "text-body text-text-secondary"}>
+        {status}
+      </p>
     </div>
   );
 }

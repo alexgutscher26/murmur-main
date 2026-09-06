@@ -80,14 +80,7 @@ export function MicIndicator({ tone, recording = false, className }: MicIndicato
         className="size-3.5 origin-center transition-transform duration-75 ease-out"
       >
         {/* Core Microphone Body */}
-        <rect
-          x="6"
-          y="2"
-          width="4"
-          height="7"
-          rx="2"
-          fill="currentColor"
-        />
+        <rect x="6" y="2" width="4" height="7" rx="2" fill="currentColor" />
         {/* Mic Base Cradle */}
         <path
           d="M4 6.5C4 8.70914 5.79086 10.5 8 10.5C10.2091 10.5 12 8.70914 12 6.5"
@@ -96,12 +89,7 @@ export function MicIndicator({ tone, recording = false, className }: MicIndicato
           strokeLinecap="round"
         />
         {/* Mic Stem */}
-        <path
-          d="M8 10.5V13"
-          stroke="currentColor"
-          strokeWidth="1.25"
-          strokeLinecap="round"
-        />
+        <path d="M8 10.5V13" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
         {/* Left Audio-Reactive Soundwave Arc */}
         {recording && (
           <path

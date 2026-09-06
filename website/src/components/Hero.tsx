@@ -137,10 +137,14 @@ export function Hero() {
   const [selectedApp, setSelectedApp] = useState<AppPreset>(APP_PRESETS[0]);
   const [isSimulating, setIsSimulating] = useState(false);
   const [typedText, setTypedText] = useState(APP_PRESETS[0].formattedOutput);
-  const [pillState, setPillState] = useState<"idle" | "listening" | "processing" | "pasted">("idle");
+  const [pillState, setPillState] = useState<"idle" | "listening" | "processing" | "pasted">(
+    "idle",
+  );
   const [detectedOs, setDetectedOs] = useState<"mac" | "windows" | "linux">("mac");
   const [wifiDisabled, setWifiDisabled] = useState(false);
-  const [waveformBars, setWaveformBars] = useState<number[]>([14, 28, 45, 75, 40, 60, 25, 55, 30, 15]);
+  const [waveformBars, setWaveformBars] = useState<number[]>([
+    14, 28, 45, 75, 40, 60, 25, 55, 30, 15,
+  ]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -155,9 +159,7 @@ export function Hero() {
     let interval: NodeJS.Timeout;
     if (pillState === "listening") {
       interval = setInterval(() => {
-        setWaveformBars(
-          Array.from({ length: 12 }, () => Math.floor(Math.random() * 60) + 15)
-        );
+        setWaveformBars(Array.from({ length: 12 }, () => Math.floor(Math.random() * 60) + 15));
       }, 80);
     } else {
       setWaveformBars([12, 16, 20, 24, 20, 16, 12, 16, 20, 16, 12, 16]);
@@ -214,14 +216,13 @@ export function Hero() {
       <div className="relative text-center max-w-4xl px-4 mx-auto mb-6 z-10">
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold tracking-[-0.035em] text-neutral-950 mb-6 leading-[1.06]">
           Speak naturally.
-          <span className="block text-[#737373] font-bold mt-1 sm:mt-2">
-            Keep it private.
-          </span>
+          <span className="block text-[#737373] font-bold mt-1 sm:mt-2">Keep it private.</span>
         </h1>
 
         {/* Subtitle with Inline Badges matching the screenshot */}
         <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed font-normal">
-          Turn your voice into polished text in any app — processed locally on your PC or Mac through key guarantees like{" "}
+          Turn your voice into polished text in any app — processed locally on your PC or Mac
+          through key guarantees like{" "}
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800 align-middle my-1">
             <Eye className="w-3.5 h-3.5 text-neutral-500" />
             <span>No uploaded audio</span>
@@ -264,7 +265,16 @@ export function Hero() {
         <svg className="w-full h-full text-neutral-300" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="pixel-matrix-grid" width="16" height="16" patternUnits="userSpaceOnUse">
-              <rect x="2" y="2" width="10" height="10" rx="1.5" fill="none" stroke="currentColor" strokeWidth="1" />
+              <rect
+                x="2"
+                y="2"
+                width="10"
+                height="10"
+                rx="1.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#pixel-matrix-grid)" />
@@ -450,7 +460,9 @@ export function Hero() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981]" />
                   whisper.cpp DirectML / Metal
                 </span>
-                <span className="text-neutral-400 hidden sm:inline">Model: Whisper Small (190 MB)</span>
+                <span className="text-neutral-400 hidden sm:inline">
+                  Model: Whisper Small (190 MB)
+                </span>
               </div>
               <div className="flex items-center gap-4">
                 <span className="text-neutral-600">Latency: ~172ms</span>

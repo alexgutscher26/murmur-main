@@ -32,10 +32,21 @@ const PADDING: Readonly<Record<EmptyStateSize, string>> = {
   default: "py-12 gap-3",
 };
 
-export function EmptyState({ icon, headline, description, action, size = "default", className }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  headline,
+  description,
+  action,
+  size = "default",
+  className,
+}: EmptyStateProps) {
   return (
     <div
-      className={cn("flex flex-col items-center justify-center px-6 text-center", PADDING[size], className)}
+      className={cn(
+        "flex flex-col items-center justify-center px-6 text-center",
+        PADDING[size],
+        className,
+      )}
     >
       {icon ? <div className="text-text-tertiary">{icon}</div> : null}
       <p className="text-heading text-text-primary">{headline}</p>

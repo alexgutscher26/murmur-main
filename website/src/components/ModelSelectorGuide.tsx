@@ -24,7 +24,8 @@ const MODELS: ModelInfo[] = [
     latency: "95 ms",
     ramUsage: "250 MB",
     accuracy: 96.0,
-    description: "Ultra lightweight model for older laptops or constrained hardware with instantaneous decoding.",
+    description:
+      "Ultra lightweight model for older laptops or constrained hardware with instantaneous decoding.",
     recommendedFor: "Older laptops, battery conservation, quick messages and commands",
   },
   {
@@ -35,7 +36,8 @@ const MODELS: ModelInfo[] = [
     latency: "160 ms",
     ramUsage: "450 MB",
     accuracy: 98.5,
-    description: "The official default for all users. Optimal balance of sub-200ms speed, low memory footprint, and accurate punctuation.",
+    description:
+      "The official default for all users. Optimal balance of sub-200ms speed, low memory footprint, and accurate punctuation.",
     recommendedFor: "Software developers, daily dictation, technical notes, bilingual typing",
   },
   {
@@ -46,7 +48,8 @@ const MODELS: ModelInfo[] = [
     latency: "140 ms",
     ramUsage: "850 MB",
     accuracy: 99.2,
-    description: "Compact 4-bit quantization of Large Turbo delivering near-perfect fidelity with reduced RAM footprint.",
+    description:
+      "Compact 4-bit quantization of Large Turbo delivering near-perfect fidelity with reduced RAM footprint.",
     recommendedFor: "Pro users on 8 GB RAM laptops wanting Turbo accuracy",
   },
   {
@@ -57,8 +60,10 @@ const MODELS: ModelInfo[] = [
     latency: "190 ms",
     ramUsage: "1.1 GB",
     accuracy: 99.7,
-    description: "Latest turbo architecture unlocking maximum precision across all 99 languages and heavy accents with DirectML/Metal acceleration.",
-    recommendedFor: "Medical, legal, engineering architecture, specialized vocabulary, 99 languages",
+    description:
+      "Latest turbo architecture unlocking maximum precision across all 99 languages and heavy accents with DirectML/Metal acceleration.",
+    recommendedFor:
+      "Medical, legal, engineering architecture, specialized vocabulary, 99 languages",
   },
   {
     id: "turbo-q8",
@@ -68,7 +73,8 @@ const MODELS: ModelInfo[] = [
     latency: "230 ms",
     ramUsage: "1.6 GB",
     accuracy: 99.9,
-    description: "Near-unquantized 8-bit precision for zero-compromise multilingual translation and technical dictation.",
+    description:
+      "Near-unquantized 8-bit precision for zero-compromise multilingual translation and technical dictation.",
     recommendedFor: "Highest fidelity across subtle accents and multi-speaker audio",
   },
 ];
@@ -77,7 +83,10 @@ export function ModelSelectorGuide() {
   const [selectedModel, setSelectedModel] = useState<ModelInfo>(MODELS[1]);
 
   return (
-    <section id="models" className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section
+      id="models"
+      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+    >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
@@ -97,7 +106,8 @@ export function ModelSelectorGuide() {
             Select the right model for your device.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Murmur runs 100% on device with Whisper GGML models. Whisper Small (190 MB) is included free by default; download any model weights with one click.
+            Murmur runs 100% on device with Whisper GGML models. Whisper Small (190 MB) is included
+            free by default; download any model weights with one click.
           </p>
         </div>
 
@@ -116,7 +126,9 @@ export function ModelSelectorGuide() {
                 }`}
               >
                 <span className="text-xs font-bold block truncate">{model.name}</span>
-                <span className={`text-[10px] font-mono block ${isSelected ? "text-neutral-400" : "text-neutral-500"}`}>
+                <span
+                  className={`text-[10px] font-mono block ${isSelected ? "text-neutral-400" : "text-neutral-500"}`}
+                >
                   {model.size} · {model.latency}
                 </span>
               </button>
@@ -129,9 +141,7 @@ export function ModelSelectorGuide() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             <div className="md:col-span-7">
               <div className="flex items-center gap-2.5 mb-3 flex-wrap">
-                <h3 className="text-xl font-bold text-neutral-950">
-                  {selectedModel.name}
-                </h3>
+                <h3 className="text-xl font-bold text-neutral-950">{selectedModel.name}</h3>
                 {selectedModel.badge && (
                   <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-bold">
                     {selectedModel.badge}
@@ -155,7 +165,9 @@ export function ModelSelectorGuide() {
             <div className="md:col-span-5 grid grid-cols-2 gap-2.5 font-mono text-xs">
               <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80">
                 <span className="text-neutral-500 block text-[10px] uppercase">Latency</span>
-                <span className="font-bold text-neutral-950 text-base">{selectedModel.latency}</span>
+                <span className="font-bold text-neutral-950 text-base">
+                  {selectedModel.latency}
+                </span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80">
@@ -165,12 +177,18 @@ export function ModelSelectorGuide() {
 
               <div className="p-3.5 rounded-xl bg-neutral-50 border border-neutral-200/80">
                 <span className="text-neutral-500 block text-[10px] uppercase">RAM Usage</span>
-                <span className="font-bold text-neutral-950 text-base">{selectedModel.ramUsage}</span>
+                <span className="font-bold text-neutral-950 text-base">
+                  {selectedModel.ramUsage}
+                </span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-200/90">
-                <span className="text-emerald-700 block text-[10px] uppercase font-bold">Accuracy</span>
-                <span className="font-bold text-emerald-700 text-base">{selectedModel.accuracy}%</span>
+                <span className="text-emerald-700 block text-[10px] uppercase font-bold">
+                  Accuracy
+                </span>
+                <span className="font-bold text-emerald-700 text-base">
+                  {selectedModel.accuracy}%
+                </span>
               </div>
             </div>
           </div>

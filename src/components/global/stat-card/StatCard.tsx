@@ -83,12 +83,16 @@ export function StatCard({
         <span className={cn(VALUE_CLASS[size], "text-text-primary tabular-nums")}>{value}</span>
         {unit ? <span className="text-label text-text-tertiary">{unit}</span> : null}
         {delta && size !== "hero" ? (
-          <span className={cn("text-label tabular-nums", TONE_CLASS[delta.tone ?? "neutral"])}>{delta.label}</span>
+          <span className={cn("text-label tabular-nums", TONE_CLASS[delta.tone ?? "neutral"])}>
+            {delta.label}
+          </span>
         ) : null}
       </div>
 
       {delta && size === "hero" ? (
-        <span className={cn("text-label tabular-nums", TONE_CLASS[delta.tone ?? "neutral"])}>{delta.label}</span>
+        <span className={cn("text-label tabular-nums", TONE_CLASS[delta.tone ?? "neutral"])}>
+          {delta.label}
+        </span>
       ) : null}
 
       {chart ? <div className="pt-2">{chart}</div> : null}

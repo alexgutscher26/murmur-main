@@ -97,7 +97,8 @@ export function ModelManager() {
   const download = useCallback(
     async (modelId: ModelId, displayName?: string) => {
       setDownloadError(null);
-      const isProModel = modelId.includes("turbo") || modelId.includes("large") || modelId.includes("medium");
+      const isProModel =
+        modelId.includes("turbo") || modelId.includes("large") || modelId.includes("medium");
       if (isProModel && !canUseTurboModel(tier)) {
         setGatedModelName(displayName || "Whisper Large v3 Turbo");
         setProModalOpen(true);
@@ -117,7 +118,8 @@ export function ModelManager() {
       }
       const existingState =
         liveStates[modelId] ?? models.data?.find((m) => m.descriptor.id === modelId)?.state;
-      const existingReceived = existingState?.kind === "DOWNLOADING" ? existingState.received_bytes : 0;
+      const existingReceived =
+        existingState?.kind === "DOWNLOADING" ? existingState.received_bytes : 0;
       const existingTotal =
         existingState?.kind === "DOWNLOADING"
           ? existingState.total_bytes
@@ -127,7 +129,11 @@ export function ModelManager() {
       setDownloadingIds((prev) => new Set([...prev, modelId]));
       setLiveStates((current) => ({
         ...current,
-        [modelId]: { kind: "DOWNLOADING", received_bytes: existingReceived, total_bytes: existingTotal },
+        [modelId]: {
+          kind: "DOWNLOADING",
+          received_bytes: existingReceived,
+          total_bytes: existingTotal,
+        },
       }));
 
       let inProgress = false;
@@ -177,7 +183,8 @@ export function ModelManager() {
           <div className="flex items-center gap-2">
             <ShieldAlert className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
             <span>
-              <strong>Air-Gap Mode is Active:</strong> Network sockets are isolated. Downloading a model will automatically disable Air-Gap Mode.
+              <strong>Air-Gap Mode is Active:</strong> Network sockets are isolated. Downloading a
+              model will automatically disable Air-Gap Mode.
             </span>
           </div>
           <button
@@ -205,7 +212,10 @@ export function ModelManager() {
 
       <ul className="hairline rounded-card bg-surface px-4">
         {(models.data ?? []).map((report) => {
-          const model: ModelReport = { ...report, state: liveStates[report.descriptor.id] ?? report.state };
+          const model: ModelReport = {
+            ...report,
+            state: liveStates[report.descriptor.id] ?? report.state,
+          };
           const isProModel =
             model.descriptor.id.includes("turbo") ||
             model.descriptor.id.includes("large") ||
@@ -218,7 +228,10 @@ export function ModelManager() {
           const isAnyDownloading = downloadingIds.size > 0;
 
           return (
-            <li key={model.descriptor.id} className="hairline-b flex items-center gap-4 py-3 last:border-b-0">
+            <li
+              key={model.descriptor.id}
+              className="hairline-b flex items-center gap-4 py-3 last:border-b-0"
+            >
               <ModelSummary
                 model={model}
                 progress={progress[model.descriptor.id]}
@@ -282,13 +295,16 @@ function ModelSummary({
   const isActivelyDownloading = Boolean(isDownloading);
   const downloading = isActivelyDownloading || isStateDownloading;
   const received = progress?.received_bytes ?? (isStateDownloading ? state.received_bytes : 0);
-  const total = progress?.total_bytes ?? (isStateDownloading ? state.total_bytes : descriptor.size_bytes);
+  const total =
+    progress?.total_bytes ?? (isStateDownloading ? state.total_bytes : descriptor.size_bytes);
   const eta = progress ? formatEta(Math.max(0, total - received), progress.bytes_per_second) : null;
 
   return (
     <div className="min-w-0 flex-1">
       <div className="flex items-center gap-2 flex-wrap">
-        <p className="text-sm font-medium text-stone-900 dark:text-white">{descriptor.display_name}</p>
+        <p className="text-sm font-medium text-stone-900 dark:text-white">
+          {descriptor.display_name}
+        </p>
         {isActive && (
           <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
             <Check className="size-3" />
@@ -300,8 +316,8 @@ function ModelSummary({
             Compressed
           </span>
         )}
-        {isProModel && (
-          isUnlocked ? (
+        {isProModel &&
+          (isUnlocked ? (
             <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
               <Sparkles className="size-2.5" />
               PRO UNLOCKED
@@ -311,8 +327,7 @@ function ModelSummary({
               <Sparkles className="size-2.5" />
               PRO
             </span>
-          )
-        )}
+          ))}
         {isLocked && (
           <span className="text-[10px] text-stone-400 dark:text-stone-500 font-mono">
             (14-day trial available)
@@ -324,12 +339,20 @@ function ModelSummary({
       {downloading ? (
         <ProgressBar
           className="mt-2"
-          label={isActivelyDownloading ? `Downloading ${descriptor.display_name}` : `Partial download: ${descriptor.display_name}`}
+          label={
+            isActivelyDownloading
+              ? `Downloading ${descriptor.display_name}`
+              : `Partial download: ${descriptor.display_name}`
+          }
           fraction={total > 0 ? received / total : 0}
           caption={
             <>
               {formatBytes(received)} of {formatBytes(total)}
-              {progress ? ` · ${formatRate(progress.bytes_per_second)}` : (!isActivelyDownloading ? " · Paused" : "")}
+              {progress
+                ? ` · ${formatRate(progress.bytes_per_second)}`
+                : !isActivelyDownloading
+                  ? " · Paused"
+                  : ""}
               {eta ? ` · ${eta} left` : ""}
             </>
           }

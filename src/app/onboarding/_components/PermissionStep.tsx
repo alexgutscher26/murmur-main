@@ -17,10 +17,18 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Check, ExternalLink, Mic } from "lucide-react";
-import { commands, type DeviceInfo, type OsPermission, type PermissionReport, type SettingValue } from "@/lib/bindings";
+import {
+  commands,
+  type DeviceInfo,
+  type OsPermission,
+  type PermissionReport,
+  type SettingValue,
+} from "@/lib/bindings";
 import { unwrapCommand, useCommand } from "@/lib/ipc";
 
-const PERMISSION_COPY: Readonly<Record<OsPermission, { label: string; why: string; required: boolean }>> = {
+const PERMISSION_COPY: Readonly<
+  Record<OsPermission, { label: string; why: string; required: boolean }>
+> = {
   MICROPHONE: {
     label: "Microphone",
     why: "Murmur cannot hear you without it.",
@@ -82,7 +90,10 @@ export function PermissionStep({
         {reports.map((report) => {
           const copy = PERMISSION_COPY[report.permission];
           return (
-            <li key={report.permission} className="hairline flex items-center gap-3 rounded-card bg-sunken p-3">
+            <li
+              key={report.permission}
+              className="hairline flex items-center gap-3 rounded-card bg-sunken p-3"
+            >
               <div className="min-w-0 flex-1">
                 <p className="text-body text-text-primary">
                   {copy.label}
@@ -122,7 +133,10 @@ export function PermissionStep({
 
       {micGranted && devices.data && devices.data.length > 0 && (
         <div className="hairline flex flex-col gap-1.5 rounded-card bg-sunken p-3">
-          <label htmlFor="mic-select" className="flex items-center gap-1.5 text-caption font-medium text-text-secondary">
+          <label
+            htmlFor="mic-select"
+            className="flex items-center gap-1.5 text-caption font-medium text-text-secondary"
+          >
             <Mic className="size-3.5" />
             Input Microphone
           </label>
@@ -132,7 +146,12 @@ export function PermissionStep({
             onChange={(e) => onSelectDevice(e.target.value)}
             className="hairline h-8 w-full rounded-input bg-glass px-2.5 text-caption text-stone-900 dark:text-stone-100 dark:bg-stone-800/80 focus:outline-none"
           >
-            <option value="default" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">Default Input Device</option>
+            <option
+              value="default"
+              className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100"
+            >
+              Default Input Device
+            </option>
             {devices.data.map((dev: DeviceInfo) => (
               <option
                 key={dev.id}

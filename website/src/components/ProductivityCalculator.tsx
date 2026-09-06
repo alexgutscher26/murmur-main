@@ -35,7 +35,8 @@ export function ProductivityCalculator() {
             Calculate your speaking speed dividend.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Human speech flows at ~160 words per minute while average typing tops out at ~40 words per minute.
+            Human speech flows at ~160 words per minute while average typing tops out at ~40 words
+            per minute.
           </p>
         </div>
 
@@ -122,9 +123,7 @@ export function ProductivityCalculator() {
               <span className="text-2xl sm:text-3xl font-bold text-emerald-700 block mb-1">
                 +{workDaysSavedPerYear.toFixed(0)} days
               </span>
-              <span className="text-neutral-500 text-[11px]">
-                Annual productivity dividend
-              </span>
+              <span className="text-neutral-500 text-[11px]">Annual productivity dividend</span>
             </div>
 
             <div className="p-5 rounded-xl bg-emerald-50/50 border border-emerald-200/90">

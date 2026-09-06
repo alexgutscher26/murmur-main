@@ -14,14 +14,14 @@ before you touch an area you have not touched before.
 
 ## Read order
 
-| Doc | What it answers |
-|---|---|
-| `01-IDEATION.md` | What the product is, every feature, what is deliberately not built |
-| `02-TECHNICAL-PLAN.md` | The stack, the architecture, the build phases, locked decisions |
+| Doc                          | What it answers                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `01-IDEATION.md`             | What the product is, every feature, what is deliberately not built                                                 |
+| `02-TECHNICAL-PLAN.md`       | The stack, the architecture, the build phases, locked decisions                                                    |
 | `03-IMPLEMENTATION-NOTES.md` | **The gotchas.** Whisper params, macOS TCC, paste races, audio threading. Read before writing code in those areas. |
-| `04-DESIGN-SYSTEM.md` | Exact tokens, materials, motion, the pill spec |
-| `05-PROJECT-STRUCTURE.md` | The full tree, where things go, naming, hard limits |
-| `06-CONVENTIONS-AND-GREP.md` | The SOURCE OF TRUTH header system and how navigation works. **Read before writing your first file.** |
+| `04-DESIGN-SYSTEM.md`        | Exact tokens, materials, motion, the pill spec                                                                     |
+| `05-PROJECT-STRUCTURE.md`    | The full tree, where things go, naming, hard limits                                                                |
+| `06-CONVENTIONS-AND-GREP.md` | The SOURCE OF TRUTH header system and how navigation works. **Read before writing your first file.**               |
 
 ## Five-minute version
 

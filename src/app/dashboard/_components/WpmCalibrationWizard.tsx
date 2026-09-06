@@ -184,7 +184,10 @@ export function WpmCalibrationWizard({
         {/* Header */}
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <h2 id="wpm-wizard-title" className="text-heading text-text-primary flex items-center gap-2">
+            <h2
+              id="wpm-wizard-title"
+              className="text-heading text-text-primary flex items-center gap-2"
+            >
               <Sparkles className="size-4 text-text-secondary" />
               WPM Baseline Calibration
             </h2>
@@ -355,13 +358,12 @@ export function WpmCalibrationWizard({
 
           <p className="text-caption text-text-secondary">
             Speaking ({measuredSpeakingWpm ?? 150} WPM) is approximately{" "}
-            <strong className="text-text-primary font-semibold">{speedup}× faster</strong> than typing at {targetWpm} WPM.
+            <strong className="text-text-primary font-semibold">{speedup}× faster</strong> than
+            typing at {targetWpm} WPM.
           </p>
         </div>
 
-        {error ? (
-          <p className="text-caption text-danger">{error.message}</p>
-        ) : null}
+        {error ? <p className="text-caption text-danger">{error.message}</p> : null}
 
         {/* Footer Actions */}
         <div className="flex items-center justify-end gap-2 pt-2 hairline-t">

@@ -163,13 +163,18 @@ export function Pill() {
     previousKind.current = kind;
     if (previous !== "CANCEL_PENDING" || kind !== "RECORDING") return;
     setRefilling(true);
-    const handle = window.setTimeout(() => setRefilling(false), readDurationMs("--motion-duration-medium"));
+    const handle = window.setTimeout(
+      () => setRefilling(false),
+      readDurationMs("--motion-duration-medium"),
+    );
     return () => window.clearTimeout(handle);
   }, [kind]);
 
   // Ticks only while a session is live; keeps its pixels after it is not.
   const elapsedMs = useElapsed(
-    live && (shown?.kind === "RECORDING" || shown?.kind === "CANCEL_PENDING") ? shown.elapsed_ms : null,
+    live && (shown?.kind === "RECORDING" || shown?.kind === "CANCEL_PENDING")
+      ? shown.elapsed_ms
+      : null,
   );
 
   // Live estimated word count during recording
@@ -202,7 +207,7 @@ export function Pill() {
       style={{ opacity: pillOpacity }}
       className={cn(
         "flex h-full w-full select-none cursor-default items-center px-3",
-        isCompactActive ? "justify-center px-2" : "gap-2"
+        isCompactActive ? "justify-center px-2" : "gap-2",
       )}
     >
       <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">

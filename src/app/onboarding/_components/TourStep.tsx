@@ -58,7 +58,11 @@ const TOUR_SLIDES: readonly TourSlide[] = [
     title: (mode) => (mode === "push_to_talk" ? "Hold to talk" : "Press to start and stop"),
     body: (hotkey, mode) => {
       const key = hotkey ? (
-        <Keycap keys={glyphsForBinding(hotkey)} size="sm" className="mx-0.5 inline-flex align-middle" />
+        <Keycap
+          keys={glyphsForBinding(hotkey)}
+          size="sm"
+          className="mx-0.5 inline-flex align-middle"
+        />
       ) : (
         "your shortcut"
       );
@@ -109,9 +113,7 @@ export function TourStep({
 
       <header className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-title text-text-primary">{title}</h1>
-        <p className="max-w-96 text-body text-text-secondary">
-          {slide.body(hotkey, mode)}
-        </p>
+        <p className="max-w-96 text-body text-text-secondary">{slide.body(hotkey, mode)}</p>
         {isLast ? (
           <button
             type="button"

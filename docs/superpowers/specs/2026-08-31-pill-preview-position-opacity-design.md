@@ -9,6 +9,7 @@
 ## 1. Overview & Objectives
 
 This specification covers three high-impact UI/UX features for Murmur's floating pill:
+
 1. **Partial transcript preview in pill**: As interior Whisper chunks decode in the background, surface the latest decoded words (e.g. `"...schedule the meeting"`) in the center slot of the pill.
 2. **Pill position memory (per-display)**: Allow dragging the pill and remember its position on a per-display basis across dictation sessions.
 3. **Pill opacity setting**: Add a `ui.pill_opacity` registry setting (30%–100%) and apply it to the pill's backdrop.

@@ -57,7 +57,10 @@ const FEATURE_LABEL: Readonly<Record<EngineFeature, string>> = {
  *        never disabled on the strength of an answer that has not arrived —
  *        briefly greying out every control reads as breakage.
  */
-function missingFeatures(def: RegistrySettingDef, engine: EngineCapabilities | null): EngineFeature[] {
+function missingFeatures(
+  def: RegistrySettingDef,
+  engine: EngineCapabilities | null,
+): EngineFeature[] {
   if (!engine) return [];
   return def.requires_engine.filter((feature) => !engine.features.includes(feature));
 }
@@ -187,7 +190,8 @@ export function toControlSetting(
         kind: "hotkey",
         value: value.type === "HOTKEY" ? glyphsForBinding(value.value).join("") : null,
         placeholder: "Press keys",
-        onChange: (_display, capture) => onChange({ type: "HOTKEY", value: bindingFromCapture(capture) }),
+        onChange: (_display, capture) =>
+          onChange({ type: "HOTKEY", value: bindingFromCapture(capture) }),
       };
   }
 }

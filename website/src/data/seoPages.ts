@@ -91,7 +91,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "X (Twitter) & LinkedIn",
-      quote: "“I dictated a full 500-word architecture issue in Cursor with Wi-Fi disabled. Sub-200ms latency and 0 bytes sent. Bye Wispr subscription.”",
+      quote:
+        "“I dictated a full 500-word architecture issue in Cursor with Wi-Fi disabled. Sub-200ms latency and 0 bytes sent. Bye Wispr subscription.”",
       context: "Verified offline benchmark on MacBook Pro M3",
     },
     reproducibleAuditStep:
@@ -166,7 +167,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "Reddit (r/privacy)",
-      quote: "“Finally a dictation tool that doesn't need an account or an internet connection. Tested with Little Snitch and it's completely silent.”",
+      quote:
+        "“Finally a dictation tool that doesn't need an account or an internet connection. Tested with Little Snitch and it's completely silent.”",
       context: "Independent security audit review",
     },
     reproducibleAuditStep:
@@ -237,7 +239,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "YouTube Shorts & TikTok",
-      quote: "“Dictating a full Substack post on a cross-country flight with Airplane Mode on. Instant paste, zero lag.”",
+      quote:
+        "“Dictating a full Substack post on a cross-country flight with Airplane Mode on. Instant paste, zero lag.”",
       context: "M2 MacBook Air user review",
     },
     reproducibleAuditStep:
@@ -308,7 +311,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "Product Hunt & Reddit",
-      quote: "“Finally a Windows dictation app that handles code terms and doesn't route my mic through cloud servers. Alt+Space is instant.”",
+      quote:
+        "“Finally a Windows dictation app that handles code terms and doesn't route my mic through cloud servers. Alt+Space is instant.”",
       context: "Windows 11 software engineer review",
     },
     reproducibleAuditStep:
@@ -379,7 +383,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "GitHub & Hacker News",
-      quote: "“Whisper.cpp compiled into a native Rust desktop app with universal hotkey injection. This is how local AI should be built.”",
+      quote:
+        "“Whisper.cpp compiled into a native Rust desktop app with universal hotkey injection. This is how local AI should be built.”",
       context: "Hacker News discussion",
     },
     reproducibleAuditStep:
@@ -406,7 +411,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     h1Highlight: "Engineered for Developers.",
     subtitle:
       "Dictate code, GitHub issues, pull request summaries, and terminal commands at 200+ WPM. Your proprietary codebase and secrets never leave your laptop.",
-    targetAudience: "Software engineers, DevOps leads, technical writers, and open-source maintainers",
+    targetAudience:
+      "Software engineers, DevOps leads, technical writers, and open-source maintainers",
     coreProblem:
       "Generic dictation tools struggle with CamelCase, snake_case, CLI flags, and code syntax—and cloud dictation violates corporate IP and NDA policies by transmitting proprietary code.",
     architecturalSolution:
@@ -415,7 +421,11 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
       { label: "Code Accuracy", value: "98.4%", detail: "Phonetic biasing for APIs" },
       { label: "Commit Syntax", value: "Conventional", detail: "feat(scope): message" },
       { label: "Secret Leak Risk", value: "0% (Air-Gapped)", detail: "No API keys or code egress" },
-      { label: "IDE Compatibility", value: "Cursor, VS Code, Zed", detail: "Universal cursor hook" },
+      {
+        label: "IDE Compatibility",
+        value: "Cursor, VS Code, Zed",
+        detail: "Universal cursor hook",
+      },
     ],
     comparisonTable: [
       {
@@ -450,7 +460,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "X (Twitter) & GitHub",
-      quote: "“Dictating PR descriptions and Jira tickets in Cursor using Murmur is 3x faster than typing. It understands TypeScript types flawlessly.”",
+      quote:
+        "“Dictating PR descriptions and Jira tickets in Cursor using Murmur is 3x faster than typing. It understands TypeScript types flawlessly.”",
       context: "Senior Frontend Engineer review",
     },
     reproducibleAuditStep:
@@ -484,7 +495,11 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
       "Because Murmur never transmits audio or text off your physical computer, no Protected Health Information (PHI) ever traverses third-party servers, eliminating cloud attack surfaces by design.",
     keyStats: [
       { label: "Cloud PHI Egress", value: "0 Bytes", detail: "Physical on-device isolation" },
-      { label: "Cloud BAA Complexity", value: "Not Required", detail: "Zero third-party processing" },
+      {
+        label: "Cloud BAA Complexity",
+        value: "Not Required",
+        detail: "Zero third-party processing",
+      },
       { label: "EHR Compatibility", value: "Universal", detail: "Types into any EHR cursor" },
       { label: "Local Data Erasure", value: "Instant Wipe", detail: "Configurable auto-purge" },
     ],
@@ -521,7 +536,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "LinkedIn (Healthcare IT)",
-      quote: "“Our clinical staff uses Murmur for chart notes on air-gapped laptops. Zero HIPAA anxiety because no audio leaves the room.”",
+      quote:
+        "“Our clinical staff uses Murmur for chart notes on air-gapped laptops. Zero HIPAA anxiety because no audio leaves the room.”",
       context: "Clinical IT Director case study",
     },
     reproducibleAuditStep:
@@ -592,7 +608,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "LegalTech Review",
-      quote: "“Murmur allows our litigation team to dictate case briefs at 220 WPM with complete confidence that client privilege is 100% protected.”",
+      quote:
+        "“Murmur allows our litigation team to dictate case briefs at 220 WPM with complete confidence that client privilege is 100% protected.”",
       context: "Managing Partner, Commercial Litigation Firm",
     },
     reproducibleAuditStep:
@@ -663,7 +680,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "Mastodon / X",
-      quote: "“Monitored Murmur with Little Snitch in alert mode during an hour-long dictation session. Zero alerts. Real local AI.”",
+      quote:
+        "“Monitored Murmur with Little Snitch in alert mode during an hour-long dictation session. Zero alerts. Real local AI.”",
       context: "Security researcher audit",
     },
     reproducibleAuditStep:
@@ -695,7 +713,11 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
       { label: "Top Pick", value: "Murmur", detail: "Best overall for privacy & speed" },
       { label: "Architecture", value: "100% On-Device", detail: "Zero cloud streaming" },
       { label: "Pricing", value: "Free (MIT)", detail: "No recurring subscriptions" },
-      { label: "Platform Parity", value: "macOS & Windows", detail: "Native hardware acceleration" },
+      {
+        label: "Platform Parity",
+        value: "macOS & Windows",
+        detail: "Native hardware acceleration",
+      },
     ],
     comparisonTable: [
       {
@@ -730,7 +752,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "Tech Blog Review",
-      quote: "“If you value your data privacy and want instant, sub-200ms dictation, Murmur is hands down the best choice on macOS and Windows.”",
+      quote:
+        "“If you value your data privacy and want instant, sub-200ms dictation, Murmur is hands down the best choice on macOS and Windows.”",
       context: "2026 AI Productivity Tool Roundup",
     },
     reproducibleAuditStep:
@@ -803,7 +826,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "Clinical Workflow Review",
-      quote: "“Murmur lets me dictate patient visit summaries directly into Epic twice as fast as typing, and our hospital IT team approved it immediately because zero network packets leave my machine.”",
+      quote:
+        "“Murmur lets me dictate patient visit summaries directly into Epic twice as fast as typing, and our hospital IT team approved it immediately because zero network packets leave my machine.”",
       context: "Internal Medicine Specialist",
     },
     reproducibleAuditStep:
@@ -838,7 +862,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     h1Highlight: "Without Cloud Exposure.",
     subtitle:
       "Capture SOAP notes, therapy progress logs, and clinical observations with push-to-talk speed. Processed entirely on local hardware with configurable retention policies and zero network egress.",
-    targetAudience: "Therapists, psychologists, psychiatrists, primary care clinicians, and medical scribes",
+    targetAudience:
+      "Therapists, psychologists, psychiatrists, primary care clinicians, and medical scribes",
     coreProblem:
       "Mental health, psychiatric evaluations, and sensitive clinical consultations require absolute patient confidentiality. Traditional cloud dictation apps upload audio to third-party servers, creating significant data breach exposure and regulatory overhead under HIPAA privacy and security rules.",
     architecturalSolution:
@@ -884,7 +909,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     },
     socialProofClip: {
       platform: "Mental Health Practice Case Study",
-      quote: "“As a private practice psychologist, I cannot risk streaming session summaries over the internet. Murmur gives me Whisper-level dictation speed without a single byte leaving my MacBook.”",
+      quote:
+        "“As a private practice psychologist, I cannot risk streaming session summaries over the internet. Murmur gives me Whisper-level dictation speed without a single byte leaving my MacBook.”",
       context: "Licensed Clinical Psychologist",
     },
     reproducibleAuditStep:
@@ -909,4 +935,3 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     ],
   },
 };
-

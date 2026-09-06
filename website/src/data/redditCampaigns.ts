@@ -33,7 +33,8 @@ export const REDDIT_CAMPAIGNS: {
     rust: {
       subreddit: "r/rust",
       flair: "Project",
-      title: "I built an open-source, air-gapped voice dictation app in Rust & Tauri 2 — AMA about whisper.cpp FFI, audio ring buffers, and Metal/DirectML shaders",
+      title:
+        "I built an open-source, air-gapped voice dictation app in Rust & Tauri 2 — AMA about whisper.cpp FFI, audio ring buffers, and Metal/DirectML shaders",
       hook: "Replacing 300MB Electron shells with a lean Rust native binary that decodes Whisper speech in under 180ms.",
       body: `Hey r/rust,
 
@@ -68,7 +69,8 @@ I'd love to hear your feedback on the architecture, unsafe FFI boundaries, and a
     machinelearning: {
       subreddit: "r/MachineLearning",
       flair: "Project / Research",
-      title: "Why on-device Whisper beats cloud STT on tail latency: 600-sample benchmark and open-source desktop implementation",
+      title:
+        "Why on-device Whisper beats cloud STT on tail latency: 600-sample benchmark and open-source desktop implementation",
       hook: "Empirical proof that hardware-accelerated local Whisper decoding outperforms cloud WebSocket APIs on real-world latency.",
       body: `Hey r/MachineLearning,
 
@@ -107,7 +109,8 @@ Would love to discuss quantization thresholds, temperature fallbacks, and specul
     selfhosted: {
       subreddit: "r/selfhosted",
       flair: "Share",
-      title: "Sick of cloud voice tools uploading your audio? Murmur is a 100% offline, zero-account speech-to-text app for Mac & Windows (MIT)",
+      title:
+        "Sick of cloud voice tools uploading your audio? Murmur is a 100% offline, zero-account speech-to-text app for Mac & Windows (MIT)",
       hook: "No Docker required, no cloud subscriptions, no phoning home. Pure local voice dictation running on your GPU.",
       body: `Hey r/selfhosted,
 
@@ -139,7 +142,8 @@ Check it out, disconnect your internet, and let me know how it runs on your setu
     productivity: {
       subreddit: "r/productivity",
       flair: "Tip / Tool",
-      title: "How local voice dictation cured my wrist RSI and cut meeting note time by 80% (without creepy cloud recording bots)",
+      title:
+        "How local voice dictation cured my wrist RSI and cut meeting note time by 80% (without creepy cloud recording bots)",
       hook: "Dictating at 160 WPM transformed my daily workflow without inviting third-party bots to my calls.",
       body: `Hey r/productivity,
 
@@ -177,8 +181,10 @@ Hope this helps anyone else dealing with typing fatigue or meeting note overload
   },
 
   ama: {
-    title: "I'm a systems engineer who spent 8 months building an open-source, air-gapped AI voice dictation app in Rust (whisper.cpp). AMA!",
-    bioProof: "Alex Gutscher (@webprodigies) - Creator of Murmur (https://github.com/webprodigies/murmur). Verification screenshot with repo commit key & terminal packet monitor.",
+    title:
+      "I'm a systems engineer who spent 8 months building an open-source, air-gapped AI voice dictation app in Rust (whisper.cpp). AMA!",
+    bioProof:
+      "Alex Gutscher (@webprodigies) - Creator of Murmur (https://github.com/webprodigies/murmur). Verification screenshot with repo commit key & terminal packet monitor.",
     openingStatement: `Hi everyone! I'm Alex Gutscher.
 
 Over the past 8 months, I've been building **Murmur**—an open-source desktop app written in Rust and Tauri 2 that brings high-speed, air-gapped AI speech-to-text to macOS and Windows using \`whisper.cpp\`.
@@ -195,7 +201,8 @@ I'm here to talk about:
 Ask me anything!`,
     faqResponses: [
       {
-        question: "Why not just use Apple's built-in macOS dictation or Windows Speech Recognition?",
+        question:
+          "Why not just use Apple's built-in macOS dictation or Windows Speech Recognition?",
         answer:
           "Apple and Windows built-in dictation rely on legacy acoustic models that lack context awareness. They don't understand programming syntax, frequently stumble on technical terms, cannot remove conversational filler words ('um', 'like'), and don't support custom phonetic dictionaries. Murmur uses OpenAI's Whisper transformer architecture, which understands semantic context and sentence flow.",
       },
