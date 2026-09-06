@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomBytes } from "crypto";
 import { calculatePrice, getStripeClient, PlanTierKey } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
 
     if (!stripe) {
       // Graceful fallback for local development or demo without active Stripe credentials
-      const mockSessionId = `mock_sess_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+      const mockSessionId = `mock_sess_${Date.now()}_${randomBytes(8).toString("hex")}`;
       const successUrl = new URL("/pricing/success", origin);
       successUrl.searchParams.set("session_id", mockSessionId);
       successUrl.searchParams.set("plan", tier);
