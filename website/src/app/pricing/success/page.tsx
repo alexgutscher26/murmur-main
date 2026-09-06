@@ -23,6 +23,7 @@ function SuccessContent() {
   const sessionId = searchParams.get("session_id") || "mock_sess_complete";
   const planParam = (searchParams.get("plan") as PlanTierKey) || "pro_lifetime";
   const discountCode = searchParams.get("code") || null;
+  const keyParam = searchParams.get("key");
 
   const [licenseKey, setLicenseKey] = useState<string>("");
   const [copied, setCopied] = useState(false);
@@ -36,9 +37,9 @@ function SuccessContent() {
     });
 
     // Generate/retrieve stable license key for this session
-    const key = generateLicenseKey(planParam, discountCode);
+    const key = keyParam || generateLicenseKey(planParam, discountCode);
     setLicenseKey(key);
-  }, [planParam, discountCode]);
+  }, [planParam, discountCode, keyParam]);
 
   const handleCopy = () => {
     if (!licenseKey) return;

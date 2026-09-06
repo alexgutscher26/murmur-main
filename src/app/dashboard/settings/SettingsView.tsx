@@ -91,10 +91,17 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
   }, [section, settings.data, containerRef]);
 
   const dynamic = useMemo<DynamicOptions>(() => {
-    const deviceOptions: SettingOption[] = (devices.data ?? []).map((device) => ({
-      value: device.id,
-      label: device.is_default ? `${device.name} (system default)` : device.name,
-    }));
+    const defaultDev = (devices.data ?? []).find((d) => d.is_default);
+    const deviceOptions: SettingOption[] = [
+      {
+        value: "default",
+        label: defaultDev ? `System Default (${defaultDev.name})` : "System Default",
+      },
+      ...(devices.data ?? []).map((device) => ({
+        value: device.id,
+        label: device.name,
+      })),
+    ];
     const modelOptions: SettingOption[] = (models.data ?? []).map((model) => ({
       value: model.descriptor.id,
       label: model.descriptor.id.includes("q3_")

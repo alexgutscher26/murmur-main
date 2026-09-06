@@ -355,7 +355,11 @@ export function DictionaryManager() {
               className={FIELD_CLASS}
             >
               {MATCH_KINDS.map((kind) => (
-                <option key={kind} value={kind}>
+                <option
+                  key={kind}
+                  value={kind}
+                  className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100"
+                >
                   {MATCH_LABEL[kind]}
                 </option>
               ))}

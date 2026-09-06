@@ -130,11 +130,15 @@ export function PermissionStep({
             id="mic-select"
             value={selectedDevice}
             onChange={(e) => onSelectDevice(e.target.value)}
-            className="hairline h-8 w-full rounded-input bg-glass px-2.5 text-caption text-text-primary focus:outline-none"
+            className="hairline h-8 w-full rounded-input bg-glass px-2.5 text-caption text-stone-900 dark:text-stone-100 dark:bg-stone-800/80 focus:outline-none"
           >
-            <option value="default">Default Input Device</option>
+            <option value="default" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">Default Input Device</option>
             {devices.data.map((dev: DeviceInfo) => (
-              <option key={dev.id} value={dev.id}>
+              <option
+                key={dev.id}
+                value={dev.id}
+                className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100"
+              >
                 {dev.name} {dev.is_default ? "(System Default)" : ""}
               </option>
             ))}

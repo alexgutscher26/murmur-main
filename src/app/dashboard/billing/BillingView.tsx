@@ -1,5 +1,5 @@
 /**
- * SOURCE OF TRUTH KEYWORDS: BillingView, usePlan, plan-management, feature-gates, design-tokens
+ * SOURCE OF TRUTH KEYWORDS: BillingView, usePlan, plan-management, feature-gates, design-tokens, syncSubscription, checkStatus
  * WHAT:  The Plan & Billing management view in the Murmur desktop app.
  * WHY:   Uses Murmur's native design tokens (bg-surface, bg-elevated, hairline, text-text-primary)
  *        so it seamlessly matches the translucent glass aesthetics in light & dark modes.
@@ -12,7 +12,7 @@ import { usePlan, PlanTier } from "@/lib/plan";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { commands } from "@/lib/bindings";
 import { unwrapCommand, useCommand } from "@/lib/ipc";
-import { Gift, Copy, Check } from "lucide-react";
+import { Gift, Copy, Check, RotateCw, ExternalLink, Sparkles, AlertCircle } from "lucide-react";
 
 type ProBillingCycle = "lifetime" | "annual";
 
@@ -22,9 +22,12 @@ export function BillingView() {
     isTrial,
     trialDaysRemaining,
     licenseKey,
+    subscriptionStatus,
+    expiresAt,
     startTrial,
     setTier,
     activateLicense,
+    syncSubscription,
     resetToStarter,
   } = usePlan();
 
@@ -33,6 +36,8 @@ export function BillingView() {
   const [keyError, setKeyError] = useState(false);
   const [keySuccess, setKeySuccess] = useState(false);
   const [copiedReferral, setCopiedReferral] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
   const referralStatus = useCommand(commands.getReferralStatus, []);
 
   const handleCopyReferral = () => {
@@ -63,6 +68,57 @@ export function BillingView() {
       setInputKey("");
     } else {
       setKeyError(true);
+    }
+  };
+
+  const handleSyncSubscription = async () => {
+    setSyncing(true);
+    setSyncFeedback(null);
+    try {
+      const res = await syncSubscription();
+      if (res) {
+        setSyncFeedback(res.message);
+      } else {
+        setSyncFeedback("No license key active to verify.");
+      }
+    } catch {
+      setSyncFeedback("Unable to reach license server. Operating in offline mode.");
+    } finally {
+      setSyncing(false);
+      setTimeout(() => setSyncFeedback(null), 4000);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      const endpoints = [
+        "http://localhost:3000/api/billing/portal",
+        "https://murmur.app/api/billing/portal",
+      ];
+      let portalUrl: string | null = null;
+      for (const ep of endpoints) {
+        try {
+          const res = await fetch(ep, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ licenseKey }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.url) {
+              portalUrl = data.url;
+              break;
+            }
+          }
+        } catch {}
+      }
+      if (portalUrl) {
+        await handleOpenLink(portalUrl);
+      } else {
+        await handleOpenLink("https://murmur.app/pricing");
+      }
+    } catch {
+      await handleOpenLink("https://murmur.app/pricing");
     }
   };
 
@@ -143,6 +199,26 @@ export function BillingView() {
 
   return (
     <ScrollArea contentClassName="flex flex-col gap-5 px-[var(--page-padding-x)] pb-8 max-w-5xl mx-auto">
+      {/* Canceled Subscription Notification Banner */}
+      {subscriptionStatus === "canceled" && (
+        <div className="hairline rounded-card bg-amber-500/10 border-amber-500/20 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="h-5 w-5 text-amber-500 shrink-0" />
+            <div className="text-caption text-text-secondary">
+              <span className="font-semibold text-text-primary block">Subscription Ended or Canceled</span>
+              Your subscription has ended. You have been switched to the Free Starter tier (100% on-device Whisper Base).
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleOpenLink("https://murmur.app/pricing")}
+            className="hairline h-8 rounded-input bg-text-primary px-3 text-caption font-semibold text-opaque-elevated hover:opacity-90 transition-opacity shrink-0 cursor-pointer"
+          >
+            Reactivate Pro
+          </button>
+        </div>
+      )}
+
       {/* Active Plan Header Banner */}
       <div className="hairline rounded-card bg-surface p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
@@ -326,9 +402,67 @@ export function BillingView() {
             ✕ Invalid key format. Enter a valid Murmur Pro, Team, Student, or Switcher key.
           </p>
         )}
+
+        {/* Active Key & Subscription Status Bar */}
         {licenseKey && (
-          <p className="text-caption font-mono text-text-tertiary mt-2">
-            Active Key: {licenseKey}
+          <div className="mt-3 pt-3 border-t border-[var(--border-hairline)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-2">
+                <span className="text-caption font-mono font-semibold text-text-primary">
+                  {licenseKey}
+                </span>
+                {licenseKey.startsWith("LIFETIME-") || subscriptionStatus === "lifetime" ? (
+                  <span className="rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.2 text-[10px] font-mono font-semibold flex items-center gap-1">
+                    <Sparkles className="size-2.5" />
+                    <span>Perpetual · Never Expires</span>
+                  </span>
+                ) : subscriptionStatus === "canceled" ? (
+                  <span className="rounded-full bg-red-500/15 text-red-600 dark:text-red-400 px-2 py-0.2 text-[10px] font-mono font-semibold">
+                    Canceled
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.2 text-[10px] font-mono font-semibold">
+                    Active Annual Pass
+                  </span>
+                )}
+              </div>
+              {expiresAt && subscriptionStatus !== "lifetime" && (
+                <span className="text-[11px] text-text-tertiary">
+                  Renewal / Expiry: {new Date(expiresAt).toLocaleDateString()}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={handleSyncSubscription}
+                disabled={syncing}
+                title="Verify license status with Stripe"
+                className="hairline h-7 rounded-input bg-sunken px-2.5 text-[11px] font-medium text-text-secondary hover:text-text-primary hover:bg-sunken-strong transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                <RotateCw className={`size-3 ${syncing ? "animate-spin text-text-primary" : ""}`} />
+                <span>{syncing ? "Checking..." : "Check Status"}</span>
+              </button>
+
+              {!licenseKey.startsWith("LIFETIME-") && (
+                <button
+                  type="button"
+                  onClick={handleManageSubscription}
+                  title="Open Stripe Customer Portal to update card or cancel subscription"
+                  className="hairline h-7 rounded-input bg-sunken px-2.5 text-[11px] font-medium text-text-secondary hover:text-text-primary hover:bg-sunken-strong transition-all flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Manage in Stripe</span>
+                  <ExternalLink className="size-2.5" />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {syncFeedback && (
+          <p className="text-caption font-mono text-text-secondary mt-2 animate-in fade-in">
+            ℹ {syncFeedback}
           </p>
         )}
       </div>

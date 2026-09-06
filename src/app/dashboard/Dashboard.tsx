@@ -3,8 +3,8 @@
  *   dictationHotkey, StatsView, HistoryView, SettingsView, ShortcutsModal, ChangelogModal
  * WHAT:  The dashboard shell redesigned with rich modern aesthetics:
  *        - Window bar with sidebar toggle, user avatar, bell
- *        - Expanded left sidebar (Murmur branding, navigation items, words remaining
- *          quota card, team invite, free month, settings with badge, help)
+ *        - Expanded left sidebar (Murmur branding, navigation items,
+ *          team invite, free month, settings with badge, help)
  *        - Spacious rounded white canvas card hosting active views
  * WHERE: Mounted by src/entries/dashboard.tsx.
  */
@@ -13,14 +13,10 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Bell,
   BookOpen,
-  CircleDot,
-  FileText,
   HelpCircle,
   Mic,
   PanelLeft,
-  Scissors,
   Settings,
-  Type,
   User,
   WandSparkles,
   X,
@@ -180,15 +176,8 @@ export function Dashboard() {
     () =>
       new Set([
         "dictation",
-        "stats",
         "insights",
         "dictionary",
-        "snippets",
-        "style",
-        "transforms",
-        "scratchpad",
-        "notetaker",
-        "history",
         "settings",
         "billing",
       ]),
@@ -346,27 +335,8 @@ export function Dashboard() {
             </nav>
           </div>
 
-          {/* Middle/Bottom Sidebar: Quota Card + Secondary Links */}
+          {/* Middle/Bottom Sidebar: Secondary Links */}
           <div className="flex flex-col gap-1">
-            {/* Words remaining quota card */}
-            {!sidebarCollapsed && (
-              <div className="rounded-2xl border border-purple-200/60 bg-[#f8f4fb] p-3.5 dark:border-purple-900/40 dark:bg-purple-950/20 mb-2">
-                <div className="text-xs font-bold text-purple-700 dark:text-purple-300">
-                  1,966 words remaining
-                </div>
-                <p className="mt-1 text-[11px] leading-relaxed text-stone-500 dark:text-stone-400">
-                  You get 2,000 words per week. Upgrade for unlimited access.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => navigateTo("billing")}
-                  className="mt-2.5 w-full rounded-xl bg-stone-900 py-1.5 text-center text-xs font-semibold text-white shadow-xs hover:bg-stone-800 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-white transition-colors"
-                >
-                  Upgrade to Pro
-                </button>
-              </div>
-            )}
-
             {/* Secondary navigation */}
             <div className="flex flex-col gap-0.5">
               <button
@@ -400,11 +370,6 @@ export function Dashboard() {
                   <Settings className="h-4 w-4 shrink-0" />
                   {!sidebarCollapsed && <span>Settings</span>}
                 </div>
-                {!sidebarCollapsed && (
-                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white">
-                    1
-                  </span>
-                )}
               </button>
 
               <button
@@ -603,68 +568,8 @@ function View({
       return <SettingsView registry={registry} section={section} />;
     case "billing":
       return <BillingView />;
-    case "notetaker":
-      return (
-        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-          <CircleDot className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
-          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
-            Notetaker
-          </h2>
-          <p className="mt-1 text-sm text-stone-500 max-w-sm">
-            Automatic meeting notes, speaker attribution, and real-time summaries.
-          </p>
-        </div>
-      );
     case "dictionary":
       return <DictionaryView />;
-    case "snippets":
-      return (
-        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-          <Scissors className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
-          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
-            Snippets
-          </h2>
-          <p className="mt-1 text-sm text-stone-500 max-w-sm">
-            Voice-triggered expansions for canned responses, email signatures, and code.
-          </p>
-        </div>
-      );
-    case "style":
-      return (
-        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-          <Type className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
-          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
-            Style & Tone
-          </h2>
-          <p className="mt-1 text-sm text-stone-500 max-w-sm">
-            Tune formality, casing, punctuation density, and vocabulary filters.
-          </p>
-        </div>
-      );
-    case "transforms":
-      return (
-        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-          <WandSparkles className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
-          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
-            AI Transforms
-          </h2>
-          <p className="mt-1 text-sm text-stone-500 max-w-sm">
-            Convert spoken voice into structured JSON, bulleted tasks, or polished prose.
-          </p>
-        </div>
-      );
-    case "scratchpad":
-      return (
-        <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-          <FileText className="h-12 w-12 text-stone-300 dark:text-stone-700 mb-3" />
-          <h2 className="text-xl font-bold text-stone-900 dark:text-white">
-            Scratchpad
-          </h2>
-          <p className="mt-1 text-sm text-stone-500 max-w-sm">
-            A continuous freeform scratchpad buffer for dictating uninterrupted thoughts.
-          </p>
-        </div>
-      );
     default:
       return <StatsView metrics={metrics} hotkey={hotkey} mode={mode} />;
   }

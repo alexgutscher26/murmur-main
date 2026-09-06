@@ -41,6 +41,7 @@ import { ActivityChart } from "./_components/ActivityChart";
 import { LatencyPanel } from "./_components/LatencyPanel";
 import { LanguageBreakdown } from "./_components/LanguageBreakdown";
 import { useHistory } from "../history/use-history";
+import { NoTranscriptionsYet } from "../_components/NoTranscriptionsYet";
 
 export interface StatsViewProps {
   metrics: readonly MetricDef[];
@@ -119,145 +120,6 @@ function groupByDay(sessions: readonly SessionSummary[]): SessionGroup[] {
   return groups;
 }
 
-// Fallback demo sessions matching Whisper Flow screenshot if no sessions recorded yet
-const DEMO_GROUPS: SessionGroup[] = [
-  {
-    label: "YESTERDAY",
-    key: "demo-yesterday",
-    sessions: [
-      {
-        id: "demo-1",
-        started_at_ms: Date.now() - 86400000 + 7200000,
-        ended_at_ms: Date.now() - 86400000 + 7205000,
-        outcome: "DELIVERED",
-        raw_text: "Hello.",
-        final_text: "Hello.",
-        word_count: 1,
-        duration_ms: 1200,
-        language: "en",
-        engine_id: "whisper",
-        model_id: "whisper-base",
-        app_bundle_id: null,
-        delivery: "PASTED",
-        error_code: null,
-        error_message: null,
-      },
-      {
-        id: "demo-2",
-        started_at_ms: Date.now() - 86400000 + 7100000,
-        ended_at_ms: Date.now() - 86400000 + 7104000,
-        outcome: "DELIVERED",
-        raw_text: "Hello.",
-        final_text: "Hello.",
-        word_count: 1,
-        duration_ms: 900,
-        language: "en",
-        engine_id: "whisper",
-        model_id: "whisper-base",
-        app_bundle_id: null,
-        delivery: "PASTED",
-        error_code: null,
-        error_message: null,
-      },
-      {
-        id: "demo-3",
-        started_at_ms: Date.now() - 86400000 + 7000000,
-        ended_at_ms: Date.now() - 86400000 + 7002000,
-        outcome: "DELIVERED",
-        raw_text: "",
-        final_text: "",
-        word_count: 0,
-        duration_ms: 500,
-        language: "en",
-        engine_id: "whisper",
-        model_id: "whisper-base",
-        app_bundle_id: null,
-        delivery: "PASTED",
-        error_code: null,
-        error_message: null,
-      },
-      {
-        id: "demo-4",
-        started_at_ms: Date.now() - 86400000 + 6900000,
-        ended_at_ms: Date.now() - 86400000 + 6903000,
-        outcome: "DELIVERED",
-        raw_text: "Hello.",
-        final_text: "Hello.",
-        word_count: 1,
-        duration_ms: 800,
-        language: "en",
-        engine_id: "whisper",
-        model_id: "whisper-base",
-        app_bundle_id: null,
-        delivery: "PASTED",
-        error_code: null,
-        error_message: null,
-      },
-    ],
-  },
-  {
-    label: "AUGUST 31, 2026",
-    key: "demo-aug31",
-    sessions: [
-      {
-        id: "demo-5",
-        started_at_ms: Date.now() - 172800000 + 39540000,
-        ended_at_ms: Date.now() - 172800000 + 39548000,
-        outcome: "DELIVERED",
-        raw_text: "Does fear make the boogeyman?",
-        final_text: "Does fear make the boogeyman?",
-        word_count: 5,
-        duration_ms: 2200,
-        language: "en",
-        engine_id: "whisper",
-        model_id: "whisper-base",
-        app_bundle_id: null,
-        delivery: "PASTED",
-        error_code: null,
-        error_message: null,
-      },
-      {
-        id: "demo-6",
-        started_at_ms: Date.now() - 172800000 + 2640000,
-        ended_at_ms: Date.now() - 172800000 + 2647000,
-        outcome: "DELIVERED",
-        raw_text:
-          "what's the best exotic cars to buy used and for a good price",
-        final_text:
-          "what's the best exotic cars to buy used and for a good price",
-        word_count: 13,
-        duration_ms: 3100,
-        language: "en",
-        engine_id: "whisper",
-        model_id: "whisper-base",
-        app_bundle_id: null,
-        delivery: "PASTED",
-        error_code: null,
-        error_message: null,
-      },
-      {
-        id: "demo-7",
-        started_at_ms: Date.now() - 172800000 + 180000,
-        ended_at_ms: Date.now() - 172800000 + 188000,
-        outcome: "DELIVERED",
-        raw_text:
-          "What cars depreciated the most but are still reliable and cheap? Season five.",
-        final_text:
-          "What cars depreciated the most but are still reliable and cheap? Season five.",
-        word_count: 13,
-        duration_ms: 3800,
-        language: "en",
-        engine_id: "whisper",
-        model_id: "whisper-base",
-        app_bundle_id: null,
-        delivery: "PASTED",
-        error_code: null,
-        error_message: null,
-      },
-    ],
-  },
-];
-
 // ─── Persona helper ──────────────────────────────────────────────────────────
 
 function personaFrom(totalWords: number): {
@@ -279,8 +141,8 @@ function personaFrom(totalWords: number): {
 
 export function StatsView({
   metrics,
-  hotkey: _hotkey,
-  mode: _mode,
+  hotkey,
+  mode,
 }: StatsViewProps) {
   const stats = useCommand(commands.getStats, []);
   const feed = useHistory("");
@@ -344,7 +206,7 @@ export function StatsView({
 
   // Filtered feed groups
   const groups = useMemo(() => {
-    const activeItems = feed.items.length > 0 ? feed.items : DEMO_GROUPS.flatMap((g) => g.sessions);
+    const activeItems = feed.items;
     const filtered = searchQuery.trim()
       ? activeItems.filter((s) =>
           textOf(s).toLowerCase().includes(searchQuery.toLowerCase()),
@@ -375,9 +237,9 @@ export function StatsView({
   }
 
   const data = stats.data;
-  const totalWords = data?.total_words || 4543;
-  const speakingWpm = Math.round(data?.speaking_wpm || 78);
-  const streakDays = data?.current_streak_days || 1;
+  const totalWords = data?.total_words ?? 0;
+  const speakingWpm = Math.round(data?.speaking_wpm ?? 0);
+  const streakDays = data?.current_streak_days ?? 0;
   const persona = personaFrom(totalWords);
 
   return (
@@ -440,7 +302,28 @@ export function StatsView({
 
             {/* ── Chronological History Feed ───────────────────────────────── */}
             <div className="flex flex-col gap-6">
-              {groups.map((group, groupIdx) => (
+              {groups.length === 0 ? (
+                <div className="rounded-2xl border border-stone-200/70 dark:border-stone-800/80 bg-[#fdfcfb] dark:bg-stone-900/40 p-12 text-center shadow-xs">
+                  {searchQuery.trim() ? (
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Search className="h-6 w-6 text-stone-400" />
+                      <p className="text-xs font-medium text-stone-700 dark:text-stone-300">
+                        No transcriptions found matching "{searchQuery}"
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery("")}
+                        className="text-xs text-stone-500 hover:text-stone-800 dark:hover:text-stone-200 underline mt-1 cursor-pointer"
+                      >
+                        Clear search
+                      </button>
+                    </div>
+                  ) : (
+                    <NoTranscriptionsYet hotkey={hotkey} mode={mode} />
+                  )}
+                </div>
+              ) : (
+                groups.map((group, groupIdx) => (
                 <section key={group.key} className="flex flex-col">
                   {/* Date Header + Search Button */}
                   <div className="flex items-center justify-between pb-2 px-1">
@@ -559,7 +442,7 @@ export function StatsView({
                               {isMenuOpen && (
                                 <div
                                   onMouseLeave={() => setMenuOpenId(null)}
-                                  className="absolute right-0 top-7 z-30 w-36 rounded-xl border border-stone-200 bg-white p-1 shadow-lg dark:border-stone-800 dark:bg-stone-900"
+                                  className="absolute right-0 top-7 z-30 w-36 rounded-xl border border-stone-200 bg-white p-1 shadow-lg dark:border-stone-700 dark:bg-[#1c1917]"
                                 >
                                   <button
                                     type="button"
@@ -567,7 +450,7 @@ export function StatsView({
                                       copy(session);
                                       setMenuOpenId(null);
                                     }}
-                                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-stone-700 hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-800"
+                                    className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-xs text-stone-700 hover:bg-stone-100 dark:text-stone-100 dark:hover:bg-stone-800"
                                   >
                                     <Copy className="h-3 w-3" />
                                     <span>Copy raw</span>
@@ -592,10 +475,11 @@ export function StatsView({
                     })}
                   </div>
                 </section>
-              ))}
+              ))
+            )}
 
               {/* Load More sentinel */}
-              {!feed.exhausted && feed.loaded && (
+              {!feed.exhausted && feed.loaded && groups.length > 0 && (
                 <button
                   type="button"
                   onClick={feed.loadMore}

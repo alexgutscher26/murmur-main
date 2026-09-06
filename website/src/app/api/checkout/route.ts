@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
-import { calculatePrice, getStripeClient, PlanTierKey } from "@/lib/stripe";
+import { calculatePrice, generateLicenseKey, getStripeClient, PlanTierKey } from "@/lib/stripe";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
 
     const pricing = calculatePrice(tier, discountCode);
     const origin = req.nextUrl.origin || "http://localhost:3000";
+    const licenseKey = generateLicenseKey(tier, discountCode);
 
     const stripe = getStripeClient();
 
@@ -29,18 +30,20 @@ export async function POST(req: NextRequest) {
       const successUrl = new URL("/pricing/success", origin);
       successUrl.searchParams.set("session_id", mockSessionId);
       successUrl.searchParams.set("plan", tier);
+      successUrl.searchParams.set("key", licenseKey);
       if (discountCode) successUrl.searchParams.set("code", discountCode);
 
       return NextResponse.json({
         url: successUrl.toString(),
         mode: "mock",
         pricing,
+        licenseKey,
       });
     }
 
     const successUrl = `${origin}/pricing/success?session_id={CHECKOUT_SESSION_ID}&plan=${tier}${
       discountCode ? `&code=${encodeURIComponent(discountCode)}` : ""
-    }`;
+    }&key=${encodeURIComponent(licenseKey)}`;
     const cancelUrl = `${origin}/pricing`;
 
     const isSubscription = tier === "pro_annual";
@@ -76,10 +79,22 @@ export async function POST(req: NextRequest) {
       metadata: {
         tier,
         discountCode: discountCode || "NONE",
+        licenseKey,
       },
+      ...(isSubscription
+        ? {
+            subscription_data: {
+              metadata: {
+                tier,
+                discountCode: discountCode || "NONE",
+                licenseKey,
+              },
+            },
+          }
+        : {}),
     });
 
-    return NextResponse.json({ url: session.url, sessionId: session.id });
+    return NextResponse.json({ url: session.url, sessionId: session.id, licenseKey });
   } catch (err: unknown) {
     console.error("Stripe checkout error:", err);
     const message = err instanceof Error ? err.message : "Failed to create checkout session";

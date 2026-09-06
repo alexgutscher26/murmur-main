@@ -103,11 +103,17 @@ export function ProfileOverrides({
           value={adding}
           aria-label={`Add an override for ${profile.display_name}`}
           onChange={(event) => addOverride(event.target.value)}
-          className="hairline h-8 w-fit rounded-input bg-sunken px-2 text-body text-text-secondary"
+          className="hairline h-8 w-fit rounded-input bg-sunken px-2 text-body text-stone-900 dark:text-stone-100 dark:bg-stone-800"
         >
-          <option value="">Add an override…</option>
+          <option value="" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">
+            Add an override…
+          </option>
           {available.map((def) => (
-            <option key={def.key} value={def.key}>
+            <option
+              key={def.key}
+              value={def.key}
+              className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100"
+            >
               {def.label}
             </option>
           ))}

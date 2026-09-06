@@ -74,14 +74,31 @@ impl CpalAudioSource {
         let device = match device_id {
             // "default" is stored rather than a device name, so that swapping
             // the system default follows automatically.
-            None | Some("default") | Some("") => host.default_input_device(),
-            Some(name) => host
-                .input_devices()
-                .map_err(device_error)?
-                .find(|device| device_name(device).as_deref() == Some(name))
-                // A device that has been unplugged since it was chosen falls
-                // back to the default rather than refusing to record.
-                .or_else(|| host.default_input_device()),
+            None | Some("default") | Some("") => {
+                let dev = host.default_input_device();
+                tracing::info!(
+                    device = ?dev.as_ref().and_then(device_name),
+                    "using system default input device"
+                );
+                dev
+            }
+            Some(name) => {
+                let found = host
+                    .input_devices()
+                    .map_err(device_error)?
+                    .find(|device| device_name(device).as_deref() == Some(name));
+                if found.is_some() {
+                    tracing::info!(device = name, "found configured input device");
+                    found
+                } else {
+                    tracing::warn!(
+                        configured = name,
+                        fallback = ?host.default_input_device().as_ref().and_then(device_name),
+                        "configured input device not found in host devices; falling back to default"
+                    );
+                    host.default_input_device()
+                }
+            }
         }
         .ok_or_else(|| {
             AppError::new(
@@ -155,6 +172,13 @@ impl AudioSource for CpalAudioSource {
     ) -> AppResult<Box<dyn CaptureSession>> {
         let (device, supported) = Self::find_device(config.device_id.as_deref())?;
         let info = Self::describe(&device, &supported, config.device_id.is_none());
+        tracing::info!(
+            device_name = %info.name,
+            is_default = info.is_default,
+            sample_rate = info.sample_rate,
+            channels = info.channels,
+            "starting audio capture stream"
+        );
         let native_rate = supported.sample_rate();
         let channels = supported.channels();
         let sample_format = supported.sample_format();

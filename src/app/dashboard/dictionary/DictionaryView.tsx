@@ -32,11 +32,14 @@ import {
 } from "lucide-react";
 import {
   commands,
+  events,
   type DictionaryChangeLogEntry,
   type DictionaryEntry,
   type MatchKind,
+  type SessionSummary,
 } from "@/lib/bindings";
 import { unwrapCommand, useCommand } from "@/lib/ipc";
+import { useTauriEvent } from "@/lib/use-event";
 import { cn } from "@/lib/utils";
 import { Skeleton, ErrorSurface } from "@/components/global";
 import { usePlan, getDictionaryWordLimit, canUseDomainPacks } from "@/lib/plan";
@@ -67,10 +70,14 @@ export const DOMAIN_PACKS: readonly DomainPack[] = [
       { pattern: "zoo stand", replacement: "Zustand" },
       { pattern: "tan stack query", replacement: "TanStack Query" },
       { pattern: "t r p c", replacement: "tRPC" },
+      { pattern: "react", replacement: "React" },
+      { pattern: "vite", replacement: "Vite" },
       { pattern: "use effect", replacement: "useEffect" },
       { pattern: "use state", replacement: "useState" },
       { pattern: "use callback", replacement: "useCallback" },
       { pattern: "use memo", replacement: "useMemo" },
+      { pattern: "use ref", replacement: "useRef" },
+      { pattern: "use layout", replacement: "useLayoutEffect" },
     ],
   },
   {
@@ -89,6 +96,13 @@ export const DOMAIN_PACKS: readonly DomainPack[] = [
       { pattern: "cube nettes", replacement: "Kubernetes" },
       { pattern: "a sync", replacement: "async" },
       { pattern: "a wait", replacement: "await" },
+      { pattern: "docker", replacement: "Docker" },
+      { pattern: "python", replacement: "Python" },
+      { pattern: "rust", replacement: "Rust" },
+      { pattern: "cargo", replacement: "Cargo" },
+      { pattern: "serde", replacement: "Serde" },
+      { pattern: "t r p c", replacement: "tRPC" },
+      { pattern: "t r p c", replacement: "tRPC" },
     ],
   },
   {
@@ -140,7 +154,7 @@ export const DOMAIN_PACKS: readonly DomainPack[] = [
   },
 ];
 
-// ─── Initial Demo Words ──────────────────────────────────────────────────────
+// ─── Learned Suggestions from User Voice History ────────────────────────────
 
 interface WordMetadata {
   sparkle?: boolean;
@@ -148,26 +162,101 @@ interface WordMetadata {
   scope?: "personal" | "team";
 }
 
-const SEED_TERMS = [
-  { pattern: "supabase", replacement: "supabase", sparkle: true, scope: "personal" as const },
-  { pattern: "workinbox69@gmail.com", replacement: "workinbox69@gmail.com", sparkle: false, scope: "personal" as const },
-  { pattern: "Alex Gutscher", replacement: "Alex Gutscher", sparkle: false, scope: "personal" as const },
-  { pattern: "expo", replacement: "expo", sparkle: true, scope: "personal" as const },
-  { pattern: "stackauth", replacement: "stackauth", sparkle: true, scope: "personal" as const },
-  { pattern: "questHow", replacement: "questHow", sparkle: true, scope: "personal" as const },
-  { pattern: "etsy", replacement: "etsy", sparkle: true, scope: "personal" as const },
-];
+const COMMON_STOPWORDS = new Set([
+  "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", "with",
+  "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we", "say", "her",
+  "she", "or", "an", "will", "my", "one", "all", "would", "there", "their", "what", "so", "up",
+  "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", "time",
+  "no", "just", "him", "know", "take", "people", "into", "year", "your", "good", "some", "could",
+  "them", "see", "other", "than", "then", "now", "look", "only", "come", "its", "over", "think",
+  "also", "back", "after", "use", "two", "how", "our", "work", "first", "well", "way", "even",
+  "new", "want", "because", "any", "these", "give", "day", "most", "us", "is", "are", "was", "were",
+  "been", "being", "has", "had", "did", "does", "doing", "very", "much", "more", "here", "where",
+  "why", "again", "please", "thank", "thanks", "hello", "hi", "hey", "yes", "yeah", "okay", "sure",
+  "today", "tomorrow", "yesterday", "going", "need", "should", "really", "something", "everything",
+  "anything", "nothing", "said", "got", "always", "around", "still", "off", "next", "last", "right",
+  "left", "don't", "dont", "can't", "cant", "won't", "wont", "it's", "its", "i'm", "im", "you're",
+  "youre", "we're", "were", "they're", "theyre", "i've", "ive", "we've", "weve", "let's", "lets"
+]);
 
-const SUGGESTED_CHIPS = ["Murmur", "Samir", "Sara", "Karol", "Spyder"];
+export const DEFAULT_SUGGESTED_CHIPS = ["Murmur", "Whisper", "Vite", "Tauri", "React"];
+export const SUGGESTED_CHIPS = DEFAULT_SUGGESTED_CHIPS;
 
-const SEED_FALLBACK: DictionaryEntry[] = SEED_TERMS.map((term, index) => ({
-  id: -(index + 1),
-  pattern: term.pattern,
-  replacement: term.replacement,
-  match_kind: "WORD",
-  enabled: true,
-  used_at: null,
-}));
+export function extractLearnedSuggestions(
+  sessions: readonly SessionSummary[],
+  existingTerms: ReadonlySet<string>,
+  maxCount = 5
+): string[] {
+  const scores = new Map<string, number>();
+  const originalCasing = new Map<string, string>();
+
+  for (const session of sessions) {
+    const text = session.final_text ?? session.raw_text ?? "";
+    if (!text.trim()) continue;
+
+    // Tokenize words, preserving dots/dashes in technical terms (e.g. Next.js, node.js)
+    const tokens = text.match(/[A-Za-z0-9][A-Za-z0-9_.-]*[A-Za-z0-9]|[A-Za-z]/g) || [];
+
+    for (let i = 0; i < tokens.length; i++) {
+      let token = tokens[i].trim();
+      token = token.replace(/^[^\w]+|[^\w]+$/g, "");
+      if (token.length < 2 || /^\d+$/.test(token)) continue;
+
+      const lower = token.toLowerCase();
+      if (COMMON_STOPWORDS.has(lower)) continue;
+      if (existingTerms.has(lower)) continue;
+
+      let score = 1;
+
+      // Boost CamelCase or PascalCase (e.g. useState, AppError)
+      if (/[a-z][A-Z]/.test(token)) {
+        score += 5;
+      }
+      // Boost uppercase acronyms (e.g. API, URL, PR, MRR, SLA)
+      else if (/^[A-Z]{2,6}$/.test(token)) {
+        score += 4;
+      }
+      // Boost capitalized proper nouns (especially mid-sentence)
+      else if (/^[A-Z][a-z]+$/.test(token)) {
+        const isStartOfSentence = i === 0 || /[.!?]$/.test(tokens[i - 1] || "");
+        score += isStartOfSentence ? 1 : 3;
+      }
+      // Boost technical terms with punctuation (e.g. Next.js, vue.js)
+      else if (/[-_.]/.test(token)) {
+        score += 4;
+      }
+
+      scores.set(lower, (scores.get(lower) ?? 0) + score);
+
+      if (!originalCasing.has(lower) || (/[A-Z]/.test(token) && !/[A-Z]/.test(originalCasing.get(lower)!))) {
+        originalCasing.set(lower, token);
+      }
+    }
+  }
+
+  // Sort by score descending
+  const sorted = Array.from(scores.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([lower]) => originalCasing.get(lower) || lower);
+
+  const results: string[] = [];
+  for (const word of sorted) {
+    if (results.length >= maxCount) break;
+    results.push(word);
+  }
+
+  // Fallback to sensible defaults if speech history is short or empty
+  if (results.length < maxCount) {
+    for (const def of DEFAULT_SUGGESTED_CHIPS) {
+      if (results.length >= maxCount) break;
+      if (!existingTerms.has(def.toLowerCase()) && !results.some((r) => r.toLowerCase() === def.toLowerCase())) {
+        results.push(def);
+      }
+    }
+  }
+
+  return results;
+}
 
 const METADATA_STORAGE_KEY = "murmur_dictionary_meta_v1";
 const BANNER_DISMISSED_KEY = "murmur_dict_banner_dismissed_v1";
@@ -216,6 +305,27 @@ function GoldenSparkleIcon({ className }: { className?: string }) {
 
 export function DictionaryView() {
   const entries = useCommand(commands.listDictionary, []);
+  const recentHistory = useCommand(() => commands.listHistory({ limit: 100, offset: 0 }), []);
+
+  useTauriEvent(events.transcriptDelivered, () => {
+    recentHistory.reload();
+  });
+
+  // Lowercased set of existing dictionary patterns & replacements
+  const existingWordSet = useMemo(() => {
+    const set = new Set<string>();
+    for (const e of entries.data ?? []) {
+      if (e.replacement) set.add(e.replacement.toLowerCase().trim());
+      if (e.pattern) set.add(e.pattern.toLowerCase().trim());
+    }
+    return set;
+  }, [entries.data]);
+
+  // Dynamically learned suggestions from what the user talks about
+  const suggestedChips = useMemo(() => {
+    return extractLearnedSuggestions(recentHistory.data ?? [], existingWordSet, 5);
+  }, [recentHistory.data, existingWordSet]);
+
   const [activeTab, setActiveTab] = useState<"all" | "personal" | "team" | "packs">("all");
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -304,39 +414,7 @@ export function DictionaryView() {
     [entries.data],
   );
 
-  // Auto-seed initial terms if dictionary is completely empty on first launch
-  useEffect(() => {
-    if (entries.data && entries.data.length === 0) {
-      const seededFlag = localStorage.getItem("murmur_dict_auto_seeded");
-      if (!seededFlag) {
-        localStorage.setItem("murmur_dict_auto_seeded", "true");
-        (async () => {
-          const newMeta = { ...meta };
-          for (const item of SEED_TERMS) {
-            try {
-              await unwrapCommand(() =>
-                commands.createDictionaryEntry({
-                  pattern: item.pattern,
-                  replacement: item.replacement,
-                  match_kind: "WORD",
-                }),
-              );
-              newMeta[item.replacement] = {
-                sparkle: item.sparkle,
-                scope: item.scope,
-                starred: false,
-              };
-            } catch {
-              // ignore duplicate or creation error
-            }
-          }
-          saveLocalMeta(newMeta);
-          setMeta(newMeta);
-          entries.reload();
-        })();
-      }
-    }
-  }, [entries.data, entries, meta]);
+
 
   const handleDismissBanner = () => {
     setBannerDismissed(true);
@@ -454,7 +532,7 @@ export function DictionaryView() {
   // Filtered & Sorted Entries
   const displayedEntries = useMemo(() => {
     const dataList = entries.data ?? [];
-    let list = dataList.length > 0 ? [...dataList] : [...SEED_FALLBACK];
+    let list = [...dataList];
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -901,15 +979,16 @@ export function DictionaryView() {
                     <span>Add new word</span>
                   </button>
 
-                  {SUGGESTED_CHIPS.map((chip) => (
+                  {suggestedChips.map((chip) => (
                     <button
                       key={chip}
                       type="button"
                       onClick={() => handleQuickAddChip(chip)}
-                      title={`Add "${chip}" to dictionary`}
-                      className="rounded-full border border-white/10 bg-white/15 px-3.5 py-1.5 text-xs font-medium text-stone-200 backdrop-blur-sm hover:bg-white/25 hover:text-white transition-all active:scale-95"
+                      title={`Add "${chip}" to dictionary (learned from your speech)`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/15 px-3.5 py-1.5 text-xs font-medium text-stone-200 backdrop-blur-sm hover:bg-white/25 hover:text-white transition-all active:scale-95"
                     >
-                      {chip}
+                      <Sparkles className="size-3 text-amber-300" />
+                      <span>{chip}</span>
                     </button>
                   ))}
                 </div>
@@ -995,14 +1074,7 @@ export function DictionaryView() {
                 displayedEntries.map((entry) => {
                   const term = entry.replacement || entry.pattern;
                   const itemMeta = meta[entry.replacement] || meta[entry.pattern] || {};
-                  // Sparkle is true if marked in metadata, or pattern/replacement matches tech names
-                  const hasSparkle = itemMeta.sparkle ?? (
-                    entry.pattern.toLowerCase() === "supabase" ||
-                    entry.pattern.toLowerCase() === "expo" ||
-                    entry.pattern.toLowerCase() === "stackauth" ||
-                    entry.pattern.toLowerCase() === "questhow" ||
-                    entry.pattern.toLowerCase() === "etsy"
-                  );
+                  const hasSparkle = itemMeta.sparkle ?? false;
                   const isStarred = !!itemMeta.starred;
 
                   return (
@@ -1362,9 +1434,9 @@ function WordModal({
               onChange={(e) => setMatchKind(e.target.value as MatchKind)}
               className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-900 focus:border-stone-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
             >
-              <option value="WORD">Whole word (recommended)</option>
-              <option value="WORD_CASE_SENSITIVE">Whole word (case sensitive)</option>
-              <option value="SUBSTRING">Anywhere (substring)</option>
+              <option value="WORD" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">Whole word (recommended)</option>
+              <option value="WORD_CASE_SENSITIVE" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">Whole word (case sensitive)</option>
+              <option value="SUBSTRING" className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100">Anywhere (substring)</option>
             </select>
           </div>
 

@@ -383,3 +383,31 @@
     --fade-bottom: var(--fade-size-bottom);
   }
 }
+
+/* ── Native Select & Dropdown Menu Theming ───────────────────────────────── */
+
+select {
+  color-scheme: light dark;
+}
+
+:where(.dark, [data-theme="dark"]) select {
+  color-scheme: dark;
+  background-color: #24201c;
+  color: #f5f5f4;
+}
+
+:where(.dark, [data-theme="dark"]) option,
+:where(.dark, [data-theme="dark"]) select option,
+:where(.dark, [data-theme="dark"]) select optgroup {
+  color-scheme: dark;
+  background-color: #1c1917 !important;
+  color: #f5f5f4 !important;
+}
+
+:where(:not(.dark):not([data-theme="dark"])) option,
+:where(:not(.dark):not([data-theme="dark"])) select option {
+  color-scheme: light;
+  background-color: #ffffff;
+  color: #1c1917;
+}
+

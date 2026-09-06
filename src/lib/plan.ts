@@ -1,7 +1,7 @@
 /**
- * SOURCE OF TRUTH KEYWORDS: PlanTier, usePlan, canUseTurboModel, canUseContextEngine, canUseFillerStripper, canUseVoiceSnippets, canUseTeamDictionarySync
- * WHAT:  Single source of truth for plan licensing and feature gating in the Murmur desktop app.
- * WHY:   Centralizes tier capabilities (Starter vs Pro vs Team) so every UI view and setting control checks the same rulebook.
+ * SOURCE OF TRUTH KEYWORDS: PlanTier, usePlan, canUseTurboModel, canUseContextEngine, canUseFillerStripper, canUseVoiceSnippets, canUseTeamDictionarySync, checkRemoteLicenseStatus
+ * WHAT:  Single source of truth for plan licensing, subscription validation, and feature gating in the Murmur desktop app.
+ * WHY:   Centralizes tier capabilities (Starter vs Pro vs Team) and synchronizes subscription cancellations/renewals with Stripe while preserving 100% offline privacy for perpetual Lifetime licenses.
  * WHERE: Consumed by BillingView, SettingsView, model selectors, and enhancement settings.
  */
 
@@ -10,12 +10,25 @@ import { commands } from "@/lib/bindings";
 import { unwrapCommand } from "@/lib/ipc";
 
 export type PlanTier = "starter" | "pro" | "team";
+export type SubscriptionStatus = "active" | "canceled" | "past_due" | "lifetime";
 
 export interface PlanState {
   tier: PlanTier;
   isTrial: boolean;
   trialExpiresAt: number | null; // timestamp ms
   licenseKey: string | null;
+  subscriptionStatus?: SubscriptionStatus;
+  expiresAt?: number | null; // timestamp ms
+  lastVerifiedAt?: number | null; // timestamp ms
+}
+
+export interface SubscriptionCheckResult {
+  valid: boolean;
+  tier: PlanTier;
+  isLifetime: boolean;
+  status: SubscriptionStatus | "expired" | "unknown";
+  expiresAt: number | null;
+  message: string;
 }
 
 const STORAGE_KEY = "murmur.license_plan";
@@ -25,6 +38,9 @@ const DEFAULT_STATE: PlanState = {
   isTrial: false,
   trialExpiresAt: null,
   licenseKey: null,
+  subscriptionStatus: undefined,
+  expiresAt: null,
+  lastVerifiedAt: null,
 };
 
 let memoryState: PlanState = DEFAULT_STATE;
@@ -35,11 +51,27 @@ function getStoredState(): PlanState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_STATE;
-    const parsed = JSON.parse(raw);
+    const parsed: PlanState = JSON.parse(raw);
+
     // Verify trial expiry
     if (parsed.isTrial && parsed.trialExpiresAt && Date.now() > parsed.trialExpiresAt) {
       return { ...parsed, tier: "starter", isTrial: false };
     }
+
+    // Verify annual subscription expiry if recorded
+    if (
+      parsed.tier !== "starter" &&
+      parsed.subscriptionStatus !== "lifetime" &&
+      parsed.expiresAt &&
+      Date.now() > parsed.expiresAt
+    ) {
+      return {
+        ...parsed,
+        tier: "starter",
+        subscriptionStatus: "canceled",
+      };
+    }
+
     return parsed;
   } catch {
     return DEFAULT_STATE;
@@ -143,6 +175,66 @@ async function unlockProFeatures() {
   } catch {}
 }
 
+/**
+ * Checks subscription validity against the license API endpoint.
+ * Respects air-gap / offline mode gracefully: Lifetime licenses never query network.
+ */
+export async function checkRemoteLicenseStatus(key: string): Promise<SubscriptionCheckResult> {
+  const cleanKey = key.trim().toUpperCase();
+
+  // 1. Lifetime licenses are perpetual and strictly offline
+  if (cleanKey.startsWith("LIFETIME-") || cleanKey.startsWith("FOUNDING-")) {
+    return {
+      valid: true,
+      tier: "pro",
+      isLifetime: true,
+      status: "lifetime",
+      expiresAt: null,
+      message: "Perpetual License · Never Expires",
+    };
+  }
+
+  // 2. Endpoints to verify active subscription or cancellation
+  const endpoints = [
+    "http://localhost:3000/api/license/verify",
+    "https://murmur.app/api/license/verify",
+  ];
+
+  for (const url of endpoints) {
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ licenseKey: cleanKey }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return {
+          valid: data.valid,
+          tier: data.tier || "pro",
+          isLifetime: data.isLifetime || false,
+          status: data.status || (data.valid ? "active" : "canceled"),
+          expiresAt: data.expiresAt || null,
+          message: data.message || (data.valid ? "Subscription Active" : "Subscription Expired or Canceled"),
+        };
+      }
+    } catch {
+      // Continue to next endpoint or fallback
+    }
+  }
+
+  // 3. Offline / Air-Gapped Fallback: keep existing access
+  const isTeam = cleanKey.startsWith("TEAM-");
+  return {
+    valid: true,
+    tier: isTeam ? "team" : "pro",
+    isLifetime: false,
+    status: "active",
+    expiresAt: null,
+    message: "Active (Offline Mode)",
+  };
+}
+
 export function usePlan() {
   const state = useSyncExternalStore(subscribe, getSnapshot, () => DEFAULT_STATE);
 
@@ -153,6 +245,9 @@ export function usePlan() {
       isTrial: true,
       trialExpiresAt: expires,
       licenseKey: "TRIAL-14DAYS-ACTIVE",
+      subscriptionStatus: "active",
+      expiresAt: expires,
+      lastVerifiedAt: Date.now(),
     });
     unlockProFeatures();
   };
@@ -173,34 +268,74 @@ export function usePlan() {
     const cleanKey = key.trim().toUpperCase();
     if (!cleanKey) return false;
 
-    if (cleanKey.startsWith("TEAM-")) {
-      saveState({
-        tier: "team",
-        isTrial: false,
-        trialExpiresAt: null,
-        licenseKey: cleanKey,
-      });
-      unlockProFeatures();
-      return true;
-    } else if (
+    const isLifetime = cleanKey.startsWith("LIFETIME-") || cleanKey.startsWith("FOUNDING-");
+    const isTeam = cleanKey.startsWith("TEAM-");
+    const isPro =
       cleanKey.startsWith("PRO-") ||
-      cleanKey.startsWith("FOUNDING-") ||
-      cleanKey.startsWith("LIFETIME-") ||
       cleanKey.startsWith("STUDENT-") ||
       cleanKey.startsWith("OSS-") ||
       cleanKey.startsWith("SWITCHER-") ||
-      cleanKey.length >= 8
-    ) {
+      cleanKey.length >= 8;
+
+    if (isTeam || isPro) {
       saveState({
-        tier: "pro",
+        tier: isTeam ? "team" : "pro",
         isTrial: false,
         trialExpiresAt: null,
         licenseKey: cleanKey,
+        subscriptionStatus: isLifetime ? "lifetime" : "active",
+        expiresAt: isLifetime ? null : Date.now() + 365 * 24 * 60 * 60 * 1000,
+        lastVerifiedAt: Date.now(),
       });
       unlockProFeatures();
+
+      // Non-blocking background sync with Stripe if online
+      if (!isLifetime) {
+        void checkRemoteLicenseStatus(cleanKey).then((result) => {
+          if (!result.valid && result.status === "canceled") {
+            saveState({
+              ...getStoredState(),
+              tier: "starter",
+              subscriptionStatus: "canceled",
+              lastVerifiedAt: Date.now(),
+            });
+          } else if (result.valid) {
+            saveState({
+              ...getStoredState(),
+              subscriptionStatus: result.isLifetime ? "lifetime" : "active",
+              expiresAt: result.expiresAt,
+              lastVerifiedAt: Date.now(),
+            });
+          }
+        });
+      }
       return true;
     }
     return false;
+  };
+
+  const syncSubscription = async (): Promise<SubscriptionCheckResult | null> => {
+    if (!state.licenseKey) return null;
+    const result = await checkRemoteLicenseStatus(state.licenseKey);
+
+    if (!result.valid && result.status === "canceled") {
+      saveState({
+        ...state,
+        tier: "starter",
+        subscriptionStatus: "canceled",
+        lastVerifiedAt: Date.now(),
+      });
+    } else if (result.valid) {
+      saveState({
+        ...state,
+        tier: result.tier,
+        subscriptionStatus: result.isLifetime ? "lifetime" : "active",
+        expiresAt: result.expiresAt,
+        lastVerifiedAt: Date.now(),
+      });
+    }
+
+    return result;
   };
 
   const resetToStarter = () => {
@@ -216,12 +351,16 @@ export function usePlan() {
     isTrial: state.isTrial,
     trialDaysRemaining,
     licenseKey: state.licenseKey,
+    subscriptionStatus: state.subscriptionStatus,
+    expiresAt: state.expiresAt,
+    lastVerifiedAt: state.lastVerifiedAt,
     isStarter: state.tier === "starter",
     isPro: state.tier === "pro" || state.tier === "team",
     isTeam: state.tier === "team",
     startTrial,
     setTier,
     activateLicense,
+    syncSubscription,
     resetToStarter,
   };
 }

@@ -16,7 +16,6 @@
 import { useState, useMemo, useCallback } from "react";
 import {
   Share2,
-  Info,
   Laptop,
   Bot,
   Infinity as InfinityIcon,
@@ -26,7 +25,6 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  TrendingDown,
   Check,
 } from "lucide-react";
 import { commands, type HotkeyBinding, type SessionSummary } from "@/lib/bindings";
@@ -37,6 +35,7 @@ import { Skeleton, ErrorSurface } from "@/components/global";
 import type { DictationMode } from "@/lib/dictation-mode";
 import { useHistory } from "../history/use-history";
 import { StreakBadge } from "../_components/StreakHeaderBadge";
+import { InfoTooltip } from "../_components/InfoTooltip";
 
 export interface InsightsViewProps {
   hotkey: HotkeyBinding | null;
@@ -53,7 +52,7 @@ function textOf(session: SessionSummary): string {
 
 function SpeedometerGauge({ wpm }: { wpm: number }) {
   const maxWpm = 160;
-  const ratio = Math.min(Math.max(wpm / maxWpm, 0.1), 1);
+  const ratio = wpm > 0 ? Math.min(Math.max(wpm / maxWpm, 0.05), 1) : 0;
 
   // SVG arc calculation: half circle from 180 deg to 0 deg
   // Arc radius = 56, center = (70, 70)
@@ -62,12 +61,13 @@ function SpeedometerGauge({ wpm }: { wpm: number }) {
   const dashOffset = arcLength * (1 - ratio);
 
   // Percentile calculation
-  let percentile = "Top 25%";
+  let percentile = "—";
   if (wpm >= 130) percentile = "Top 1%";
   else if (wpm >= 105) percentile = "Top 3%";
   else if (wpm >= 90) percentile = "Top 5%";
   else if (wpm >= 75) percentile = "Top 10%";
   else if (wpm >= 60) percentile = "Top 20%";
+  else if (wpm > 0) percentile = "Top 25%";
 
   return (
     <div className="relative flex flex-col items-center justify-center pt-2">
@@ -92,24 +92,26 @@ function SpeedometerGauge({ wpm }: { wpm: number }) {
           className="text-stone-200 dark:text-stone-700/60"
         />
         {/* Active progress arc */}
-        <path
-          d="M 14 75 A 56 56 0 0 1 126 75"
-          fill="none"
-          stroke="url(#gaugeGradient)"
-          strokeWidth="15"
-          strokeLinecap="round"
-          strokeDasharray={arcLength}
-          strokeDashoffset={dashOffset}
-          className="transition-all duration-700 ease-out"
-        />
+        {wpm > 0 && (
+          <path
+            d="M 14 75 A 56 56 0 0 1 126 75"
+            fill="none"
+            stroke="url(#gaugeGradient)"
+            strokeWidth="15"
+            strokeLinecap="round"
+            strokeDasharray={arcLength}
+            strokeDashoffset={dashOffset}
+            className="transition-all duration-700 ease-out"
+          />
+        )}
       </svg>
       {/* Center text */}
       <div className="absolute bottom-2 flex flex-col items-center text-center">
         <span className="text-[11px] font-medium uppercase tracking-wider text-text-tertiary">
-          Top
+          {wpm > 0 ? "Top" : "Speed"}
         </span>
         <span className="text-sm font-bold text-text-primary">
-          {percentile.replace("Top ", "")}
+          {wpm > 0 ? percentile.replace("Top ", "") : "0 WPM"}
         </span>
       </div>
     </div>
@@ -289,9 +291,48 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
   const sessions = historyFeed.items;
 
   // ── Stats Calculations ──
-  const totalWords = stats?.total_words ?? 4543;
-  const speakingWpm = Math.round(stats?.speaking_wpm ?? 78);
-  const streakDays = stats?.current_streak_days ?? 1;
+  const totalWords = stats?.total_words ?? 0;
+  const speakingWpm = Math.round(stats?.speaking_wpm ?? 0);
+  const streakDays = stats?.current_streak_days ?? 0;
+
+  // Words dictated in current month
+  const thisMonthWords = useMemo(() => {
+    if (!stats?.activity) return 0;
+    const currentYearMonth = new Date().toISOString().slice(0, 7);
+    return stats.activity
+      .filter((a) => a.date.startsWith(currentYearMonth))
+      .reduce((sum, a) => sum + a.word_count, 0);
+  }, [stats?.activity]);
+
+  // Unique apps count
+  const totalAppsUsed = useMemo(() => {
+    const apps = new Set<string>();
+    for (const s of sessions) {
+      if (s.app_bundle_id) {
+        apps.add(s.app_bundle_id);
+      }
+    }
+    return apps.size;
+  }, [sessions]);
+
+  // Longest streak calculation from activity history
+  const longestStreak = useMemo(() => {
+    if (!stats?.activity || stats.activity.length === 0) {
+      return streakDays;
+    }
+    let maxStreak = 0;
+    let currStreak = 0;
+    const sorted = [...stats.activity].sort((a, b) => a.date.localeCompare(b.date));
+    for (const day of sorted) {
+      if (day.word_count > 0 || day.session_count > 0) {
+        currStreak++;
+        if (currStreak > maxStreak) maxStreak = currStreak;
+      } else {
+        currStreak = 0;
+      }
+    }
+    return Math.max(maxStreak, streakDays);
+  }, [stats?.activity, streakDays]);
 
   // Derive post-processing fixes count
   const { wordsCorrected, dictionaryFixes, totalFixes } = useMemo(() => {
@@ -305,11 +346,6 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
         corrected += Math.max(1, Math.abs(rawWords - finalWords) + 2);
         dict += 1;
       }
-    }
-
-    if (corrected === 0 && (!sessions || sessions.length === 0)) {
-      corrected = 233;
-      dict = 53;
     }
 
     return {
@@ -344,56 +380,56 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
       else otherTasks++;
     }
 
-    const aiCount = sessions.length ? aiPrompts : 171;
-    const otherCount = sessions.length ? otherTasks : 83;
-    const emailCount = sessions.length ? emails : 0;
-    const workCount = sessions.length ? workMessages : 0;
-    const personalCount = sessions.length ? personalMessages : 0;
-    const docCount = sessions.length ? documents : 0;
+    const aiCount = aiPrompts;
+    const otherCount = otherTasks;
+    const emailCount = emails;
+    const workCount = workMessages;
+    const personalCount = personalMessages;
+    const docCount = documents;
 
-    const computedTotal = aiCount + otherCount + emailCount + workCount + personalCount + docCount || 1;
+    const computedTotal = aiCount + otherCount + emailCount + workCount + personalCount + docCount;
 
     return [
       {
         icon: Bot,
         label: "AI PROMPTS",
         count: aiCount,
-        percent: Math.round((aiCount / computedTotal) * 100),
+        percent: computedTotal > 0 ? Math.round((aiCount / computedTotal) * 100) : 0,
         barColor: "bg-teal-800 dark:bg-teal-500",
       },
       {
         icon: InfinityIcon,
         label: "OTHER TASKS",
         count: otherCount,
-        percent: Math.round((otherCount / computedTotal) * 100),
+        percent: computedTotal > 0 ? Math.round((otherCount / computedTotal) * 100) : 0,
         barColor: "bg-teal-600 dark:bg-teal-600",
       },
       {
         icon: Mail,
         label: "EMAILS",
         count: emailCount,
-        percent: Math.round((emailCount / computedTotal) * 100),
+        percent: computedTotal > 0 ? Math.round((emailCount / computedTotal) * 100) : 0,
         barColor: "bg-teal-500/30 dark:bg-teal-800/40",
       },
       {
         icon: MessageSquare,
         label: "WORK MESSAGES",
         count: workCount,
-        percent: Math.round((workCount / computedTotal) * 100),
+        percent: computedTotal > 0 ? Math.round((workCount / computedTotal) * 100) : 0,
         barColor: "bg-teal-500/30 dark:bg-teal-800/40",
       },
       {
         icon: MessageCircle,
         label: "PERSONAL MESSAGES",
         count: personalCount,
-        percent: Math.round((personalCount / computedTotal) * 100),
+        percent: computedTotal > 0 ? Math.round((personalCount / computedTotal) * 100) : 0,
         barColor: "bg-teal-500/30 dark:bg-teal-800/40",
       },
       {
         icon: FileText,
         label: "DOCUMENTS",
         count: docCount,
-        percent: Math.round((docCount / computedTotal) * 100),
+        percent: computedTotal > 0 ? Math.round((docCount / computedTotal) * 100) : 0,
         barColor: "bg-teal-500/30 dark:bg-teal-800/40",
       },
     ];
@@ -406,7 +442,9 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
     let fillerCount = 0;
     const wordFreq = new Map<string, number>();
 
+    let deliveredCount = 0;
     for (const s of sessions) {
+      if (s.outcome === "DELIVERED") deliveredCount++;
       const text = textOf(s).toLowerCase();
       const words = text.match(/\b[a-z]{3,}\b/g) || [];
       totalWordTokens += words.length;
@@ -421,9 +459,15 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
       }
     }
 
-    const uniqueWords = wordFreq.size || 680;
-    const lexicalDiversity = totalWordTokens > 0 ? Math.min(94, Math.round((uniqueWords / totalWordTokens) * 100)) : 76;
-    const fillerRatio = totalWordTokens > 0 ? ((fillerCount / totalWordTokens) * 100).toFixed(1) : "0.4";
+    const uniqueWords = wordFreq.size;
+    const lexicalDiversity =
+      totalWordTokens > 0 ? Math.min(100, Math.round((uniqueWords / totalWordTokens) * 100)) : 0;
+    const fillerRatio =
+      totalWordTokens > 0 ? ((fillerCount / totalWordTokens) * 100).toFixed(1) : "0.0";
+    const clarityScore =
+      sessions.length > 0 ? Math.round((deliveredCount / sessions.length) * 1000) / 10 : 0;
+    const avgSentenceLength =
+      sessions.length > 0 ? Math.round(totalWordTokens / sessions.length) : 0;
 
     const topKeywords = Array.from(wordFreq.entries())
       .sort((a, b) => b[1] - a[1])
@@ -431,18 +475,12 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
       .map(([word, count]) => ({ word, count }));
 
     return {
+      hasData: sessions.length > 0,
       lexicalDiversity,
       fillerRatio,
-      clarityScore: 98.2,
-      avgSentenceLength: 14,
-      topKeywords: topKeywords.length > 0 ? topKeywords : [
-        { word: "feature", count: 42 },
-        { word: "component", count: 38 },
-        { word: "refactor", count: 29 },
-        { word: "interface", count: 24 },
-        { word: "pipeline", count: 19 },
-        { word: "latency", count: 16 },
-      ],
+      clarityScore,
+      avgSentenceLength,
+      topKeywords,
     };
   }, [sessions]);
 
@@ -457,7 +495,7 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
 
   if (statsQuery.loading) {
     return (
-      <div className="flex h-full min-h-0 flex-col overflow-y-auto px-[var(--page-padding-x)] pt-[var(--page-header-height)] pb-8">
+      <div className="flex h-full min-h-0 flex-col overflow-y-auto px-[var(--page-padding-x)] pt-3 pb-8">
         <Skeleton rows={5} />
       </div>
     );
@@ -465,7 +503,7 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
 
   if (statsQuery.error) {
     return (
-      <div className="flex h-full min-h-0 flex-col overflow-y-auto px-[var(--page-padding-x)] pt-[var(--page-header-height)] pb-8">
+      <div className="flex h-full min-h-0 flex-col overflow-y-auto px-[var(--page-padding-x)] pt-3 pb-8">
         <ErrorSurface error={statsQuery.error} onRetry={statsQuery.reload} />
       </div>
     );
@@ -474,10 +512,10 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
   return (
     <div
       data-scroll-area
-      className="flex h-full min-h-0 flex-col overflow-y-auto px-[var(--page-padding-x)] pt-[var(--page-header-height)] pb-12"
+      className="flex h-full min-h-0 flex-col overflow-y-auto px-[var(--page-padding-x)] pt-3 pb-12"
     >
       {/* ── Header Navigation Bar ─────────────────────────────────────────── */}
-      <div className="flex items-center justify-between border-b border-hairline pb-3 mb-6">
+      <div className="flex items-center justify-between border-b border-hairline pb-2.5 mb-5">
         {/* Sub tabs */}
         <div className="flex items-center gap-6">
           <button
@@ -548,9 +586,10 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
                 </div>
                 <div className="mt-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
                   <span>WORDS PER MINUTE</span>
-                  <span title="Your average speaking speed while dictating">
-                    <Info className="h-3.5 w-3.5 opacity-70 hover:opacity-100 cursor-pointer" />
-                  </span>
+                  <InfoTooltip
+                    content="Your average speaking speed measured across delivered dictations."
+                    align="start"
+                  />
                 </div>
               </div>
 
@@ -575,17 +614,19 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
                   <span className="font-medium text-text-primary">
                     {formatCount(wordsCorrected)} words corrected
                   </span>
-                  <span title="Typos, grammatical cleanups, and punctuation inserted">
-                    <Info className="h-3.5 w-3.5 text-text-tertiary hover:text-text-primary cursor-pointer" />
-                  </span>
+                  <InfoTooltip
+                    content="Typos, grammatical cleanups, and punctuation inserted automatically."
+                    align="end"
+                  />
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium text-text-primary">
                     {formatCount(dictionaryFixes)} dictionary fixes
                   </span>
-                  <span title="Custom spelling rules applied from your Murmur Dictionary">
-                    <Info className="h-3.5 w-3.5 text-text-tertiary hover:text-text-primary cursor-pointer" />
-                  </span>
+                  <InfoTooltip
+                    content="Custom spelling rules applied from your Murmur Dictionary."
+                    align="end"
+                  />
                 </div>
               </div>
             </div>
@@ -603,10 +644,11 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
                 </div>
 
                 {/* Trend pill */}
-                <div className="flex items-center gap-1 rounded-full bg-sunken px-2.5 py-1 text-xs font-medium text-text-secondary">
-                  <TrendingDown className="h-3.5 w-3.5 text-text-tertiary" />
-                  <span>94% this month</span>
-                </div>
+                {totalWords > 0 && thisMonthWords > 0 && (
+                  <div className="flex items-center gap-1 rounded-full bg-sunken px-2.5 py-1 text-xs font-medium text-text-secondary">
+                    <span>{formatCount(thisMonthWords)} this month</span>
+                  </div>
+                )}
               </div>
 
               {/* Platform breakdown & mobile button */}
@@ -647,7 +689,7 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
               <div className="flex items-center justify-between pb-4">
                 <h3 className="text-xl font-bold text-text-primary">Desktop usage</h3>
                 <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">
-                  TOTAL APPS USED | 10
+                  TOTAL APPS USED | {totalAppsUsed}
                 </span>
               </div>
 
@@ -701,7 +743,7 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
                   <StreakBadge />
                 </div>
                 <span className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">
-                  LONGEST STREAK | {Math.max(streakDays, 10)} DAYS
+                  LONGEST STREAK | {longestStreak} {longestStreak === 1 ? "DAY" : "DAYS"}
                 </span>
               </div>
 
@@ -724,14 +766,16 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-xl font-bold text-text-primary">
-                    Articulate & Direct
+                    {voiceAnalytics.hasData ? "Articulate & Direct" : "No Voice Profile Yet"}
                   </h3>
                   <span className="rounded-full bg-teal-500/20 px-2 py-0.5 text-xs font-semibold text-teal-800 dark:text-teal-300">
                     Voice Profile
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-text-secondary">
-                  Your speech cadence features concise thoughts with rapid execution and minimal hesitation.
+                  {voiceAnalytics.hasData
+                    ? "Your speech cadence features concise thoughts with rapid execution and minimal hesitation."
+                    : "Dictate some phrases to unlock your cadence, speech clarity, and vocabulary insights."}
                 </p>
               </div>
             </div>
@@ -799,19 +843,25 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-2.5 pt-2">
-              {voiceAnalytics.topKeywords.map((kw, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-2 rounded-xl border border-hairline bg-sunken px-3.5 py-2 text-sm font-medium text-text-primary"
-                >
-                  <span>{kw.word}</span>
-                  <span className="rounded-md bg-stone-300/60 px-1.5 py-0.5 text-xs font-bold text-text-secondary dark:bg-stone-700/60">
-                    {kw.count}
-                  </span>
-                </div>
-              ))}
-            </div>
+            {voiceAnalytics.topKeywords.length > 0 ? (
+              <div className="flex flex-wrap gap-2.5 pt-2">
+                {voiceAnalytics.topKeywords.map((kw, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 rounded-xl border border-hairline bg-sunken px-3.5 py-2 text-sm font-medium text-text-primary"
+                  >
+                    <span>{kw.word}</span>
+                    <span className="rounded-md bg-stone-300/60 px-1.5 py-0.5 text-xs font-bold text-text-secondary dark:bg-stone-700/60">
+                      {kw.count}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="pt-2 text-xs text-text-tertiary">
+                No transcriptions recorded yet to extract concepts.
+              </p>
+            )}
           </div>
         </div>
       )}

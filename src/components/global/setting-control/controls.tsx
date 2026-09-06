@@ -54,10 +54,15 @@ export function SelectControl({ setting }: { setting: SelectSetting }) {
         disabled={setting.disabled}
         value={setting.value}
         onChange={(e) => setting.onChange(e.target.value)}
-        className="hairline h-8 appearance-none rounded-input bg-sunken pl-3 pr-8 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80 focus:outline-none focus:ring-1 focus:ring-text-primary disabled:opacity-50 cursor-default"
+        className="hairline h-8 appearance-none rounded-input bg-sunken pl-3 pr-8 text-body text-text-primary text-stone-900 dark:text-stone-100 dark:bg-stone-800/80 focus:outline-none focus:ring-1 focus:ring-text-primary disabled:opacity-50 cursor-default"
       >
         {setting.options.map((option) => (
-          <option key={option.value} value={option.value} disabled={option.disabled} className="text-stone-900 bg-white dark:text-white dark:bg-stone-900">
+          <option
+            key={option.value}
+            value={option.value}
+            disabled={option.disabled}
+            className="bg-white text-stone-900 dark:bg-[#1c1917] dark:text-stone-100"
+          >
             {option.label}
           </option>
         ))}

@@ -166,7 +166,12 @@ export function Onboarding() {
           }}
         />
       ) : invited ? (
-        <InviteStep onFinish={finish} finishError={finishError} />
+        <InviteStep
+          onFinish={finish}
+          finishError={finishError}
+          hotkey={hotkey}
+          mode={mode}
+        />
       ) : !toured ? (
         <TourStep
           hotkey={hotkey}
@@ -232,9 +237,20 @@ export function Onboarding() {
                 }}
                 className="h-[var(--control-height)] rounded-input bg-text-primary px-4 text-body font-medium text-opaque-elevated transition-opacity hover:opacity-90"
               >
-                Start using Murmur
+                Continue
               </button>
-            ) : null
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setInvited(true);
+                  persistStep(5);
+                }}
+                className="h-[var(--control-height)] rounded-input px-3 text-caption text-text-secondary transition-colors hover:text-text-primary cursor-pointer"
+              >
+                Skip for now
+              </button>
+            )
           }
         >
           <HotkeyStep
