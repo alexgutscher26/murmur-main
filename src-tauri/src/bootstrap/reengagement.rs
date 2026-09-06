@@ -12,7 +12,35 @@
 use std::time::Duration;
 use tauri::AppHandle;
 
+#[cfg(target_os = "windows")]
 use crate::adapters::windows::WindowsToast;
+
+#[cfg(not(target_os = "windows"))]
+struct WindowsToast;
+
+#[cfg(not(target_os = "windows"))]
+impl WindowsToast {
+    fn is_dnd_active() -> bool {
+        false
+    }
+
+    fn notify_reengagement(app: &AppHandle, hotkey_desc: &str) {
+        use tauri_plugin_notification::NotificationExt;
+        let body = format!(
+            "It's been a few days since your last dictation. Press {hotkey_desc} anytime to capture your thoughts."
+        );
+        if let Err(err) = app
+            .notification()
+            .builder()
+            .title("Murmur is ready whenever you are")
+            .body(&body)
+            .show()
+        {
+            tracing::debug!(error = %err, "could not post re-engagement notification");
+        }
+    }
+}
+
 use crate::db::Database;
 use crate::error::AppResult;
 use crate::ipc::context::AppState;
@@ -65,10 +93,10 @@ pub async fn evaluate_and_prompt(app: &AppHandle, db: &Database) -> AppResult<bo
     let hotkey_val = services::settings::get_setting(db, keys::DICTATION_HOTKEY)?;
     let hotkey_desc = match hotkey_val {
         Some(SettingValue::Hotkey(hk)) => format_hotkey(&hk),
-        _ => "Ctrl+Space".to_string(),
+        _ => if cfg!(target_os = "macos") { "Cmd+Space".to_string() } else { "Ctrl+Space".to_string() },
     };
 
-    // 5. Display the native Windows toast
+    // 5. Display the re-engagement prompt (Windows toast or system notification)
     WindowsToast::notify_reengagement(app, &hotkey_desc);
 
     // 6. Record prompt timestamp to enforce the 7-day throttle
@@ -87,8 +115,9 @@ fn format_hotkey(hk: &HotkeyBinding) -> String {
     let mut parts = Vec::new();
     for modifier in &hk.modifiers {
         match modifier {
-            KeyModifier::Command | KeyModifier::Control => parts.push("Ctrl"),
-            KeyModifier::Option => parts.push("Alt"),
+            KeyModifier::Command => parts.push(if cfg!(target_os = "macos") { "Cmd" } else { "Ctrl" }),
+            KeyModifier::Control => parts.push("Ctrl"),
+            KeyModifier::Option => parts.push(if cfg!(target_os = "macos") { "Option" } else { "Alt" }),
             KeyModifier::Shift => parts.push("Shift"),
         }
     }
