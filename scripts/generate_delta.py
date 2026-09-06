@@ -23,6 +23,7 @@ import os
 import sys
 
 try:
+    # pyrefly: ignore [missing-import]
     import bsdiff4
 except ImportError:
     # Fallback pure-python basic diff or warn if bsdiff4 library isn't installed

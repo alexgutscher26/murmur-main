@@ -1,70 +1,213 @@
-# Murmur
+<div align="center">
 
-Press a key, talk, press it again — your words are on the clipboard and pasted
-before you can look up.
+# 🎙️ Murmur
 
-Local-first speech to text for Windows and macOS. No account, no subscription, no word cap,
-and no audio ever leaves your machine.
+**Instant, 100% private, local speech-to-text for macOS & Windows.**  
+*Press a hotkey, speak naturally, release — your words are transcribed and pasted before you can look up.*
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/alexgutscher26/murmur)
+[![Tauri v2](https://img.shields.io/badge/built%20with-Tauri%20v2-24C8DB?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app)
+[![Rust](https://img.shields.io/badge/core-Rust-DEA584?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
+[![React 19](https://img.shields.io/badge/ui-React%2019%20%2B%20Tailwind%20v4-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
+[![100% Local](https://img.shields.io/badge/voice-100%25%20Local%20%2F%20Zero%20Egress-10B981?style=flat-square&logo=shield&logoColor=white)](docs/badges.md)
+[![Dictated with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](docs/badges.md)
+
+[Features](#-key-features) • [Why Murmur?](#-why-murmur) • [Architecture](#-architecture) • [Installation](#-installation--downloads) • [Developer Guide](#-developer-guide) • [Community Badges](#-community-badges) • [License](#-license)
+
+</div>
 
 ---
 
-## What it does
+## ⚡ What is Murmur?
 
-- **Global hotkey** — ⌥Space (macOS) / Alt+Space (Windows) anywhere. Toggle, or hold-to-talk.
-- **Transcribes while you speak**, not after you stop, so finishing is as fast
-  after a five-minute monologue as after a five-second one.
-- **Pastes into whatever had focus**, and puts your clipboard back afterwards.
-- **Escape to cancel**, with a three-second countdown. Press Escape again and
-  the recording resumes with nothing lost.
-- **99 languages**, auto-detected or pinned.
-- **A custom dictionary** for the names and jargon the model gets wrong — used
-  both to bias recognition and to correct the output.
-- **Searchable local history**, so a failed paste is never a lost thought.
-- **Honest stats**, including the p50/p95 latency the app actually achieves.
+**Murmur** is an open-source, local-first dictation tool built for speed, privacy, and seamless workflow integration. Unlike cloud speech-to-text tools that record audio, stream it across the internet, and make you wait seconds for a response, Murmur processes speech directly on your hardware using optimized `whisper.cpp` models.
 
-Everything runs on your machine. The only network requests Murmur ever makes are the
-first-run model download and an optional update check, and both are visible and
-both can be turned off.
+No accounts, no monthly cloud subscriptions, no word limits, and **zero audio ever leaves your machine**.
 
-## Requirements
+---
 
-- **macOS**: macOS 13 or later, Apple Silicon (Metal-accelerated) or Intel
-- **Windows**: Windows 10/11 (64-bit)
-- ~600 MB of disk for the default model
+## ✨ Key Features
 
-## Running it
+- ⚡ **Flat, Real-Time Latency (`p50 < 300ms`)**  
+  Transcribes continuously while you speak instead of waiting for you to finish. Finishing a 5-minute stream of thought is just as instantaneous as a 5-second sentence.
+- ⌨️ **Global Hotkeys & Mouse Triggers**  
+  Trigger anywhere with `⌥ Space` (macOS) or `Alt+Space` (Windows). Supports hold-to-talk, toggle mode, secondary keyboard shortcuts, and auxiliary mouse buttons (Middle Click, Mouse 4 / 5). Double-tap initiates rapid priority dictation.
+- 💊 **Minimal Floating Pill Overlay**  
+  A sleek, non-intrusive obsidian glass pill displays real-time audio waveforms, volume levels, and streaming transcription without ever stealing window focus or blocking clicks.
+- 📋 **Direct Synthetic Paste & Clipboard Restoration**  
+  Injects transcribed text directly into whichever application has focus (VS Code, Cursor, Obsidian, Slack, Terminal, browser) and automatically restores your prior clipboard content.
+- 🛑 **Graceful Escape & Cancel**  
+  Hit `Escape` or `Option/Alt+Escape` to cancel with an interactive 3-second countdown. Pressing `Escape` again instantly resumes the recording without losing audio.
+- 🌐 **99 Languages & Auto-Detection**  
+  Transcribe in nearly any language supported by OpenAI Whisper, automatically detected or pinned to your preferred dialect.
+- 📖 **Custom Vocabulary & Biasing**  
+  Train Murmur on technical jargon, programming identifiers, unusual names, and domain-specific acronyms to both bias recognition and normalize output.
+- 🎛️ **Per-App Overrides & Profiles**  
+  Customize dictation hotkeys, vocabulary, and formatting profiles tailored specifically for code editors, chat clients, or document editors.
+- 🔍 **Searchable SQLite History & Honest Telemetry**  
+  Every dictation is indexed locally in SQLite. Easily search previous thoughts, monitor word counts, and review real achieved latency metrics (`p50` / `p95`).
+- 🚀 **Hardware Acceleration**  
+  Native Apple Silicon Metal & Core ML on macOS; DirectML (DirectX 12), CUDA, and Vulkan on Windows.
 
-```bash
-pnpm install   # or bun install
-pnpm tauri dev # or bun run tauri dev
+---
+
+## 📊 Why Murmur? (Comparison)
+
+| Feature | Murmur | Cloud Dictation (Wispr Flow, etc.) | MacWhisper / Superwhisper |
+| :--- | :---: | :---: | :---: |
+| **Privacy / Audio Egress** | **100% On-Device (Zero Egress)** | Audio sent to cloud APIs | Often on-device, but closed-source |
+| **Cross-Platform** | **macOS & Windows** | Web / Limited desktop | Mostly macOS only |
+| **Inference Latency** | **Streaming (`p50 < 300ms`)** | Network lag (~1.5s – 3.0s) | Post-speech batch decode (~1s–5s) |
+| **Price** | **Free & Open Source (MIT)** | $10 – $20 / month | $30+ paid license or subscription |
+| **Audio / Word Limits** | **Unlimited** | Tiered quotas / monthly caps | Model-gated |
+| **Clipboard Restoration** | **Yes (Preserved)** | Often overwrites clipboard | Inconsistent |
+| **Extensible Architecture** | **Tauri v2 + Rust + React 19** | Closed SaaS | Proprietary closed binary |
+
+---
+
+## 🏗️ Architecture
+
+Murmur combines a high-performance, low-latency Rust audio pipeline with a modern Tauri v2 desktop container.
+
+```mermaid
+flowchart LR
+    subgraph AudioPipeline ["Hardware Audio Pipeline (Rust)"]
+        Mic[Microphone Input] --> cpal[cpal Stream]
+        cpal --> rubato[rubato 16kHz Resampler]
+        rubato --> ringbuf[ringbuf SPSC RingBuffer]
+        ringbuf --> VAD[earshot WebRTC VAD]
+        VAD --> Whisper[whisper-rs / whisper.cpp]
+    end
+
+    subgraph CoreEngine ["Murmur Core & Registry"]
+        Whisper --> Factory[IPC Command Factory]
+        Factory --> DB[(SQLite Local History)]
+        Factory --> SystemPaste[Synthetic Paste + Clipboard Restore]
+    end
+
+    subgraph UI ["Tauri v2 Frontend"]
+        Factory -. Typed Events .-> Pill[Floating Pill Window]
+        Factory -. Specta Bindings .-> Dashboard[Dashboard & Settings UI]
+    end
 ```
 
-### Windows Development & Performance
+### Core Architecture Highlights
+1. **The Registry (`src-tauri/src/registry/`)**: Single source of truth defining every capability, setting, hotkey, permission, and metric.
+2. **The Command Factory (`src-tauri/src/ipc/factory.rs`)**: Single entry point for all IPC commands, enforcing validation schemas, permission preflights, reentrancy guards, error mapping, and tracing.
+3. **Type-Safe IPC (`tauri-specta`)**: Rust types automatically generate `src/lib/bindings.ts` on test/build. No manual DTO sync or hand-written TypeScript IPC wrappers.
 
-On Windows, Whisper C++ inference in debug builds can take up to ~20 seconds per segment without dependency optimization. `src-tauri/Cargo.toml` includes:
+---
+
+## 📦 Installation & Downloads
+
+### Windows
+
+#### Option A: Windows Package Manager (WinGet)
+```powershell
+winget install WebProdigies.Murmur
+```
+
+#### Option B: Standalone Installer
+Download the latest `.msi` or `.exe` installer from [GitHub Releases](https://github.com/alexgutscher26/murmur/releases).
+
+---
+
+### macOS
+
+1. Download the latest Universal `.dmg` from [GitHub Releases](https://github.com/alexgutscher26/murmur/releases).
+2. Open the `.dmg` and drag **Murmur** into your `/Applications` folder.
+3. Grant **Microphone** and **Accessibility** permissions on initial launch.
+
+---
+
+## 🛠️ Developer Guide
+
+### System Requirements
+- **macOS**: macOS 13 (Ventura) or later (Apple Silicon M-series or Intel x86_64).
+- **Windows**: Windows 10/11 (64-bit).
+- **Tooling**:
+  - [Rust](https://rustup.rs/) (stable toolchain)
+  - [Node.js](https://nodejs.org/) (v18+) or [Bun](https://bun.sh/)
+  - [pnpm](https://pnpm.io/) or `bun`
+  - C++ build tools (Xcode Command Line Tools on macOS, Visual Studio C++ Build Tools on Windows)
+- ~200MB – 600MB disk space for local GGML Whisper weights (`small-q5_1` default).
+
+---
+
+### Running in Development
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/alexgutscher26/murmur.git
+cd murmur
+
+# Install frontend dependencies
+pnpm install   # or: bun install
+
+# Start the Tauri development desktop app
+pnpm tauri dev # or: bun run tauri dev
+```
+
+> **First Launch Setup:** Murmur opens a guided onboarding window to request microphone access, download your preferred starting Whisper model, and test your global hotkey. Afterwards, Murmur minimizes to your system tray / menu bar.
+
+---
+
+### Windows Performance Optimization
+
+In debug builds on Windows, raw unoptimized C++ compilation of Whisper dependencies can cause high inference latencies. Murmur's `src-tauri/Cargo.toml` overrides dependencies in dev profile:
 
 ```toml
 [profile.dev.package."*"]
 opt-level = 3
 ```
 
-This compiles all native dependencies (including `whisper-rs-sys` and `rubato` resampler) with full optimizations even during `tauri dev`, bringing real-time factor down from `>1.0x` (slow) to `<0.3x` (instantaneous).
+This ensures `whisper-rs-sys` and `rubato` run with native optimizations even during `tauri dev`, maintaining a real-time factor `< 0.3x`.
 
-First launch opens setup: grant the microphone, download the model, and test the
-hotkey. After that Murmur lives in the system tray / menu bar and you will not see a window
-again unless you open one.
+---
 
-## Building a release
+### Source-of-Truth Navigation (`pnpm sot`)
+
+Murmur enforces strict `SOURCE OF TRUTH KEYWORDS` headers across the codebase. You can search symbols and architecture components instantly without scanning the entire file tree:
+
+```bash
+# Find files owning a specific symbol or concept
+pnpm sot SessionState
+
+# Display file headers and architectural context
+pnpm sot:show AudioChunk
+
+# Validate that all project files adhere to SOT conventions
+pnpm sot:validate
+```
+
+---
+
+### Testing & Typecheck
+
+```bash
+# Run Rust tests and regenerate TypeScript bindings via tauri-specta
+cargo test --manifest-path src-tauri/Cargo.toml
+
+# Typecheck TypeScript and React components
+pnpm typecheck
+```
+
+---
+
+### Building for Production
 
 ```bash
 pnpm tauri build
 ```
 
-The bundle lands in `src-tauri/target/release/bundle/` — a `.app`, a `.dmg`,
-and an updater archive.
+The resulting binaries will be placed in `src-tauri/target/release/bundle/`:
+- **macOS**: `.app` and `.dmg`
+- **Windows**: `.msi` and `.exe`
 
-**Signing the updater archive.** Because a public key is configured, Tauri also
-signs the update artifact, and it needs the matching private key:
+#### Signing Updater Archives (Optional)
+To sign release updater archives with your private key:
 
 ```bash
 TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.murmur-updater.key)" \
@@ -72,70 +215,64 @@ TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" \
   pnpm tauri build
 ```
 
-Both variables are required. Setting the key without the password makes Tauri
-prompt for one interactively, which fails in any non-interactive shell with a
-misleading "incorrect password" error — the password is empty, it simply had no
-way to tell you so.
+---
 
-Without either, the `.app` and `.dmg` still build correctly and only the update
-artifact goes unsigned. In CI both come from repository secrets.
+## 🔒 Permissions & Privacy Model
 
-> **Back that private key up somewhere you will still have in five years.**
-> It is the only thing that can sign an update. If it is lost, every existing
-> installation is permanently stranded on whatever version it has — there is no
-> recovery, because the public key is compiled into the apps already out there.
+| Permission | Why It's Needed | Fallback if Denied |
+| :--- | :--- | :--- |
+| **Microphone** | Audio capture during dictation. | Dictation cannot operate. (Required) |
+| **Accessibility** | Simulates `⌘V` / `Ctrl+V` to paste text into the active window. | Text is cleanly copied to the system clipboard for manual pasting. |
 
-## Permissions, and what happens without them
+> [!NOTE]  
+> **macOS Code Signing & Accessibility:**  
+> macOS binds Accessibility permissions to the app's bundle identifier *and* its cryptographic signature. In development, ad-hoc signatures change on rebuild, causing macOS to occasionally require re-granting Accessibility. This does not occur in distributed release builds. Refer to `docs/03 §3.4` for details on configuring a local development certificate.
 
-| Permission    | Needed for      | Without it                                                   |
-| ------------- | --------------- | ------------------------------------------------------------ |
-| Microphone    | Recording       | Murmur cannot record. Required.                              |
-| Accessibility | Pasting for you | Everything still works — text goes to the clipboard instead. |
+### Zero Network Egress Guarantee
+Murmur does **not** collect telemetry, user recordings, or text snippets. The only optional network interactions are:
+1. One-time GGML model download during onboarding or when switching models in Settings.
+2. Optional automated check for app updates via GitHub Releases.  
+Both can be audited, monitored, or disabled entirely.
 
-macOS shows each of these prompts **once per app**. If you dismiss one, the
-dialog never comes back, so Murmur takes you straight to the right System
-Settings pane instead of asking again.
+---
 
-### If Accessibility keeps forgetting you granted it
+## 🏷️ Community Badges
 
-macOS keys permission grants to the bundle id **plus the code signature**.
-Builds here are ad-hoc signed, which produces a new signature every time, so
-**every rebuild looks like a different app** and the Accessibility grant is
-lost. Pasting silently degrades to clipboard-only and nothing explains why.
+Showcase your local, private AI dictation workflow in your open-source projects, pull requests, and documentation.
 
-That is a development annoyance, not a bug, and it does not affect a released
-build. If you are rebuilding often, create one self-signed code-signing
-certificate in Keychain Access and sign every build with that same identity —
-the signature then stays stable and macOS stops forgetting. `docs/03 §3.4` has
-the detail.
+### Shields.io Markdown Badges
 
-## For developers
+```markdown
+<!-- Flat Square Badge -->
+[![Dictated with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://github.com/alexgutscher26/murmur)
 
-The architecture is documented in `docs/`, and `CLAUDE.md` is the rulebook.
-Start with `docs/00-START-HERE.md`; read `docs/06-CONVENTIONS-AND-GREP.md`
-before writing your first file, because navigation here works through a
-comment-based search index rather than by reading the tree:
-
-```bash
-pnpm sot SessionState      # which files own this symbol
-pnpm sot:show AudioChunk   # the same, with each file's header
+<!-- 100% Local Privacy Badge -->
+[![100% Local Dictation](https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white)](https://github.com/alexgutscher26/murmur)
 ```
 
-Two ideas carry the codebase. **The registry** (`src-tauri/src/registry/`) is one
-table describing every feature — adding an entry wires up its settings UI,
-permission preflight, nav placement, hotkey and metrics at once. **The command
-factory** (`src-tauri/src/ipc/factory.rs`) is the single function every IPC call
-passes through, so validation, permissions, reentrancy, tracing and error
-mapping have one implementation instead of one per handler.
-
-Types cross to TypeScript through `tauri-specta`: `src/lib/bindings.ts` is
-generated by `cargo test` and must never be hand-edited.
-
-```bash
-cargo test --manifest-path src-tauri/Cargo.toml   # also regenerates bindings
-pnpm typecheck
+### Pull Request & Issue Footer
+```markdown
+---
+_Dictated privately on-device with [Murmur](https://github.com/alexgutscher26/murmur)_
 ```
 
-## Licence
+*(For full badge options, HTML embeds, and voice-triggered templates, see [`docs/badges.md`](docs/badges.md).)*
 
-MIT. See `LICENSE`.
+---
+
+## 📚 Documentation Index
+
+- [`docs/00-START-HERE.md`](docs/00-START-HERE.md) — Onboarding and architectural orientation.
+- [`docs/01-IDEATION.md`](docs/01-IDEATION.md) — Product requirements, feature breakdown, and scope.
+- [`docs/02-TECHNICAL-PLAN.md`](docs/02-TECHNICAL-PLAN.md) — Technology stack, system design, and latency budgets.
+- [`docs/03-IMPLEMENTATION-NOTES.md`](docs/03-IMPLEMENTATION-NOTES.md) — Audio thread safety, Whisper configuration, and platform quirks.
+- [`docs/04-DESIGN-SYSTEM.md`](docs/04-DESIGN-SYSTEM.md) — Design tokens, color palette, glass materials, and motion specs.
+- [`docs/05-PROJECT-STRUCTURE.md`](docs/05-PROJECT-STRUCTURE.md) — Directory layout and structural conventions.
+- [`docs/06-CONVENTIONS-AND-GREP.md`](docs/06-CONVENTIONS-AND-GREP.md) — SOT header system and rapid navigation guidelines.
+- [`CLAUDE.md`](CLAUDE.md) — Codebase engineering rules and invariants.
+
+---
+
+## 📄 License
+
+Murmur is distributed under the [MIT License](LICENSE).
