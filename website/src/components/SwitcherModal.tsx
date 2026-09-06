@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -51,7 +52,14 @@ export function SwitcherModal({ isOpen, onClose, defaultPlan = "lifetime" }: Swi
         }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        const text = await res.text();
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = {};
+      }
+
       if (!res.ok || !data.url) {
         throw new Error(data.error || "Failed to initialize checkout session");
       }

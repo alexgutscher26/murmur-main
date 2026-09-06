@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import { getStripeClient } from "@/lib/stripe";
 
@@ -13,7 +14,14 @@ export interface LicenseVerifyResponse {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    let body: any = {};
+    try {
+      const text = await req.text();
+      body = text ? JSON.parse(text) : {};
+    } catch {
+      body = {};
+    }
+
     const { licenseKey } = body as { licenseKey?: string };
 
     if (!licenseKey || typeof licenseKey !== "string") {

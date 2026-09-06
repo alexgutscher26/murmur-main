@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, Suspense } from "react";
@@ -121,7 +122,14 @@ function PricingContent() {
           discountCode: refCode || undefined,
         }),
       });
-      const data = await res.json();
+      let data: any = {};
+      try {
+        const text = await res.text();
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = {};
+      }
+
       if (data.url) {
         window.location.href = data.url;
       } else {
