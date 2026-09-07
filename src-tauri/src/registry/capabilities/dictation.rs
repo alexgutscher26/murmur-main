@@ -137,9 +137,9 @@ pub fn dictation_capability() -> Capability {
                 "Finalize timeout",
                 "If the last fragment has not decoded by this point, deliver what is ready rather than waiting.",
                 SettingSection::Recording,
-                (5000.0, 30_000.0, 500.0),
+                (5000.0, 60_000.0, 500.0),
                 Some("ms"),
-                15_000.0,
+                45_000.0,
             )),
         ],
     }

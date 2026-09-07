@@ -13,7 +13,7 @@ Installers:
   - Architecture: x64
     InstallerType: nullsoft
     InstallerUrl: https://github.com/webprodigies/murmur/releases/download/v0.1.0/murmur_0.1.0_x64-setup.exe
-    InstallerSha256: 0000000000000000000000000000000000000000000000000000000000000000
+    InstallerSha256: 5B4D77B455A0201E58A7DC30F79F4036168FADC05D0FF84E8714765B01FBCA3D
     ProductCode: Murmur
 ManifestType: installer
 ManifestVersion: 1.6.0

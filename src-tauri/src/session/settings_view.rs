@@ -126,7 +126,7 @@ impl SessionSettings {
                 as u64,
             discard_on_escape: read_bool(stored, keys::DISCARD_ON_ESCAPE).unwrap_or(false),
             finalize_timeout_ms: read_number(stored, keys::FINALIZE_TIMEOUT_MS)
-                .unwrap_or(15_000.0)
+                .unwrap_or(45_000.0)
                 .max(MIN_FINALIZE_TIMEOUT_MS as f64) as u64,
             auto_paste: read_bool(stored, keys::AUTO_PASTE).unwrap_or(true),
             restore_clipboard: read_bool(stored, keys::RESTORE_CLIPBOARD).unwrap_or(true),

@@ -49,12 +49,16 @@ export function DownloadSection() {
 
   const cliCommands = [
     {
-      platform: "macOS Homebrew",
-      command: "brew install --cask murmur",
-    },
-    {
       platform: "Windows Winget",
       command: "winget install WebProdigies.Murmur",
+    },
+    {
+      platform: "Windows PowerShell",
+      command: "irm https://murmur.app/downloads/murmur-setup.exe -OutFile murmur-setup.exe; .\\murmur-setup.exe",
+    },
+    {
+      platform: "macOS Homebrew",
+      command: "brew install --cask murmur",
     },
     {
       platform: "Source / GitHub Clone",
@@ -205,7 +209,7 @@ export function DownloadSection() {
             </h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {cliCommands.map((item, idx) => (
               <div
                 key={idx}

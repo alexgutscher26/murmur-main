@@ -277,6 +277,16 @@ pub const CODE_BOUNDARY_WORDS: &[&str] = &[
     "of", "and", "or", "then", "let", "const", "var", "fn", "def", "function", "class",
     "interface", "type", "import", "export", "return", "if", "else", "while", "be",
     "define", "declare", "create", "make", "set", "use", "add", "get", "call", "run",
+    "i", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them",
+    "my", "your", "his", "their", "our", "its", "this", "that", "these", "those",
+    "want", "wanted", "wants", "fix", "fixed", "fixes", "exist", "exists", "existed",
+    "does", "doesnt", "doesn't", "did", "didnt", "didn't", "do", "dont", "don't",
+    "have", "has", "had", "can", "cant", "can't", "could", "would", "should", "will", "wont", "won't",
+    "shall", "may", "might", "must", "am", "are", "was", "were", "been", "being",
+    "not", "no", "yes", "but", "so", "because", "since", "just", "very", "too", "also",
+    "what", "which", "who", "whom", "whose", "why", "how", "when", "where",
+    "like", "know", "think", "see", "look", "come", "go", "take", "give", "find",
+    "tell", "ask", "seem", "feel", "try", "leave", "good", "new", "first", "last",
 ];
 
 pub fn apply_code_mode_casing(text: &str, style: CaseStyle) -> String {

@@ -49,7 +49,6 @@ import { MicIndicator } from "./_components/MicIndicator";
 import type { PillTone } from "./_components/StateDot";
 import { PillWaveform } from "./_components/PillWaveform";
 import { useElapsed } from "./use-elapsed";
-import { useWordCount } from "./use-word-count";
 
 /** Every state that puts something on screen. IDLE is the window's business. */
 type VisibleState = Exclude<SessionState, { kind: "IDLE" }>;
@@ -177,9 +176,6 @@ export function Pill() {
       : null,
   );
 
-  // Live estimated word count during recording
-  const wordCount = useWordCount(live && shown?.kind === "RECORDING");
-
   const handleKeepRecording = useCallback(() => {
     void unwrapCommand(commands.resumeRecording);
   }, []);
@@ -231,16 +227,9 @@ export function Pill() {
           />
 
           {failed ? null : (
-            <div className="flex items-center gap-1.5 shrink-0 text-right">
-              {wordCount.formatted && !showLine ? (
-                <span className="text-caption text-text-tertiary tabular-nums">
-                  {wordCount.formatted} ·
-                </span>
-              ) : null}
-              <span className="w-[var(--pill-timer-width)] shrink-0 text-right text-label tabular-nums text-text-secondary">
-                {formatClock(elapsedMs)}
-              </span>
-            </div>
+            <span className="w-[var(--pill-timer-width)] shrink-0 text-right text-label tabular-nums text-text-secondary">
+              {formatClock(elapsedMs)}
+            </span>
           )}
         </>
       )}
