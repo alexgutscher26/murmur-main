@@ -149,164 +149,170 @@ const REPRODUCIBLE_TEST_RECIPES = [
 
 export default function PrivacyPage() {
   return (
-    <main className="min-h-screen bg-[#000000] text-white selection:bg-white/20 selection:text-white">
+    <main className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white relative overflow-hidden">
+      {/* Background ambient glow matching landing page */}
+      <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-gradient-to-b from-neutral-100 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
+
+      {/* Subtle Pixel Grid Texture matching landing page */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
+
       <Navbar />
 
-      <section className="pt-36 pb-20 md:pt-44 md:pb-28 max-w-5xl mx-auto px-4">
+      <section className="pt-36 pb-20 md:pt-44 md:pb-28 max-w-5xl mx-auto px-4 relative z-10">
         {/* Header */}
         <div className="text-center max-w-[760px] mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#181818] border border-[#313131] mb-6">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-semibold text-white/90">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-6">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-xs font-semibold text-neutral-800">
               Verifiable Trust · 100% Local-First
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white mb-6">
-            Privacy by Architecture.
-            <span className="block text-gradient-hero mt-1">Not merely by policy.</span>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-[-0.035em] text-neutral-950 mb-6 leading-[1.06]">
+            Privacy by architecture.
+            <span className="block text-[#737373] font-bold mt-1 sm:mt-2">Not merely by policy.</span>
           </h1>
 
-          <p className="text-base sm:text-lg text-white/70 leading-relaxed font-normal">
+          <p className="text-base sm:text-lg text-neutral-600 leading-relaxed font-normal">
             Cloud dictation services ask you to trust legal privacy policies while streaming your
             raw voice to remote servers. Murmur protects your confidential thoughts with physical
             architecture:{" "}
-            <strong className="text-white">your voice never leaves your device.</strong>
+            <strong className="text-neutral-950 font-semibold">your voice never leaves your device.</strong>
           </p>
         </div>
 
         {/* Visual Data Flow Diagram */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-[#141414] border border-[#272727] mb-14">
+        <div className="p-6 sm:p-8 rounded-2xl bg-neutral-50/90 border border-neutral-200/90 shadow-sm mb-14">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-400 block mb-1">
+              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-emerald-800 block mb-1">
                 Data Boundary Flow
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-white">
+              <h2 className="text-xl sm:text-2xl font-bold text-neutral-950">
                 How voice flows from microphone to active window
               </h2>
-              <p className="text-xs font-mono text-emerald-400/90 mt-1">
+              <p className="text-xs font-mono text-emerald-700 mt-1">
                 Microphone → Your Computer (whisper.cpp & RAM) → Any App (Zero network egress)
               </p>
             </div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1c1c1c] border border-emerald-500/30 text-[11px] font-mono text-emerald-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-mono font-medium text-emerald-800 shadow-xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
               Air-Gapped Local Loop
             </div>
           </div>
 
           {/* Diagram Nodes */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
-            <div className="p-4 rounded-xl bg-[#1a1a1a] border border-[#333333] relative flex flex-col justify-between">
+            <div className="p-5 rounded-xl bg-white border border-neutral-200/80 shadow-sm relative flex flex-col justify-between">
               <div>
-                <div className="w-8 h-8 rounded-lg bg-[#272727] flex items-center justify-center text-sm mb-3">
+                <div className="w-9 h-9 rounded-lg bg-neutral-100 border border-neutral-200 flex items-center justify-center text-base mb-3 shadow-xs">
                   🎙️
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1">1. Microphone</h3>
-                <p className="text-xs text-white/60 leading-normal">
-                  OS audio stream captured into temporary volatile RAM buffer (CPAL / WASAPI /
-                  CoreAudio).
+                <h3 className="text-sm font-bold text-neutral-950 mb-1">1. Microphone</h3>
+                <p className="text-xs text-neutral-600 leading-normal">
+                  OS audio stream captured into temporary volatile RAM buffer (CPAL / WASAPI / CoreAudio).
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 mt-4 block">
+              <span className="text-[11px] font-mono font-medium text-emerald-700 mt-4 block">
                 RAM only · 0 bytes to disk
               </span>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#1a1a1a] border border-emerald-500/40 relative flex flex-col justify-between shadow-[0_0_20px_rgba(16,185,129,0.05)]">
+            <div className="p-5 rounded-xl bg-white border border-emerald-500/40 relative flex flex-col justify-between shadow-sm ring-1 ring-emerald-500/20">
               <div>
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-sm mb-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-base mb-3 shadow-xs">
                   ⚡
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1">2. Local Whisper Engine</h3>
-                <p className="text-xs text-white/60 leading-normal">
+                <h3 className="text-sm font-bold text-neutral-950 mb-1">2. Local Whisper Engine</h3>
+                <p className="text-xs text-neutral-600 leading-normal">
                   Decoded on-device via{" "}
-                  <code className="text-emerald-300 text-[11px]">whisper.cpp</code> using native
-                  Metal (macOS) or DirectML/CUDA (Windows).
+                  <code className="text-emerald-800 bg-emerald-50 px-1 py-0.5 rounded font-mono text-[11px]">
+                    whisper.cpp
+                  </code>{" "}
+                  using native Metal (macOS) or DirectML/CUDA (Windows).
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 mt-4 block">
+              <span className="text-[11px] font-mono font-medium text-emerald-700 mt-4 block">
                 On-device GPU/NPU
               </span>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#1a1a1a] border border-[#333333] relative flex flex-col justify-between">
+            <div className="p-5 rounded-xl bg-white border border-neutral-200/80 shadow-sm relative flex flex-col justify-between">
               <div>
-                <div className="w-8 h-8 rounded-lg bg-[#272727] flex items-center justify-center text-sm mb-3">
+                <div className="w-9 h-9 rounded-lg bg-neutral-100 border border-neutral-200 flex items-center justify-center text-base mb-3 shadow-xs">
                   ⚙️
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1">3. Context Rules</h3>
-                <p className="text-xs text-white/60 leading-normal">
+                <h3 className="text-sm font-bold text-neutral-950 mb-1">3. Context Rules</h3>
+                <p className="text-xs text-neutral-600 leading-normal">
                   Local regex & jargon bias rules format text, strip fillers, and match app context.
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 mt-4 block">
+              <span className="text-[11px] font-mono font-medium text-emerald-700 mt-4 block">
                 Instant local transform
               </span>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#1a1a1a] border border-[#333333] relative flex flex-col justify-between">
+            <div className="p-5 rounded-xl bg-white border border-neutral-200/80 shadow-sm relative flex flex-col justify-between">
               <div>
-                <div className="w-8 h-8 rounded-lg bg-[#272727] flex items-center justify-center text-sm mb-3">
+                <div className="w-9 h-9 rounded-lg bg-neutral-100 border border-neutral-200 flex items-center justify-center text-base mb-3 shadow-xs">
                   📋
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1">4. Direct Insertion</h3>
-                <p className="text-xs text-white/60 leading-normal">
-                  Formatted text is typed directly into your focused cursor via native OS input
-                  injection.
+                <h3 className="text-sm font-bold text-neutral-950 mb-1">4. Direct Insertion</h3>
+                <p className="text-xs text-neutral-600 leading-normal">
+                  Formatted text is typed directly into your focused cursor via native OS input injection.
                 </p>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 mt-4 block">
+              <span className="text-[11px] font-mono font-medium text-emerald-700 mt-4 block">
                 Audio RAM buffer purged
               </span>
             </div>
           </div>
 
-          <div className="mt-6 p-4 rounded-xl bg-[#0f0f0f] border border-[#272727] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-white/70">
+          <div className="mt-6 p-4 rounded-xl bg-white border border-neutral-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-neutral-700 shadow-xs">
             <div className="flex items-center gap-2">
-              <span className="text-emerald-400 font-bold">✓ Net Result:</span>
+              <span className="text-emerald-700 font-bold">✓ Net Result:</span>
               <span>Zero audio packets. Zero transcripts in the cloud. No remote logging.</span>
             </div>
-            <span className="font-mono text-[11px] text-white/50">
+            <span className="font-mono text-[11px] text-neutral-500">
               Audit method: Wireshark / LuLu / Little Snitch
             </span>
           </div>
         </div>
 
         {/* The Data Boundary Matrix */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-[#181818] border border-[#313131] mb-14">
+        <div className="p-6 sm:p-8 rounded-2xl bg-white border border-neutral-200/90 shadow-sm mb-14">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
             <div>
-              <h2 className="text-xl font-bold text-white">The Murmur Local Data Boundary</h2>
-              <p className="text-xs sm:text-sm text-white/60">
+              <h2 className="text-xl font-bold text-neutral-950">The Murmur Local Data Boundary</h2>
+              <p className="text-xs sm:text-sm text-neutral-600">
                 A line-by-line breakdown of every data asset and its storage guarantee.
               </p>
             </div>
-            <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-[#222] border border-[#333] text-white/70">
+            <span className="text-[11px] font-mono px-2.5 py-1 rounded bg-neutral-100 border border-neutral-200 text-neutral-700 font-medium">
               Audit Version: 1.0.0
             </span>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-neutral-200/80">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-[#313131] text-white/80 font-mono">
-                  <th className="pb-3 pr-4">Data Type</th>
-                  <th className="pb-3 px-4">Storage Location</th>
-                  <th className="pb-3 px-4">Cloud Transmission</th>
-                  <th className="pb-3 px-4">Retention & Erasure</th>
-                  <th className="pb-3 pl-4">Audit Status</th>
+                <tr className="border-b border-neutral-200/80 bg-neutral-50/80 text-neutral-900 font-mono uppercase tracking-wider">
+                  <th className="py-3 px-4 font-semibold">Data Type</th>
+                  <th className="py-3 px-4 font-semibold">Storage Location</th>
+                  <th className="py-3 px-4 font-semibold">Cloud Transmission</th>
+                  <th className="py-3 px-4 font-semibold">Retention & Erasure</th>
+                  <th className="py-3 px-4 font-semibold">Audit Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#272727] text-white/70 font-mono">
+              <tbody className="divide-y divide-neutral-200/70 text-neutral-700 font-mono">
                 {DATA_BOUNDARY_MATRIX.map((row, idx) => (
-                  <tr key={idx} className="hover:bg-[#202020] transition-colors">
-                    <td className="py-3 pr-4 font-bold text-white">{row.type}</td>
-                    <td className="py-3 px-4 text-white/80">{row.storage}</td>
-                    <td className="py-3 px-4 text-emerald-400 font-semibold">{row.cloud}</td>
-                    <td className="py-3 px-4 text-white/60">{row.retention}</td>
-                    <td className="py-3 pl-4">
-                      <span className="inline-block px-2 py-0.5 rounded text-[10px] bg-[#262626] text-emerald-300 border border-emerald-500/20">
+                  <tr key={idx} className="hover:bg-neutral-50/60 transition-colors">
+                    <td className="py-3.5 px-4 font-bold text-neutral-950 font-sans">{row.type}</td>
+                    <td className="py-3.5 px-4 text-neutral-800">{row.storage}</td>
+                    <td className="py-3.5 px-4 text-emerald-700 font-bold">{row.cloud}</td>
+                    <td className="py-3.5 px-4 text-neutral-600">{row.retention}</td>
+                    <td className="py-3.5 px-4">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-semibold">
                         {row.status}
                       </span>
                     </td>
@@ -320,10 +326,10 @@ export default function PrivacyPage() {
         {/* 8 Plain-Language Questions */}
         <div className="mb-14">
           <div className="text-center max-w-[680px] mx-auto mb-10">
-            <span className="text-xs font-mono font-semibold uppercase tracking-widest text-emerald-400 block mb-2">
+            <span className="text-xs font-mono font-semibold uppercase tracking-widest text-emerald-700 block mb-2">
               Auditable Plain-English FAQ
             </span>
-            <h2 className="text-2xl sm:text-4xl font-bold text-white">
+            <h2 className="text-3xl sm:text-4xl font-bold text-neutral-950">
               Direct answers. Zero legalese.
             </h2>
           </div>
@@ -332,17 +338,17 @@ export default function PrivacyPage() {
             {VERIFICATION_QUESTIONS.map((item, idx) => (
               <div
                 key={idx}
-                className="p-6 rounded-2xl bg-[#181818] border border-[#313131] flex flex-col justify-between hover:border-[#444] transition-colors"
+                className="p-6 rounded-2xl bg-white border border-neutral-200/90 shadow-sm flex flex-col justify-between hover:border-neutral-300 transition-all"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#272727] text-emerald-400 border border-[#313131]">
+                    <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-medium">
                       {item.badge}
                     </span>
-                    <span className="text-xs font-mono text-white/40">#{idx + 1}</span>
+                    <span className="text-xs font-mono text-neutral-400">#{idx + 1}</span>
                   </div>
-                  <h3 className="text-base font-bold text-white mb-2">{item.q}</h3>
-                  <p className="text-xs sm:text-sm text-white/70 leading-relaxed">{item.a}</p>
+                  <h3 className="text-base font-bold text-neutral-950 mb-2">{item.q}</h3>
+                  <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed font-normal">{item.a}</p>
                 </div>
               </div>
             ))}
@@ -350,15 +356,15 @@ export default function PrivacyPage() {
         </div>
 
         {/* Reproducible Verification Recipes */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-[#141414] border border-[#2b2b2b] mb-14">
+        <div className="p-6 sm:p-8 rounded-2xl bg-neutral-50/80 border border-neutral-200/90 shadow-sm mb-14">
           <div className="max-w-2xl mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#202020] border border-[#333] text-xs font-mono text-white/80 mb-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-neutral-200/90 text-xs font-mono text-neutral-800 mb-3 shadow-xs">
               <span>🔬</span> Reproducible Audit Recipes
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-bold text-neutral-950 mb-2">
               Turn &ldquo;Trust Me&rdquo; into &ldquo;Verify Me&rdquo;
             </h2>
-            <p className="text-xs sm:text-sm text-white/70 leading-relaxed">
+            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
               Don&apos;t take our word for it. Here is how security teams, enterprise compliance
               officers, and power users can independently verify Murmur with network inspection
               tools:
@@ -369,19 +375,19 @@ export default function PrivacyPage() {
             {REPRODUCIBLE_TEST_RECIPES.map((recipe, idx) => (
               <div
                 key={idx}
-                className="p-5 rounded-xl bg-[#1a1a1a] border border-[#313131] flex flex-col justify-between"
+                className="p-5 rounded-xl bg-white border border-neutral-200/80 shadow-sm flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="text-[11px] font-bold text-white">{recipe.tool}</span>
-                    <span className="text-[10px] text-white/40">{recipe.os}</span>
+                    <span className="text-[11px] font-bold text-neutral-950">{recipe.tool}</span>
+                    <span className="text-[10px] text-neutral-500 font-sans">{recipe.os}</span>
                   </div>
-                  <h3 className="text-sm font-semibold text-emerald-300 mb-2">{recipe.title}</h3>
-                  <p className="text-white/70 text-xs font-sans leading-relaxed mb-4">
+                  <h3 className="text-sm font-semibold text-emerald-800 mb-2">{recipe.title}</h3>
+                  <p className="text-neutral-600 text-xs font-sans leading-relaxed mb-4">
                     {recipe.description}
                   </p>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#0e0e0e] border border-[#272727] font-mono text-[11px] text-white/90 overflow-x-auto">
+                <div className="p-2.5 rounded-lg bg-[#0e0e11] border border-neutral-800 font-mono text-[11px] text-emerald-400 overflow-x-auto shadow-inner">
                   <code>{recipe.command}</code>
                 </div>
               </div>
@@ -390,42 +396,39 @@ export default function PrivacyPage() {
         </div>
 
         {/* The Competitive Trust Wedge */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-[#161616] border border-[#2f2f2f] mb-14">
-          <h2 className="text-xl font-bold text-white mb-4">
+        <div className="p-6 sm:p-8 rounded-2xl bg-white border border-neutral-200/90 shadow-sm mb-14">
+          <h2 className="text-xl font-bold text-neutral-950 mb-4">
             The Trust Wedge: Local Architecture vs. Cloud Promises
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-white/75 leading-relaxed font-sans">
-            <div className="p-5 rounded-xl bg-[#111] border border-[#262626]">
-              <h3 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm leading-relaxed font-sans">
+            <div className="p-5 rounded-xl bg-neutral-50 border border-neutral-200/80">
+              <h3 className="text-sm font-bold text-neutral-950 mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500" />
                 Cloud Dictation (e.g. Wispr Flow, Cloud APIs)
               </h3>
-              <ul className="space-y-2 text-xs text-white/60 list-disc list-inside">
+              <ul className="space-y-2 text-xs text-neutral-600 list-disc list-inside">
                 <li>Audio streams across public networks to remote GPU endpoints.</li>
                 <li>Requires account creation, authentication tokens, and user IDs.</li>
                 <li>
-                  Transcripts and voice snippets may be retained for model fine-tuning unless
-                  explicitly opted out.
+                  Transcripts and voice snippets may be retained for model fine-tuning unless explicitly opted out.
                 </li>
                 <li>
-                  Dependent on third-party uptime, internet bandwidth, and corporate cloud retention
-                  policies.
+                  Dependent on third-party uptime, internet bandwidth, and corporate cloud retention policies.
                 </li>
               </ul>
             </div>
 
-            <div className="p-5 rounded-xl bg-[#111] border border-emerald-500/30">
-              <h3 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <div className="p-5 rounded-xl bg-emerald-50/30 border border-emerald-200/80">
+              <h3 className="text-sm font-bold text-neutral-950 mb-3 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 Murmur On-Device Architecture
               </h3>
-              <ul className="space-y-2 text-xs text-white/80 list-disc list-inside">
+              <ul className="space-y-2 text-xs text-neutral-700 list-disc list-inside">
                 <li>0 bytes of audio or transcript leave your physical hardware.</li>
                 <li>Zero accounts, zero logins, zero marketing or crash telemetry.</li>
                 <li>Model weights execute directly in local memory via whisper.cpp.</li>
                 <li>
-                  Works completely offline on airplanes, air-gapped workstations, and strict
-                  enterprise networks.
+                  Works completely offline on airplanes, air-gapped workstations, and strict enterprise networks.
                 </li>
               </ul>
             </div>
@@ -433,24 +436,28 @@ export default function PrivacyPage() {
         </div>
 
         {/* Call to action */}
-        <div className="text-center p-8 sm:p-10 rounded-2xl bg-[#181818] border border-[#313131]">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-            Dictate with total confidence.
-          </h2>
-          <p className="text-sm text-white/70 max-w-md mx-auto mb-6">
-            Murmur is free, open source, and built for people who value privacy as an absolute
-            guarantee.
-          </p>
-          <div className="flex justify-center gap-3">
+        <div className="text-center p-8 sm:p-12 rounded-3xl bg-[#141416] border border-neutral-800 text-white shadow-xl relative overflow-hidden">
+          <div className="w-[500px] h-[250px] bg-gradient-to-r from-emerald-500/10 to-transparent rounded-full blur-3xl absolute -top-24 left-1/2 -translate-x-1/2 pointer-events-none" />
+
+          <div className="relative z-10 max-w-xl mx-auto space-y-3">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Dictate with total confidence.
+            </h2>
+            <p className="text-sm text-neutral-400">
+              Murmur is free, open source, and built for people who value privacy as an absolute guarantee.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3.5 pt-4 relative z-10">
             <Link
               href="/#download"
-              className="text-sm font-semibold text-black bg-white hover:bg-white/90 px-6 py-2.5 rounded-full transition-colors"
+              className="px-7 py-3.5 rounded-xl bg-white text-neutral-950 font-semibold hover:bg-neutral-100 transition-all text-sm shadow-md"
             >
-              Download Murmur
+              Download Murmur Free
             </Link>
             <Link
               href="/"
-              className="text-sm font-semibold text-white/80 hover:text-white bg-[#222222] border border-[#313131] px-5 py-2.5 rounded-full transition-colors"
+              className="px-6 py-3.5 rounded-xl bg-neutral-800 text-white/90 border border-neutral-700 hover:text-white hover:bg-neutral-700 transition-all text-sm font-medium"
             >
               Back to Home
             </Link>

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import React, { Suspense, useState } from "react";
@@ -30,11 +31,13 @@ function InviteContent() {
   };
 
   return (
-    <div className="relative pt-32 pb-20 px-4 max-w-4xl mx-auto text-center">
+    <div className="relative pt-36 pb-20 md:pt-44 md:pb-28 px-4 max-w-4xl mx-auto text-center">
       {/* Invitation Badge */}
-      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs font-mono font-semibold mb-6 shadow-sm">
-        <Gift className="size-4 text-emerald-600 animate-pulse" />
-        Personal Invitation · Welcome Bonus Unlocked
+      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-6">
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        <span className="text-xs font-semibold text-neutral-800">
+          Personal Invitation · Welcome Bonus Unlocked
+        </span>
       </div>
 
       <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-neutral-950 mb-5">
@@ -63,7 +66,7 @@ function InviteContent() {
 
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-neutral-500">Referral Code:</span>
-            <div className="px-3 py-1 rounded-xl bg-white border border-neutral-200 text-xs font-mono font-bold text-neutral-900 flex items-center gap-2">
+            <div className="px-3 py-1 rounded-xl bg-white border border-neutral-200 text-xs font-mono font-bold text-neutral-900 flex items-center gap-2 shadow-xs">
               <span>{refCode}</span>
               <button
                 onClick={handleCopyCode}
@@ -81,7 +84,7 @@ function InviteContent() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-5 text-xs text-neutral-700">
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
+          <div className="p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
             <div className="font-bold text-neutral-950 mb-1 flex items-center gap-1.5">
               <CheckCircle2 className="size-3.5 text-emerald-600" />
               <span>Free Starter Tier</span>
@@ -91,7 +94,7 @@ function InviteContent() {
             </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
+          <div className="p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
             <div className="font-bold text-neutral-950 mb-1 flex items-center gap-1.5">
               <CheckCircle2 className="size-3.5 text-emerald-600" />
               <span>Pro Pack Unlocked</span>
@@ -102,7 +105,7 @@ function InviteContent() {
             </p>
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
+          <div className="p-4 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
             <div className="font-bold text-neutral-950 mb-1 flex items-center gap-1.5">
               <CheckCircle2 className="size-3.5 text-emerald-600" />
               <span>100% Offline & Private</span>
@@ -116,14 +119,14 @@ function InviteContent() {
         <div className="mt-6 flex flex-col sm:flex-row items-center gap-3">
           <Link
             href="/#download"
-            className="w-full sm:w-auto py-3 px-6 rounded-2xl bg-neutral-950 hover:bg-neutral-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+            className="w-full sm:w-auto py-3 px-6 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
           >
             <Download className="size-4" />
             <span>Download Murmur Free</span>
           </Link>
           <Link
             href={`/pricing?ref=${encodeURIComponent(refCode)}`}
-            className="w-full sm:w-auto py-3 px-6 rounded-2xl bg-white hover:bg-neutral-50 border border-neutral-200 text-neutral-900 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full sm:w-auto py-3 px-6 rounded-xl bg-white hover:bg-neutral-50 border border-neutral-200/90 text-neutral-900 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
           >
             <span>Explore Pro Plans & Pricing</span>
             <ArrowRight className="size-4" />
@@ -133,8 +136,8 @@ function InviteContent() {
 
       {/* Feature comparison highlights */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left mb-12">
-        <div className="p-5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3">
+        <div className="p-6 rounded-3xl bg-white border border-neutral-200/90 shadow-xs hover:border-neutral-300 hover:shadow-md transition-all">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3">
             <Zap className="size-5" />
           </div>
           <h3 className="text-sm font-bold text-neutral-950 mb-1">Sub-200ms Latency</h3>
@@ -144,8 +147,8 @@ function InviteContent() {
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3">
+        <div className="p-6 rounded-3xl bg-white border border-neutral-200/90 shadow-xs hover:border-neutral-300 hover:shadow-md transition-all">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3">
             <ShieldCheck className="size-5" />
           </div>
           <h3 className="text-sm font-bold text-neutral-950 mb-1">100% Local Processing</h3>
@@ -155,8 +158,8 @@ function InviteContent() {
           </p>
         </div>
 
-        <div className="p-5 rounded-2xl bg-white border border-neutral-200/80 shadow-xs">
-          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3">
+        <div className="p-6 rounded-3xl bg-white border border-neutral-200/90 shadow-xs hover:border-neutral-300 hover:shadow-md transition-all">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3">
             <Cpu className="size-5" />
           </div>
           <h3 className="text-sm font-bold text-neutral-950 mb-1">Own Your Software</h3>
@@ -172,7 +175,13 @@ function InviteContent() {
 
 export default function InvitePage() {
   return (
-    <main className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white relative overflow-x-hidden">
+    <main className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white relative overflow-hidden">
+      {/* Background glow & subtle texture */}
+      <div className="absolute inset-0 pointer-events-none -z-10 flex items-center justify-center overflow-hidden">
+        <div className="absolute -top-32 w-[700px] h-[600px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50" />
+      </div>
+
       <Navbar />
       <Suspense
         fallback={<div className="pt-40 text-center text-neutral-500">Loading invite...</div>}

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
@@ -208,7 +210,13 @@ function SuccessContent() {
 
 export default function PricingSuccessPage() {
   return (
-    <main className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white relative overflow-x-hidden">
+    <main className="min-h-screen bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white relative overflow-hidden">
+      {/* Background glow & subtle texture */}
+      <div className="absolute inset-0 pointer-events-none -z-10 flex items-center justify-center overflow-hidden">
+        <div className="absolute -top-32 w-[700px] h-[600px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-50" />
+      </div>
+
       <Navbar />
       <Suspense
         fallback={
