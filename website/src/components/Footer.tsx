@@ -25,24 +25,34 @@ const SOLUTIONS_LINKS: FooterLink[] = [
 
 const COMPARISONS_LINKS: FooterLink[] = [
   { href: "/wispr-flow-alternative", label: "Wispr Flow Alternative" },
-  { href: "/best-private-ai-dictation", label: "Best Private Dictation" },
-  { href: "/offline-voice-to-text-for-mac", label: "Offline Voice for Mac" },
+  {
+    href: "/blog/wispr-flow-alternative-windows-local-dictation",
+    label: "Wispr Alternative (Windows)",
+    badge: "New",
+  },
+  {
+    href: "/blog/murmur-vs-wispr-flow-vs-superwhisper-2026-latency-accuracy-comparison",
+    label: "Methodology Benchmark",
+  },
+  { href: "/blog/best-private-dictation-software-for-developers", label: "Best Dictation for Devs" },
   { href: "/offline-voice-to-text-for-windows", label: "Offline Windows Dictation" },
-  { href: "/local-whisper-dictation", label: "Local Whisper Models" },
   { href: "/#comparison", label: "Cloud vs Local Matrix" },
 ];
 
 const RESOURCES_LINKS: FooterLink[] = [
   { href: "/blog", label: "Technical Blog" },
   {
-    href: "/blog/murmur-vs-wispr-flow-vs-superwhisper-2026-latency-accuracy-comparison",
-    label: "2026 Benchmarks",
-    badge: "New",
+    href: "/blog/how-to-dictate-github-issues-prs-cursor-prompts",
+    label: "Dictate Cursor & PRs",
+    badge: "Guide",
   },
   {
-    href: "/blog/how-i-reduced-meeting-note-time-by-80-percent-with-local-dictation",
-    label: "Meeting Notes Guide",
-    badge: "Guide",
+    href: "/blog/local-voice-dictation-notion-slack-gmail-windows",
+    label: "Slack & Notion Dictation",
+  },
+  {
+    href: "/blog/how-to-use-voice-dictation-without-uploading-sensitive-work-drafts",
+    label: "Zero-Cloud Drafts Guide",
   },
   { href: "/privacy", label: "Privacy Promise", accent: true },
   { href: "/pricing", label: "Pricing & Lifetime" },

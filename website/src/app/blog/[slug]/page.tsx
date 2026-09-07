@@ -40,19 +40,48 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
 
-  // Helper to parse inline markdown: **bold** and `code`
+  // Helper to parse inline markdown: links [text](url), **bold**, `code`, and *italic*
   const formatInlineMarkdown = (text: string): React.ReactNode => {
-    // Regex for matching **bold** or `code`
-    const parts = text.split(/(\*\*.*?\*\*|`.*?`)/g);
+    // Regex for matching [text](url), **bold**, `code`, or *italic*
+    const parts = text.split(/(\[.*?\]\(.*?\)|\*\*.*?\*\*|`.*?`|\*.*?\*)/g);
     return parts.map((part, i) => {
-      if (part.startsWith("**") && part.endsWith("**")) {
+      if (part.startsWith("[") && part.includes("](") && part.endsWith(")")) {
+        const match = part.match(/^\[(.*?)\]\((.*?)\)$/);
+        if (match) {
+          const [, linkText, href] = match;
+          const isInternal = href.startsWith("/") || href.startsWith("#");
+          if (isInternal) {
+            return (
+              <Link
+                key={i}
+                href={href}
+                className="text-emerald-700 font-medium underline underline-offset-4 hover:text-emerald-950 transition-colors"
+              >
+                {linkText}
+              </Link>
+            );
+          }
+          return (
+            <a
+              key={i}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-emerald-700 font-medium underline underline-offset-4 hover:text-emerald-950 transition-colors"
+            >
+              {linkText}
+            </a>
+          );
+        }
+      }
+      if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
         return (
           <strong key={i} className="text-neutral-950 font-bold">
             {part.slice(2, -2)}
           </strong>
         );
       }
-      if (part.startsWith("`") && part.endsWith("`")) {
+      if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
         return (
           <code
             key={i}
@@ -60,6 +89,13 @@ export default async function BlogPostPage({ params }: Props) {
           >
             {part.slice(1, -1)}
           </code>
+        );
+      }
+      if (part.startsWith("*") && part.endsWith("*") && part.length > 2 && !part.startsWith("**")) {
+        return (
+          <em key={i} className="italic text-neutral-800">
+            {part.slice(1, -1)}
+          </em>
         );
       }
       return part;
@@ -72,53 +108,23 @@ export default async function BlogPostPage({ params }: Props) {
     const elements: React.ReactNode[] = [];
     let inCodeBlock = false;
     let codeBuffer: string[] = [];
-    let inTable = false;
     let tableBuffer: string[] = [];
 
-    lines.forEach((line, idx) => {
-      // Code blocks
-      if (line.startsWith("```")) {
-        if (inCodeBlock) {
-          elements.push(
-            <pre
-              key={`code-${idx}`}
-              className="p-4 sm:p-5 rounded-2xl bg-[#0e0e11] border border-neutral-800 font-mono text-xs text-neutral-100 overflow-x-auto my-6 leading-relaxed shadow-sm"
-            >
-              <code>{codeBuffer.join("\n")}</code>
-            </pre>,
-          );
-          codeBuffer = [];
-          inCodeBlock = false;
-        } else {
-          inCodeBlock = true;
-        }
-        return;
-      }
-
-      if (inCodeBlock) {
-        codeBuffer.push(line);
-        return;
-      }
-
-      // Tables
-      if (line.trim().startsWith("|") && line.trim().endsWith("|")) {
-        inTable = true;
-        tableBuffer.push(line);
-        return;
-      } else if (inTable) {
-        // flush table
-        const rows = tableBuffer.map((r) =>
-          r
-            .split("|")
-            .filter((_, cIdx, arr) => cIdx > 0 && cIdx < arr.length - 1)
-            .map((c) => c.trim()),
-        );
+    const flushTable = (keyId: string | number) => {
+      if (tableBuffer.length === 0) return;
+      const rows = tableBuffer.map((r) =>
+        r
+          .split("|")
+          .filter((_, cIdx, arr) => cIdx > 0 && cIdx < arr.length - 1)
+          .map((c) => c.trim()),
+      );
+      if (rows.length >= 2) {
         const header = rows[0];
         const body = rows.slice(2);
 
         elements.push(
           <div
-            key={`table-${idx}`}
+            key={`table-${keyId}`}
             className="my-6 rounded-2xl border border-neutral-200/90 overflow-x-auto bg-white shadow-xs"
           >
             <table className="w-full text-left text-xs border-collapse font-mono">
@@ -145,8 +151,42 @@ export default async function BlogPostPage({ params }: Props) {
             </table>
           </div>,
         );
-        tableBuffer = [];
-        inTable = false;
+      }
+      tableBuffer = [];
+    };
+
+    lines.forEach((line, idx) => {
+      // Code blocks
+      if (line.startsWith("```")) {
+        if (inCodeBlock) {
+          elements.push(
+            <pre
+              key={`code-${idx}`}
+              className="p-4 sm:p-5 rounded-2xl bg-[#0e0e11] border border-neutral-800 font-mono text-xs text-neutral-100 overflow-x-auto my-6 leading-relaxed shadow-sm"
+            >
+              <code>{codeBuffer.join("\n")}</code>
+            </pre>,
+          );
+          codeBuffer = [];
+          inCodeBlock = false;
+        } else {
+          flushTable(`pre-code-${idx}`);
+          inCodeBlock = true;
+        }
+        return;
+      }
+
+      if (inCodeBlock) {
+        codeBuffer.push(line);
+        return;
+      }
+
+      // Tables
+      if (line.trim().startsWith("|") && line.trim().endsWith("|")) {
+        tableBuffer.push(line);
+        return;
+      } else if (tableBuffer.length > 0) {
+        flushTable(`auto-${idx}`);
       }
 
       // Headings
@@ -216,6 +256,8 @@ export default async function BlogPostPage({ params }: Props) {
       }
     });
 
+    flushTable("final-eof");
+
     return elements;
   };
 
@@ -247,13 +289,19 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Article Header */}
         <header className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-wrap items-center gap-2.5 mb-4">
             <span className="text-xs font-mono px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-medium">
               {post.category}
             </span>
             <span className="text-xs font-mono text-neutral-500">
               {post.readTime} · Published {post.date}
             </span>
+            {post.updatedDate && (
+              <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-800 border border-neutral-300 font-semibold flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                Updated {post.updatedDate}
+              </span>
+            )}
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-neutral-950 mb-6 leading-tight">
