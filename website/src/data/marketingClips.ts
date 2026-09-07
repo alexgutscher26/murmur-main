@@ -171,3 +171,98 @@ Try dictating in Airplane Mode and let us know what you think!`,
     },
   },
 };
+
+export const X_LINKEDIN_THREAD_DEMO: MarketingClipCampaign = {
+  id: "x-linkedin-voice-dictation-demo",
+  title: "Dictating a 5-Part X Thread and LinkedIn Thought Leadership Post in 45 Seconds",
+  durationSeconds: 42,
+  hook: "Typing social posts kills your flow. Watch how Murmur lets you dictate full viral threads and LinkedIn frameworks with spoken macros and 0 bytes uploaded.",
+  storyboard: [
+    {
+      timestamp: "0:00 - 0:08",
+      action: "Focus empty Typefully / X composer. Hold Alt+Space / Option+Space.",
+      screenDisplay: "Clean X editor with Murmur floating pill active.",
+      audioVoiceover: "Watch me dictate a 5-part technical X thread in under 30 seconds with voice macros.",
+    },
+    {
+      timestamp: "0:09 - 0:22",
+      action: "Speak 'x thread template' followed by bullet takeaways and 'tweet break' delimiters.",
+      screenDisplay: "Pill waveform ripples; thread tweets auto-populate with numbered headers and clean spacing.",
+      audioVoiceover: "x thread template on why local whisper runs 3x faster than cloud dictation... tweet break... key lesson one: DirectML bypasses network overhead.",
+    },
+    {
+      timestamp: "0:23 - 0:32",
+      action: "Switch window to LinkedIn draft editor. Hold Alt+Space and speak 'linkedin post template'.",
+      screenDisplay: "LinkedIn composer formats instantly into a hook, bullet insights, and engagement callout.",
+      audioVoiceover: "Now over to LinkedIn: linkedin post template on shipping open source tools without cloud telemetry.",
+    },
+    {
+      timestamp: "0:33 - 0:42",
+      action: "Show task manager / packet monitor showing 0.00 KB network egress and <120ms latency.",
+      screenDisplay: "Local DirectML GPU inference stats and 0 bytes transmitted badge.",
+      audioVoiceover: "Zero cloud servers touched. Complete privacy for unreleased startup strategy. 100% free and open source.",
+    },
+  ],
+  platforms: {
+    x: {
+      postText: `Stop typing social posts for 45 minutes every morning.
+
+I just dictated this entire 5-part breakdown in 28 seconds using Murmur + voice macros.
+
+• "x thread template" -> auto-formats numbered 1/ 🧵 structure
+• "tweet break" -> inserts thread separators on the fly
+• 100% on-device Whisper (0 bytes sent to any cloud)
+
+Full demo & open-source code: 👇`,
+      mediaAlt:
+        "Video demonstrating voice dictation of a structured X thread and LinkedIn post using local Whisper AI.",
+      hashtags: ["#buildinpublic", "#indiehackers", "#productivity", "#voiceAI"],
+    },
+    linkedin: {
+      headline: "How dictating social content out loud solved our team's creative burnout",
+      postText: `Typing out thought leadership posts and technical insights is exhausting. When you type, your inner editor constantly interrupts your flow.
+
+When you speak out loud, you communicate at 160 words per minute—the exact conversational rhythm that performs best on LinkedIn.
+
+We added dedicated LinkedIn and X macros to Murmur:
+• "linkedin post template" creates a hook, insight bullets, and question framework
+• "linkedin carousel template" structures slide-by-slide PDF decks
+• "tweet break" and "x thread template" format multi-tweet threads effortlessly
+
+And because Murmur runs 100% locally via whisper.cpp, confidential client learnings and unreleased product metrics never leave your computer.
+
+Open source on GitHub: https://github.com/alexgutscher26/murmur`,
+      discussionQuestion:
+        "Do you find your thoughts flow more naturally speaking out loud vs typing into a blank document?",
+    },
+    reddit: {
+      subreddits: ["r/content_marketing", "r/buildinpublic", "r/productivity"],
+      postTitle:
+        "I added spoken macros for X threads and LinkedIn posts to our offline voice app",
+      postBody: `Hey all,
+
+Writing daily social updates and technical threads is one of the most tedious parts of building in public. We found ourselves spending 30-40 minutes drafting what could have been spoken in 90 seconds.
+
+We just updated Murmur (our open-source local voice dictation tool) with built-in voice macros for LinkedIn and X:
+1. "x thread template": Automatically generates a 5-part thread structure.
+2. "tweet break": Inserts thread breaks while speaking so you don't have to pause and click 'Add Tweet'.
+3. "linkedin post template": Formats the classic hook + white-space paragraph + bullet takeaways framework.
+4. "mention user" (@) and "hashtag" (#) commands.
+
+Everything runs on your local GPU via whisper.cpp (no cloud subscriptions, no data collection).
+
+GitHub: https://github.com/alexgutscher26/murmur`,
+    },
+    productHunt: {
+      tagline: "Voice-to-content engine for creators, founders & social builders",
+      makerCommentSnippet: "Creators and founders: you don't have a typing shortage; you have an editing bottleneck. Murmur's new LinkedIn & X thread macros turn your natural speech into structured, high-performing social posts with zero cloud latency.",
+      highlightBullets: [
+        "Built-in X thread delimiters ('tweet break') for single-breath thread dictation",
+        "LinkedIn thought leadership & carousel slide templates",
+        "100% local GPU execution with zero cloud uploads",
+        "Free and open-source under MIT license",
+      ],
+    },
+  },
+};
+

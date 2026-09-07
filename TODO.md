@@ -469,6 +469,7 @@
 - [x] [FEAT] Voice-triggered text-expander snippets & macros — Speak trigger words (e.g. "bug template", "status update", "pr template", "meeting notes") to instantly insert structured markdown schemas.
 - [x] [FEAT] Creator & scriptwriting voice macros — YouTube video script outlines, 3-part viral hook frameworks, Substack newsletter drafts, social captions, podcast show notes, and 60s sponsor ad reads.
 - [x] [FEAT] Dedicated Content Creators Hub (`/creators` & `/content-creators`) — Interactive creator voice playground, creator app workflow integration (Notion, Google Docs, Descript, Final Cut, Obsidian), and unreleased script IP privacy comparison vs Wispr Flow.
+- [x] [FEAT] Dedicated LinkedIn and X (Twitter) features — Built-in spoken macros for X threads (`x thread template`), thread delimiters (`tweet break`, `next tweet`), LinkedIn posts (`linkedin post template`), carousel slide decks (`linkedin carousel template`), and hook frameworks. Added entity normalization (LinkedIn, Twitter, Typefully, Taplio, TweetDeck) and interactive playground demos on `/creators`.
 - [ ] [FEAT] Portable dictionary export/import (`.json` / `.csv`) — "Your vocabulary is an asset you own—not a training signal for someone else's model."
   - Export: one entry per line, CSV format `trigger,replacement,type,enabled`
   - Import: validate schema, deduplicate against existing entries, show a preview diff before confirming
@@ -500,6 +501,7 @@
 - [x] [SEO] Added JSON-LD Schema markup (`SoftwareApplication` & `FAQPage`) and canonical meta tags across all comparison routes.
 - [x] [CONTENT] Published 6 trust-earning technical articles addressing buyer anxieties, legal privilege risks, developer privacy, and hardware benchmarks.
 - [x] [MARKETING] Record and publish short outcome-driven demonstration clips for X, LinkedIn, Reddit, and Product Hunt: "Dictating a full GitHub issue in Airplane Mode with 0 bytes sent."
+- [x] [MARKETING] Dedicated LinkedIn and X (Twitter) outcome demonstration package & guide — Added `X_LINKEDIN_THREAD_DEMO` campaign storyboard in `marketingClips.ts` and published guide `/blog/how-to-dictate-linkedin-posts-x-threads-voice`.
 - [x] [SEO] Add `/dictation-for-medical-professionals` and `/hipaa-voice-notes` landing pages targeting healthcare vertical.
   - Include a disclaimer (Murmur is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims)
   - Emphasize local processing, no cloud upload, configurable retention policy

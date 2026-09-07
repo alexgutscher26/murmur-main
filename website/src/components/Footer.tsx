@@ -51,6 +51,11 @@ const RESOURCES_LINKS: FooterLink[] = [
     label: "Slack & Notion Dictation",
   },
   {
+    href: "/blog/how-to-dictate-linkedin-posts-x-threads-voice",
+    label: "X & LinkedIn Dictation",
+    badge: "Guide",
+  },
+  {
     href: "/blog/how-to-use-voice-dictation-without-uploading-sensitive-work-drafts",
     label: "Zero-Cloud Drafts Guide",
   },

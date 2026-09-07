@@ -21,6 +21,7 @@ import {
   ArrowRight,
   FileText,
   Lock,
+  Share2,
 } from "lucide-react";
 
 const CREATOR_DEMOS = [
@@ -136,6 +137,56 @@ const CREATOR_DEMOS = [
     target: "Sponsorships & Ads",
     badge: "Monetization",
   },
+  {
+    id: "linkedin-post",
+    title: "LinkedIn Thought Leadership",
+    spoken: "linkedin post template on why we stopped streaming microphone audio to cloud servers",
+    output: `### 💼 LinkedIn Post
+**Hook:** Why we stopped streaming microphone audio to cloud servers
+
+**The Problem / Insight:**
+Cloud voice AI tools require your data to leave your machine. When engineers and founders dictate proprietary codebase secrets, auth tokens, or unreleased strategy into remote cloud endpoints, privacy evaporates.
+
+**Key Lessons / Framework:**
+• Local inference with DirectML and Metal runs at sub-150ms latency
+• Zero outbound bytes means zero compliance or NDA headaches
+• Open-weights Whisper models match cloud accuracy on modern laptops
+
+**Takeaway & Question:**
+👉 Have you audited which third-party cloud servers receive your voice recordings during dictation?
+
+#Tech #Productivity #Engineering #OpenSource #Privacy`,
+    target: "LinkedIn Web / Taplio / Buffer",
+    badge: "Thought Leadership",
+  },
+  {
+    id: "x-thread",
+    title: "X (Twitter) Thread",
+    spoken: "x thread template breakdown of our directml whisper speech benchmarks",
+    output: `### 🧵 X (Twitter) Thread
+**1/ 🧵 [Hook & Big Promise]:**
+We benchmarked local whisper.cpp against cloud speech APIs on Windows 11.
+The results shocked us: on-device was 3.2x faster with 0 bytes sent.
+Here is the full technical breakdown: 👇
+
+**2/ [The Context & Pain]:**
+Cloud dictation incurs WebSocket handshake delay + server queuing + roundtrip network overhead (~450ms tail latency).
+
+**3/ [The Solution / Core Breakthrough]:**
+By compiling Whisper with DirectML and FP16 weights, the GPU executes inference right in VRAM in <120ms.
+
+**4/ [Detailed Breakdown]:**
+• Realtime factor: 0.08x on mid-range laptops
+• Memory consumption: <380 MB RAM
+• Network egress: Absolute 0.00 KB verified by Wireshark
+
+**5/ [Conclusion & Bookmark CTA]:**
+If you build software or write online:
+1. Follow @alexgutscher for local AI architectures
+2. Repost the first post to share with other builders 🔄`,
+    target: "X.com / Typefully / Hypefury",
+    badge: "Virality Threads",
+  },
 ];
 
 const CREATOR_PILLARS = [
@@ -165,6 +216,11 @@ const CREATOR_PILLARS = [
     desc: "Direct native injection into Notion, Google Docs, Apple Notes, Scrivener, Word, Final Cut Pro, DaVinci Resolve, and Descript.",
   },
   {
+    icon: <Share2 className="w-5 h-5 text-sky-500" />,
+    title: "Dictate Viral X Threads & LinkedIn Insights",
+    desc: "Draft engaging X threads and LinkedIn posts in one breath using spoken commands like 'x thread template', 'tweet break', and 'linkedin post template'. Types straight into Typefully, Taplio, or your browser.",
+  },
+  {
     icon: <Smartphone className="w-5 h-5 text-neutral-800" />,
     title: "Mobile & Desktop Flexibility",
     desc: "Capture memos on the go with zero subscription fatigue. One-time purchase or free open source forever.",
@@ -183,8 +239,13 @@ const CREATOR_COMPARISONS = [
     wispr: "Requires active Internet connection",
   },
   {
+    feature: "X & LinkedIn Thread Macros",
+    murmur: "Built-in X thread delimiters, LinkedIn hooks, and carousel templates",
+    wispr: "Generic cloud rewriting without thread delimiters",
+  },
+  {
     feature: "Scriptwriting & Hook Templates",
-    murmur: "Built-in voice macros (YouTube, Substack, Reels)",
+    murmur: "Built-in voice macros (YouTube, Substack, Reels, X, LinkedIn)",
     wispr: "Standard AI rewriting",
   },
   {
@@ -240,15 +301,19 @@ export default function CreatorsPage() {
 
           <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed font-normal">
             Murmur gives creators hours back every week by replacing typing, editing, and creative
-            friction with your natural voice. Draft scripts in{" "}
+            friction with your natural voice. Dictate viral threads on{" "}
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-neutral-100 border border-neutral-200 text-xs font-mono text-neutral-800">
+              X (Twitter)
+            </span>
+            {", "}share thought leadership on{" "}
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-neutral-100 border border-neutral-200 text-xs font-mono text-neutral-800">
+              LinkedIn
+            </span>
+            {", draft scripts in "}
             <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-neutral-100 border border-neutral-200 text-xs font-mono text-neutral-800">
               Notion
             </span>
-            {", "}generate viral hooks for{" "}
-            <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-neutral-100 border border-neutral-200 text-xs font-mono text-neutral-800">
-              YouTube
-            </span>
-            {", and "}prompt AI without touching a keyboard.
+            {", and prompt AI without touching a keyboard."}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">

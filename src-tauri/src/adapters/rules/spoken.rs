@@ -34,6 +34,14 @@ pub const ENGLISH_SPOKEN_COMMANDS: &[(&str, &str)] = &[
     ("comma", ","),
     ("dash", " — "),
     ("hyphen", "-"),
+    ("mention user", "@"),
+    ("tag user", "@"),
+    ("at user", "@"),
+    ("hashtag", "#"),
+    ("hash tag", "#"),
+    ("tweet break", "\n\n🧵 "),
+    ("thread break", "\n\n🧵 "),
+    ("next tweet", "\n\n🧵 "),
 ];
 
 fn is_english(language: Option<&LanguageCode>) -> bool {
@@ -589,6 +597,29 @@ pub fn format_markdown_mode(text: &str) -> String {
     out = replace_whole_words(&out, "instagram caption template", "\n### 📱 Social Caption\n**Hook Line:**\n\n**Body / Story:**\n\n**Call to Action:**\n👉 \n\n**Hashtags:**\n# \n", false);
     out = replace_whole_words(&out, "tiktok caption template", "\n### 📱 Social Caption\n**Hook Line:**\n\n**Body / Story:**\n\n**Call to Action:**\n👉 \n\n**Hashtags:**\n# \n", false);
 
+    out = replace_whole_words(&out, "linkedin post template", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false);
+    out = replace_whole_words(&out, "linkedin post", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false);
+    out = replace_whole_words(&out, "linkedin update", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false);
+    out = replace_whole_words(&out, "linkedin thought leadership", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false);
+
+    out = replace_whole_words(&out, "linkedin carousel template", "\n### 📑 LinkedIn Carousel Outline\n**Slide 1 (Cover Hook):**\n\n**Slide 2 (The Hidden Mistake):**\n\n**Slide 3 (The Shift):**\n\n**Slide 4 (Step-by-Step System):**\n• Step 1:\n• Step 2:\n• Step 3:\n\n**Slide 5 (Summary & Repost CTA):**\n", false);
+    out = replace_whole_words(&out, "linkedin carousel", "\n### 📑 LinkedIn Carousel Outline\n**Slide 1 (Cover Hook):**\n\n**Slide 2 (The Hidden Mistake):**\n\n**Slide 3 (The Shift):**\n\n**Slide 4 (Step-by-Step System):**\n• Step 1:\n• Step 2:\n• Step 3:\n\n**Slide 5 (Summary & Repost CTA):**\n", false);
+    out = replace_whole_words(&out, "carousel outline template", "\n### 📑 LinkedIn Carousel Outline\n**Slide 1 (Cover Hook):**\n\n**Slide 2 (The Hidden Mistake):**\n\n**Slide 3 (The Shift):**\n\n**Slide 4 (Step-by-Step System):**\n• Step 1:\n• Step 2:\n• Step 3:\n\n**Slide 5 (Summary & Repost CTA):**\n", false);
+
+    out = replace_whole_words(&out, "linkedin hook template", "\n### 🪝 LinkedIn Hook\n**Contrarian Opening:**\n\n**Data / Real-World Proof:**\n\n**Core Thesis:**\n", false);
+    out = replace_whole_words(&out, "thought leadership hook", "\n### 🪝 LinkedIn Hook\n**Contrarian Opening:**\n\n**Data / Real-World Proof:**\n\n**Core Thesis:**\n", false);
+
+    out = replace_whole_words(&out, "x thread template", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
+    out = replace_whole_words(&out, "twitter thread template", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
+    out = replace_whole_words(&out, "x thread", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
+    out = replace_whole_words(&out, "twitter thread", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
+
+    out = replace_whole_words(&out, "x post template", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
+    out = replace_whole_words(&out, "twitter post template", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
+    out = replace_whole_words(&out, "tweet template", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
+    out = replace_whole_words(&out, "x post", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
+    out = replace_whole_words(&out, "single tweet", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
+
     out = replace_whole_words(&out, "podcast outline template", "\n### 🎙️ Podcast Episode Outline\n**Episode Title:** \n**Guest:** \n**Core Theme:** \n\n**Discussion Questions:**\n- \n- \n- \n\n**Key Timestamps:**\n- 00:00 Intro\n- \n\n**Links Mentioned:**\n- \n", false);
     out = replace_whole_words(&out, "podcast show notes", "\n### 🎙️ Podcast Episode Outline\n**Episode Title:** \n**Guest:** \n**Core Theme:** \n\n**Discussion Questions:**\n- \n- \n- \n\n**Key Timestamps:**\n- 00:00 Intro\n- \n\n**Links Mentioned:**\n- \n", false);
 
@@ -665,6 +696,18 @@ pub const COMMON_NAMED_ENTITIES: &[(&str, &str)] = &[
     ("youtube", "YouTube"),
     ("instagram", "Instagram"),
     ("tiktok", "TikTok"),
+    ("linkedin", "LinkedIn"),
+    ("twitter", "Twitter"),
+    ("tweetdeck", "TweetDeck"),
+    ("typefully", "Typefully"),
+    ("taplio", "Taplio"),
+    ("hypefury", "Hypefury"),
+    ("bluesky", "Bluesky"),
+    ("threads", "Threads"),
+    ("mastodon", "Mastodon"),
+    ("x post", "X post"),
+    ("x thread", "X thread"),
+    ("x com", "X.com"),
     ("substack", "Substack"),
     ("medium", "Medium"),
     ("patreon", "Patreon"),

@@ -242,6 +242,22 @@ mod tests {
 
         let sponsor = format_markdown_mode("record sponsor read template for brand");
         assert!(sponsor.contains("### 📢 Sponsor Read (60s)"));
+
+        let linkedin_post = format_markdown_mode("here is the linkedin post template for today");
+        assert!(linkedin_post.contains("### 💼 LinkedIn Post"));
+        assert!(linkedin_post.contains("Key Lessons / Framework:"));
+
+        let linkedin_carousel = format_markdown_mode("drafting a linkedin carousel template about ai");
+        assert!(linkedin_carousel.contains("### 📑 LinkedIn Carousel Outline"));
+        assert!(linkedin_carousel.contains("Slide 1 (Cover Hook):"));
+
+        let x_thread = format_markdown_mode("here is the x thread template for the launch");
+        assert!(x_thread.contains("### 🧵 X (Twitter) Thread"));
+        assert!(x_thread.contains("1/ 🧵 [Hook & Big Promise]:"));
+
+        let x_post = format_markdown_mode("share this x post template with the team");
+        assert!(x_post.contains("### 🐦 X (Twitter) Post"));
+        assert!(x_post.contains("CTA / Question:"));
     }
 
     #[test]
@@ -249,6 +265,22 @@ mod tests {
         let raw = "publishing to youtube, instagram, tiktok, substack, and spotify with davinci resolve and descript";
         let out = normalize_named_entities(raw);
         assert_eq!(out, "publishing to YouTube, Instagram, TikTok, Substack, and Spotify with DaVinci Resolve and Descript");
+
+        let social_raw = "scheduling posts across linkedin, twitter, typefully, taplio, tweetdeck, and bluesky";
+        let social_out = normalize_named_entities(social_raw);
+        assert_eq!(social_out, "scheduling posts across LinkedIn, Twitter, Typefully, Taplio, TweetDeck, and Bluesky");
+    }
+
+    #[test]
+    fn social_spoken_commands_expand_properly() {
+        use super::super::spoken::expand_spoken_commands;
+
+        let lang = english();
+        let raw = "first thought tweet break second thought tag user alex hashtag buildinpublic";
+        let out = expand_spoken_commands(raw, Some(&lang));
+        assert!(out.contains("🧵"));
+        assert!(out.contains("@ alex"));
+        assert!(out.contains("# buildinpublic"));
     }
 
     #[test]
