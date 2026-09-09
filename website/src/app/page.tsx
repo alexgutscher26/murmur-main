@@ -193,7 +193,7 @@ export default function Home() {
       <ModelSelectorGuide />
 
       {/* Social Proof & Testimonials */}
-      <Testimonials />
+      {/* <Testimonials /> */}
 
       {/* OS Auto-Detect Download Section & Package Managers */}
       <DownloadSection />
