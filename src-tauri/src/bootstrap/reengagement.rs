@@ -32,7 +32,7 @@ impl WindowsToast {
         if let Err(err) = app
             .notification()
             .builder()
-            .title("Murmur is ready whenever you are")
+            .title("HushWrite is ready whenever you are")
             .body(&body)
             .show()
         {
@@ -93,7 +93,13 @@ pub async fn evaluate_and_prompt(app: &AppHandle, db: &Database) -> AppResult<bo
     let hotkey_val = services::settings::get_setting(db, keys::DICTATION_HOTKEY)?;
     let hotkey_desc = match hotkey_val {
         Some(SettingValue::Hotkey(hk)) => format_hotkey(&hk),
-        _ => if cfg!(target_os = "macos") { "Cmd+Space".to_string() } else { "Ctrl+Space".to_string() },
+        _ => {
+            if cfg!(target_os = "macos") {
+                "Cmd+Space".to_string()
+            } else {
+                "Ctrl+Space".to_string()
+            }
+        }
     };
 
     // 5. Display the re-engagement prompt (Windows toast or system notification)
@@ -107,7 +113,10 @@ pub async fn evaluate_and_prompt(app: &AppHandle, db: &Database) -> AppResult<bo
         now,
     )?;
 
-    tracing::info!(idle_days = (now - latest) / (24 * 60 * 60 * 1000), "dispatched re-engagement prompt toast");
+    tracing::info!(
+        idle_days = (now - latest) / (24 * 60 * 60 * 1000),
+        "dispatched re-engagement prompt toast"
+    );
     Ok(true)
 }
 
@@ -115,9 +124,17 @@ fn format_hotkey(hk: &HotkeyBinding) -> String {
     let mut parts = Vec::new();
     for modifier in &hk.modifiers {
         match modifier {
-            KeyModifier::Command => parts.push(if cfg!(target_os = "macos") { "Cmd" } else { "Ctrl" }),
+            KeyModifier::Command => parts.push(if cfg!(target_os = "macos") {
+                "Cmd"
+            } else {
+                "Ctrl"
+            }),
             KeyModifier::Control => parts.push("Ctrl"),
-            KeyModifier::Option => parts.push(if cfg!(target_os = "macos") { "Option" } else { "Alt" }),
+            KeyModifier::Option => parts.push(if cfg!(target_os = "macos") {
+                "Option"
+            } else {
+                "Alt"
+            }),
             KeyModifier::Shift => parts.push("Shift"),
         }
     }

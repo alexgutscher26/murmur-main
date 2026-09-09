@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to **Murmur** are documented in this file.
+All notable changes to **HushWrite** are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **100% On-Device Whisper Inference**:
   - `small-q5_1` (190 MB) as the new default Starter tier model for fast, low-memory transcription.
   - `base-q5_1` (90 MB) for instant lightweight decodes on constrained hardware.
-  - `large-v3-turbo` (q4_0, q5_0, q8_0) precision models unlocked under the **Murmur Pro** tier.
+  - `large-v3-turbo` (q4_0, q5_0, q8_0) precision models unlocked under the **HushWrite Pro** tier.
 - **Hardware GPU Acceleration**:
   - Windows DirectML execution provider for DirectX 12 GPUs.
   - macOS Apple Silicon Metal acceleration with sub-200ms latency.
@@ -35,14 +35,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Keyboard Shortcuts & Voice Commands Reference Panel**:
   - In-app modal accessible via `?` or header action with styled keycap badges.
 - **In-App Changelog Modal**:
-  - "What's new in Murmur" release notes dialog accessible from the dashboard header and settings.
+  - "What's new in HushWrite" release notes dialog accessible from the dashboard header and settings.
 - **App Profile Manager**:
   - Quick-add preset chips for VS Code, Cursor, Slack, Notion, and Terminal with sparse override settings.
 - **Window Bounds Persistence**:
   - Automatically saves and restores dashboard window size and screen coordinates across launches.
-- **Feature Gating & Murmur Pro Licensing**:
+- **Feature Gating & HushWrite Pro Licensing**:
   - Free Starter tier ($0 forever) with 25 dictionary words and 100 history items.
-  - Murmur Pro ($8/mo or $149 Lifetime) unlocking Large Turbo, Smart Context Engine, and Filler Word Stripper.
+  - HushWrite Pro ($8/mo or $149 Lifetime) unlocking Large Turbo, Smart Context Engine, and Filler Word Stripper.
   - Team tier ($15/user/mo) with centralized team dictionary sync and fleet management.
 
 ### Fixed

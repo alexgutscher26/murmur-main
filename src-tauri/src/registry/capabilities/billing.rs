@@ -16,7 +16,7 @@ pub fn billing_capability() -> Capability {
     Capability {
         key: CapabilityKey::Billing,
         name: text("Billing"),
-        description: text("What Murmur costs, which is nothing."),
+        description: text("What HushWrite costs, which is nothing."),
         requires: vec![],
         engine_needs: vec![],
         nav: Some(NavDef {

@@ -16,12 +16,12 @@ interface BadgeOption {
 const BADGE_PRESETS: BadgeOption[] = [
   {
     id: "shield-default",
-    name: "Dictated with Murmur (Brand)",
+    name: "Dictated with HushWrite (Brand)",
     badgeUrl:
-      "https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white",
+      "https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white",
     markdown:
-      "[![Dictated with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://murmur.app)",
-    html: `<a href="https://murmur.app" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white" alt="Dictated with Murmur" /></a>`,
+      "[![Dictated with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)",
+    html: `<a href="https://HushWrite.app" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white" alt="Dictated with HushWrite" /></a>`,
     category: "badge",
   },
   {
@@ -30,8 +30,8 @@ const BADGE_PRESETS: BadgeOption[] = [
     badgeUrl:
       "https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white",
     markdown:
-      "[![100% Local Dictation](https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white)](https://murmur.app/privacy)",
-    html: `<a href="https://murmur.app/privacy" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white" alt="100% Local Dictation" /></a>`,
+      "[![100% Local Dictation](https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white)](https://HushWrite.app/privacy)",
+    html: `<a href="https://HushWrite.app/privacy" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white" alt="100% Local Dictation" /></a>`,
     category: "badge",
   },
   {
@@ -39,8 +39,8 @@ const BADGE_PRESETS: BadgeOption[] = [
     name: "Monochrome Dark",
     badgeUrl: "https://img.shields.io/badge/dictation-local%20whisper-18181B?style=flat-square",
     markdown:
-      "[![Murmur](https://img.shields.io/badge/dictation-local%20whisper-18181B?style=flat-square)](https://murmur.app)",
-    html: `<a href="https://murmur.app" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/dictation-local%20whisper-18181B?style=flat-square" alt="Murmur" /></a>`,
+      "[![HushWrite](https://img.shields.io/badge/dictation-local%20whisper-18181B?style=flat-square)](https://HushWrite.app)",
+    html: `<a href="https://HushWrite.app" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/dictation-local%20whisper-18181B?style=flat-square" alt="HushWrite" /></a>`,
     category: "badge",
   },
 ];
@@ -167,7 +167,7 @@ export function BadgeGenerator() {
                   <button
                     onClick={() =>
                       handleCopy(
-                        "_Dictated privately on-device with [Murmur](https://murmur.app)_",
+                        "_Dictated privately on-device with [HushWrite](https://HushWrite.app)_",
                         "footer",
                       )
                     }
@@ -178,7 +178,7 @@ export function BadgeGenerator() {
                 </div>
                 <div className="p-3 bg-neutral-50 border border-neutral-200/80 rounded-xl text-xs text-neutral-600 italic">
                   _Dictated privately on-device with{" "}
-                  <span className="text-neutral-900 font-medium underline">Murmur</span>_
+                  <span className="text-neutral-900 font-medium underline">HushWrite</span>_
                 </div>
               </div>
             </div>
@@ -207,11 +207,11 @@ export function BadgeGenerator() {
 
             <div className="mt-4 p-2.5 bg-white border border-neutral-200/80 rounded-xl flex items-center justify-between gap-3 shadow-inner">
               <div className="font-mono text-xs text-neutral-700 truncate px-1">
-                https://murmur.app/invite?ref=MURMUR-8X7K9P
+                https://HushWrite.app/invite?ref=HushWrite-8X7K9P
               </div>
               <button
                 onClick={() =>
-                  handleCopy("https://murmur.app/invite?ref=MURMUR-8X7K9P", "referral")
+                  handleCopy("https://HushWrite.app/invite?ref=HushWrite-8X7K9P", "referral")
                 }
                 className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-neutral-900 hover:bg-neutral-800 text-white transition-all whitespace-nowrap shadow-sm"
               >

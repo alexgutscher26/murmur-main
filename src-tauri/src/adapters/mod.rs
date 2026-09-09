@@ -69,16 +69,13 @@ pub fn available_engines() -> Vec<EngineId> {
  *        model load and the caller decides which thread wears it.
  * WHERE: App bootstrap; the handle goes to pipeline/worker.rs.
  */
-pub fn build_engine(
-    id: &EngineId,
-    model_path: PathBuf,
-) -> AppResult<Arc<dyn TranscriptionEngine>> {
+pub fn build_engine(id: &EngineId, model_path: PathBuf) -> AppResult<Arc<dyn TranscriptionEngine>> {
     match id.as_str() {
         WHISPER_ENGINE_ID => Ok(Arc::new(WhisperEngine::new(model_path))),
         FASTER_WHISPER_ENGINE_ID => Ok(Arc::new(FasterWhisperEngine::new(model_path))),
         other => Err(AppError::new(
             ErrorCode::EngineNotReady,
-            "That transcription engine is not available in this version of Murmur.",
+            "That transcription engine is not available in this version of HushWrite.",
         )
         .with_detail(format!("unknown engine id {other}"))),
     }

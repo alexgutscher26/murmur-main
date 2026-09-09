@@ -4,7 +4,7 @@
  * WHAT:  The individual control primitives for settings — toggle switch,
  *        select dropdown, numeric stepper, text box, and hotkey recorder with
  *        conflict detection and mouse button support.
- * WHY:   Renders standard native-styled controls honoring Murmur design tokens.
+ * WHY:   Renders standard native-styled controls honoring HushWrite design tokens.
  * WHERE: Rendered by SettingControl.tsx.
  */
 

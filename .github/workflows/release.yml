@@ -92,7 +92,7 @@ jobs:
           if [ -z "$KEY" ]; then
             echo "::error::TAURI_SIGNING_PRIVATE_KEY is not set. Without it the"
             echo "::error::build produces artifacts every installed copy of"
-            echo "::error::Murmur will refuse, and the failure would only show"
+            echo "::error::HushWrite will refuse, and the failure would only show"
             echo "::error::up at update time on a user's machine."
             exit 1
           fi
@@ -215,7 +215,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ inputs.tag || github.ref_name }}
-          releaseName: "Murmur __VERSION__"
+          releaseName: "HushWrite __VERSION__"
           releaseBody: "See the assets below to download and install."
           # Published as a draft: the DMG should be opened and launched once
           # before anyone is told it exists. Publishing the release is what
@@ -251,13 +251,13 @@ jobs:
       # bundle around it was not.
       - name: Verify the signed bundle
         run: |
-          APP=$(find src-tauri/target -type d -name "Murmur.app" -path "*/bundle/macos/*" | head -1)
+          APP=$(find src-tauri/target -type d -name "HushWrite.app" -path "*/bundle/macos/*" | head -1)
           if [ -z "$APP" ]; then
-            echo "::error::no Murmur.app was produced"; exit 1
+            echo "::error::no HushWrite.app was produced"; exit 1
           fi
           echo "checking $APP"
           codesign --verify --deep --strict --verbose=2 "$APP"
-          codesign -dv "$APP" 2>&1 | grep -qE "^Identifier=com\.webprodigies\.murmur" \
+          codesign -dv "$APP" 2>&1 | grep -qE "^Identifier=com\.webprodigies\.HushWrite" \
             || { echo "::error::wrong bundle identifier — TCC grants will not persist"; exit 1; }
           codesign -d --entitlements :- "$APP" 2>/dev/null | grep -q "audio-input" \
             || { echo "::error::microphone entitlement missing"; exit 1; }

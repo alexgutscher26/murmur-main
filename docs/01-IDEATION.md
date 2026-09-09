@@ -1,9 +1,9 @@
-# Murmur — Ideation
+# HushWrite — Ideation
 
 **One line:** Press a key, talk, press it again — your words are on the clipboard and pasted before you can look up.
 
 **Status:** BUILT. Every feature in §4.1 and §4.2 is implemented. This document
-remains the product definition — it says what Murmur is and, just as usefully,
+remains the product definition — it says what HushWrite is and, just as usefully,
 what it deliberately is not. Read it before adding anything, because §4.4 is the
 list of things that will otherwise creep back in.
 
@@ -20,7 +20,7 @@ Typing is the bottleneck between a thought and an AI agent. Prompts are long, it
 | Raw whisper.cpp CLI                     | Not a product — no hotkey, no paste, no history, no UI             |
 | Browser-based STT                       | Wrong context — you need it in your terminal, your IDE, everywhere |
 
-**Murmur's position:** the accuracy and polish of the paid tools, running entirely on your machine, free forever, with no cap and no account.
+**HushWrite's position:** the accuracy and polish of the paid tools, running entirely on your machine, free forever, with no cap and no account.
 
 ## 2. Non-negotiables
 
@@ -96,7 +96,7 @@ These are the constraints the whole design bends around. If a decision violates 
 | --- | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | N1  | Local LLM cleanup pass          | Rewrites rambling speech into clean prose via a small local model (Qwen3-0.6B class). Adds 200–500ms, so it must be opt-in and per-profile. The adapter seam for this ships in the MVP; the implementation does not. |
 | N2  | Live partial text in the pill   | Words appear as you speak. Beautiful demo, real complexity, zero functional value since you only need the final text. Deliberately deferred.                                                                         |
-| N3  | Voice commands                  | "Murmur, clear that" without touching the keyboard.                                                                                                                                                                  |
+| N3  | Voice commands                  | "HushWrite, clear that" without touching the keyboard.                                                                                                                                                               |
 | N4  | Snippets / macros               | "insert my signature" expands a stored block.                                                                                                                                                                        |
 | N5  | Meeting / long-form mode        | Record for an hour, transcribe with speaker turns, save as a document. Different product shape — separate mode, not the pill.                                                                                        |
 | N6  | Windows + Linux                 | **Decided: out of MVP scope.** The architecture is portable by design; only the injection and overlay layers are platform-specific. See technical plan §14.                                                          |

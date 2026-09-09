@@ -1,12 +1,12 @@
 /**
- * SOURCE OF TRUTH KEYWORDS: DictionaryView, CustomVocabulary, MurmurSpellsTheWayYouDo,
+ * SOURCE OF TRUTH KEYWORDS: DictionaryView, CustomVocabulary, HushWriteSpellsTheWayYouDo,
  *   DictionaryEntry, AddWordModal, EditWordModal
- * WHAT:  Dedicated Murmur Dictionary view:
+ * WHAT:  Dedicated HushWrite Dictionary view:
  *        - Top bar with title "Dictionary" and "Add new" button
  *        - Tabs for "All", "Personal", and "Shared with team" with search, sort, and refresh
- *        - Ambient bokeh hero banner: "Murmur spells the way you do." with sample tags
+ *        - Ambient bokeh hero banner: "HushWrite spells the way you do." with sample tags
  *        - Clean, responsive vocabulary card list with AI sparkle icons and hover actions
- *        - Full CRUD support synced to Murmur's SQLite dictionary backend
+ *        - Full CRUD support synced to HushWrite's SQLite dictionary backend
  * WHERE: Rendered by Dashboard.tsx on route === "dictionary".
  */
 
@@ -340,7 +340,7 @@ const COMMON_STOPWORDS = new Set([
   "lets",
 ]);
 
-export const DEFAULT_SUGGESTED_CHIPS = ["Murmur", "Whisper", "Vite", "Tauri", "React"];
+export const DEFAULT_SUGGESTED_CHIPS = ["HushWrite", "Whisper", "Vite", "Tauri", "React"];
 export const SUGGESTED_CHIPS = DEFAULT_SUGGESTED_CHIPS;
 
 export function extractLearnedSuggestions(
@@ -425,8 +425,8 @@ export function extractLearnedSuggestions(
   return results;
 }
 
-const METADATA_STORAGE_KEY = "murmur_dictionary_meta_v1";
-const BANNER_DISMISSED_KEY = "murmur_dict_banner_dismissed_v1";
+const METADATA_STORAGE_KEY = "HushWrite_dictionary_meta_v1";
+const BANNER_DISMISSED_KEY = "HushWrite_dict_banner_dismissed_v1";
 
 function loadLocalMeta(): Record<string, WordMetadata> {
   try {
@@ -1119,12 +1119,12 @@ export function DictionaryView() {
 
                 {/* Banner Headline in Serif */}
                 <h2 className="font-serif text-2xl md:text-3xl font-normal text-stone-100 tracking-tight">
-                  Murmur spells the way <span className="italic font-serif">you</span> do.
+                  HushWrite spells the way <span className="italic font-serif">you</span> do.
                 </h2>
 
                 {/* Banner Description */}
                 <p className="mt-2.5 max-w-2xl text-xs leading-relaxed text-stone-300/90">
-                  Murmur learns your unique words and names — automatically or manually.{" "}
+                  HushWrite learns your unique words and names — automatically or manually.{" "}
                   <strong className="font-semibold text-white">
                     Add personal terms, company jargon, client names, or industry-specific lingo.
                   </strong>{" "}
@@ -1534,7 +1534,7 @@ function WordModal({
               type="text"
               value={word}
               onChange={(e) => setWord(e.target.value)}
-              placeholder="e.g. Supabase, Alex Gutscher, Murmur"
+              placeholder="e.g. Supabase, Alex Gutscher, HushWrite"
               autoFocus
               className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:bg-white focus:outline-none dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100"
             />

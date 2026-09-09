@@ -76,7 +76,7 @@ const DEV_CAPABILITIES = [
   {
     icon: <FileCode2 className="w-5 h-5 text-emerald-600" />,
     title: "Context-Aware File Tagging",
-    desc: "Tag files in Cursor, Windsurf, Claude Code, and Copilot hands-free. Speak 'tag file src/auth.ts' and Murmur formats '@src/auth.ts' right into your prompt.",
+    desc: "Tag files in Cursor, Windsurf, Claude Code, and Copilot hands-free. Speak 'tag file src/auth.ts' and HushWrite formats '@src/auth.ts' right into your prompt.",
   },
   {
     icon: <Zap className="w-5 h-5 text-amber-500" />,
@@ -96,7 +96,7 @@ const DEV_CAPABILITIES = [
   {
     icon: <ShieldCheck className="w-5 h-5 text-emerald-500" />,
     title: "100% On-Device & Zero Cloud Leaks",
-    desc: "Never stream company proprietary code or secret prompt context to 3rd-party servers. Murmur runs 100% offline with local whisper.cpp.",
+    desc: "Never stream company proprietary code or secret prompt context to 3rd-party servers. HushWrite runs 100% offline with local whisper.cpp.",
   },
   {
     icon: <Terminal className="w-5 h-5 text-neutral-800" />,
@@ -117,37 +117,37 @@ const IDE_INTEGRATIONS = [
 const COMPARISON_ROWS = [
   {
     feature: "AI Model Execution",
-    murmur: "100% Local (whisper.cpp / GPU)",
+    HushWrite: "100% Local (whisper.cpp / GPU)",
     wispr: "Cloud Servers (Audio Uploaded)",
   },
   {
     feature: "Codebase Context Privacy",
-    murmur: "Zero Outbound Data / Air-Gap Safe",
+    HushWrite: "Zero Outbound Data / Air-Gap Safe",
     wispr: "Code & Prompts Streamed Online",
   },
   {
     feature: "Cursor & Windsurf @file Tagging",
-    murmur: "Native Voice Directive",
+    HushWrite: "Native Voice Directive",
     wispr: "Supported (Cloud)",
   },
   {
     feature: "Syntax & Casing Directives",
-    murmur: "camelCase, snake_case, backticks",
+    HushWrite: "camelCase, snake_case, backticks",
     wispr: "Supported (Cloud)",
   },
   {
     feature: "Developer Snippet Library",
-    murmur: "Included (PRs, APIs, Env Setup)",
+    HushWrite: "Included (PRs, APIs, Env Setup)",
     wispr: "Supported (Cloud)",
   },
   {
     feature: "Codebase Symbol Importer",
-    murmur: "1-Click package.json / Cargo scanner",
+    HushWrite: "1-Click package.json / Cargo scanner",
     wispr: "Manual Dictionary Entry",
   },
   {
     feature: "Pricing",
-    murmur: "Free (MIT) / $89 Lifetime ($49/yr)",
+    HushWrite: "Free (MIT) / $89 Lifetime ($49/yr)",
     wispr: "$12/mo / $144/yr recurring",
   },
 ];
@@ -209,11 +209,11 @@ export default function DevelopersPage() {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white text-sm font-semibold shadow-md transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
             >
               <Download className="w-4 h-4 text-emerald-400" />
-              <span>Download Murmur Free</span>
+              <span>Download HushWrite Free</span>
               <span className="text-xs text-neutral-400 font-normal">Windows & Mac</span>
             </Link>
             <a
-              href="https://github.com/webprodigies/murmur"
+              href="https://github.com/webprodigies/HushWrite"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-50 border border-neutral-200/90 shadow-sm text-sm font-semibold text-neutral-800 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
@@ -363,7 +363,7 @@ export default function DevelopersPage() {
               Works Seamlessly Across Your Developer Stack
             </h2>
             <p className="text-xs sm:text-sm text-neutral-600">
-              Murmur injects text directly into the focused window via native OS events. No
+              HushWrite injects text directly into the focused window via native OS events. No
               browser extensions or plugins required.
             </p>
           </div>
@@ -394,10 +394,10 @@ export default function DevelopersPage() {
               </span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-neutral-950">
-              Murmur vs. Wispr Flow for Developers
+              HushWrite vs. Wispr Flow for Developers
             </h2>
             <p className="text-base text-neutral-600">
-              Why privacy-conscious engineering teams choose on-device Murmur over cloud
+              Why privacy-conscious engineering teams choose on-device HushWrite over cloud
               subscriptions.
             </p>
           </div>
@@ -416,7 +416,7 @@ export default function DevelopersPage() {
                 <tr className="border-b border-neutral-200/80 bg-neutral-50/80 font-mono text-xs text-neutral-900 uppercase tracking-wider">
                   <th className="p-4 sm:p-5 font-semibold">Feature / Requirement</th>
                   <th className="p-4 sm:p-5 font-bold text-emerald-800 bg-emerald-50/30">
-                    Murmur (100% On-Device)
+                    HushWrite (100% On-Device)
                   </th>
                   <th className="p-4 sm:p-5 text-neutral-500 font-normal">Wispr Flow (Cloud)</th>
                 </tr>
@@ -428,7 +428,7 @@ export default function DevelopersPage() {
                       {row.feature}
                     </td>
                     <td className="p-4 sm:p-5 text-xs font-mono font-bold text-emerald-700 bg-emerald-50/20">
-                      {row.murmur}
+                      {row.HushWrite}
                     </td>
                     <td className="p-4 sm:p-5 text-xs font-mono text-neutral-500">
                       {row.wispr}
@@ -453,7 +453,7 @@ export default function DevelopersPage() {
               Ready to Flow 4x Faster at Your Terminal?
             </h2>
             <p className="text-sm text-neutral-400">
-              Install Murmur in seconds. Works completely offline with zero setup and zero account
+              Install HushWrite in seconds. Works completely offline with zero setup and zero account
               creation.
             </p>
           </div>

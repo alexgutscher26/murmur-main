@@ -1,7 +1,7 @@
 /*!
  * SOURCE OF TRUTH KEYWORDS: MODEL_CATALOG, catalog, descriptor_for,
  *   DEFAULT_MODEL_ID, FALLBACK_MODEL_ID, HF_BASE_URL, CatalogEntry
- * WHAT:  The static table of every model Murmur offers, with its URL, size and
+ * WHAT:  The static table of every model HushWrite offers, with its URL, size and
  *        SHA-256.
  * WHY:   A static table rather than a fetched manifest, because listing models
  *        has to work on a plane. The whole model manager — names, sizes, RAM
@@ -125,7 +125,8 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
 ];
 
 /// Online CDN manifest URL for dynamic model listings.
-pub const ONLINE_CATALOG_URL: &str = "https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/models.json";
+pub const ONLINE_CATALOG_URL: &str =
+    "https://raw.githubusercontent.com/ggerganov/whisper.cpp/master/models/models.json";
 
 /// Configures a reqwest client builder according to whether Air-Gap mode is active.
 /// When air-gapped, binds to loopback (127.0.0.1) with no proxy to prevent outbound traffic.
@@ -151,15 +152,9 @@ pub async fn fetch_online_catalog_with_air_gap(
         // Block outbound CDN fetch entirely when Air-Gap / Hardware Isolation Mode is active
         return Ok(MODEL_CATALOG.iter().map(|e| e.descriptor()).collect());
     }
-    let builder = reqwest::Client::builder()
-        .timeout(std::time::Duration::from_secs(5));
+    let builder = reqwest::Client::builder().timeout(std::time::Duration::from_secs(5));
     let client = configure_air_gap_client_builder(builder, false).build()?;
-    let entries: Vec<ModelDescriptor> = client
-        .get(ONLINE_CATALOG_URL)
-        .send()
-        .await?
-        .json()
-        .await?;
+    let entries: Vec<ModelDescriptor> = client.get(ONLINE_CATALOG_URL).send().await?.json().await?;
     Ok(entries)
 }
 

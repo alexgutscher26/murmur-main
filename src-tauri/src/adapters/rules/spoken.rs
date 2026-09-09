@@ -7,8 +7,8 @@
  * WHERE: Consumed by adapters/rules/mod.rs and text.rs.
  */
 
-use crate::types::LanguageCode;
 use super::dictionary::replace_whole_words;
+use crate::types::LanguageCode;
 
 pub const ENGLISH_SPOKEN_COMMANDS: &[(&str, &str)] = &[
     ("new paragraph", "\n\n"),
@@ -45,7 +45,9 @@ pub const ENGLISH_SPOKEN_COMMANDS: &[(&str, &str)] = &[
 ];
 
 fn is_english(language: Option<&LanguageCode>) -> bool {
-    language.map(|l| l.as_str().starts_with("en")).unwrap_or(false)
+    language
+        .map(|l| l.as_str().starts_with("en"))
+        .unwrap_or(false)
 }
 
 pub fn expand_spoken_commands(text: &str, language: Option<&LanguageCode>) -> String {
@@ -134,7 +136,11 @@ fn apply_case_style(text: &str, directive: &str, style: CaseStyle) -> String {
 
         let after_chars = text[match_end..].chars();
         let after_whitespace = match_end == text.len()
-            || after_chars.clone().next().map(|c| c.is_whitespace()).unwrap_or(false);
+            || after_chars
+                .clone()
+                .next()
+                .map(|c| c.is_whitespace())
+                .unwrap_or(false);
         if !after_whitespace {
             result.push_str(&text[cursor..match_end]);
             cursor = match_end;
@@ -153,10 +159,16 @@ fn apply_case_style(text: &str, directive: &str, style: CaseStyle) -> String {
                 break;
             }
             let has_punct = word.ends_with(|c: char| {
-                matches!(c, ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}')
+                matches!(
+                    c,
+                    ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}'
+                )
             });
             let clean_word = word.trim_end_matches(|c: char| {
-                matches!(c, ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}')
+                matches!(
+                    c,
+                    ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}'
+                )
             });
 
             let clean_lower = clean_word.to_lowercase();
@@ -203,7 +215,10 @@ fn transform_words(words: &[&str], style: CaseStyle) -> String {
         CaseStyle::Camel => {
             let mut res = String::new();
             for (i, w) in words.iter().enumerate() {
-                let clean: String = w.chars().filter(|c| c.is_alphanumeric() || *c == '_').collect();
+                let clean: String = w
+                    .chars()
+                    .filter(|c| c.is_alphanumeric() || *c == '_')
+                    .collect();
                 if clean.is_empty() {
                     continue;
                 }
@@ -222,7 +237,10 @@ fn transform_words(words: &[&str], style: CaseStyle) -> String {
         CaseStyle::Pascal => {
             let mut res = String::new();
             for w in words {
-                let clean: String = w.chars().filter(|c| c.is_alphanumeric() || *c == '_').collect();
+                let clean: String = w
+                    .chars()
+                    .filter(|c| c.is_alphanumeric() || *c == '_')
+                    .collect();
                 if clean.is_empty() {
                     continue;
                 }
@@ -281,20 +299,151 @@ fn transform_words(words: &[&str], style: CaseStyle) -> String {
 }
 
 pub const CODE_BOUNDARY_WORDS: &[&str] = &[
-    "a", "an", "the", "in", "on", "at", "for", "to", "from", "with", "into", "as", "is",
-    "of", "and", "or", "then", "let", "const", "var", "fn", "def", "function", "class",
-    "interface", "type", "import", "export", "return", "if", "else", "while", "be",
-    "define", "declare", "create", "make", "set", "use", "add", "get", "call", "run",
-    "i", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them",
-    "my", "your", "his", "their", "our", "its", "this", "that", "these", "those",
-    "want", "wanted", "wants", "fix", "fixed", "fixes", "exist", "exists", "existed",
-    "does", "doesnt", "doesn't", "did", "didnt", "didn't", "do", "dont", "don't",
-    "have", "has", "had", "can", "cant", "can't", "could", "would", "should", "will", "wont", "won't",
-    "shall", "may", "might", "must", "am", "are", "was", "were", "been", "being",
-    "not", "no", "yes", "but", "so", "because", "since", "just", "very", "too", "also",
-    "what", "which", "who", "whom", "whose", "why", "how", "when", "where",
-    "like", "know", "think", "see", "look", "come", "go", "take", "give", "find",
-    "tell", "ask", "seem", "feel", "try", "leave", "good", "new", "first", "last",
+    "a",
+    "an",
+    "the",
+    "in",
+    "on",
+    "at",
+    "for",
+    "to",
+    "from",
+    "with",
+    "into",
+    "as",
+    "is",
+    "of",
+    "and",
+    "or",
+    "then",
+    "let",
+    "const",
+    "var",
+    "fn",
+    "def",
+    "function",
+    "class",
+    "interface",
+    "type",
+    "import",
+    "export",
+    "return",
+    "if",
+    "else",
+    "while",
+    "be",
+    "define",
+    "declare",
+    "create",
+    "make",
+    "set",
+    "use",
+    "add",
+    "get",
+    "call",
+    "run",
+    "i",
+    "you",
+    "he",
+    "she",
+    "it",
+    "we",
+    "they",
+    "me",
+    "him",
+    "her",
+    "us",
+    "them",
+    "my",
+    "your",
+    "his",
+    "their",
+    "our",
+    "its",
+    "this",
+    "that",
+    "these",
+    "those",
+    "want",
+    "wanted",
+    "wants",
+    "fix",
+    "fixed",
+    "fixes",
+    "exist",
+    "exists",
+    "existed",
+    "does",
+    "doesnt",
+    "doesn't",
+    "did",
+    "didnt",
+    "didn't",
+    "do",
+    "dont",
+    "don't",
+    "have",
+    "has",
+    "had",
+    "can",
+    "cant",
+    "can't",
+    "could",
+    "would",
+    "should",
+    "will",
+    "wont",
+    "won't",
+    "shall",
+    "may",
+    "might",
+    "must",
+    "am",
+    "are",
+    "was",
+    "were",
+    "been",
+    "being",
+    "not",
+    "no",
+    "yes",
+    "but",
+    "so",
+    "because",
+    "since",
+    "just",
+    "very",
+    "too",
+    "also",
+    "what",
+    "which",
+    "who",
+    "whom",
+    "whose",
+    "why",
+    "how",
+    "when",
+    "where",
+    "like",
+    "know",
+    "think",
+    "see",
+    "look",
+    "come",
+    "go",
+    "take",
+    "give",
+    "find",
+    "tell",
+    "ask",
+    "seem",
+    "feel",
+    "try",
+    "leave",
+    "good",
+    "new",
+    "first",
+    "last",
 ];
 
 pub fn apply_code_mode_casing(text: &str, style: CaseStyle) -> String {
@@ -317,19 +466,20 @@ pub fn apply_code_mode_casing(text: &str, style: CaseStyle) -> String {
         let mut cluster: Vec<&str> = Vec::new();
         let mut trailing_punct = String::new();
 
-        let flush_cluster = |tokens: &mut Vec<String>, cluster: &mut Vec<&str>, punct: &mut String| {
-            if cluster.is_empty() {
-                return;
-            }
-            if cluster.len() >= 2 {
-                let transformed = transform_words(cluster, style);
-                tokens.push(format!("{transformed}{punct}"));
-            } else {
-                tokens.push(format!("{}{punct}", cluster[0]));
-            }
-            cluster.clear();
-            punct.clear();
-        };
+        let flush_cluster =
+            |tokens: &mut Vec<String>, cluster: &mut Vec<&str>, punct: &mut String| {
+                if cluster.is_empty() {
+                    return;
+                }
+                if cluster.len() >= 2 {
+                    let transformed = transform_words(cluster, style);
+                    tokens.push(format!("{transformed}{punct}"));
+                } else {
+                    tokens.push(format!("{}{punct}", cluster[0]));
+                }
+                cluster.clear();
+                punct.clear();
+            };
 
         for w in words {
             let punct: String = w
@@ -386,9 +536,8 @@ pub fn format_file_tagging(text: &str) -> String {
 }
 
 pub const KNOWN_FILE_EXTENSIONS: &[&str] = &[
-    "ts", "tsx", "js", "jsx", "py", "rs", "go", "json", "md", "toml",
-    "yaml", "yml", "css", "scss", "html", "sql", "env", "c", "cpp",
-    "h", "hpp", "swift", "kt", "dart", "sh", "lock", "prisma",
+    "ts", "tsx", "js", "jsx", "py", "rs", "go", "json", "md", "toml", "yaml", "yml", "css", "scss",
+    "html", "sql", "env", "c", "cpp", "h", "hpp", "swift", "kt", "dart", "sh", "lock", "prisma",
 ];
 
 fn apply_file_tag_directive(text: &str, directive: &str) -> String {
@@ -414,7 +563,11 @@ fn apply_file_tag_directive(text: &str, directive: &str) -> String {
 
         let after_chars = text[match_end..].chars();
         let after_whitespace = match_end == text.len()
-            || after_chars.clone().next().map(|c| c.is_whitespace()).unwrap_or(false);
+            || after_chars
+                .clone()
+                .next()
+                .map(|c| c.is_whitespace())
+                .unwrap_or(false);
         if !after_whitespace {
             result.push_str(&text[cursor..match_end]);
             cursor = match_end;
@@ -434,13 +587,20 @@ fn apply_file_tag_directive(text: &str, directive: &str) -> String {
                 break;
             }
             let has_punct = word.ends_with(|c: char| {
-                matches!(c, ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}')
+                matches!(
+                    c,
+                    ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}'
+                )
             });
             let clean_word = word.trim_end_matches(|c: char| {
-                matches!(c, ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}')
+                matches!(
+                    c,
+                    ',' | '.' | '!' | '?' | ';' | ':' | '\n' | '\r' | '\u{2014}'
+                )
             });
 
-            let is_ext = prev_was_dot && KNOWN_FILE_EXTENSIONS.contains(&clean_word.to_lowercase().as_str());
+            let is_ext =
+                prev_was_dot && KNOWN_FILE_EXTENSIONS.contains(&clean_word.to_lowercase().as_str());
 
             if !clean_word.is_empty() {
                 raw_words.push(clean_word);
@@ -503,8 +663,8 @@ fn build_tagged_path(words: &[&str]) -> String {
             let next_ext = words[i + 1].to_lowercase();
             let ext = match next_ext.as_str() {
                 "ts" | "tsx" | "js" | "jsx" | "py" | "rs" | "go" | "json" | "md" | "toml"
-                | "yaml" | "yml" | "css" | "scss" | "html" | "sql" | "env" | "c" | "cpp"
-                | "h" | "hpp" | "swift" | "kt" | "dart" | "sh" | "lock" | "prisma" => {
+                | "yaml" | "yml" | "css" | "scss" | "html" | "sql" | "env" | "c" | "cpp" | "h"
+                | "hpp" | "swift" | "kt" | "dart" | "sh" | "lock" | "prisma" => {
                     format!(".{next_ext}")
                 }
                 _ => format!(".{}", words[i + 1]),
@@ -552,11 +712,31 @@ pub fn format_markdown_mode(text: &str) -> String {
     out = replace_whole_words(&out, "insert bug template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false);
     out = replace_whole_words(&out, "bug report template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false);
     out = replace_whole_words(&out, "bug template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false);
-    
-    out = replace_whole_words(&out, "insert status update", "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n", false);
-    out = replace_whole_words(&out, "standup update", "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n", false);
-    out = replace_whole_words(&out, "daily standup", "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n", false);
-    out = replace_whole_words(&out, "status update", "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n", false);
+
+    out = replace_whole_words(
+        &out,
+        "insert status update",
+        "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "standup update",
+        "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "daily standup",
+        "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "status update",
+        "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n",
+        false,
+    );
 
     out = replace_whole_words(&out, "insert pull request template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
     out = replace_whole_words(&out, "pull request template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
@@ -578,8 +758,18 @@ pub fn format_markdown_mode(text: &str) -> String {
     out = replace_whole_words(&out, "onboarding instructions", "\n### 🚀 Developer Onboarding Checklist\n- [ ] Request repository access & permissions\n- [ ] Configure local dev environment & secrets\n- [ ] Review architecture guidelines & standards\n- [ ] Submit first starter PR\n", false);
     out = replace_whole_words(&out, "developer onboarding", "\n### 🚀 Developer Onboarding Checklist\n- [ ] Request repository access & permissions\n- [ ] Configure local dev environment & secrets\n- [ ] Review architecture guidelines & standards\n- [ ] Submit first starter PR\n", false);
 
-    out = replace_whole_words(&out, "calendar link", "\nYou can book a quick technical discussion with me here: calendly.com\n", false);
-    out = replace_whole_words(&out, "book a call", "\nYou can book a quick technical discussion with me here: calendly.com\n", false);
+    out = replace_whole_words(
+        &out,
+        "calendar link",
+        "\nYou can book a quick technical discussion with me here: calendly.com\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "book a call",
+        "\nYou can book a quick technical discussion with me here: calendly.com\n",
+        false,
+    );
 
     out = replace_whole_words(&out, "youtube script template", "\n### 🎬 YouTube Video Script\n**Title Idea:** \n**Hook (0:00 - 0:30):**\n\n**Intro & Value Proposition:**\n\n**Main Points:**\n1. \n2. \n3. \n\n**Sponsor / Mid-roll CTA:**\n\n**Conclusion & Next Video CTA:**\n", false);
     out = replace_whole_words(&out, "video script template", "\n### 🎬 YouTube Video Script\n**Title Idea:** \n**Hook (0:00 - 0:30):**\n\n**Intro & Value Proposition:**\n\n**Main Points:**\n1. \n2. \n3. \n\n**Sponsor / Mid-roll CTA:**\n\n**Conclusion & Next Video CTA:**\n", false);
@@ -614,11 +804,36 @@ pub fn format_markdown_mode(text: &str) -> String {
     out = replace_whole_words(&out, "x thread", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
     out = replace_whole_words(&out, "twitter thread", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
 
-    out = replace_whole_words(&out, "x post template", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
-    out = replace_whole_words(&out, "twitter post template", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
-    out = replace_whole_words(&out, "tweet template", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
-    out = replace_whole_words(&out, "x post", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
-    out = replace_whole_words(&out, "single tweet", "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n", false);
+    out = replace_whole_words(
+        &out,
+        "x post template",
+        "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "twitter post template",
+        "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "tweet template",
+        "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "x post",
+        "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "single tweet",
+        "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
+        false,
+    );
 
     out = replace_whole_words(&out, "podcast outline template", "\n### 🎙️ Podcast Episode Outline\n**Episode Title:** \n**Guest:** \n**Core Theme:** \n\n**Discussion Questions:**\n- \n- \n- \n\n**Key Timestamps:**\n- 00:00 Intro\n- \n\n**Links Mentioned:**\n- \n", false);
     out = replace_whole_words(&out, "podcast show notes", "\n### 🎙️ Podcast Episode Outline\n**Episode Title:** \n**Guest:** \n**Core Theme:** \n\n**Discussion Questions:**\n- \n- \n- \n\n**Key Timestamps:**\n- 00:00 Intro\n- \n\n**Links Mentioned:**\n- \n", false);
@@ -634,32 +849,102 @@ pub fn format_markdown_mode(text: &str) -> String {
     out = replace_whole_words(&out, "rfc template", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false);
     out = replace_whole_words(&out, "feature spec", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false);
 
-    out = replace_whole_words(&out, "release notes template", "\n### 📦 Release Notes\n**Added:**\n- \n\n**Fixed:**\n- \n\n**Changed:**\n- \n", false);
-    out = replace_whole_words(&out, "changelog template", "\n### 📦 Release Notes\n**Added:**\n- \n\n**Fixed:**\n- \n\n**Changed:**\n- \n", false);
+    out = replace_whole_words(
+        &out,
+        "release notes template",
+        "\n### 📦 Release Notes\n**Added:**\n- \n\n**Fixed:**\n- \n\n**Changed:**\n- \n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "changelog template",
+        "\n### 📦 Release Notes\n**Added:**\n- \n\n**Fixed:**\n- \n\n**Changed:**\n- \n",
+        false,
+    );
 
-    out = replace_whole_words(&out, "todo list template", "\n### 🎯 Action Items\n- [ ] \n- [ ] \n- [ ] \n", false);
-    out = replace_whole_words(&out, "task checklist", "\n### 🎯 Action Items\n- [ ] \n- [ ] \n- [ ] \n", false);
+    out = replace_whole_words(
+        &out,
+        "todo list template",
+        "\n### 🎯 Action Items\n- [ ] \n- [ ] \n- [ ] \n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "task checklist",
+        "\n### 🎯 Action Items\n- [ ] \n- [ ] \n- [ ] \n",
+        false,
+    );
 
-    out = replace_whole_words(&out, "insert badge template", "\n[![Made with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://murmur.app)\n", false);
-    out = replace_whole_words(&out, "made with murmur badge", "\n[![Made with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://murmur.app)\n", false);
-    out = replace_whole_words(&out, "badge template", "\n[![Made with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://murmur.app)\n", false);
-    out = replace_whole_words(&out, "dictated with murmur", "\n_Dictated privately on-device with [Murmur](https://murmur.app)_\n", false);
-    out = replace_whole_words(&out, "made with local dictation", "\n_Dictated privately on-device with [Murmur](https://murmur.app)_\n", false);
+    out = replace_whole_words(&out, "insert badge template", "\n[![Made with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)\n", false);
+    out = replace_whole_words(&out, "made with HushWrite badge", "\n[![Made with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)\n", false);
+    out = replace_whole_words(&out, "badge template", "\n[![Made with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)\n", false);
+    out = replace_whole_words(
+        &out,
+        "dictated with HushWrite",
+        "\n_Dictated privately on-device with [HushWrite](https://HushWrite.app)_\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "made with local dictation",
+        "\n_Dictated privately on-device with [HushWrite](https://HushWrite.app)_\n",
+        false,
+    );
 
     out = replace_whole_words(&out, "issue title", "\n# Issue:", false);
-    out = replace_whole_words(&out, "steps to reproduce", "\n### Steps to Reproduce:\n1. ", false);
-    out = replace_whole_words(&out, "reproduction steps", "\n### Steps to Reproduce:\n1. ", false);
-    out = replace_whole_words(&out, "expected behavior", "\n### Expected Behavior\n", false);
+    out = replace_whole_words(
+        &out,
+        "steps to reproduce",
+        "\n### Steps to Reproduce:\n1. ",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "reproduction steps",
+        "\n### Steps to Reproduce:\n1. ",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "expected behavior",
+        "\n### Expected Behavior\n",
+        false,
+    );
     out = replace_whole_words(&out, "actual behavior", "\n### Actual Behavior\n", false);
-    out = replace_whole_words(&out, "acceptance criteria", "\n### Acceptance Criteria:\n- [ ] ", false);
-    out = replace_whole_words(&out, "pull request description", "\n## Description\n\n## Changes\n- ", false);
-    out = replace_whole_words(&out, "pr description", "\n## Description\n\n## Changes\n- ", false);
+    out = replace_whole_words(
+        &out,
+        "acceptance criteria",
+        "\n### Acceptance Criteria:\n- [ ] ",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "pull request description",
+        "\n## Description\n\n## Changes\n- ",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "pr description",
+        "\n## Description\n\n## Changes\n- ",
+        false,
+    );
     out = replace_whole_words(&out, "pr summary", "\n## Summary\n\n", false);
 
     out = replace_whole_words(&out, "code block python", "\n```python\n\n```\n", false);
     out = replace_whole_words(&out, "code block rust", "\n```rust\n\n```\n", false);
-    out = replace_whole_words(&out, "code block typescript", "\n```typescript\n\n```\n", false);
-    out = replace_whole_words(&out, "code block javascript", "\n```javascript\n\n```\n", false);
+    out = replace_whole_words(
+        &out,
+        "code block typescript",
+        "\n```typescript\n\n```\n",
+        false,
+    );
+    out = replace_whole_words(
+        &out,
+        "code block javascript",
+        "\n```javascript\n\n```\n",
+        false,
+    );
     out = replace_whole_words(&out, "code block json", "\n```json\n\n```\n", false);
     out = replace_whole_words(&out, "code block sql", "\n```sql\n\n```\n", false);
     out = replace_whole_words(&out, "code block bash", "\n```bash\n\n```\n", false);

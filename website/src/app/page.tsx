@@ -20,11 +20,11 @@ import { Footer } from "@/components/Footer";
 const HOME_SCHEMA = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Murmur",
+  name: "HushWrite",
   operatingSystem: "macOS, Windows",
   applicationCategory: "ProductivityApplication",
-  url: "https://murmur.app",
-  image: "https://murmur.app/128x128@2x.png",
+  url: "https://HushWrite.app",
+  image: "https://HushWrite.app/128x128@2x.png",
   offers: {
     "@type": "Offer",
     price: "0",
@@ -47,7 +47,7 @@ const HOME_SCHEMA = {
       datePublished: "2026-08-15",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
       reviewBody:
-        "Murmur completely replaced cloud dictation tools for my daily engineering work. I write code comments, PR reviews, and Slack messages with my voice. Being 100% offline and free is an incredible achievement.",
+        "HushWrite completely replaced cloud dictation tools for my daily engineering work. I write code comments, PR reviews, and Slack messages with my voice. Being 100% offline and free is an incredible achievement.",
     },
     {
       "@type": "Review",
@@ -55,7 +55,7 @@ const HOME_SCHEMA = {
       datePublished: "2026-08-18",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
       reviewBody:
-        "As a physician, HIPAA compliance is strictly non-negotiable. I cannot use cloud speech tools. Murmur runs locally on my laptop with zero network traffic and recognizes medical terminology reliably.",
+        "As a physician, HIPAA compliance is strictly non-negotiable. I cannot use cloud speech tools. HushWrite runs locally on my laptop with zero network traffic and recognizes medical terminology reliably.",
     },
     {
       "@type": "Review",
@@ -63,7 +63,7 @@ const HOME_SCHEMA = {
       datePublished: "2026-08-20",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
       reviewBody:
-        "I dictated over 40,000 words of my latest manuscript with Murmur. The filler word removal cleans false starts without interrupting my natural drafting rhythm.",
+        "I dictated over 40,000 words of my latest manuscript with HushWrite. The filler word removal cleans false starts without interrupting my natural drafting rhythm.",
     },
     {
       "@type": "Review",
@@ -79,7 +79,7 @@ const HOME_SCHEMA = {
       datePublished: "2026-08-25",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
       reviewBody:
-        "Murmur is faster than paid cloud alternatives because it eliminates the network latency roundtrip entirely. Solid native engineering in Rust.",
+        "HushWrite is faster than paid cloud alternatives because it eliminates the network latency roundtrip entirely. Solid native engineering in Rust.",
     },
     {
       "@type": "Review",
@@ -95,7 +95,7 @@ const HOME_SCHEMA = {
       datePublished: "2026-08-29",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
       reviewBody:
-        "Attorney-client privilege cannot survive unvetted cloud audio streaming. Murmur's local air-gapped processing is the only dictation architecture our compliance committee cleared for confidential litigation briefs.",
+        "Attorney-client privilege cannot survive unvetted cloud audio streaming. HushWrite's local air-gapped processing is the only dictation architecture our compliance committee cleared for confidential litigation briefs.",
     },
     {
       "@type": "Review",
@@ -119,7 +119,7 @@ const HOME_SCHEMA = {
       datePublished: "2026-09-02",
       reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
       reviewBody:
-        "Our security policy banned cloud transcription bots company-wide. Murmur passed our internal packet inspection and security audit with flying colors. 100% on-device is the future.",
+        "Our security policy banned cloud transcription bots company-wide. HushWrite passed our internal packet inspection and security audit with flying colors. 100% on-device is the future.",
     },
     {
       "@type": "Review",
@@ -168,7 +168,7 @@ export default function Home() {
       {/* Dated, Reproducible Latency Benchmarks */}
       <LatencyBenchmarks />
 
-      {/* Adaptive Tone & Style Engine: Make Murmur Sound Like You */}
+      {/* Adaptive Tone & Style Engine: Make HushWrite Sound Like You */}
       <ToneStyleEngine />
 
       {/* Context Engine (App-Aware Formatting) */}

@@ -52,9 +52,7 @@ const LANGUAGES: CommandSpec = CommandSpec::new("list_languages", CapabilityKey:
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_languages(
-    state: State<'_, AppState>,
-) -> Result<Vec<LanguageOption>, AppError> {
+pub async fn list_languages(state: State<'_, AppState>) -> Result<Vec<LanguageOption>, AppError> {
     execute(&state, LANGUAGES, (), |ctx, ()| async move {
         let capabilities = ctx.ports().engine.capabilities();
         let auto_detect = capabilities.has(crate::types::EngineFeature::LanguageAutoDetect);
@@ -86,14 +84,14 @@ pub async fn copy_text(state: State<'_, AppState>, input: CopyTextInput) -> Resu
         let mut clipboard = arboard::Clipboard::new().map_err(|err| {
             AppError::new(
                 ErrorCode::ClipboardUnavailable,
-                "Murmur could not reach the clipboard.",
+                "HushWrite could not reach the clipboard.",
             )
             .with_detail(err)
         })?;
         clipboard.set_text(input.text).map_err(|err| {
             AppError::new(
                 ErrorCode::ClipboardUnavailable,
-                "Murmur could not copy that.",
+                "HushWrite could not copy that.",
             )
             .with_detail(err)
         })

@@ -78,7 +78,7 @@ impl Database {
         let guard = self.inner.lock().map_err(|_| {
             AppError::new(
                 ErrorCode::Database,
-                "Murmur's database is in an inconsistent state. Restarting the app will fix it.",
+                "HushWrite's database is in an inconsistent state. Restarting the app will fix it.",
             )
         })?;
         operation(&guard)
@@ -92,7 +92,7 @@ impl Database {
         let mut guard = self.inner.lock().map_err(|_| {
             AppError::new(
                 ErrorCode::Database,
-                "Murmur's database is in an inconsistent state. Restarting the app will fix it.",
+                "HushWrite's database is in an inconsistent state. Restarting the app will fix it.",
             )
         })?;
         operation(&mut guard)

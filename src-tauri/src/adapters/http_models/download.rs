@@ -96,8 +96,9 @@ pub async fn hash_file(path: PathBuf) -> AppResult<String> {
         use sha2::Digest;
         use std::io::Read;
 
-        let mut file = std::fs::File::open(&path)
-            .map_err(|err| AppError::from(err).with_detail(format!("hashing {}", path.display())))?;
+        let mut file = std::fs::File::open(&path).map_err(|err| {
+            AppError::from(err).with_detail(format!("hashing {}", path.display()))
+        })?;
         let mut hasher = sha2::Sha256::new();
         let mut buffer = vec![0_u8; HASH_BUFFER_BYTES];
 
@@ -222,7 +223,7 @@ mod tests {
 
     #[tokio::test]
     async fn hashing_matches_the_known_sha256_of_the_empty_input() {
-        let dir = std::env::temp_dir().join("murmur-hash-test-empty");
+        let dir = std::env::temp_dir().join("HushWrite-hash-test-empty");
         tokio::fs::create_dir_all(&dir).await.expect("temp dir");
         let path = dir.join("empty.bin");
         tokio::fs::write(&path, b"").await.expect("write");
@@ -236,7 +237,7 @@ mod tests {
 
     #[tokio::test]
     async fn hashing_matches_the_known_sha256_of_abc() {
-        let dir = std::env::temp_dir().join("murmur-hash-test-abc");
+        let dir = std::env::temp_dir().join("HushWrite-hash-test-abc");
         tokio::fs::create_dir_all(&dir).await.expect("temp dir");
         let path = dir.join("abc.bin");
         tokio::fs::write(&path, b"abc").await.expect("write");
@@ -250,7 +251,7 @@ mod tests {
 
     #[tokio::test]
     async fn hashing_a_file_that_is_not_there_is_an_error_not_a_panic() {
-        let err = hash_file(PathBuf::from("/nonexistent/murmur/model.bin"))
+        let err = hash_file(PathBuf::from("/nonexistent/HushWrite/model.bin"))
             .await
             .expect_err("no such file");
         assert_eq!(err.code, ErrorCode::Io);
@@ -259,17 +260,19 @@ mod tests {
     #[tokio::test]
     async fn a_missing_part_file_resumes_from_zero() {
         assert_eq!(
-            resume_offset(Path::new("/nonexistent/murmur/model.bin.part")).await,
+            resume_offset(Path::new("/nonexistent/HushWrite/model.bin.part")).await,
             0
         );
     }
 
     #[tokio::test]
     async fn an_existing_part_file_reports_its_length() {
-        let dir = std::env::temp_dir().join("murmur-resume-test");
+        let dir = std::env::temp_dir().join("HushWrite-resume-test");
         tokio::fs::create_dir_all(&dir).await.expect("temp dir");
         let path = dir.join("model.bin.part");
-        tokio::fs::write(&path, vec![7_u8; 4096]).await.expect("write");
+        tokio::fs::write(&path, vec![7_u8; 4096])
+            .await
+            .expect("write");
 
         assert_eq!(resume_offset(&path).await, 4096);
         let _ = tokio::fs::remove_dir_all(&dir).await;

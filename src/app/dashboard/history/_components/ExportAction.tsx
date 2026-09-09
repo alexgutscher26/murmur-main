@@ -47,7 +47,7 @@ export function ExportAction({ onError }: { onError: (error: AppError | null) =>
         const meta = FORMAT_META[format];
         const stamp = new Date().toISOString().slice(0, 10);
         const outcome = await saveTextFile(
-          `murmur-history-${stamp}.${meta.extension}`,
+          `HushWrite-history-${stamp}.${meta.extension}`,
           result.data,
         );
 

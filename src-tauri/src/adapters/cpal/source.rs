@@ -103,7 +103,7 @@ impl CpalAudioSource {
         .ok_or_else(|| {
             AppError::new(
                 ErrorCode::AudioDeviceUnavailable,
-                "Murmur could not find a microphone to record from.",
+                "HushWrite could not find a microphone to record from.",
             )
         })?;
 
@@ -215,7 +215,7 @@ impl AudioSource for CpalAudioSource {
                 let _ = error_sink.try_send(CaptureEvent::Lost(
                     AppError::new(
                         ErrorCode::AudioDeviceLost,
-                        "The microphone disconnected. Murmur kept what it heard.",
+                        "The microphone disconnected. HushWrite kept what it heard.",
                     )
                     .with_detail(err),
                 ));
@@ -225,7 +225,7 @@ impl AudioSource for CpalAudioSource {
         stream.play().map_err(|err| {
             AppError::new(
                 ErrorCode::AudioDeviceUnavailable,
-                "Murmur could not start recording from that microphone.",
+                "HushWrite could not start recording from that microphone.",
             )
             .with_detail(err)
         })?;
@@ -235,7 +235,7 @@ impl AudioSource for CpalAudioSource {
 
         // ── The drain thread. Allowed to allocate, lock and log. ──
         let drain = std::thread::Builder::new()
-            .name("murmur-audio-drain".into())
+            .name("HushWrite-audio-drain".into())
             .spawn(move || {
                 let mut resampler = match Resampler16k::new(native_rate, channels) {
                     Ok(resampler) => resampler,
@@ -471,7 +471,7 @@ where
         other => {
             return Err(AppError::new(
                 ErrorCode::AudioFormatUnsupported,
-                "That microphone uses an audio format Murmur cannot read.",
+                "That microphone uses an audio format HushWrite cannot read.",
             )
             .with_detail(format!("{other:?}")))
         }
@@ -480,7 +480,7 @@ where
     stream.map_err(|err| {
         AppError::new(
             ErrorCode::AudioDeviceUnavailable,
-            "Murmur could not open that microphone.",
+            "HushWrite could not open that microphone.",
         )
         .with_detail(err)
     })
@@ -489,7 +489,7 @@ where
 fn device_error(err: cpal::Error) -> AppError {
     AppError::new(
         ErrorCode::AudioDeviceUnavailable,
-        "Murmur could not list your microphones.",
+        "HushWrite could not list your microphones.",
     )
     .with_detail(err)
 }

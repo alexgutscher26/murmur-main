@@ -1,4 +1,4 @@
-# Murmur — Conventions, and how navigation actually works
+# HushWrite — Conventions, and how navigation actually works
 
 `../CLAUDE.md` is the rulebook and it is deliberately terse — "when you see X, do
 Y", with no explanation. This document is the explanation. It covers the one

@@ -1,5 +1,5 @@
 /*!
- * SOURCE OF TRUTH KEYWORDS: run, murmur_lib, module_tree, ActivationPolicy
+ * SOURCE OF TRUTH KEYWORDS: run, HushWrite_lib, module_tree, ActivationPolicy
  * WHAT:  Crate root. Declares the layer modules and starts the Tauri app.
  * WHY:   Wiring only, no logic — the layering the whole codebase depends on is
  *        only legible if the root stays a table of contents. Module order here
@@ -107,7 +107,7 @@ pub fn run() {
             // Registers the typed event channel the frontend listens on.
             builder.mount_events(app);
 
-            // No Dock icon, no app switcher entry. Murmur is a background
+            // No Dock icon, no app switcher entry. HushWrite is a background
             // utility; the menu bar item is its only permanent surface.
             #[cfg(target_os = "macos")]
             app.set_activation_policy(tauri::ActivationPolicy::Accessory);
@@ -136,5 +136,5 @@ pub fn run() {
             Ok(())
         })
         .run(tauri::generate_context!())
-        .expect("error while running Murmur");
+        .expect("error while running HushWrite");
 }

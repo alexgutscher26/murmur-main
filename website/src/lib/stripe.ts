@@ -32,7 +32,7 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
     if (normalizedDiscount === "SWITCHER-40") {
       return {
         tier,
-        name: "Murmur Pro Lifetime (Switcher Guarantee)",
+        name: "HushWrite Pro Lifetime (Switcher Guarantee)",
         amountCents: 6900, // $69.00 ($20 off)
         currency: "usd",
         discountApplied: "Switcher Guarantee ($20 Off Lifetime)",
@@ -45,8 +45,8 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
         tier,
         name:
           normalizedDiscount === "STUDENT-50"
-            ? "Murmur Pro Lifetime (Student & Academic Grant)"
-            : "Murmur Pro Lifetime (Open Source Maintainer Grant)",
+            ? "HushWrite Pro Lifetime (Student & Academic Grant)"
+            : "HushWrite Pro Lifetime (Open Source Maintainer Grant)",
         amountCents: 4400, // $44.00 (50% off)
         currency: "usd",
         discountApplied: "Academic / OSS 50% Grant",
@@ -54,10 +54,10 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
       };
     }
 
-    if (normalizedDiscount?.startsWith("MURMUR-") || normalizedDiscount?.startsWith("REF-")) {
+    if (normalizedDiscount?.startsWith("HushWrite-") || normalizedDiscount?.startsWith("REF-")) {
       return {
         tier,
-        name: "Murmur Pro Lifetime (Referral Bonus)",
+        name: "HushWrite Pro Lifetime (Referral Bonus)",
         amountCents: 7900, // $79.00 ($10 off)
         currency: "usd",
         discountApplied: `Friend Referral Bonus ($10 Off with ${normalizedDiscount})`,
@@ -67,7 +67,7 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
 
     return {
       tier,
-      name: "Murmur Pro Lifetime License",
+      name: "HushWrite Pro Lifetime License",
       amountCents: 8900,
       currency: "usd",
       originalAmountCents,
@@ -80,7 +80,7 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
   if (normalizedDiscount === "SWITCHER-40") {
     return {
       tier,
-      name: "Murmur Pro Annual Pass (Switcher Deal)",
+      name: "HushWrite Pro Annual Pass (Switcher Deal)",
       amountCents: 2900, // $29.00 / first yr (40% off)
       currency: "usd",
       interval: "year",
@@ -94,8 +94,8 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
       tier,
       name:
         normalizedDiscount === "STUDENT-50"
-          ? "Murmur Pro Annual Pass (Student Grant)"
-          : "Murmur Pro Annual Pass (Open Source Grant)",
+          ? "HushWrite Pro Annual Pass (Student Grant)"
+          : "HushWrite Pro Annual Pass (Open Source Grant)",
       amountCents: 2400, // $24.00 / yr (50% off)
       currency: "usd",
       interval: "year",
@@ -104,10 +104,10 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
     };
   }
 
-  if (normalizedDiscount?.startsWith("MURMUR-") || normalizedDiscount?.startsWith("REF-")) {
+  if (normalizedDiscount?.startsWith("HushWrite-") || normalizedDiscount?.startsWith("REF-")) {
     return {
       tier,
-      name: "Murmur Pro Annual Pass (Referral Bonus)",
+      name: "HushWrite Pro Annual Pass (Referral Bonus)",
       amountCents: 3900, // $39.00 / yr ($10 off)
       currency: "usd",
       interval: "year",
@@ -118,7 +118,7 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
 
   return {
     tier,
-    name: "Murmur Pro Annual Pass",
+    name: "HushWrite Pro Annual Pass",
     amountCents: 4900,
     currency: "usd",
     interval: "year",
@@ -127,7 +127,7 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
 }
 
 /**
- * Generates an authentic, cryptographically-spaced Murmur license key.
+ * Generates an authentic, cryptographically-spaced HushWrite license key.
  * Formats match desktop app activation rules in `src/lib/plan.ts`.
  */
 export function generateLicenseKey(tier: PlanTierKey, discountCode?: string | null): string {

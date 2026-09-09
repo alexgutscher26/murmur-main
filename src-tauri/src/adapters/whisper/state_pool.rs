@@ -47,7 +47,7 @@ impl StatePool {
             None => context.create_state().map_err(|err| {
                 AppError::new(
                     ErrorCode::EngineNotReady,
-                    "Murmur could not prepare the transcription model for this recording.",
+                    "HushWrite could not prepare the transcription model for this recording.",
                 )
                 .with_detail(format!("{err:?}"))
             })?,

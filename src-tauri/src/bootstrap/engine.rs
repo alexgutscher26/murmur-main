@@ -43,7 +43,7 @@ pub fn prepare_engine(
 ) {
     let app = app.clone();
     std::thread::Builder::new()
-        .name("murmur-engine-warmup".into())
+        .name("HushWrite-engine-warmup".into())
         .spawn(move || {
             let installed = tauri::async_runtime::block_on(models.status(&model_id))
                 .map(|status| worth_warming(&status.state))

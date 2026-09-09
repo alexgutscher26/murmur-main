@@ -1,6 +1,6 @@
-# Murmur Privacy Architecture & Data Boundary
+# HushWrite Privacy Architecture & Data Boundary
 
-Murmur is built on a **local-first, zero-cloud architecture**. Your voice, your transcripts, and your personal data never leave your computer. We turn "trust me" into **"verify me"**.
+HushWrite is built on a **local-first, zero-cloud architecture**. Your voice, your transcripts, and your personal data never leave your computer. We turn "trust me" into **"verify me"**.
 
 ---
 
@@ -14,7 +14,7 @@ Murmur is built on a **local-first, zero-cloud architecture**. Your voice, your 
 | **Window Context (App Title/ID)** | Ephemeral memory buffer                  | **0 Bytes (Never)**                         | Discarded after formatting rule evaluation                           |
 | **User Account & Identity**       | None (Zero accounts or logins required)  | **0 Bytes (No auth service)**               | N/A — 100% anonymous & local                                         |
 | **Telemetry & Crash Reports**     | None (Zero tracking SDKs)                | **0 Bytes (Never)**                         | N/A — No analytics beacons exist                                     |
-| **AI Model Weights**              | Local Disk Storage (`~/.murmur/models`)  | **1-time download from HuggingFace/GitHub** | Fully offline permanent storage                                      |
+| **AI Model Weights**              | Local Disk Storage (`~/.HushWrite/models`)  | **1-time download from HuggingFace/GitHub** | Fully offline permanent storage                                      |
 | **App Update Checks**             | None                                     | **GitHub Releases API (Query only)**        | Can be toggled OFF in Settings                                       |
 
 ---
@@ -41,50 +41,50 @@ Murmur is built on a **local-first, zero-cloud architecture**. Your voice, your 
 
 ## 🌐 3. Explicit Outbound Network Request Disclosure
 
-Murmur makes **only two optional network requests**:
+HushWrite makes **only two optional network requests**:
 
-1. **Model Weight Download:** When you download a model (e.g., `whisper-base-q5_0.bin`), Murmur fetches the model directly from HuggingFace or official GitHub release assets. Once downloaded, it never connects again.
-2. **Version Check:** If enabled in Settings, Murmur checks `api.github.com/repos/alexgutscher26/murmur/releases/latest` to notify you if an update is available.
+1. **Model Weight Download:** When you download a model (e.g., `whisper-base-q5_0.bin`), HushWrite fetches the model directly from HuggingFace or official GitHub release assets. Once downloaded, it never connects again.
+2. **Version Check:** If enabled in Settings, HushWrite checks `api.github.com/repos/alexgutscher26/HushWrite/releases/latest` to notify you if an update is available.
 
-**Zero other network requests exist in the codebase.** If you block Murmur in your firewall, all dictation, formatting, and history features continue operating with 100% functionality.
+**Zero other network requests exist in the codebase.** If you block HushWrite in your firewall, all dictation, formatting, and history features continue operating with 100% functionality.
 
 ---
 
 ## 🧪 4. Reproducible Verification Recipes
 
-You can independently audit Murmur using standard packet capture and network monitoring utilities:
+You can independently audit HushWrite using standard packet capture and network monitoring utilities:
 
 ### A. macOS (Little Snitch / LuLu)
 
 1. Install [LuLu](https://objective-see.org/products/lulu.html) or [Little Snitch](https://www.obdev.at/products/littlesnitch/).
-2. Launch Murmur and dictate a 5-minute paragraph.
+2. Launch HushWrite and dictate a 5-minute paragraph.
 3. Observe the rule monitor: **0 connection attempts** are initiated during dictation or text delivery.
 
 ### B. Windows (Wireshark / Pktmon)
 
 1. Run Windows Packet Monitor:
    ```powershell
-   pktmon filter add -n murmur
+   pktmon filter add -n HushWrite
    pktmon start --etw
    ```
 2. Dictate continuously across multiple applications.
 3. Stop the trace and inspect the output:
    ```powershell
    pktmon stop
-   pktmon pcapng pktmon.etl -o murmur_audit.pcapng
+   pktmon pcapng pktmon.etl -o HushWrite_audit.pcapng
    ```
 4. Verify that zero audio or HTTP packets were emitted.
 
 ### C. Linux / Cross-Platform (NetHogs)
 
-1. Run `sudo nethogs` and isolate the Murmur process PID.
+1. Run `sudo nethogs` and isolate the HushWrite process PID.
 2. Observe bandwidth during active transcription: `0.000 KB/s SENT` / `0.000 KB/s RECV`.
 
 ---
 
-## ⚔️ 5. The Competitive Trust Wedge: Murmur vs. Cloud Dictation
+## ⚔️ 5. The Competitive Trust Wedge: HushWrite vs. Cloud Dictation
 
-| Privacy Dimension      | Murmur (Local-First)                                | Cloud Dictation (e.g. Wispr Flow, Cloud APIs)         |
+| Privacy Dimension      | HushWrite (Local-First)                                | Cloud Dictation (e.g. Wispr Flow, Cloud APIs)         |
 | :--------------------- | :-------------------------------------------------- | :---------------------------------------------------- |
 | **Trust Model**        | **Verifiable Architecture** (0 bytes leave machine) | Policy-based ("We promise not to train on your data") |
 | **Network Egress**     | 0 bytes audio / 0 bytes text                        | Continuous WebSocket audio stream                     |

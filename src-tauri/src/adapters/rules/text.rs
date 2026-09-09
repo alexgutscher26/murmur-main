@@ -12,17 +12,15 @@
 #[cfg(test)]
 use crate::types::LanguageCode;
 
-pub use super::abbreviations::{
-    abbreviations_for_language, expand_abbreviations, Abbreviation,
-};
+pub use super::abbreviations::{abbreviations_for_language, expand_abbreviations, Abbreviation};
 pub use super::corrections::apply_spoken_corrections;
 pub use super::dictionary::{apply_dictionary, replace_whole_words};
 pub use super::fillers::{fillers_for_language, is_cjk, strip_fillers};
+pub use super::numbers::normalize_numbers;
 pub use super::punctuation::{
     capitalise_sentences, ensure_terminal_punctuation, normalise_punctuation,
     strip_trailing_punctuation,
 };
-pub use super::numbers::normalize_numbers;
 pub use super::spoken::{
     apply_code_mode_casing, expand_spoken_commands, format_code_casing, format_file_tagging,
     format_markdown_mode, normalize_named_entities, CaseStyle,
@@ -177,7 +175,10 @@ mod tests {
             "userProfileComponent"
         );
         assert_eq!(
-            apply_code_mode_casing("create a user profile component in react", CaseStyle::Pascal),
+            apply_code_mode_casing(
+                "create a user profile component in react",
+                CaseStyle::Pascal
+            ),
             "create a UserProfileComponent in react"
         );
     }
@@ -223,7 +224,8 @@ mod tests {
 
     #[test]
     fn creator_macros_and_templates_expand_cleanly() {
-        let script = format_markdown_mode("here is the youtube script template for the new episode");
+        let script =
+            format_markdown_mode("here is the youtube script template for the new episode");
         assert!(script.contains("### 🎬 YouTube Video Script"));
         assert!(script.contains("Hook (0:00 - 0:30):"));
 
@@ -247,7 +249,8 @@ mod tests {
         assert!(linkedin_post.contains("### 💼 LinkedIn Post"));
         assert!(linkedin_post.contains("Key Lessons / Framework:"));
 
-        let linkedin_carousel = format_markdown_mode("drafting a linkedin carousel template about ai");
+        let linkedin_carousel =
+            format_markdown_mode("drafting a linkedin carousel template about ai");
         assert!(linkedin_carousel.contains("### 📑 LinkedIn Carousel Outline"));
         assert!(linkedin_carousel.contains("Slide 1 (Cover Hook):"));
 
@@ -266,9 +269,13 @@ mod tests {
         let out = normalize_named_entities(raw);
         assert_eq!(out, "publishing to YouTube, Instagram, TikTok, Substack, and Spotify with DaVinci Resolve and Descript");
 
-        let social_raw = "scheduling posts across linkedin, twitter, typefully, taplio, tweetdeck, and bluesky";
+        let social_raw =
+            "scheduling posts across linkedin, twitter, typefully, taplio, tweetdeck, and bluesky";
         let social_out = normalize_named_entities(social_raw);
-        assert_eq!(social_out, "scheduling posts across LinkedIn, Twitter, Typefully, Taplio, TweetDeck, and Bluesky");
+        assert_eq!(
+            social_out,
+            "scheduling posts across LinkedIn, Twitter, Typefully, Taplio, TweetDeck, and Bluesky"
+        );
     }
 
     #[test]
@@ -346,7 +353,10 @@ mod tests {
     #[test]
     fn repetition_that_is_real_speech_is_preserved() {
         // Not adjacent duplicates of the same span — this is how people talk.
-        assert_eq!(dedupe_stutters("very good and very bad"), "very good and very bad");
+        assert_eq!(
+            dedupe_stutters("very good and very bad"),
+            "very good and very bad"
+        );
     }
 
     #[test]
@@ -437,10 +447,11 @@ mod tests {
         assert!(pr.contains("Testing Checklist:"));
 
         let badge = format_markdown_mode("badge template");
-        assert!(badge.contains("https://img.shields.io/badge/dictated%20with-Murmur-5865F2"));
+        assert!(badge.contains("https://img.shields.io/badge/dictated%20with-HushWrite-5865F2"));
 
-        let footer = format_markdown_mode("dictated with murmur");
-        assert!(footer.contains("_Dictated privately on-device with [Murmur](https://murmur.app)_"));
+        let footer = format_markdown_mode("dictated with HushWrite");
+        assert!(footer
+            .contains("_Dictated privately on-device with [HushWrite](https://HushWrite.app)_"));
     }
 }
 

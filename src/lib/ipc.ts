@@ -33,7 +33,7 @@ export function toAppError(cause: unknown): AppError {
   }
   return {
     code: "INTERNAL",
-    message: "Murmur could not reach its background service.",
+    message: "HushWrite could not reach its background service.",
     recoverable: true,
     action: { kind: "RETRY" },
     detail: cause instanceof Error ? cause.message : String(cause),

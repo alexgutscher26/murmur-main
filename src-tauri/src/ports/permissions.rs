@@ -65,7 +65,7 @@ pub trait PermissionProvider: Send + Sync {
      *
      *        Collapsing them produces a specific, hard-to-diagnose dead end:
      *        the app refuses to record and sends the user to a privacy pane
-     *        that does not list Murmur at all, because macOS only lists an app
+     *        that does not list HushWrite at all, because macOS only lists an app
      *        there once it has actually requested. The user sees an empty list,
      *        concludes the app is broken, and they are not wrong.
      *

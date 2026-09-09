@@ -92,7 +92,7 @@ impl Resampler16k {
                 .map_err(|err| {
                     AppError::new(
                         ErrorCode::AudioFormatUnsupported,
-                        "Murmur could not work with that microphone's sample rate.",
+                        "HushWrite could not work with that microphone's sample rate.",
                     )
                     .with_detail(err)
                 })?,
@@ -129,14 +129,18 @@ impl Resampler16k {
             self.scratch.extend_from_slice(&self.pending[..needed]);
             self.pending.drain(..needed);
 
-            let input = InterleavedSlice::new(self.scratch.as_slice(), 1, needed).map_err(|err| {
-                AppError::new(ErrorCode::AudioFormatUnsupported, "Audio buffer mismatch.")
-                    .with_detail(err)
-            })?;
+            let input =
+                InterleavedSlice::new(self.scratch.as_slice(), 1, needed).map_err(|err| {
+                    AppError::new(ErrorCode::AudioFormatUnsupported, "Audio buffer mismatch.")
+                        .with_detail(err)
+                })?;
 
             let resampled = resampler.process(&input, None).map_err(|err| {
-                AppError::new(ErrorCode::AudioFormatUnsupported, "Audio conversion failed.")
-                    .with_detail(err)
+                AppError::new(
+                    ErrorCode::AudioFormatUnsupported,
+                    "Audio conversion failed.",
+                )
+                .with_detail(err)
             })?;
 
             // Mono, so the interleaved buffer IS the sample sequence and the
@@ -151,7 +155,12 @@ impl Resampler16k {
             // out, silently mis-reads instead), and Whisper expects normalised
             // input. One clamp here keeps that contract true at the boundary
             // where it is first established.
-            output.extend(resampled.take_data().into_iter().map(|s| s.clamp(-1.0, 1.0)));
+            output.extend(
+                resampled
+                    .take_data()
+                    .into_iter()
+                    .map(|s| s.clamp(-1.0, 1.0)),
+            );
         }
 
         Ok(output)

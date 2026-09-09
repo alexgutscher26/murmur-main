@@ -111,20 +111,21 @@ impl<P: PermissionProvider> MacosInjector<P> {
         let source = CGEventSource::new(CGEventSourceStateID::HIDSystemState).map_err(|_| {
             AppError::new(
                 ErrorCode::InjectionFailed,
-                "Murmur could not send the paste. Your text is on the clipboard.",
+                "HushWrite could not send the paste. Your text is on the clipboard.",
             )
         })?;
 
-        let key_down = CGEvent::new_keyboard_event(source.clone(), KEYCODE_V, true).map_err(|_| {
-            AppError::new(
-                ErrorCode::InjectionFailed,
-                "Murmur could not send the paste. Your text is on the clipboard.",
-            )
-        })?;
+        let key_down =
+            CGEvent::new_keyboard_event(source.clone(), KEYCODE_V, true).map_err(|_| {
+                AppError::new(
+                    ErrorCode::InjectionFailed,
+                    "HushWrite could not send the paste. Your text is on the clipboard.",
+                )
+            })?;
         let key_up = CGEvent::new_keyboard_event(source, KEYCODE_V, false).map_err(|_| {
             AppError::new(
                 ErrorCode::InjectionFailed,
-                "Murmur could not send the paste. Your text is on the clipboard.",
+                "HushWrite could not send the paste. Your text is on the clipboard.",
             )
         })?;
 
@@ -141,7 +142,7 @@ impl<P: PermissionProvider> MacosInjector<P> {
         Clipboard::new().map_err(|err| {
             AppError::new(
                 ErrorCode::ClipboardUnavailable,
-                "Murmur could not reach the clipboard.",
+                "HushWrite could not reach the clipboard.",
             )
             .with_detail(err)
         })
@@ -191,7 +192,7 @@ impl<P: PermissionProvider> TextInjector for MacosInjector<P> {
         clipboard.set_text(request.text.clone()).map_err(|err| {
             AppError::new(
                 ErrorCode::ClipboardUnavailable,
-                "Murmur could not copy your text.",
+                "HushWrite could not copy your text.",
             )
             .with_detail(err)
         })?;
@@ -244,10 +245,10 @@ impl<P: PermissionProvider> TextInjector for MacosInjector<P> {
                     // unanswered. Tell them what to do with the dialog rather
                     // than describing the state.
                     PermissionState::NotDetermined => {
-                        "Text copied. Allow Murmur under Accessibility to have it pasted for you."
+                        "Text copied. Allow HushWrite under Accessibility to have it pasted for you."
                             .into()
                     }
-                    _ => "Murmur does not have Accessibility access yet.".to_string(),
+                    _ => "HushWrite does not have Accessibility access yet.".to_string(),
                 }),
                 clipboard_write_ms,
             });
@@ -259,7 +260,7 @@ impl<P: PermissionProvider> TextInjector for MacosInjector<P> {
             tracing::warn!(error = %err, "synthetic paste failed");
             return Ok(InjectionOutcome {
                 delivery: DeliveryKind::ClipboardOnly,
-                reason: Some("Murmur could not send the paste.".into()),
+                reason: Some("HushWrite could not send the paste.".into()),
                 clipboard_write_ms,
             });
         }
@@ -647,7 +648,7 @@ mod tests {
         let _guard = PASTEBOARD_LOCK.lock();
         let _clipboard = PreservedClipboard::save();
         let injector = MacosInjector::new(FakePermissions::new(PermissionState::Denied));
-        let text = "murmur clipboard fallback check";
+        let text = "HushWrite clipboard fallback check";
 
         injector.deliver(&InjectionRequest {
             text: text.into(),

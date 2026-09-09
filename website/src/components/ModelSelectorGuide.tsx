@@ -106,7 +106,7 @@ export function ModelSelectorGuide() {
             Select the right model for your device.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Murmur runs 100% on device with Whisper GGML models. Whisper Small (190 MB) is included
+            HushWrite runs 100% on device with Whisper GGML models. Whisper Small (190 MB) is included
             free by default; download any model weights with one click.
           </p>
         </div>

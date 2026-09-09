@@ -18,11 +18,11 @@ export async function GET(request: NextRequest) {
 
   // Default to serving the Windows x64 NSIS setup executable
   return NextResponse.redirect(
-    new URL("/downloads/Murmur_0.1.0_x64-setup.exe", origin),
+    new URL("/downloads/HushWrite_0.1.0_x64-setup.exe", origin),
     {
       status: 302,
       headers: {
-        "Content-Disposition": 'attachment; filename="Murmur_0.1.0_x64-setup.exe"',
+        "Content-Disposition": 'attachment; filename="HushWrite_0.1.0_x64-setup.exe"',
       },
     }
   );

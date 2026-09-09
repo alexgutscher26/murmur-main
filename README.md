@@ -1,27 +1,27 @@
 <div align="center">
 
-# 🎙️ Murmur
+# 🎙️ HushWrite
 
 **Instant, 100% private, local speech-to-text for macOS & Windows.**  
 _Press a hotkey, speak naturally, release — your words are transcribed and pasted before you can look up._
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/alexgutscher26/murmur)
+[![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/alexgutscher26/HushWrite)
 [![Tauri v2](https://img.shields.io/badge/built%20with-Tauri%20v2-24C8DB?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app)
 [![Rust](https://img.shields.io/badge/core-Rust-DEA584?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
 [![React 19](https://img.shields.io/badge/ui-React%2019%20%2B%20Tailwind%20v4-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
 [![100% Local](https://img.shields.io/badge/voice-100%25%20Local%20%2F%20Zero%20Egress-10B981?style=flat-square&logo=shield&logoColor=white)](docs/badges.md)
-[![Dictated with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](docs/badges.md)
+[![Dictated with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](docs/badges.md)
 
-[Features](#-key-features) • [Why Murmur?](#-why-murmur) • [Architecture](#-architecture) • [Installation](#-installation--downloads) • [Developer Guide](#-developer-guide) • [Community Badges](#-community-badges) • [License](#-license)
+[Features](#-key-features) • [Why HushWrite?](#-why-HushWrite) • [Architecture](#-architecture) • [Installation](#-installation--downloads) • [Developer Guide](#-developer-guide) • [Community Badges](#-community-badges) • [License](#-license)
 
 </div>
 
 ---
 
-## ⚡ What is Murmur?
+## ⚡ What is HushWrite?
 
-**Murmur** is an open-source, local-first dictation tool built for speed, privacy, and seamless workflow integration. Unlike cloud speech-to-text tools that record audio, stream it across the internet, and make you wait seconds for a response, Murmur processes speech directly on your hardware using optimized `whisper.cpp` models.
+**HushWrite** is an open-source, local-first dictation tool built for speed, privacy, and seamless workflow integration. Unlike cloud speech-to-text tools that record audio, stream it across the internet, and make you wait seconds for a response, HushWrite processes speech directly on your hardware using optimized `whisper.cpp` models.
 
 No accounts, no monthly cloud subscriptions, no word limits, and **zero audio ever leaves your machine**.
 
@@ -42,7 +42,7 @@ No accounts, no monthly cloud subscriptions, no word limits, and **zero audio ev
 - 🌐 **99 Languages & Auto-Detection**  
   Transcribe in nearly any language supported by OpenAI Whisper, automatically detected or pinned to your preferred dialect.
 - 📖 **Custom Vocabulary & Biasing**  
-  Train Murmur on technical jargon, programming identifiers, unusual names, and domain-specific acronyms to both bias recognition and normalize output.
+  Train HushWrite on technical jargon, programming identifiers, unusual names, and domain-specific acronyms to both bias recognition and normalize output.
 - 🎛️ **Per-App Overrides & Profiles**  
   Customize dictation hotkeys, vocabulary, and formatting profiles tailored specifically for code editors, chat clients, or document editors.
 - 🔍 **Searchable SQLite History & Honest Telemetry**  
@@ -52,9 +52,9 @@ No accounts, no monthly cloud subscriptions, no word limits, and **zero audio ev
 
 ---
 
-## 📊 Why Murmur? (Comparison)
+## 📊 Why HushWrite? (Comparison)
 
-| Feature                     |              Murmur              | Cloud Dictation (Wispr Flow, etc.) |     MacWhisper / Superwhisper      |
+| Feature                     |            HushWrite             | Cloud Dictation (Wispr Flow, etc.) |     MacWhisper / Superwhisper      |
 | :-------------------------- | :------------------------------: | :--------------------------------: | :--------------------------------: |
 | **Privacy / Audio Egress**  | **100% On-Device (Zero Egress)** |      Audio sent to cloud APIs      | Often on-device, but closed-source |
 | **Cross-Platform**          |       **macOS & Windows**        |       Web / Limited desktop        |         Mostly macOS only          |
@@ -68,7 +68,7 @@ No accounts, no monthly cloud subscriptions, no word limits, and **zero audio ev
 
 ## 🏗️ Architecture
 
-Murmur combines a high-performance, low-latency Rust audio pipeline with a modern Tauri v2 desktop container.
+HushWrite combines a high-performance, low-latency Rust audio pipeline with a modern Tauri v2 desktop container.
 
 ```mermaid
 flowchart LR
@@ -80,7 +80,7 @@ flowchart LR
         VAD --> Whisper[whisper-rs / whisper.cpp]
     end
 
-    subgraph CoreEngine ["Murmur Core & Registry"]
+    subgraph CoreEngine ["HushWrite Core & Registry"]
         Whisper --> Factory[IPC Command Factory]
         Factory --> DB[(SQLite Local History)]
         Factory --> SystemPaste[Synthetic Paste + Clipboard Restore]
@@ -107,19 +107,19 @@ flowchart LR
 #### Option A: Windows Package Manager (WinGet)
 
 ```powershell
-winget install WebProdigies.Murmur
+winget install WebProdigies.HushWrite
 ```
 
 #### Option B: Standalone Installer
 
-Download the latest `.msi` or `.exe` installer from [GitHub Releases](https://github.com/alexgutscher26/murmur/releases).
+Download the latest `.msi` or `.exe` installer from [GitHub Releases](https://github.com/alexgutscher26/HushWrite/releases).
 
 ---
 
 ### macOS
 
-1. Download the latest Universal `.dmg` from [GitHub Releases](https://github.com/alexgutscher26/murmur/releases).
-2. Open the `.dmg` and drag **Murmur** into your `/Applications` folder.
+1. Download the latest Universal `.dmg` from [GitHub Releases](https://github.com/alexgutscher26/HushWrite/releases).
+2. Open the `.dmg` and drag **HushWrite** into your `/Applications` folder.
 3. Grant **Microphone** and **Accessibility** permissions on initial launch.
 
 ---
@@ -144,8 +144,8 @@ Download the latest `.msi` or `.exe` installer from [GitHub Releases](https://gi
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/alexgutscher26/murmur.git
-cd murmur
+git clone https://github.com/alexgutscher26/HushWrite.git
+cd HushWrite
 
 # Install frontend dependencies
 pnpm install   # or: bun install
@@ -154,13 +154,13 @@ pnpm install   # or: bun install
 pnpm tauri dev # or: bun run tauri dev
 ```
 
-> **First Launch Setup:** Murmur opens a guided onboarding window to request microphone access, download your preferred starting Whisper model, and test your global hotkey. Afterwards, Murmur minimizes to your system tray / menu bar.
+> **First Launch Setup:** HushWrite opens a guided onboarding window to request microphone access, download your preferred starting Whisper model, and test your global hotkey. Afterwards, HushWrite minimizes to your system tray / menu bar.
 
 ---
 
 ### Windows Performance Optimization
 
-In debug builds on Windows, raw unoptimized C++ compilation of Whisper dependencies can cause high inference latencies. Murmur's `src-tauri/Cargo.toml` overrides dependencies in dev profile:
+In debug builds on Windows, raw unoptimized C++ compilation of Whisper dependencies can cause high inference latencies. HushWrite's `src-tauri/Cargo.toml` overrides dependencies in dev profile:
 
 ```toml
 [profile.dev.package."*"]
@@ -173,7 +173,7 @@ This ensures `whisper-rs-sys` and `rubato` run with native optimizations even du
 
 ### Source-of-Truth Navigation (`pnpm sot`)
 
-Murmur enforces strict `SOURCE OF TRUTH KEYWORDS` headers across the codebase. You can search symbols and architecture components instantly without scanning the entire file tree:
+HushWrite enforces strict `SOURCE OF TRUTH KEYWORDS` headers across the codebase. You can search symbols and architecture components instantly without scanning the entire file tree:
 
 ```bash
 # Find files owning a specific symbol or concept
@@ -216,7 +216,7 @@ The resulting binaries will be placed in `src-tauri/target/release/bundle/`:
 To sign release updater archives with your private key:
 
 ```bash
-TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.murmur-updater.key)" \
+TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.HushWrite-updater.key)" \
 TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" \
   pnpm tauri build
 ```
@@ -236,7 +236,7 @@ TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" \
 
 ### Zero Network Egress Guarantee
 
-Murmur does **not** collect telemetry, user recordings, or text snippets. The only optional network interactions are:
+HushWrite does **not** collect telemetry, user recordings, or text snippets. The only optional network interactions are:
 
 1. One-time GGML model download during onboarding or when switching models in Settings.
 2. Optional automated check for app updates via GitHub Releases.  
@@ -253,11 +253,11 @@ Showcase your local, private AI dictation workflow in your open-source projects,
 ```markdown
 <!-- Flat Square Badge -->
 
-[![Dictated with Murmur](https://img.shields.io/badge/dictated%20with-Murmur-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://github.com/alexgutscher26/murmur)
+[![Dictated with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://github.com/alexgutscher26/HushWrite)
 
 <!-- 100% Local Privacy Badge -->
 
-[![100% Local Dictation](https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white)](https://github.com/alexgutscher26/murmur)
+[![100% Local Dictation](https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white)](https://github.com/alexgutscher26/HushWrite)
 ```
 
 ### Pull Request & Issue Footer
@@ -265,7 +265,7 @@ Showcase your local, private AI dictation workflow in your open-source projects,
 ```markdown
 ---
 
-_Dictated privately on-device with [Murmur](https://github.com/alexgutscher26/murmur)_
+_Dictated privately on-device with [HushWrite](https://github.com/alexgutscher26/HushWrite)_
 ```
 
 _(For full badge options, HTML embeds, and voice-triggered templates, see [`docs/badges.md`](docs/badges.md).)_
@@ -287,4 +287,4 @@ _(For full badge options, HTML embeds, and voice-triggered templates, see [`docs
 
 ## 📄 License
 
-Murmur is distributed under the [MIT License](LICENSE).
+HushWrite is distributed under the [MIT License](LICENSE).

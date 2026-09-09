@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "murmur",
+      "name": "HushWrite",
       "dependencies": {
         "@hookform/resolvers": "^5.9.1",
         "@tauri-apps/api": "^2",

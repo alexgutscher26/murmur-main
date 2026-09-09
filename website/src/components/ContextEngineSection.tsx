@@ -98,7 +98,7 @@ export function ContextEngineSection() {
             One voice input. Formatted for every app.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Murmur senses the frontmost active window and shapes tone, punctuation, and layout to
+            HushWrite senses the frontmost active window and shapes tone, punctuation, and layout to
             fit the medium.
           </p>
         </div>

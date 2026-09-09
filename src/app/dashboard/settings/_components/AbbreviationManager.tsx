@@ -3,7 +3,7 @@
  *   disabled_abbreviations
  * WHAT:  Per-language abbreviation expansion list with user-configurable opt-out.
  * WHY:   Whisper frequently emits unpunctuated spoken abbreviations ("eg", "ie", "vs").
- *        Murmur expands these cleanly into written form ("e.g.", "i.e.", "vs."),
+ *        HushWrite expands these cleanly into written form ("e.g.", "i.e.", "vs."),
  *        and users can disable individual expansions according to personal preference.
  * WHERE: Rendered under the Enhancement / Output section of SettingsView.
  */

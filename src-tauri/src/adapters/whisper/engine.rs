@@ -231,7 +231,7 @@ impl TranscriptionEngine for WhisperEngine {
         let context = WhisperContext::new_with_params(&self.model_path, params).map_err(|err| {
             AppError::new(
                 ErrorCode::EngineNotReady,
-                "Murmur could not load the transcription model.",
+                "HushWrite could not load the transcription model.",
             )
             .with_action(ErrorAction::Retry)
             .with_detail(format!("{err:?} loading {}", self.model_path.display()))
@@ -240,7 +240,7 @@ impl TranscriptionEngine for WhisperEngine {
         let mut state = context.create_state().map_err(|err| {
             AppError::new(
                 ErrorCode::EngineNotReady,
-                "Murmur could not load the transcription model.",
+                "HushWrite could not load the transcription model.",
             )
             .with_detail(format!("{err:?}"))
         })?;
@@ -322,7 +322,7 @@ impl TranscriptionEngine for WhisperEngine {
         state.full(params, &chunk.samples).map_err(|err| {
             AppError::new(
                 ErrorCode::TranscriptionFailed,
-                "Murmur could not turn that recording into text.",
+                "HushWrite could not turn that recording into text.",
             )
             .recoverable()
             .with_detail(format!("{err:?}"))
@@ -394,7 +394,9 @@ impl TranscriptionEngine for WhisperEngine {
  * WHERE: adapters/whisper/engine.rs only.
  */
 fn absolute_ms(chunk: &AudioChunk, centiseconds: i64) -> u64 {
-    let within = u64::try_from(centiseconds.max(0)).unwrap_or(0).saturating_mul(10);
+    let within = u64::try_from(centiseconds.max(0))
+        .unwrap_or(0)
+        .saturating_mul(10);
     let chunk_len_ms = (chunk.samples.len() as u64 * 1000) / u64::from(TARGET_SAMPLE_RATE);
     chunk.start_ms.saturating_add(within.min(chunk_len_ms))
 }

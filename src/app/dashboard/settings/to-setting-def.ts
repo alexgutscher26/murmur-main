@@ -108,7 +108,7 @@ export function toControlSetting(
   }
   if (ungranted.length > 0) {
     notes.push(
-      `Needs ${ungranted.map(permissionLabel).join(" and ")} access, which Murmur does not have yet.`,
+      `Needs ${ungranted.map(permissionLabel).join(" and ")} access, which HushWrite does not have yet.`,
     );
   }
 

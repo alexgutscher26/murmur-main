@@ -45,7 +45,7 @@ export function SettingsBackup() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = `murmur-settings-backup-${new Date().toISOString().split("T")[0]}.json`;
+      link.download = `HushWrite-settings-backup-${new Date().toISOString().split("T")[0]}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -70,7 +70,7 @@ export function SettingsBackup() {
       const backup = JSON.parse(text) as Partial<BackupData>;
 
       if (!backup.settings && !backup.profiles && !backup.dictionary) {
-        throw new Error("Invalid Murmur backup file format.");
+        throw new Error("Invalid HushWrite backup file format.");
       }
 
       // Restore settings

@@ -24,7 +24,7 @@ export function HowItWorks() {
       number: "03",
       title: "Receive formatted text instantly",
       description:
-        "Release the shortcut. Murmur clears filler sounds, structures sentences, and pastes text directly into your document.",
+        "Release the shortcut. HushWrite clears filler sounds, structures sentences, and pastes text directly into your document.",
       icon: Sparkles,
       badge: "Instant Paste",
     },
@@ -48,7 +48,7 @@ export function HowItWorks() {
             </span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
-            How Murmur works in three steps.
+            How HushWrite works in three steps.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
             No window switching or manual copying. Speak and your thoughts become structured

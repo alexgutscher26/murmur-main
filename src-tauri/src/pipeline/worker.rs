@@ -21,12 +21,12 @@
  */
 
 use std::sync::mpsc::{sync_channel, SyncSender, TrySendError};
-use std::time::{Duration, Instant};
 use std::sync::Arc;
 use std::thread::JoinHandle;
+use std::time::{Duration, Instant};
 
 use crate::ports::engine::{TranscribeRequest, TranscriptionEngine};
-use crate::types::{AudioChunk, ChunkKind, LatencyStage, TranscriptSegment, SessionId};
+use crate::types::{AudioChunk, ChunkKind, LatencyStage, SessionId, TranscriptSegment};
 
 /**
  * How many chunks may wait to be decoded. Small on purpose: chunks are 8-15
@@ -100,7 +100,7 @@ impl AsrWorker {
         let (sender, receiver) = sync_channel::<WorkItem>(QUEUE_DEPTH);
 
         let handle = std::thread::Builder::new()
-            .name("murmur-asr".into())
+            .name("HushWrite-asr".into())
             .spawn(move || {
                 tracing::debug!("ASR worker started");
 
@@ -344,7 +344,11 @@ mod tests {
         )
         .expect("spawn");
 
-        assert!(worker.submit(chunk(0, ChunkKind::Interior), TranscribeRequest::default(), SessionId::new()));
+        assert!(worker.submit(
+            chunk(0, ChunkKind::Interior),
+            TranscribeRequest::default(),
+            SessionId::new()
+        ));
 
         let result = rx.recv().await.expect("a result");
         assert_eq!(result.segments.len(), 1);
@@ -365,7 +369,11 @@ mod tests {
         )
         .expect("spawn");
 
-        worker.submit(chunk(0, ChunkKind::Tail), TranscribeRequest::default(), SessionId::new());
+        worker.submit(
+            chunk(0, ChunkKind::Tail),
+            TranscribeRequest::default(),
+            SessionId::new(),
+        );
         let result = rx.recv().await.expect("a result");
 
         assert_eq!(result.stage, LatencyStage::TailDecode);
@@ -383,7 +391,11 @@ mod tests {
         )
         .expect("spawn");
 
-        worker.submit(chunk(0, ChunkKind::Interior), TranscribeRequest::default(), SessionId::new());
+        worker.submit(
+            chunk(0, ChunkKind::Interior),
+            TranscribeRequest::default(),
+            SessionId::new(),
+        );
         let result = rx.recv().await.expect("a result");
 
         assert_eq!(result.stage, LatencyStage::ChunkDecode);
@@ -463,12 +475,20 @@ mod tests {
         let (tx, mut rx) = tokio::sync::mpsc::channel(8);
         let worker = AsrWorker::spawn(Arc::new(BrokenEngine), tx).expect("spawn");
 
-        worker.submit(chunk(0, ChunkKind::Interior), TranscribeRequest::default(), SessionId::new());
+        worker.submit(
+            chunk(0, ChunkKind::Interior),
+            TranscribeRequest::default(),
+            SessionId::new(),
+        );
         let first = rx.recv().await.expect("a result");
         assert!(first.error.is_some());
 
         // And the worker is still alive for the next chunk.
-        worker.submit(chunk(1000, ChunkKind::Interior), TranscribeRequest::default(), SessionId::new());
+        worker.submit(
+            chunk(1000, ChunkKind::Interior),
+            TranscribeRequest::default(),
+            SessionId::new(),
+        );
         let second = rx.recv().await.expect("a second result");
         assert!(second.error.is_some());
     }

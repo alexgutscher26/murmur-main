@@ -137,7 +137,7 @@ export function ProductivityCalculator() {
                 ${moneyValueSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </span>
               <span className="text-emerald-700 font-medium text-[11px]">
-                $0.00 Murmur software cost (Free)
+                $0.00 HushWrite software cost (Free)
               </span>
             </div>
           </div>

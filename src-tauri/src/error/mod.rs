@@ -174,7 +174,7 @@ impl AppError {
     pub fn microphone_denied() -> Self {
         Self::new(
             ErrorCode::MicrophoneDenied,
-            "Murmur needs microphone access to hear you.",
+            "HushWrite needs microphone access to hear you.",
         )
         .with_action(ErrorAction::OpenPrivacyPane {
             pane: PrivacyPane::Microphone,
@@ -189,14 +189,14 @@ impl AppError {
      *        Settings, so its error deep-links there. A grant that has merely
      *        never been asked for is fixed by answering the dialog that is
      *        already in front of the user — and sending them to System Settings
-     *        instead would send them to a pane that does not list Murmur yet.
+     *        instead would send them to a pane that does not list HushWrite yet.
      * WHERE: Raised by the factory preflight when a required permission was
      *        NotDetermined and has just been requested.
      */
     pub fn microphone_pending() -> Self {
         Self::new(
             ErrorCode::MicrophonePending,
-            "Murmur just asked for microphone access. Allow it, then press your shortcut again.",
+            "HushWrite just asked for microphone access. Allow it, then press your shortcut again.",
         )
         .recoverable()
         .with_action(ErrorAction::Retry)
@@ -205,7 +205,7 @@ impl AppError {
     pub fn accessibility_denied() -> Self {
         Self::new(
             ErrorCode::AccessibilityDenied,
-            "Murmur needs Accessibility access to paste for you. Without it your text is still copied to the clipboard.",
+            "HushWrite needs Accessibility access to paste for you. Without it your text is still copied to the clipboard.",
         )
         .recoverable()
         .with_action(ErrorAction::OpenPrivacyPane {
@@ -241,7 +241,7 @@ impl AppError {
     pub fn microphone_silent() -> Self {
         Self::new(
             ErrorCode::MicrophoneSilent,
-            "Murmur heard nothing at all. Check that the right input device is selected and that it is not muted.",
+            "HushWrite heard nothing at all. Check that the right input device is selected and that it is not muted.",
         )
         .recoverable()
         .with_action(ErrorAction::OpenSettings {
@@ -256,7 +256,7 @@ impl AppError {
     pub fn internal(detail: impl std::fmt::Display) -> Self {
         Self::new(
             ErrorCode::Internal,
-            "Something went wrong inside Murmur. Your transcript is in History.",
+            "Something went wrong inside HushWrite. Your transcript is in History.",
         )
         .with_detail(detail)
     }
@@ -288,7 +288,7 @@ impl From<rusqlite::Error> for AppError {
     fn from(err: rusqlite::Error) -> Self {
         Self::new(
             ErrorCode::Database,
-            "Murmur could not read its local database.",
+            "HushWrite could not read its local database.",
         )
         .with_detail(err)
     }

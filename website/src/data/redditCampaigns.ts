@@ -42,7 +42,7 @@ Over the past year, voice dictation apps had a massive resurgence. However, virt
 
 I wanted something different: a lean, native desktop utility that runs 100% locally on the device's GPU, requires zero network connections, and feels as instantaneous as physical keystrokes.
 
-Today we're open-sourcing **Murmur** (MIT License): https://github.com/webprodigies/murmur
+Today we're open-sourcing **HushWrite** (MIT License): https://github.com/webprodigies/HushWrite
 
 ### Architecture & Technical Details:
 - **Core Engine:** Tauri 2 backend written in Rust. The idle memory footprint is under 45MB RAM (compared to ~180MB for typical Electron apps).
@@ -56,7 +56,7 @@ Today we're open-sourcing **Murmur** (MIT License): https://github.com/webprodig
 ### Unsafe FFI & Lessons Learned:
 Bridging Rust and C++ across whisper.cpp's memory model was an adventure. Ensuring audio sample buffers remained aligned without heap reallocations during active beam search decoding required careful lifetime management and zero-copy slicing.
 
-The repo is fully open source (MIT): https://github.com/webprodigies/murmur
+The repo is fully open source (MIT): https://github.com/webprodigies/HushWrite
 
 I'd love to hear your feedback on the architecture, unsafe FFI boundaries, and audio buffer management! Happy to answer any questions about the Rust stack.`,
       discussionPrompts: [
@@ -85,7 +85,7 @@ The prevailing industry assumption has been that massive cloud GPUs (H100/A100) 
 
 ### Key Results:
 1. **Tail Latency:**
-   - On-Device Murmur (Whisper Base Q5_0): **134 ms** (RTX 4080) / **142 ms** (M3 Max)
+   - On-Device HushWrite (Whisper Base Q5_0): **134 ms** (RTX 4080) / **142 ms** (M3 Max)
    - Cloud WebSocket APIs (Gigabit Fiber): **475–510 ms**
    - Cloud WebSocket APIs (35Mbps Wi-Fi): **1,420 ms**
    - Cloud APIs (Airplane Mode): **FAILED**
@@ -95,8 +95,8 @@ The prevailing industry assumption has been that massive cloud GPUs (H100/A100) 
 3. **Power & Resource Impact:**
    - Running quantized Q5_0 models drew under 1.1% battery per hour on Apple Silicon, whereas maintaining an active WebSocket upload socket consumed 2.8% battery per hour.
 
-We've packaged this engine into a free, open-source desktop app (Murmur) and published the benchmark methodology and evaluation scripts on GitHub:
-https://github.com/webprodigies/murmur
+We've packaged this engine into a free, open-source desktop app (HushWrite) and published the benchmark methodology and evaluation scripts on GitHub:
+https://github.com/webprodigies/HushWrite
 
 Would love to discuss quantization thresholds, temperature fallbacks, and speculative decoding techniques for on-device ASR!`,
       discussionPrompts: [
@@ -110,7 +110,7 @@ Would love to discuss quantization thresholds, temperature fallbacks, and specul
       subreddit: "r/selfhosted",
       flair: "Share",
       title:
-        "Sick of cloud voice tools uploading your audio? Murmur is a 100% offline, zero-account speech-to-text app for Mac & Windows (MIT)",
+        "Sick of cloud voice tools uploading your audio? HushWrite is a 100% offline, zero-account speech-to-text app for Mac & Windows (MIT)",
       hook: "No Docker required, no cloud subscriptions, no phoning home. Pure local voice dictation running on your GPU.",
       body: `Hey r/selfhosted,
 
@@ -118,7 +118,7 @@ If you've been following the recent wave of voice dictation tools, you've probab
 
 For anyone who cares about data sovereignty, that's an unacceptable security vector.
 
-I built **Murmur** to solve this: an open-source, air-gapped voice dictation desktop app for macOS and Windows that runs 100% on your machine.
+I built **HushWrite** to solve this: an open-source, air-gapped voice dictation desktop app for macOS and Windows that runs 100% on your machine.
 
 ### Why it fits the r/selfhosted ethos:
 - **Zero Cloud Architecture:** Audio is captured into volatile RAM, transcribed by a local Whisper model running on your GPU (via whisper.cpp), and typed into your cursor.
@@ -128,8 +128,8 @@ I built **Murmur** to solve this: an open-source, air-gapped voice dictation des
 - **Unlimited & Free:** No 2,000-word weekly quotas or $15/month subscriptions. MIT licensed.
 
 Download DMGs/Installers or build from source:
-https://github.com/webprodigies/murmur
-Website: https://murmur.app
+https://github.com/webprodigies/HushWrite
+Website: https://HushWrite.app
 
 Check it out, disconnect your internet, and let me know how it runs on your setup!`,
       discussionPrompts: [
@@ -153,7 +153,7 @@ I tried using voice dictation, but ran into two frustrating issues:
 1. Built-in OS dictation was clunky and constantly made silly punctuation errors.
 2. New AI dictation tools required inviting third-party cloud bots to meetings or uploading audio to remote cloud servers—which violated our company's client confidentiality policies.
 
-So I built a lightweight open-source tool called **Murmur** to solve my own problem. After six months of daily use, here is how it changed my work:
+So I built a lightweight open-source tool called **HushWrite** to solve my own problem. After six months of daily use, here is how it changed my work:
 
 ### 1. The 90-Second Post-Meeting Debrief
 Instead of typing meeting notes for 20 minutes after every sync, I open my Notion meeting template immediately after hanging up, hold **Alt+Space** (or ⌥ Space on Mac), and dictate a 90-second verbal debrief:
@@ -161,7 +161,7 @@ Instead of typing meeting notes for 20 minutes after every sync, I open my Notio
 - Action items & owners
 - Blockers & risks
 
-Murmur strips out filler words ('um', 'like', 'you know'), adds punctuation automatically, and formats clean markdown bullets. What used to take 20 minutes now takes **under 2 minutes**.
+HushWrite strips out filler words ('um', 'like', 'you know'), adds punctuation automatically, and formats clean markdown bullets. What used to take 20 minutes now takes **under 2 minutes**.
 
 ### 2. Zero Wrist Strain on Long Drafts
 Speaking at 160 WPM is roughly 3x faster than average typing speed (50–60 WPM). Dictating first drafts of emails, essays, and task descriptions gives my hands a total break while keeping my thought flow continuous.
@@ -169,7 +169,7 @@ Speaking at 160 WPM is roughly 3x faster than average typing speed (50–60 WPM)
 ### 3. Complete Privacy
 The audio is processed 100% locally on your computer's GPU via open-weights Whisper models. Nothing is sent to cloud servers, no account is required, and it works with Wi-Fi turned off on an airplane.
 
-It's completely free and open source (MIT): https://murmur.app
+It's completely free and open source (MIT): https://HushWrite.app
 
 Hope this helps anyone else dealing with typing fatigue or meeting note overload!`,
       discussionPrompts: [
@@ -184,10 +184,10 @@ Hope this helps anyone else dealing with typing fatigue or meeting note overload
     title:
       "I'm a systems engineer who spent 8 months building an open-source, air-gapped AI voice dictation app in Rust (whisper.cpp). AMA!",
     bioProof:
-      "Alex Gutscher (@webprodigies) - Creator of Murmur (https://github.com/webprodigies/murmur). Verification screenshot with repo commit key & terminal packet monitor.",
+      "Alex Gutscher (@webprodigies) - Creator of HushWrite (https://github.com/webprodigies/HushWrite). Verification screenshot with repo commit key & terminal packet monitor.",
     openingStatement: `Hi everyone! I'm Alex Gutscher.
 
-Over the past 8 months, I've been building **Murmur**—an open-source desktop app written in Rust and Tauri 2 that brings high-speed, air-gapped AI speech-to-text to macOS and Windows using \`whisper.cpp\`.
+Over the past 8 months, I've been building **HushWrite**—an open-source desktop app written in Rust and Tauri 2 that brings high-speed, air-gapped AI speech-to-text to macOS and Windows using \`whisper.cpp\`.
 
 We reached a point where Apple Silicon (Metal) and Windows PC GPUs (DirectML) can decode OpenAI Whisper models locally in under 180ms—faster than cloud round-trips over the internet.
 
@@ -204,27 +204,27 @@ Ask me anything!`,
         question:
           "Why not just use Apple's built-in macOS dictation or Windows Speech Recognition?",
         answer:
-          "Apple and Windows built-in dictation rely on legacy acoustic models that lack context awareness. They don't understand programming syntax, frequently stumble on technical terms, cannot remove conversational filler words ('um', 'like'), and don't support custom phonetic dictionaries. Murmur uses OpenAI's Whisper transformer architecture, which understands semantic context and sentence flow.",
+          "Apple and Windows built-in dictation rely on legacy acoustic models that lack context awareness. They don't understand programming syntax, frequently stumble on technical terms, cannot remove conversational filler words ('um', 'like'), and don't support custom phonetic dictionaries. HushWrite uses OpenAI's Whisper transformer architecture, which understands semantic context and sentence flow.",
       },
       {
-        question: "How does Murmur compare to Wispr Flow?",
+        question: "How does HushWrite compare to Wispr Flow?",
         answer:
-          "Wispr Flow is a polished product, but its fundamental architecture streams your microphone audio to remote cloud GPU servers. That introduces a network latency tax (400–1,200ms), requires continuous internet, enforces a 2,000-word free weekly cap, and charges $144/year. Murmur runs 100% locally on your machine, delivers 134–168ms latency, works in Airplane Mode, has no word limits, and is open source (MIT).",
+          "Wispr Flow is a polished product, but its fundamental architecture streams your microphone audio to remote cloud GPU servers. That introduces a network latency tax (400–1,200ms), requires continuous internet, enforces a 2,000-word free weekly cap, and charges $144/year. HushWrite runs 100% locally on your machine, delivers 134–168ms latency, works in Airplane Mode, has no word limits, and is open source (MIT).",
       },
       {
-        question: "If Murmur is free and open source, how is the project sustainable?",
+        question: "If HushWrite is free and open source, how is the project sustainable?",
         answer:
-          "Murmur operates on an open-core hybrid model: the core dictation app, local Whisper models, global hotkeys, and air-gapped privacy are 100% free and open source under the MIT license forever. We monetize through an optional one-time perpetual lifetime license ($49 Core Lifetime) and Pro tiers that offer advanced features like automated multi-model acoustic switching, cloud backup of custom phonetic dictionaries (optional and encrypted), and priority support.",
+          "HushWrite operates on an open-core hybrid model: the core dictation app, local Whisper models, global hotkeys, and air-gapped privacy are 100% free and open source under the MIT license forever. We monetize through an optional one-time perpetual lifetime license ($49 Core Lifetime) and Pro tiers that offer advanced features like automated multi-model acoustic switching, cloud backup of custom phonetic dictionaries (optional and encrypted), and priority support.",
       },
       {
         question: "Will this slow down my laptop or drain the battery?",
         answer:
-          "No. Murmur's idle memory footprint is under 45MB RAM. When you speak, Whisper only runs for the exact duration of your audio chunk (typically 2–5 seconds). On Apple Silicon, inference finishes in ~150ms and the GPU immediately enters low-power idle. In our testing, active dictation draws less than 1.1% battery per hour—significantly less than maintaining a continuous Wi-Fi radio socket for cloud audio streaming.",
+          "No. HushWrite's idle memory footprint is under 45MB RAM. When you speak, Whisper only runs for the exact duration of your audio chunk (typically 2–5 seconds). On Apple Silicon, inference finishes in ~150ms and the GPU immediately enters low-power idle. In our testing, active dictation draws less than 1.1% battery per hour—significantly less than maintaining a continuous Wi-Fi radio socket for cloud audio streaming.",
       },
       {
         question: "How do I verify that audio really never leaves my computer?",
         answer:
-          "You can verify it yourself in 10 seconds: disconnect your Wi-Fi or turn on Airplane Mode and hold the hotkey—Murmur works identically. Alternatively, run `sudo tcpdump -i en0` on macOS or `pktmon` on Windows while dictating. You will observe exactly 0 network packets emitted by the Murmur process.",
+          "You can verify it yourself in 10 seconds: disconnect your Wi-Fi or turn on Airplane Mode and hold the hotkey—HushWrite works identically. Alternatively, run `sudo tcpdump -i en0` on macOS or `pktmon` on Windows while dictating. You will observe exactly 0 network packets emitted by the HushWrite process.",
       },
     ],
   },

@@ -1,7 +1,7 @@
 /*!
  * SOURCE OF TRUTH KEYWORDS: install_tray, TrayMenu, MENU_DASHBOARD,
  *   MENU_QUIT, show_dashboard, toggle_pill_window
- * WHAT:  The menu bar item: the only permanently visible part of Murmur, and
+ * WHAT:  The menu bar item: the only permanently visible part of HushWrite, and
  *        the only way to reach the dashboard.
  * WHY:   The app has no Dock icon and no window on launch — it is invisible
  *        until summoned, which is the product. That makes this the sole
@@ -48,10 +48,10 @@ pub fn update_tray_wpm(app: &AppHandle, wpm: Option<f64>) {
         Err(poisoned) => poisoned.into_inner(),
     };
     *guard = wpm;
-    if let Some(tray) = app.tray_by_id("murmur") {
+    if let Some(tray) = app.tray_by_id("HushWrite") {
         let tooltip = match wpm {
-            Some(w) if w > 0.0 => format!("Murmur — {:.0} WPM", w),
-            _ => "Murmur".to_string(),
+            Some(w) if w > 0.0 => format!("HushWrite — {:.0} WPM", w),
+            _ => "HushWrite".to_string(),
         };
         let _ = tray.set_tooltip(Some(tooltip));
     }
@@ -77,12 +77,18 @@ pub fn install_tray(app: &AppHandle) -> AppResult<()> {
         Some("Ctrl+D")
     };
     let dashboard_label = if cfg!(target_os = "windows") {
-        "&Open Murmur"
+        "&Open HushWrite"
     } else {
-        "Open Murmur"
+        "Open HushWrite"
     };
-    let dashboard = MenuItem::with_id(app, MENU_DASHBOARD, dashboard_label, true, dashboard_accelerator)
-        .map_err(menu_error)?;
+    let dashboard = MenuItem::with_id(
+        app,
+        MENU_DASHBOARD,
+        dashboard_label,
+        true,
+        dashboard_accelerator,
+    )
+    .map_err(menu_error)?;
 
     let quit_accelerator = if cfg!(target_os = "macos") {
         "Cmd+Q"
@@ -90,9 +96,9 @@ pub fn install_tray(app: &AppHandle) -> AppResult<()> {
         "Ctrl+Q"
     };
     let quit_label = if cfg!(target_os = "windows") {
-        "&Quit Murmur"
+        "&Quit HushWrite"
     } else {
-        "Quit Murmur"
+        "Quit HushWrite"
     };
     let quit = MenuItem::with_id(app, MENU_QUIT, quit_label, true, Some(quit_accelerator))
         .map_err(menu_error)?;
@@ -100,17 +106,20 @@ pub fn install_tray(app: &AppHandle) -> AppResult<()> {
     let separator = PredefinedMenuItem::separator(app).map_err(menu_error)?;
     let menu = Menu::with_items(app, &[&dashboard, &separator, &quit]).map_err(menu_error)?;
 
-    TrayIconBuilder::with_id("murmur")
+    TrayIconBuilder::with_id("HushWrite")
         // The identity mark (docs/04 §12), not the app icon. A menu-bar glyph
         // is a different drawing problem from an app icon: it is 22pt, it must
         // read at that size, and macOS uses ONLY its alpha channel. The app
         // icon shrunk into that slot is a smudge.
-        .icon(tauri::image::Image::from_bytes(include_bytes!("../icons/tray.png")).map_err(menu_error)?)
+        .icon(
+            tauri::image::Image::from_bytes(include_bytes!("../icons/tray.png"))
+                .map_err(menu_error)?,
+        )
         // Template rendering: macOS recolours the shape for light menu bars,
         // dark menu bars and the pressed state from the alpha alone. Without it
         // the glyph is a fixed colour that is wrong in one of the three.
         .icon_as_template(true)
-        .tooltip("Murmur")
+        .tooltip("HushWrite")
         .menu(&menu)
         // The menu is the only interaction. Left-click opening it too would
         // make an accidental click open a window the user did not ask for.
@@ -300,7 +309,11 @@ pub fn set_pill_visible(app: &AppHandle, visible: bool) {
                 unsafe {
                     let raw_hwnd = HWND(hwnd.0 as _);
                     let ex_style = GetWindowLongW(raw_hwnd, GWL_EXSTYLE);
-                    let _ = SetWindowLongW(raw_hwnd, GWL_EXSTYLE, ex_style | (WS_EX_NOACTIVATE.0 as i32));
+                    let _ = SetWindowLongW(
+                        raw_hwnd,
+                        GWL_EXSTYLE,
+                        ex_style | (WS_EX_NOACTIVATE.0 as i32),
+                    );
                     let _ = ShowWindow(raw_hwnd, SW_SHOWNOACTIVATE);
                     let _ = SetWindowPos(
                         raw_hwnd,
@@ -418,8 +431,8 @@ fn animate_pill_out(window: &tauri::WebviewWindow, leaving: Option<crate::types:
         {
             use windows::Win32::Foundation::HWND;
             use windows::Win32::UI::WindowsAndMessaging::{
-                ShowWindow, SetWindowPos, HWND_NOTOPMOST, SW_HIDE,
-                SWP_NOMOVE, SWP_NOSIZE, SWP_NOACTIVATE, SWP_HIDEWINDOW,
+                SetWindowPos, ShowWindow, HWND_NOTOPMOST, SWP_HIDEWINDOW, SWP_NOACTIVATE,
+                SWP_NOMOVE, SWP_NOSIZE, SW_HIDE,
             };
             if let Ok(hwnd) = window.hwnd() {
                 unsafe {
@@ -513,7 +526,7 @@ struct PillMetrics {
     /**
      * The failure box, which is a different size because it carries a
      * different kind of content. Every capture state is one size — nothing
-     * resizes mid-dictation — but a failure is a SENTENCE ("Murmur heard
+     * resizes mid-dictation — but a failure is a SENTENCE ("HushWrite heard
      * nothing at all. Check that the right input device is selected"), and a
      * sentence cropped to an indicator's width is a sentence nobody reads.
      */
@@ -638,12 +651,11 @@ pub fn fit_pill_to_state(app: &AppHandle, state: &crate::types::SessionState) {
 
     let appearing = !PILL_SHOWN.swap(true, Ordering::SeqCst);
     if appearing {
-        let placement = get_active_monitor(app)
-            .map(|monitor| PillPlacement {
-                origin: (monitor.position().x, monitor.position().y),
-                size: (monitor.size().width, monitor.size().height),
-                scale: monitor.scale_factor(),
-            });
+        let placement = get_active_monitor(app).map(|monitor| PillPlacement {
+            origin: (monitor.position().x, monitor.position().y),
+            size: (monitor.size().width, monitor.size().height),
+            scale: monitor.scale_factor(),
+        });
 
         if let Ok(mut stored) = PILL_PLACEMENT.lock() {
             *stored = placement;
@@ -710,12 +722,7 @@ fn pill_frame_on(
  * WHERE: The single writer of the pill's frame.
  */
 fn apply_pill_frame(window: &tauri::WebviewWindow, placement: PillPlacement, points: (f64, f64)) {
-    let ((x, y), (w, h)) = pill_frame_on(
-        placement.origin,
-        placement.size,
-        placement.scale,
-        points,
-    );
+    let ((x, y), (w, h)) = pill_frame_on(placement.origin, placement.size, placement.scale, points);
     let position = tauri::PhysicalPosition::new(x, y);
     let size = tauri::PhysicalSize::new(w, h);
 
@@ -730,7 +737,6 @@ fn apply_pill_frame(window: &tauri::WebviewWindow, placement: PillPlacement, poi
         tracing::warn!(error = %err, "could not position the pill");
     }
 }
-
 
 fn menu_error(err: tauri::Error) -> AppError {
     AppError::internal(err).with_detail("building the menu bar item")
@@ -855,10 +861,16 @@ mod tests {
         PILL_SHOWN.store(false, Ordering::SeqCst);
 
         // First appearance.
-        assert!(!PILL_SHOWN.swap(true, Ordering::SeqCst), "first show places");
+        assert!(
+            !PILL_SHOWN.swap(true, Ordering::SeqCst),
+            "first show places"
+        );
 
         // A tick mid-recording is not an appearance.
-        assert!(PILL_SHOWN.swap(true, Ordering::SeqCst), "ticks must not replace");
+        assert!(
+            PILL_SHOWN.swap(true, Ordering::SeqCst),
+            "ticks must not replace"
+        );
 
         // Hide REQUESTED. The animation is still running and the window is
         // still visible to AppKit at this instant — that is the whole point.
@@ -889,7 +901,10 @@ mod tests {
             ("--pill-height-failed", pill.height_failed),
             ("--radius-pill", pill.radius),
         ] {
-            assert!(value > 0.0, "{name} resolved to {value}, which cannot be a size");
+            assert!(
+                value > 0.0,
+                "{name} resolved to {value}, which cannot be a size"
+            );
         }
 
         assert!(

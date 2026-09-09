@@ -1,6 +1,6 @@
 /**
  * SOURCE OF TRUTH KEYWORDS: productHuntLaunch, phListingAssets, launchCoupon
- * WHAT: Product Hunt launch assets and submission package for Murmur.
+ * WHAT: Product Hunt launch assets and submission package for HushWrite.
  * SPEC: Tagline (<60 chars), Description (<260 chars), 3 screenshots, 1 demo GIF,
  *       Maker bio, first-comment talking points, 25% coupon code.
  */
@@ -50,27 +50,27 @@ export interface ProductHuntListing {
 }
 
 export const PRODUCT_HUNT_LAUNCH: ProductHuntListing = {
-  name: "Murmur",
+  name: "HushWrite",
   tagline: "Fast, private on-device voice dictation for macOS & Windows",
   description:
-    "Murmur turns speech into clean, formatted text in any desktop app—running 100% locally on your GPU via whisper.cpp. No cloud audio uploads, no accounts, and sub-180ms latency. Dictate code, notes, and emails with complete privacy.",
+    "HushWrite turns speech into clean, formatted text in any desktop app—running 100% locally on your GPU via whisper.cpp. No cloud audio uploads, no accounts, and sub-180ms latency. Dictate code, notes, and emails with complete privacy.",
   topics: ["Productivity", "Open Source", "Artificial Intelligence", "Developer Tools", "Privacy"],
   pricingType: "Free + Paid Options",
   couponCode: {
     code: "HUNTER25",
     discountPercent: 25,
     description:
-      "25% off Murmur Core Lifetime perpetual license ($49 → $36.75) and Pro Annual ($49/yr → $36.75/yr)",
+      "25% off HushWrite Core Lifetime perpetual license ($49 → $36.75) and Pro Annual ($49/yr → $36.75/yr)",
     targetTiers: ["Core Lifetime", "Pro Annual"],
   },
   maker: {
-    name: "Alex Gutscher & Murmur Core Contributors",
-    role: "Systems Engineer & Creator of Murmur",
-    bio: "Systems engineer obsessed with local-first software, latency optimization, and data sovereignty. Built Murmur to prove that local AI on modern GPUs is faster, cheaper, and fundamentally more private than cloud streaming.",
-    avatarUrl: "https://murmur.app/128x128@2x.png",
+    name: "Alex Gutscher & HushWrite Core Contributors",
+    role: "Systems Engineer & Creator of HushWrite",
+    bio: "Systems engineer obsessed with local-first software, latency optimization, and data sovereignty. Built HushWrite to prove that local AI on modern GPUs is faster, cheaper, and fundamentally more private than cloud streaming.",
+    avatarUrl: "https://HushWrite.app/128x128@2x.png",
     socialLinks: {
       x: "https://x.com/webprodigies",
-      github: "https://github.com/webprodigies/murmur",
+      github: "https://github.com/webprodigies/HushWrite",
     },
   },
   screenshots: [
@@ -126,12 +126,12 @@ export const PRODUCT_HUNT_LAUNCH: ProductHuntListing = {
     ],
   },
   firstComment: {
-    greeting: "Hey Product Hunt! 👋 I'm Alex, creator of Murmur.",
+    greeting: "Hey Product Hunt! 👋 I'm Alex, creator of HushWrite.",
     storyParagraphs: [
       "Over the past year, voice dictation tools experienced a renaissance. Being able to speak at 160 WPM transformed how we draft pull request reviews, write Notion docs, and reply to messages. But when we looked under the hood of popular tools, we were alarmed: almost every single one streams raw microphone audio over WebSockets to remote cloud GPU clusters.",
       "For engineers handling proprietary code, lawyers with privileged briefs, and clinicians writing patient notes, that architecture is a dealbreaker. Furthermore, round-tripping audio to the cloud adds 400–1,200ms of latency, requires continuous Wi-Fi, and ends with a $15/month subscription.",
       "So we asked: Can we run modern speech recognition completely on-device, make it faster than cloud APIs, and keep it 100% free and open source?",
-      "The result is **Murmur**. Built in Rust, Tauri 2, and whisper.cpp, Murmur offloads quantized Whisper models directly to Apple Silicon Metal or Windows DirectML GPUs. It achieves a tail latency of 134–168ms, uses under 45MB of idle RAM, works completely offline on an airplane, and never emits a single byte of telemetry.",
+      "The result is **HushWrite**. Built in Rust, Tauri 2, and whisper.cpp, HushWrite offloads quantized Whisper models directly to Apple Silicon Metal or Windows DirectML GPUs. It achieves a tail latency of 134–168ms, uses under 45MB of idle RAM, works completely offline on an airplane, and never emits a single byte of telemetry.",
     ],
     technicalHighlights: [
       "⚡ 100% Local GPU Inference: Powered by whisper.cpp with native Metal & DirectML shaders.",
@@ -141,7 +141,7 @@ export const PRODUCT_HUNT_LAUNCH: ProductHuntListing = {
       "💻 Native Cross-Platform: Universal binaries for macOS (Apple Silicon & Intel) and Windows 10/11.",
     ],
     offerAnnouncement:
-      "Murmur is 100% free forever for core daily dictation. For power users who want advanced acoustic model switching and professional custom profiles, we're offering 25% off our Core Lifetime perpetual license and Pro tier with code **HUNTER25** for the next 48 hours!",
+      "HushWrite is 100% free forever for core daily dictation. For power users who want advanced acoustic model switching and professional custom profiles, we're offering 25% off our Core Lifetime perpetual license and Pro tier with code **HUNTER25** for the next 48 hours!",
     callToAction:
       "Download the app, disconnect your Wi-Fi, hold ⌥ Space or Alt+Space, and let us know what you think! I'll be hanging out in the comments all day to answer questions about whisper.cpp FFI, DirectML shaders, and audio buffer optimization.",
   },

@@ -29,13 +29,13 @@ pub struct TracingGuard(#[allow(dead_code)] WorkerGuard);
  * WHERE: Called once from lib.rs setup with AppPaths::logs_dir.
  */
 pub fn init_tracing(logs_dir: &std::path::Path) -> TracingGuard {
-    let appender = tracing_appender::rolling::daily(logs_dir, "murmur.log");
+    let appender = tracing_appender::rolling::daily(logs_dir, "HushWrite.log");
     let (writer, guard) = tracing_appender::non_blocking(appender);
 
     // Default to info for our own crate and warn for everything else, so a
     // dependency cannot flood the log. RUST_LOG overrides it during debugging.
     let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("warn,murmur_lib=info"));
+        .unwrap_or_else(|_| EnvFilter::new("warn,HushWrite_lib=info"));
 
     let file_layer = fmt::layer()
         .with_writer(writer)

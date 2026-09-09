@@ -28,9 +28,7 @@ const LIST: CommandSpec = CommandSpec::new("list_dictionary", CapabilityKey::Dic
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_dictionary(
-    state: State<'_, AppState>,
-) -> Result<Vec<DictionaryEntry>, AppError> {
+pub async fn list_dictionary(state: State<'_, AppState>) -> Result<Vec<DictionaryEntry>, AppError> {
     execute(&state, LIST, (), |ctx, ()| async move {
         dictionary::list_entries(ctx.db())
     })
@@ -47,7 +45,7 @@ pub struct CreateDictionaryEntryInput {
 impl Validate for CreateDictionaryEntryInput {
     fn validate(&self) -> Result<(), String> {
         if self.pattern.trim().is_empty() {
-            return Err("Enter the word Murmur keeps getting wrong.".into());
+            return Err("Enter the word HushWrite keeps getting wrong.".into());
         }
         if self.replacement.trim().is_empty() {
             return Err("Enter what it should say instead.".into());
@@ -206,9 +204,7 @@ const CLEAR_CHANGELOG: CommandSpec =
 
 #[tauri::command]
 #[specta::specta]
-pub async fn clear_dictionary_changelog(
-    state: State<'_, AppState>,
-) -> Result<(), AppError> {
+pub async fn clear_dictionary_changelog(state: State<'_, AppState>) -> Result<(), AppError> {
     execute(&state, CLEAR_CHANGELOG, (), |ctx, ()| async move {
         dictionary::clear_changelog(ctx.db())
     })

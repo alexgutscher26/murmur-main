@@ -56,13 +56,13 @@ export function HistoryView({ hotkey, mode }: HistoryViewProps) {
   const [selectedIds, setSelectedIds] = useState<ReadonlySet<string>>(() => new Set());
   const [confirmDelete, setConfirmDelete] = useState<"selected" | "all" | null>(null);
   const [incognito, setIncognito] = useState(() => {
-    return localStorage.getItem("murmur_incognito") === "true";
+    return localStorage.getItem("HushWrite_incognito") === "true";
   });
 
   const toggleIncognito = () => {
     setIncognito((prev) => {
       const next = !prev;
-      localStorage.setItem("murmur_incognito", String(next));
+      localStorage.setItem("HushWrite_incognito", String(next));
       return next;
     });
   };

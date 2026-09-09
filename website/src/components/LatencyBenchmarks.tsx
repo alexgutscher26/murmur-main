@@ -7,9 +7,9 @@ interface BenchmarkMetric {
   id: string;
   name: string;
   category: string;
-  murmurValue: string;
+  HushWriteValue: string;
   cloudValue: string;
-  murmurBarPercent: number; // For visualization
+  HushWriteBarPercent: number; // For visualization
   cloudBarPercent: number;
   diffHighlight: string;
   testMethod: string;
@@ -21,22 +21,22 @@ const BENCHMARKS: BenchmarkMetric[] = [
     id: "tail-latency",
     name: "Tail Latency (Speech End → Injected)",
     category: "Perceived Speed",
-    murmurValue: "140 – 190 ms",
+    HushWriteValue: "140 – 190 ms",
     cloudValue: "450 – 850 ms",
-    murmurBarPercent: 22,
+    HushWriteBarPercent: 22,
     cloudBarPercent: 88,
     diffHighlight: "3.2x Faster",
     testMethod: "M3 Max / Windows RTX 4070 · Whisper Base Q5_0 · 15s utterances",
     description:
-      "Cloud dictation pays a mandatory network round-trip penalty (DNS + TLS handshake + WebSocket upload + cloud inference queue). Murmur decodes inside GPU VRAM immediately.",
+      "Cloud dictation pays a mandatory network round-trip penalty (DNS + TLS handshake + WebSocket upload + cloud inference queue). HushWrite decodes inside GPU VRAM immediately.",
   },
   {
     id: "sustained-wpm",
     name: "Sustained Dictation Throughput",
     category: "Real-Time Factor",
-    murmurValue: "240+ WPM (RTF < 0.08)",
+    HushWriteValue: "240+ WPM (RTF < 0.08)",
     cloudValue: "180 WPM (Throttled)",
-    murmurBarPercent: 95,
+    HushWriteBarPercent: 95,
     cloudBarPercent: 65,
     diffHighlight: "Zero Stalls",
     testMethod: "Continuous 5-minute technical monologue · Zero dropped chunks",
@@ -47,9 +47,9 @@ const BENCHMARKS: BenchmarkMetric[] = [
     id: "technical-wer",
     name: "Technical & Code Vocabulary Accuracy",
     category: "Domain Precision",
-    murmurValue: "98.4% Accuracy",
+    HushWriteValue: "98.4% Accuracy",
     cloudValue: "91.2% Accuracy",
-    murmurBarPercent: 98,
+    HushWriteBarPercent: 98,
     cloudBarPercent: 91,
     diffHighlight: "+7.2% Precision",
     testMethod: "500-sample test set of Rust, TypeScript, CLI flags, and API names",
@@ -60,9 +60,9 @@ const BENCHMARKS: BenchmarkMetric[] = [
     id: "resource-footprint",
     name: "Hardware & Memory Overhead",
     category: "Resource Impact",
-    murmurValue: "~380 MB RAM · <1% CPU idle",
+    HushWriteValue: "~380 MB RAM · <1% CPU idle",
     cloudValue: "600 MB+ (Electron / Web)",
-    murmurBarPercent: 35,
+    HushWriteBarPercent: 35,
     cloudBarPercent: 85,
     diffHighlight: "Rust Native",
     testMethod: "Rust Tauri Native Binary · Persistent warm model state in VRAM",
@@ -73,9 +73,9 @@ const BENCHMARKS: BenchmarkMetric[] = [
     id: "battery-efficiency",
     name: "Battery Consumption Impact",
     category: "Laptop Mobility",
-    murmurValue: "< 1.2% / hour active use",
+    HushWriteValue: "< 1.2% / hour active use",
     cloudValue: "3 – 5% / hour (WiFi streaming)",
-    murmurBarPercent: 25,
+    HushWriteBarPercent: 25,
     cloudBarPercent: 75,
     diffHighlight: "60% Less Battery",
     testMethod: "MacBook Air M2 & ThinkPad X1 Carbon · 60 mins continuous dictation",
@@ -86,9 +86,9 @@ const BENCHMARKS: BenchmarkMetric[] = [
     id: "offline-resilience",
     name: "Offline & High-Jitter Resilience",
     category: "Network Dependency",
-    murmurValue: "100% Unaffected (0 ms jitter)",
+    HushWriteValue: "100% Unaffected (0 ms jitter)",
     cloudValue: "Drops, stalls, or fails",
-    murmurBarPercent: 100,
+    HushWriteBarPercent: 100,
     cloudBarPercent: 30,
     diffHighlight: "Air-Gap Ready",
     testMethod: "Tested in Airplane Mode & simulated 250ms packet loss network",
@@ -124,7 +124,7 @@ export function LatencyBenchmarks() {
             Beat the cloud on latency.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Local AI is only compelling if it feels instantaneous. We engineered Murmur in native
+            Local AI is only compelling if it feels instantaneous. We engineered HushWrite in native
             Rust to outpace cloud WebSocket pipelines at every stage.
           </p>
         </div>
@@ -173,22 +173,22 @@ export function LatencyBenchmarks() {
 
           {/* Side-by-Side Comparison Panels */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
-            {/* Murmur (Local) */}
+            {/* HushWrite (Local) */}
             <div className="p-5 rounded-xl bg-emerald-50/40 border border-emerald-200/90 flex flex-col justify-between relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
               <div>
                 <span className="text-[11px] font-mono text-emerald-700 font-semibold uppercase tracking-wider block mb-1.5">
-                  Murmur (Native On-Device)
+                  HushWrite (Native On-Device)
                 </span>
                 <span className="text-2xl sm:text-3xl font-bold text-neutral-950 font-mono block">
-                  {activeMetric.murmurValue}
+                  {activeMetric.HushWriteValue}
                 </span>
               </div>
               <div className="mt-4">
                 <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden mb-2">
                   <div
                     className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                    style={{ width: `${activeMetric.murmurBarPercent}%` }}
+                    style={{ width: `${activeMetric.HushWriteBarPercent}%` }}
                   />
                 </div>
                 <span className="text-[11px] font-mono text-emerald-700 flex items-center gap-1 font-medium">

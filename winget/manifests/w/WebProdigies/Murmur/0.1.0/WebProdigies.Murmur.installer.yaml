@@ -1,7 +1,7 @@
 # Created using wingetcreate 1.6.5.0
 # yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
 
-PackageIdentifier: WebProdigies.Murmur
+PackageIdentifier: WebProdigies.HushWrite
 PackageVersion: 0.1.0
 InstallerType: nullsoft
 Scope: user
@@ -12,8 +12,8 @@ UpgradeBehavior: install
 Installers:
   - Architecture: x64
     InstallerType: nullsoft
-    InstallerUrl: https://github.com/webprodigies/murmur/releases/download/v0.1.0/murmur_0.1.0_x64-setup.exe
+    InstallerUrl: https://github.com/webprodigies/HushWrite/releases/download/v0.1.0/HushWrite_0.1.0_x64-setup.exe
     InstallerSha256: 5B4D77B455A0201E58A7DC30F79F4036168FADC05D0FF84E8714765B01FBCA3D
-    ProductCode: Murmur
+    ProductCode: HushWrite
 ManifestType: installer
 ManifestVersion: 1.6.0

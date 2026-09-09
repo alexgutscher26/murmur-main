@@ -44,7 +44,7 @@ const PHILOSOPHY_PILLARS = [
     icon: Zap,
     title: "Universal OS Injection",
     description:
-      "Dictate into Cursor, Slack, Notion, Xcode, or Terminal at the OS level. Murmur simulates native key events directly without overwriting your clipboard history.",
+      "Dictate into Cursor, Slack, Notion, Xcode, or Terminal at the OS level. HushWrite simulates native key events directly without overwriting your clipboard history.",
     badge: "Sub-180ms latency",
   },
 ];

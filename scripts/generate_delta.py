@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Binary Delta Patch Generator for Murmur.
+Binary Delta Patch Generator for HushWrite.
 
 Compares an older release binary with a newly compiled binary using bsdiff
 to produce a lightweight delta patch file (.patch).
 
 Usage:
     python scripts/generate_delta.py \
-        --old-binary path/to/murmur-v1.2.0.exe \
-        --new-binary path/to/murmur-v1.2.1.exe \
+        --old-binary path/to/HushWrite-v1.2.0.exe \
+        --new-binary path/to/HushWrite-v1.2.1.exe \
         --from-version 1.2.0 \
         --target-version 1.2.1 \
         --platform windows-x86_64 \
@@ -64,7 +64,7 @@ def generate_patch(old_path: str, new_path: str, out_path: str):
 def update_manifest(manifest_path: str, platform: str, from_version: str, target_version: str, patch_url: str, target_sha256: str, patch_size: int):
     manifest = {
         "version": target_version,
-        "notes": f"Murmur release {target_version}",
+        "notes": f"HushWrite release {target_version}",
         "pub_date": None,
         "platforms": {}
     }
@@ -78,7 +78,7 @@ def update_manifest(manifest_path: str, platform: str, from_version: str, target
 
     if platform not in manifest["platforms"]:
         manifest["platforms"][platform] = {
-            "url": f"https://github.com/webprodigies/murmur/releases/download/v{target_version}/murmur_{target_version}_{platform}.zip",
+            "url": f"https://github.com/webprodigies/HushWrite/releases/download/v{target_version}/HushWrite_{target_version}_{platform}.zip",
             "signature": None,
             "patches": []
         }
@@ -101,7 +101,7 @@ def update_manifest(manifest_path: str, platform: str, from_version: str, target
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate binary delta patches for Murmur.")
+    parser = argparse.ArgumentParser(description="Generate binary delta patches for HushWrite.")
     parser.add_argument("--old-binary", required=True, help="Path to previous version binary")
     parser.add_argument("--new-binary", required=True, help="Path to new version binary")
     parser.add_argument("--from-version", required=True, help="Source version string (e.g. 1.2.0)")
@@ -109,7 +109,7 @@ def main():
     parser.add_argument("--platform", default="windows-x86_64", help="Platform key (windows-x86_64 or darwin-aarch64)")
     parser.add_argument("--output", required=True, help="Output .patch file path")
     parser.add_argument("--manifest", default="dist/latest.json", help="Path to latest.json to update")
-    parser.add_argument("--patch-base-url", default="https://github.com/webprodigies/murmur/releases/download", help="Base URL for release downloads")
+    parser.add_argument("--patch-base-url", default="https://github.com/webprodigies/HushWrite/releases/download", help="Base URL for release downloads")
 
     args = parser.parse_args()
 

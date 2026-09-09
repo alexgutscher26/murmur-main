@@ -6,7 +6,7 @@
  * WHY:   Implements TextInjector for Windows using SendInput and arboard,
  *        respecting per-request delays and clipboard restoration.
  *        Also detects whether the frontmost process is running at a higher
- *        integrity level (elevated / administrator) than Murmur itself.
+ *        integrity level (elevated / administrator) than HushWrite itself.
  *        When it is, User Interface Privilege Isolation (UIPI) will silently
  *        swallow every SendInput call — the clipboard write still succeeds and
  *        the text is there to paste manually, but the automatic Ctrl+V will
@@ -19,11 +19,9 @@
 use std::time::{Duration, Instant};
 
 use arboard::Clipboard;
-use windows::core::{BSTR, Interface};
+use windows::core::{Interface, BSTR};
 use windows::Win32::Foundation::{CloseHandle, HANDLE, HWND};
-use windows::Win32::Security::{
-    GetTokenInformation, TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY,
-};
+use windows::Win32::Security::{GetTokenInformation, TokenElevation, TOKEN_ELEVATION, TOKEN_QUERY};
 use windows::Win32::System::Com::{
     CoCreateInstance, CoInitializeEx, CLSCTX_INPROC_SERVER, COINIT_APARTMENTTHREADED,
 };
@@ -33,7 +31,8 @@ use windows::Win32::System::Threading::{
     PROCESS_QUERY_LIMITED_INFORMATION,
 };
 use windows::Win32::UI::Accessibility::{
-    CUIAutomation, IUIAutomation, IUIAutomationElement, IUIAutomationValuePattern, UIA_ValuePatternId,
+    CUIAutomation, IUIAutomation, IUIAutomationElement, IUIAutomationValuePattern,
+    UIA_ValuePatternId,
 };
 use windows::Win32::UI::Input::KeyboardAndMouse::{
     SendInput, INPUT, INPUT_0, INPUT_KEYBOARD, KEYBDINPUT, KEYBD_EVENT_FLAGS, KEYEVENTF_KEYUP,
@@ -152,7 +151,7 @@ impl<P: PermissionProvider> WindowsInjector<P> {
         if sent1 != paste_down.len() as u32 || sent2 != paste_up.len() as u32 {
             return Err(AppError::new(
                 ErrorCode::InjectionFailed,
-                "Murmur could not send the paste keystroke. Text is copied to clipboard.",
+                "HushWrite could not send the paste keystroke. Text is copied to clipboard.",
             ));
         }
 
@@ -185,7 +184,8 @@ impl<P: PermissionProvider> WindowsInjector<P> {
                     ki: KEYBDINPUT {
                         wVk: windows::Win32::UI::Input::KeyboardAndMouse::VIRTUAL_KEY(0),
                         wScan: ch,
-                        dwFlags: windows::Win32::UI::Input::KeyboardAndMouse::KEYEVENTF_UNICODE | KEYEVENTF_KEYUP,
+                        dwFlags: windows::Win32::UI::Input::KeyboardAndMouse::KEYEVENTF_UNICODE
+                            | KEYEVENTF_KEYUP,
                         time: 0,
                         dwExtraInfo: 0,
                     },
@@ -193,17 +193,12 @@ impl<P: PermissionProvider> WindowsInjector<P> {
             });
         }
 
-        let sent = unsafe {
-            SendInput(
-                &inputs,
-                std::mem::size_of::<INPUT>() as i32,
-            )
-        };
+        let sent = unsafe { SendInput(&inputs, std::mem::size_of::<INPUT>() as i32) };
 
         if sent != inputs.len() as u32 {
             return Err(AppError::new(
                 ErrorCode::InjectionFailed,
-                "Murmur could not simulate direct unicode keyboard input.",
+                "HushWrite could not simulate direct unicode keyboard input.",
             ));
         }
 
@@ -214,7 +209,7 @@ impl<P: PermissionProvider> WindowsInjector<P> {
         Clipboard::new().map_err(|err| {
             AppError::new(
                 ErrorCode::ClipboardUnavailable,
-                "Murmur could not reach the clipboard.",
+                "HushWrite could not reach the clipboard.",
             )
             .with_detail(err)
         })
@@ -225,7 +220,7 @@ impl<P: PermissionProvider> WindowsInjector<P> {
      * WHAT:  Returns true when the process owning `process_id` holds a high or
      *        system integrity token — i.e. it is running as Administrator.
      * WHY:   Windows User Interface Privilege Isolation (UIPI) silently blocks
-     *        cross-integrity SendInput. When Murmur (medium integrity) calls
+     *        cross-integrity SendInput. When HushWrite (medium integrity) calls
      *        SendInput targeting an elevated window (high integrity), the OS
      *        accepts the call (returns success) but never delivers the keystrokes
      *        to the target. There is no error code; the text is on the clipboard
@@ -234,7 +229,7 @@ impl<P: PermissionProvider> WindowsInjector<P> {
      *        rather than leaving the user confused.
      *
      *        Implementation: open the process token with TOKEN_QUERY and call
-     *        GetTokenInformation(TokenElevation). This works even when Murmur
+     *        GetTokenInformation(TokenElevation). This works even when HushWrite
      *        only has PROCESS_QUERY_LIMITED_INFORMATION on the target, because
      *        OpenProcessToken requires PROCESS_QUERY_INFORMATION but we reuse
      *        the same limited handle — it is enough on Windows 10+.
@@ -244,14 +239,11 @@ impl<P: PermissionProvider> WindowsInjector<P> {
      */
     fn is_process_elevated(process_id: u32) -> bool {
         unsafe {
-            let process_handle = match OpenProcess(
-                PROCESS_QUERY_LIMITED_INFORMATION,
-                false,
-                process_id,
-            ) {
-                Ok(h) => h,
-                Err(_) => return false,
-            };
+            let process_handle =
+                match OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, process_id) {
+                    Ok(h) => h,
+                    Err(_) => return false,
+                };
 
             let mut token: HANDLE = HANDLE::default();
             if OpenProcessToken(process_handle, TOKEN_QUERY, &mut token).is_err() {
@@ -293,10 +285,11 @@ impl<P: PermissionProvider> WindowsInjector<P> {
         unsafe {
             let _ = CoInitializeEx(None, COINIT_APARTMENTTHREADED);
 
-            let automation: IUIAutomation = match CoCreateInstance(&CUIAutomation, None, CLSCTX_INPROC_SERVER) {
-                Ok(auto) => auto,
-                Err(_) => return false,
-            };
+            let automation: IUIAutomation =
+                match CoCreateInstance(&CUIAutomation, None, CLSCTX_INPROC_SERVER) {
+                    Ok(auto) => auto,
+                    Err(_) => return false,
+                };
 
             let focused_element: IUIAutomationElement = match automation.GetFocusedElement() {
                 Ok(elem) => elem,
@@ -459,7 +452,7 @@ impl<P: PermissionProvider> TextInjector for WindowsInjector<P> {
                 delivery: DeliveryKind::ClipboardOnly,
                 reason: Some(
                     "The active window is running as Administrator. \
-                     Murmur has copied your text to the clipboard — press Ctrl+V to paste."
+                     HushWrite has copied your text to the clipboard — press Ctrl+V to paste."
                         .to_string(),
                 ),
                 clipboard_write_ms,

@@ -8,7 +8,7 @@
 
 ## 1. Overview & Objectives
 
-This specification defines three interconnected UX improvements for Murmur's floating pill interface:
+This specification defines three interconnected UX improvements for HushWrite's floating pill interface:
 
 1. **Real-time word count**: Continuous feedback to the user estimating words spoken during recording (`~12 words so far`), anchored by interior Whisper chunk decodes.
 2. **Animated recording indicator**: An audio-reactive SVG microphone icon with soundwave arcs replacing the static 2s keyframe dot, scaling and pulsing smoothly with `CaptureEvent::Level` values.

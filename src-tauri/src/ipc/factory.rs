@@ -1,6 +1,6 @@
 /*!
  * SOURCE OF TRUTH KEYWORDS: execute, CommandSpec, Reentrancy, Validate,
- *   ValidationError, murmur_command, preflight_permissions
+ *   ValidationError, HushWrite_command, preflight_permissions
  * WHAT:  The command factory. Every IPC command runs through `execute`, which
  *        validates the input, preflights permissions, guards reentrancy, opens
  *        a tracing span, runs the handler, and maps whatever comes back to an
@@ -21,7 +21,7 @@
 
 use std::future::Future;
 
-use crate::error::{AppError, AppResult, ErrorCode, ErrorAction, PrivacyPane};
+use crate::error::{AppError, AppResult, ErrorAction, ErrorCode, PrivacyPane};
 use crate::ports::permissions::{OsPermission, PermissionState};
 use crate::registry::{self, CapabilityKey};
 
@@ -236,7 +236,10 @@ where
  *        macOS never asks twice.
  * WHERE: Step 2 of execute.
  */
-fn preflight_permissions<R: tauri::Runtime>(state: &AppState<R>, key: CapabilityKey) -> AppResult<()> {
+fn preflight_permissions<R: tauri::Runtime>(
+    state: &AppState<R>,
+    key: CapabilityKey,
+) -> AppResult<()> {
     let Some(capability) = registry::capability(key) else {
         // A command naming a capability that is not declared is a wiring bug,
         // not a user problem — fail loudly rather than running unprotected.
@@ -260,7 +263,7 @@ fn preflight_permissions<R: tauri::Runtime>(state: &AppState<R>, key: Capability
         return Err(match (permission, state) {
             // Asked, and the dialog is still on screen. The remedy is to answer
             // it and try again — NOT a trip to System Settings, which would not
-            // list Murmur yet.
+            // list HushWrite yet.
             (OsPermission::Microphone, PermissionState::NotDetermined) => {
                 AppError::microphone_pending()
             }
@@ -369,18 +372,17 @@ mod tests {
 
     // ── Integration tests for execute end-to-end through a test AppHandle ───
 
-    use std::sync::Arc;
-    use std::sync::atomic::{AtomicBool, Ordering};
-    use std::path::PathBuf;
-    use tauri::Manager;
     use crate::config::AppPaths;
     use crate::db::Database;
     use crate::error::ErrorCode;
     use crate::ipc::context::{Ports, SessionHandle};
     use crate::ports::{
-        AudioSource, EventSink, ModelStore, PermissionProvider, TextInjector,
-        TranscriptionEngine,
+        AudioSource, EventSink, ModelStore, PermissionProvider, TextInjector, TranscriptionEngine,
     };
+    use std::path::PathBuf;
+    use std::sync::atomic::{AtomicBool, Ordering};
+    use std::sync::Arc;
+    use tauri::Manager;
 
     struct DummyEngine;
     impl TranscriptionEngine for DummyEngine {
@@ -413,15 +415,14 @@ mod tests {
     struct DummySession;
     impl crate::ports::audio::CaptureSession for DummySession {
         fn device(&self) -> &crate::types::DeviceInfo {
-            static INFO: once_cell::sync::Lazy<crate::types::DeviceInfo> = once_cell::sync::Lazy::new(|| {
-                crate::types::DeviceInfo {
+            static INFO: once_cell::sync::Lazy<crate::types::DeviceInfo> =
+                once_cell::sync::Lazy::new(|| crate::types::DeviceInfo {
                     id: "dummy".into(),
                     name: "Dummy".into(),
                     is_default: true,
                     sample_rate: 16000,
                     channels: 1,
-                }
-            });
+                });
             &INFO
         }
         fn native_sample_rate(&self) -> u32 {
@@ -481,7 +482,10 @@ mod tests {
         async fn list(&self) -> AppResult<Vec<crate::ports::models::ModelStatus>> {
             Ok(vec![])
         }
-        async fn status(&self, id: &crate::types::ModelId) -> AppResult<crate::ports::models::ModelStatus> {
+        async fn status(
+            &self,
+            id: &crate::types::ModelId,
+        ) -> AppResult<crate::ports::models::ModelStatus> {
             Err(AppError::not_found(id.as_str()))
         }
         async fn ensure(&self, _id: &crate::types::ModelId) -> AppResult<PathBuf> {
@@ -505,7 +509,12 @@ mod tests {
         fn partial_transcript(&self, _text: &str) {}
         fn backtrack_occurred(&self, _message: &str) {}
         fn set_cancel_key_active(&self, _active: bool) {}
-        fn model_state_changed(&self, _model_id: crate::types::ModelId, _state: crate::types::ModelState) {}
+        fn model_state_changed(
+            &self,
+            _model_id: crate::types::ModelId,
+            _state: crate::types::ModelState,
+        ) {
+        }
     }
 
     struct MockPermissions {
@@ -573,16 +582,24 @@ mod tests {
         let ran = Arc::clone(&handler_ran);
 
         // Invalid input (-10) should fail validation immediately.
-        let result = execute(&state, spec, Input { value: -10 }, |_ctx, _inp| async move {
-            ran.store(true, Ordering::SeqCst);
-            Ok("unreachable")
-        })
+        let result = execute(
+            &state,
+            spec,
+            Input { value: -10 },
+            |_ctx, _inp| async move {
+                ran.store(true, Ordering::SeqCst);
+                Ok("unreachable")
+            },
+        )
         .await;
 
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert_eq!(err.code, ErrorCode::InvalidInput);
-        assert!(!handler_ran.load(Ordering::SeqCst), "handler must not run on validation failure");
+        assert!(
+            !handler_ran.load(Ordering::SeqCst),
+            "handler must not run on validation failure"
+        );
     }
 
     #[tokio::test]
@@ -605,8 +622,16 @@ mod tests {
         assert!(result.is_err());
         let err = result.unwrap_err();
         assert_eq!(err.code, ErrorCode::MicrophoneDenied);
-        assert!(matches!(err.action, Some(ErrorAction::OpenPrivacyPane { pane: PrivacyPane::Microphone })));
-        assert!(!handler_ran.load(Ordering::SeqCst), "handler must not run when permissions are denied");
+        assert!(matches!(
+            err.action,
+            Some(ErrorAction::OpenPrivacyPane {
+                pane: PrivacyPane::Microphone
+            })
+        ));
+        assert!(
+            !handler_ran.load(Ordering::SeqCst),
+            "handler must not run when permissions are denied"
+        );
     }
 
     #[tokio::test]
@@ -629,7 +654,10 @@ mod tests {
 
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), "reports_ok");
-        assert!(handler_ran.load(Ordering::SeqCst), "handler should run when spec declares reports()");
+        assert!(
+            handler_ran.load(Ordering::SeqCst),
+            "handler should run when spec declares reports()"
+        );
     }
 
     #[tokio::test]
@@ -644,10 +672,14 @@ mod tests {
         let state_clone = state.clone();
         let result = execute(&state, spec, Input { value: 1 }, |_ctx, _inp| async move {
             // Inside the exclusive execution, attempt another exclusive call for the same capability.
-            let nested_spec = CommandSpec::new("nested_exclusive_op", CapabilityKey::Dictation).exclusive();
-            let nested_res = execute(&state_clone, nested_spec, Input { value: 2 }, |_c, _i| async move {
-                Ok("nested_ok")
-            })
+            let nested_spec =
+                CommandSpec::new("nested_exclusive_op", CapabilityKey::Dictation).exclusive();
+            let nested_res = execute(
+                &state_clone,
+                nested_spec,
+                Input { value: 2 },
+                |_c, _i| async move { Ok("nested_ok") },
+            )
             .await;
 
             assert!(nested_res.is_err());
@@ -682,11 +714,16 @@ mod tests {
         let managed_state = app.state::<AppState<tauri::test::MockRuntime>>();
         let spec = CommandSpec::new("managed_cmd", CapabilityKey::History);
 
-        let result = execute(&managed_state, spec, Input { value: 100 }, |ctx, inp| async move {
-            assert!(!ctx.correlation_id.is_empty());
-            assert_eq!(ctx.paths().data_dir, PathBuf::from("/test/data"));
-            Ok(inp.value * 2)
-        })
+        let result = execute(
+            &managed_state,
+            spec,
+            Input { value: 100 },
+            |ctx, inp| async move {
+                assert!(!ctx.correlation_id.is_empty());
+                assert_eq!(ctx.paths().data_dir, PathBuf::from("/test/data"));
+                Ok(inp.value * 2)
+            },
+        )
         .await;
 
         assert!(result.is_ok());

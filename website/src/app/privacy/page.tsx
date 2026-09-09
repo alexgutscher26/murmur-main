@@ -3,9 +3,9 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
 export const metadata = {
-  title: "Privacy Architecture & Verifiability Ledger · Murmur",
+  title: "Privacy Architecture & Verifiability Ledger · HushWrite",
   description:
-    "Plain-English, auditable proof of how Murmur processes voice, audio, and transcriptions 100% locally on your machine. Zero cloud streaming, zero accounts, zero telemetry.",
+    "Plain-English, auditable proof of how HushWrite processes voice, audio, and transcriptions 100% locally on your machine. Zero cloud streaming, zero accounts, zero telemetry.",
 };
 
 const DATA_BOUNDARY_MATRIX = [
@@ -53,7 +53,7 @@ const DATA_BOUNDARY_MATRIX = [
   },
   {
     type: "Whisper AI Model Weights",
-    storage: "Local Disk (`~/.murmur/models`)",
+    storage: "Local Disk (`~/.HushWrite/models`)",
     cloud: "1-time download from HuggingFace/GitHub",
     retention: "Permanent offline storage",
     status: "Air-Gap Ready",
@@ -75,47 +75,47 @@ const VERIFICATION_QUESTIONS = [
   },
   {
     q: "Are transcripts ever uploaded? — No, never.",
-    a: "No. Never. Transcripts are generated locally on-device and typed directly into your active window at your cursor position via native OS keyboard injection. Murmur maintains no cloud transcript databases, remote backups, or synchronization servers. Your spoken words never touch an external server.",
+    a: "No. Never. Transcripts are generated locally on-device and typed directly into your active window at your cursor position via native OS keyboard injection. HushWrite maintains no cloud transcript databases, remote backups, or synchronization servers. Your spoken words never touch an external server.",
     badge: "0 Cloud Transcripts",
   },
   {
     q: "Does the product work with no internet connection?",
-    a: "Yes, 100%. Once model weights are stored on your local disk, Murmur requires zero internet connectivity to operate. You can dictate on airplanes, in air-gapped secure development facilities, or during network outages with zero drop in speed or accuracy.",
+    a: "Yes, 100%. Once model weights are stored on your local disk, HushWrite requires zero internet connectivity to operate. You can dictate on airplanes, in air-gapped secure development facilities, or during network outages with zero drop in speed or accuracy.",
     badge: "100% Offline Capable",
   },
   {
     q: "What data leaves the device for licensing, updates, or error reporting?",
-    a: "Murmur is free and open-source under the MIT license, so there are zero licensing calls, seat tracking, or activation checks. For software updates, Murmur makes an optional, read-only HTTPS query to the official public GitHub Releases API to check version tags (which can be disabled with one click in Settings). Zero crash logs, stack traces, or error diagnostics leave your machine.",
+    a: "HushWrite is free and open-source under the MIT license, so there are zero licensing calls, seat tracking, or activation checks. For software updates, HushWrite makes an optional, read-only HTTPS query to the official public GitHub Releases API to check version tags (which can be disabled with one click in Settings). Zero crash logs, stack traces, or error diagnostics leave your machine.",
     badge: "Zero Licensing Telemetry",
   },
   {
     q: "Is analytics disabled by default?",
-    a: "Yes. Telemetry and analytics are zero by default—Murmur contains no analytics SDKs, telemetry beacons, Google Analytics, PostHog, or third-party tracking scripts. We do not track words spoken, session frequencies, or what applications you dictate into.",
+    a: "Yes. Telemetry and analytics are zero by default—HushWrite contains no analytics SDKs, telemetry beacons, Google Analytics, PostHog, or third-party tracking scripts. We do not track words spoken, session frequencies, or what applications you dictate into.",
     badge: "Zero Analytics by Default",
   },
   {
     q: "Can users delete all local history?",
-    a: "Yes. Local history is stored in an on-device SQLite database (`murmur.db`). You can purge your entire history at any time with a single click in Settings, configure automatic purge retention rules (e.g. wipe after 24 hours, 7 days, or 30 days), or use Incognito Mode so transcripts are never written to disk in the first place.",
+    a: "Yes. Local history is stored in an on-device SQLite database (`HushWrite.db`). You can purge your entire history at any time with a single click in Settings, configure automatic purge retention rules (e.g. wipe after 24 hours, 7 days, or 30 days), or use Incognito Mode so transcripts are never written to disk in the first place.",
     badge: "1-Click Wipe & Incognito",
   },
   {
     q: "What model runs locally?",
-    a: "Murmur runs open-source OpenAI Whisper architecture models compiled into compact, quantized GGML weights (Tiny, Base, Small, Medium, and Large-v3-Turbo) using whisper.cpp. Models execute natively with GPU hardware acceleration via Apple Metal on macOS and DirectML or CUDA on Windows.",
+    a: "HushWrite runs open-source OpenAI Whisper architecture models compiled into compact, quantized GGML weights (Tiny, Base, Small, Medium, and Large-v3-Turbo) using whisper.cpp. Models execute natively with GPU hardware acceleration via Apple Metal on macOS and DirectML or CUDA on Windows.",
     badge: "Open-Source Whisper Models",
   },
   {
     q: "Can advanced users block the app's network access and retain core functionality?",
-    a: "Yes. Advanced users and IT administrators can block Murmur in Windows Defender Firewall, Little Snitch, LuLu, or pf, or toggle Murmur's built-in 'Air-Gap Mode' in Settings. Core dictation, custom phonetic dictionary biasing, and context-aware formatting continue to function with 100% reliability.",
+    a: "Yes. Advanced users and IT administrators can block HushWrite in Windows Defender Firewall, Little Snitch, LuLu, or pf, or toggle HushWrite's built-in 'Air-Gap Mode' in Settings. Core dictation, custom phonetic dictionary biasing, and context-aware formatting continue to function with 100% reliability.",
     badge: "Firewall & Air-Gap Friendly",
   },
   {
-    q: "How does Murmur differ from cloud dictation tools like Wispr Flow?",
-    a: "Cloud tools like Wispr Flow stream your voice over WebSockets to remote GPU clusters, store transcripts in cloud databases, and use cloud LLMs for post-processing. Murmur executes speech recognition and prompt formatting on your local hardware using whisper.cpp with sub-180ms latency.",
+    q: "How does HushWrite differ from cloud dictation tools like Wispr Flow?",
+    a: "Cloud tools like Wispr Flow stream your voice over WebSockets to remote GPU clusters, store transcripts in cloud databases, and use cloud LLMs for post-processing. HushWrite executes speech recognition and prompt formatting on your local hardware using whisper.cpp with sub-180ms latency.",
     badge: "Architecture vs Policy",
   },
   {
     q: "How can I independently test and verify these claims?",
-    a: "You can monitor Murmur using standard packet capture tools (Wireshark, Little Snitch, LuLu, or Windows pktmon). When you press the dictation hotkey and speak for 10 minutes, your network monitor will register exactly 0 bytes of egress traffic.",
+    a: "You can monitor HushWrite using standard packet capture tools (Wireshark, Little Snitch, LuLu, or Windows pktmon). When you press the dictation hotkey and speak for 10 minutes, your network monitor will register exactly 0 bytes of egress traffic.",
     badge: "Verifiable by Anyone",
   },
 ];
@@ -125,7 +125,7 @@ const REPRODUCIBLE_TEST_RECIPES = [
     os: "macOS",
     tool: "Little Snitch / LuLu",
     title: "Real-Time Connection Monitoring",
-    command: "lulu --monitor /Applications/Murmur.app",
+    command: "lulu --monitor /Applications/HushWrite.app",
     description:
       "Launch LuLu or Little Snitch in Alert Mode. Start dictating in any application. Notice that zero connection alert prompts appear during voice capture, decode, or text insertion.",
   },
@@ -133,9 +133,9 @@ const REPRODUCIBLE_TEST_RECIPES = [
     os: "Windows",
     tool: "Pktmon / Wireshark",
     title: "Packet Inspection During Dictation",
-    command: "pktmon filter add -n murmur && pktmon start --etw",
+    command: "pktmon filter add -n HushWrite && pktmon start --etw",
     description:
-      "Bind packet monitor to Murmur.exe. Dictate high-entropy paragraphs. Stop the trace and inspect the capture: zero TCP/UDP packets leave your network interface.",
+      "Bind packet monitor to HushWrite.exe. Dictate high-entropy paragraphs. Stop the trace and inspect the capture: zero TCP/UDP packets leave your network interface.",
   },
   {
     os: "Linux / Cross-Platform",
@@ -143,7 +143,7 @@ const REPRODUCIBLE_TEST_RECIPES = [
     title: "Process Bandwidth Auditing",
     command: "sudo nethogs -d 1",
     description:
-      "Monitor process bandwidth in real-time. Dictate for several minutes continuously. Murmur will register 0 KB/s upload and 0 KB/s download.",
+      "Monitor process bandwidth in real-time. Dictate for several minutes continuously. HushWrite will register 0 KB/s upload and 0 KB/s download.",
   },
 ];
 
@@ -175,7 +175,7 @@ export default function PrivacyPage() {
 
           <p className="text-base sm:text-lg text-neutral-600 leading-relaxed font-normal">
             Cloud dictation services ask you to trust legal privacy policies while streaming your
-            raw voice to remote servers. Murmur protects your confidential thoughts with physical
+            raw voice to remote servers. HushWrite protects your confidential thoughts with physical
             architecture:{" "}
             <strong className="text-neutral-950 font-semibold">your voice never leaves your device.</strong>
           </p>
@@ -283,7 +283,7 @@ export default function PrivacyPage() {
         <div className="p-6 sm:p-8 rounded-2xl bg-white border border-neutral-200/90 shadow-sm mb-14">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
             <div>
-              <h2 className="text-xl font-bold text-neutral-950">The Murmur Local Data Boundary</h2>
+              <h2 className="text-xl font-bold text-neutral-950">The HushWrite Local Data Boundary</h2>
               <p className="text-xs sm:text-sm text-neutral-600">
                 A line-by-line breakdown of every data asset and its storage guarantee.
               </p>
@@ -366,7 +366,7 @@ export default function PrivacyPage() {
             </h2>
             <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
               Don&apos;t take our word for it. Here is how security teams, enterprise compliance
-              officers, and power users can independently verify Murmur with network inspection
+              officers, and power users can independently verify HushWrite with network inspection
               tools:
             </p>
           </div>
@@ -421,7 +421,7 @@ export default function PrivacyPage() {
             <div className="p-5 rounded-xl bg-emerald-50/30 border border-emerald-200/80">
               <h3 className="text-sm font-bold text-neutral-950 mb-3 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                Murmur On-Device Architecture
+                HushWrite On-Device Architecture
               </h3>
               <ul className="space-y-2 text-xs text-neutral-700 list-disc list-inside">
                 <li>0 bytes of audio or transcript leave your physical hardware.</li>
@@ -444,7 +444,7 @@ export default function PrivacyPage() {
               Dictate with total confidence.
             </h2>
             <p className="text-sm text-neutral-400">
-              Murmur is free, open source, and built for people who value privacy as an absolute guarantee.
+              HushWrite is free, open source, and built for people who value privacy as an absolute guarantee.
             </p>
           </div>
 
@@ -453,7 +453,7 @@ export default function PrivacyPage() {
               href="/#download"
               className="px-7 py-3.5 rounded-xl bg-white text-neutral-950 font-semibold hover:bg-neutral-100 transition-all text-sm shadow-md"
             >
-              Download Murmur Free
+              Download HushWrite Free
             </Link>
             <Link
               href="/"

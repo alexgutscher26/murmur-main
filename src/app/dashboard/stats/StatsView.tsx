@@ -234,7 +234,7 @@ export function StatsView({ metrics, hotkey, mode }: StatsViewProps) {
               {/* Left Content */}
               <div className="relative z-10 p-6 max-w-md">
                 <h2 className="text-[17px] font-medium tracking-tight text-white mb-1">
-                  Make Murmur sound like{" "}
+                  Make HushWrite sound like{" "}
                   <span className="font-serif italic font-normal text-amber-100 text-xl">you</span>
                 </h2>
                 <p className="text-xs text-stone-400 font-normal mb-4">

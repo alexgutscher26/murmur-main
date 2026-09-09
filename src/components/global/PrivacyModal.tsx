@@ -1,6 +1,6 @@
 /**
  * SOURCE OF TRUTH KEYWORDS: PrivacyModal, privacy-policy, local-data-boundary, on-device-proof
- * WHAT:  The "Privacy & Local Data Architecture" modal in Murmur.
+ * WHAT:  The "Privacy & Local Data Architecture" modal in HushWrite.
  * WHY:   Gives users immediate, transparent, and auditable proof that all audio processing,
  *        model weights, transcripts, custom dictionary entries, and settings reside 100% locally.
  * WHERE: Triggered from onboarding tour, permission steps, or settings view.
@@ -47,7 +47,7 @@ const PRIVACY_POINTS: PrivacyPoint[] = [
     icon: <EyeOff className="size-4 text-text-primary" />,
     title: "Zero Telemetry & No Analytics",
     description:
-      "Murmur has no tracking beacons, telemetry SDKs, or analytics trackers. We do not track words spoken, dictation duration, or active applications.",
+      "HushWrite has no tracking beacons, telemetry SDKs, or analytics trackers. We do not track words spoken, dictation duration, or active applications.",
     badge: "No Trackers",
   },
   {
@@ -106,7 +106,7 @@ export function PrivacyModal({ isOpen, onClose }: PrivacyModalProps) {
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
           <div className="rounded-input bg-sunken/60 p-3 text-caption text-text-secondary leading-relaxed border border-[var(--border-hairline)]">
-            Murmur is engineered as a zero-cloud utility. Your speech is processed locally on your
+            HushWrite is engineered as a zero-cloud utility. Your speech is processed locally on your
             machine and never leaves your computer.
           </div>
 

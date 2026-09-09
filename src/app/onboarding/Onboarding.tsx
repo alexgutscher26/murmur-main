@@ -178,7 +178,7 @@ export function Onboarding() {
       ) : !micGranted ? (
         <StepShell
           title="Two permissions"
-          description="Murmur runs entirely on your Mac. It needs the microphone to hear you, and accessibility to paste for you."
+          description="HushWrite runs entirely on your Mac. It needs the microphone to hear you, and accessibility to paste for you."
         >
           <PermissionStep
             reports={permissions.data ?? []}
@@ -204,7 +204,7 @@ export function Onboarding() {
       ) : !tutorialDone ? (
         <StepShell
           title="Guided Practice"
-          description="Practice dictating a messy thought and watch Murmur turn it into clean formatted text."
+          description="Practice dictating a messy thought and watch HushWrite turn it into clean formatted text."
         >
           <TutorialStep
             hotkey={hotkey}

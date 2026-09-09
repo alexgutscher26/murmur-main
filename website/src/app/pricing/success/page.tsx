@@ -58,7 +58,7 @@ function SuccessContent() {
       {/* Celebration badge */}
       <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200/90 text-emerald-800 text-xs font-mono font-semibold mb-6 shadow-sm">
         <CheckCircle2 className="size-4 text-emerald-600" />
-        Payment Verified · Welcome to Murmur Pro
+        Payment Verified · Welcome to HushWrite Pro
       </div>
 
       <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-neutral-950 mb-4">
@@ -112,7 +112,7 @@ function SuccessContent() {
             </button>
 
             <a
-              href={`murmur://activate?key=${encodeURIComponent(licenseKey)}`}
+              href={`HushWrite://activate?key=${encodeURIComponent(licenseKey)}`}
               className="px-4 py-2.5 rounded-xl bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-xs shrink-0 cursor-pointer"
             >
               <span>Activate in App</span>
@@ -124,16 +124,16 @@ function SuccessContent() {
         {/* Activation Steps */}
         <div className="pt-2">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 mb-3">
-            How to activate inside Murmur:
+            How to activate inside HushWrite:
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <div className="p-3 rounded-xl bg-neutral-50/70 border border-neutral-200/70">
               <span className="w-5 h-5 rounded-full bg-neutral-900 text-white flex items-center justify-center font-bold text-[10px] mb-2">
                 1
               </span>
-              <span className="font-semibold text-neutral-900 block">Open Murmur Desktop</span>
+              <span className="font-semibold text-neutral-900 block">Open HushWrite Desktop</span>
               <span className="text-neutral-500 text-[11px]">
-                Launch Murmur on your Mac or Windows machine.
+                Launch HushWrite on your Mac or Windows machine.
               </span>
             </div>
 

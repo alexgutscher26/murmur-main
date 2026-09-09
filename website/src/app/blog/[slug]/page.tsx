@@ -18,10 +18,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const post = BLOG_POSTS.find((p) => p.slug === slug);
-  if (!post) return { title: "Article Not Found · Murmur" };
+  if (!post) return { title: "Article Not Found · HushWrite" };
 
   return {
-    title: `${post.title} · Murmur Blog`,
+    title: `${post.title} · HushWrite Blog`,
     description: post.description,
     keywords: post.keywords,
     openGraph: {
@@ -372,14 +372,14 @@ export default async function BlogPostPage({ params }: Props) {
             Experience 100% On-Device Voice Typing
           </h2>
           <p className="text-xs sm:text-sm text-neutral-400 max-w-md mx-auto mb-6 leading-relaxed">
-            Murmur runs locally on your Mac or Windows PC. No cloud transcription, no audio uploads,
+            HushWrite runs locally on your Mac or Windows PC. No cloud transcription, no audio uploads,
             zero subscriptions.
           </p>
           <a
             href="/#download"
             className="inline-block text-sm font-semibold text-neutral-950 bg-white hover:bg-neutral-100 px-6 py-2.5 rounded-xl transition-colors shadow-md"
           >
-            Download Murmur (Free Forever)
+            Download HushWrite (Free Forever)
           </a>
         </div>
 

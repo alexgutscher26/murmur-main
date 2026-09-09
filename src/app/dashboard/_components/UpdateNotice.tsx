@@ -220,7 +220,7 @@ export function UpdateNotice() {
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-sm font-bold text-stone-900 dark:text-white">
-                    What&apos;s New in Murmur {version}
+                    What&apos;s New in HushWrite {version}
                   </h3>
                   <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
                     Ready to install
@@ -275,7 +275,7 @@ export function UpdateNotice() {
             ) : (
               <>
                 <span className="font-semibold text-stone-900 dark:text-white">
-                  Murmur {version}
+                  HushWrite {version}
                 </span>{" "}
                 is downloaded and ready to install.
               </>

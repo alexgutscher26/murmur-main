@@ -212,7 +212,9 @@ pub fn latest_session_timestamp(db: &Database) -> AppResult<Option<i64>> {
               WHERE outcome = ?1",
         )?;
         let ts: Option<i64> = stmt
-            .query_row(rusqlite::params![SessionOutcome::Delivered.as_str()], |r| r.get(0))
+            .query_row(rusqlite::params![SessionOutcome::Delivered.as_str()], |r| {
+                r.get(0)
+            })
             .optional()?;
         Ok(ts)
     })
@@ -246,10 +248,11 @@ pub fn referral_status(db: &Database) -> AppResult<ReferralStatus> {
         Some(SettingValue::Text(code)) if !code.is_empty() => code,
         _ => {
             let alphabet = b"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-            let mut code = String::from("MURMUR-");
+            let mut code = String::from("HushWrite-");
             let now_u = now as usize;
             for i in 0..6 {
-                let idx = (now_u.wrapping_add(i * 37 + (tot.session_count as usize * 17))) % alphabet.len();
+                let idx = (now_u.wrapping_add(i * 37 + (tot.session_count as usize * 17)))
+                    % alphabet.len();
                 code.push(alphabet[idx] as char);
             }
             let _ = crate::services::settings::set_setting(
@@ -264,7 +267,7 @@ pub fn referral_status(db: &Database) -> AppResult<ReferralStatus> {
 
     let threshold = 50;
     let eligible = onboarding_done && tot.session_count >= threshold && !dismissed;
-    let referral_url = format!("https://murmur.app/invite?ref={referral_code}");
+    let referral_url = format!("https://HushWrite.app/invite?ref={referral_code}");
 
     Ok(ReferralStatus {
         eligible,
@@ -397,7 +400,9 @@ mod tests {
         let status = referral_status(&db)?;
         assert!(status.eligible);
         assert_eq!(status.session_count, 50);
-        assert!(status.referral_url.contains("https://murmur.app/invite?ref=MURMUR-"));
+        assert!(status
+            .referral_url
+            .contains("https://HushWrite.app/invite?ref=HushWrite-"));
 
         // 4. Dismiss referral prompt
         dismiss_referral_prompt(&db)?;

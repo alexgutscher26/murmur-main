@@ -25,7 +25,7 @@ export default function NotFound() {
       </h1>
 
       <p className="text-neutral-600 text-sm max-w-sm mb-8 leading-relaxed font-normal">
-        The requested page does not exist or has been moved. Return to the Murmur homepage to
+        The requested page does not exist or has been moved. Return to the HushWrite homepage to
         download the app or explore features.
       </p>
 

@@ -28,9 +28,9 @@ const CUSTOM_FEATURES: CustomFeature[] = [
   2. Toggle Air-Gap mode
 - **Expected:** Sockets close immediately
 - **Actual:** Verified 0 bytes egress
-- **Environment:** Murmur v0.1.0 · macOS Sonoma`,
+- **Environment:** HushWrite v0.1.0 · macOS Sonoma`,
     description:
-      "Define vocal expanders. When you say 'bug template', 'schedule link', or 'invoice address', Murmur replaces the phrase with your structured schema immediately.",
+      "Define vocal expanders. When you say 'bug template', 'schedule link', or 'invoice address', HushWrite replaces the phrase with your structured schema immediately.",
   },
   {
     id: "per-app",
@@ -105,7 +105,7 @@ export function CustomizationShowcase() {
             Own your customization.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Generic cloud dictation gives you one rigid output style. Murmur gives you complete
+            Generic cloud dictation gives you one rigid output style. HushWrite gives you complete
             local automation, vocal snippets, and portable dictionaries.
           </p>
         </div>

@@ -193,7 +193,7 @@ const CREATOR_PILLARS = [
   {
     icon: <Mic className="w-5 h-5 text-emerald-600" />,
     title: "Brainstorm & Script Out Loud",
-    desc: "Beat writer's block instantly. Talk through your ideas on a walk, in the car, or at your desk. Murmur formats your spoken thoughts into clean, structured prose.",
+    desc: "Beat writer's block instantly. Talk through your ideas on a walk, in the car, or at your desk. HushWrite formats your spoken thoughts into clean, structured prose.",
   },
   {
     icon: <Brain className="w-5 h-5 text-purple-500" />,
@@ -230,37 +230,37 @@ const CREATOR_PILLARS = [
 const CREATOR_COMPARISONS = [
   {
     feature: "Script & Idea Privacy",
-    murmur: "100% On-Device (0 bytes cloud upload)",
+    HushWrite: "100% On-Device (0 bytes cloud upload)",
     wispr: "Cloud streaming (Sent to servers)",
   },
   {
     feature: "Offline & Airplane Mode",
-    murmur: "Full functionality without Wi-Fi",
+    HushWrite: "Full functionality without Wi-Fi",
     wispr: "Requires active Internet connection",
   },
   {
     feature: "X & LinkedIn Thread Macros",
-    murmur: "Built-in X thread delimiters, LinkedIn hooks, and carousel templates",
+    HushWrite: "Built-in X thread delimiters, LinkedIn hooks, and carousel templates",
     wispr: "Generic cloud rewriting without thread delimiters",
   },
   {
     feature: "Scriptwriting & Hook Templates",
-    murmur: "Built-in voice macros (YouTube, Substack, Reels, X, LinkedIn)",
+    HushWrite: "Built-in voice macros (YouTube, Substack, Reels, X, LinkedIn)",
     wispr: "Standard AI rewriting",
   },
   {
     feature: "AI Prompt Context Capacity",
-    murmur: "Unlimited words, zero cloud throttle",
+    HushWrite: "Unlimited words, zero cloud throttle",
     wispr: "Cloud token limits & tiers",
   },
   {
     feature: "Audio Retention Policy",
-    murmur: "Instantly freed from RAM (0 storage)",
+    HushWrite: "Instantly freed from RAM (0 storage)",
     wispr: "Cloud server audio logs",
   },
   {
     feature: "Pricing Model",
-    murmur: "Free Starter / $49 Lifetime perpetual",
+    HushWrite: "Free Starter / $49 Lifetime perpetual",
     wispr: "$12/month ($144/year recurring)",
   },
 ];
@@ -300,7 +300,7 @@ export default function CreatorsPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed font-normal">
-            Murmur gives creators hours back every week by replacing typing, editing, and creative
+            HushWrite gives creators hours back every week by replacing typing, editing, and creative
             friction with your natural voice. Dictate viral threads on{" "}
             <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-neutral-100 border border-neutral-200 text-xs font-mono text-neutral-800">
               X (Twitter)
@@ -322,7 +322,7 @@ export default function CreatorsPage() {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white text-sm font-semibold shadow-md transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
             >
               <Download className="w-4 h-4 text-emerald-400" />
-              <span>Download Murmur Free</span>
+              <span>Download HushWrite Free</span>
               <span className="text-xs text-neutral-400 font-normal">Windows & Mac</span>
             </Link>
             <Link
@@ -487,7 +487,7 @@ export default function CreatorsPage() {
           <p className="text-sm sm:text-base text-neutral-700 leading-relaxed max-w-3xl">
             Cloud dictation services upload your voice, audio recordings, and confidential draft
             text to external servers where they can be retained or used for third-party AI
-            training. <strong className="text-neutral-950 font-semibold">Murmur never touches the Internet.</strong> Your
+            training. <strong className="text-neutral-950 font-semibold">HushWrite never touches the Internet.</strong> Your
             video ideas, client NDAs, sponsor pricing negotiations, and private creative drafts
             exist solely in your computer's memory.
           </p>
@@ -513,7 +513,7 @@ export default function CreatorsPage() {
               </span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-neutral-950">
-              Murmur vs. Wispr Flow for Creators
+              HushWrite vs. Wispr Flow for Creators
             </h2>
             <p className="text-base text-neutral-600">
               Compare local offline speech-to-text with cloud monthly subscriptions.
@@ -526,7 +526,7 @@ export default function CreatorsPage() {
                 <tr className="border-b border-neutral-200/80 bg-neutral-50/80 font-mono text-xs text-neutral-900 uppercase tracking-wider">
                   <th className="p-4 sm:p-5 font-semibold">Feature / Privacy Guard</th>
                   <th className="p-4 sm:p-5 font-bold text-emerald-800 bg-emerald-50/30">
-                    Murmur (100% On-Device)
+                    HushWrite (100% On-Device)
                   </th>
                   <th className="p-4 sm:p-5 text-neutral-500 font-normal">Wispr Flow (Cloud)</th>
                 </tr>
@@ -538,7 +538,7 @@ export default function CreatorsPage() {
                       {row.feature}
                     </td>
                     <td className="p-4 sm:p-5 text-xs font-mono font-bold text-emerald-700 bg-emerald-50/20">
-                      {row.murmur}
+                      {row.HushWrite}
                     </td>
                     <td className="p-4 sm:p-5 text-xs font-mono text-neutral-500">
                       {row.wispr}
@@ -563,7 +563,7 @@ export default function CreatorsPage() {
               Start Creating at the Speed of Speech
             </h2>
             <p className="text-sm text-neutral-400">
-              Join thousands of writers, YouTubers, and podcasters drafting 4x faster with Murmur.
+              Join thousands of writers, YouTubers, and podcasters drafting 4x faster with HushWrite.
             </p>
           </div>
 
@@ -572,7 +572,7 @@ export default function CreatorsPage() {
               href="/#download"
               className="px-7 py-3.5 rounded-xl bg-white text-neutral-950 font-semibold hover:bg-neutral-100 transition-all text-sm shadow-md"
             >
-              Download Murmur Free
+              Download HushWrite Free
             </Link>
             <Link
               href="/pricing"

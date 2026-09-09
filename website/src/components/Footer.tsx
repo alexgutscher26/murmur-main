@@ -31,7 +31,7 @@ const COMPARISONS_LINKS: FooterLink[] = [
     badge: "New",
   },
   {
-    href: "/blog/murmur-vs-wispr-flow-vs-superwhisper-2026-latency-accuracy-comparison",
+    href: "/blog/HushWrite-vs-wispr-flow-vs-superwhisper-2026-latency-accuracy-comparison",
     label: "Methodology Benchmark",
   },
   { href: "/blog/best-private-dictation-software-for-developers", label: "Best Dictation for Devs" },
@@ -66,13 +66,13 @@ const RESOURCES_LINKS: FooterLink[] = [
 
 const ECOSYSTEM_LINKS: FooterLink[] = [
   {
-    href: "https://github.com/webprodigies/murmur",
+    href: "https://github.com/webprodigies/HushWrite",
     label: "GitHub Repository",
     external: true,
     icon: true,
   },
   {
-    href: "/downloads/Murmur_0.1.0_x64-setup.exe",
+    href: "/downloads/HushWrite_0.1.0_x64-setup.exe",
     label: "Download Windows (.exe)",
   },
   {
@@ -81,12 +81,12 @@ const ECOSYSTEM_LINKS: FooterLink[] = [
     external: true,
   },
   {
-    href: "https://github.com/webprodigies/murmur/blob/main/LICENSE",
+    href: "https://github.com/webprodigies/HushWrite/blob/main/LICENSE",
     label: "Open Source (MIT)",
     external: true,
   },
   {
-    href: "https://github.com/alexgutscher26/murmur-main/blob/main/PRIVACY.md",
+    href: "https://github.com/alexgutscher26/HushWrite-main/blob/main/PRIVACY.md",
     label: "Air-Gapped Policy (PRIVACY.md)",
     external: true,
   },
@@ -181,7 +181,7 @@ export function Footer() {
         {WAVE_BARS.map((h, i) => (
           <span
             key={i}
-            className="motion-safe:animate-[murmur-wave_2.8s_ease-in-out_infinite] w-full max-w-[3px] rounded-full bg-gradient-to-t from-emerald-500/50 to-emerald-300/10 origin-bottom"
+            className="motion-safe:animate-[HushWrite-wave_2.8s_ease-in-out_infinite] w-full max-w-[3px] rounded-full bg-gradient-to-t from-emerald-500/50 to-emerald-300/10 origin-bottom"
             style={{
               height: `${h * 100}%`,
               animationDelay: `${i * 0.035}s`,
@@ -191,7 +191,7 @@ export function Footer() {
       </div>
 
       <style jsx global>{`
-        @keyframes murmur-wave {
+        @keyframes HushWrite-wave {
           0%,
           100% {
             transform: scaleY(0.45);
@@ -213,7 +213,7 @@ export function Footer() {
                 <Mark size="sm" animated />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-base text-neutral-950 tracking-tight">Murmur</span>
+                <span className="font-bold text-base text-neutral-950 tracking-tight">HushWrite</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-mono font-medium">
                   v0.1.0
                 </span>
@@ -297,7 +297,7 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
           <p>
-            © {new Date().getFullYear()} Murmur. Zero telemetry, 100% on-device data sovereignty.
+            © {new Date().getFullYear()} HushWrite. Zero telemetry, 100% on-device data sovereignty.
           </p>
 
           <div className="flex items-center gap-4">

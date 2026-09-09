@@ -18,16 +18,15 @@ use tauri_plugin_global_shortcut::ShortcutState;
 use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
 use windows::Win32::System::LibraryLoader::GetModuleHandleW;
 use windows::Win32::UI::Input::{
-    GetRawInputData, RegisterRawInputDevices, HRAWINPUT, RAWINPUT, RAWINPUTDEVICE,
-    RAWINPUTHEADER, RIDEV_INPUTSINK, RID_INPUT, RIM_TYPEMOUSE,
+    GetRawInputData, RegisterRawInputDevices, HRAWINPUT, RAWINPUT, RAWINPUTDEVICE, RAWINPUTHEADER,
+    RIDEV_INPUTSINK, RID_INPUT, RIM_TYPEMOUSE,
 };
 use windows::Win32::UI::WindowsAndMessaging::{
-    CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetMessageW,
-    PostMessageW, PostQuitMessage, RegisterClassW, TranslateMessage, UnregisterClassW,
-    MSG, WINDOW_EX_STYLE, WNDCLASSW, WS_OVERLAPPED, WM_CLOSE, WM_DESTROY, WM_INPUT,
-    RI_MOUSE_BUTTON_4_DOWN, RI_MOUSE_BUTTON_4_UP,
-    RI_MOUSE_BUTTON_5_DOWN, RI_MOUSE_BUTTON_5_UP,
-    RI_MOUSE_MIDDLE_BUTTON_DOWN, RI_MOUSE_MIDDLE_BUTTON_UP,
+    CreateWindowExW, DefWindowProcW, DestroyWindow, DispatchMessageW, GetMessageW, PostMessageW,
+    PostQuitMessage, RegisterClassW, TranslateMessage, UnregisterClassW, MSG,
+    RI_MOUSE_BUTTON_4_DOWN, RI_MOUSE_BUTTON_4_UP, RI_MOUSE_BUTTON_5_DOWN, RI_MOUSE_BUTTON_5_UP,
+    RI_MOUSE_MIDDLE_BUTTON_DOWN, RI_MOUSE_MIDDLE_BUTTON_UP, WINDOW_EX_STYLE, WM_CLOSE, WM_DESTROY,
+    WM_INPUT, WNDCLASSW, WS_OVERLAPPED,
 };
 
 pub const HID_USAGE_PAGE_GENERIC: u16 = 0x01;
@@ -84,14 +83,8 @@ pub fn evaluate_button_flags(
             RI_MOUSE_MIDDLE_BUTTON_DOWN as u16,
             RI_MOUSE_MIDDLE_BUTTON_UP as u16,
         ),
-        MouseTriggerButton::Button4 => (
-            RI_MOUSE_BUTTON_4_DOWN as u16,
-            RI_MOUSE_BUTTON_4_UP as u16,
-        ),
-        MouseTriggerButton::Button5 => (
-            RI_MOUSE_BUTTON_5_DOWN as u16,
-            RI_MOUSE_BUTTON_5_UP as u16,
-        ),
+        MouseTriggerButton::Button4 => (RI_MOUSE_BUTTON_4_DOWN as u16, RI_MOUSE_BUTTON_4_UP as u16),
+        MouseTriggerButton::Button5 => (RI_MOUSE_BUTTON_5_DOWN as u16, RI_MOUSE_BUTTON_5_UP as u16),
         MouseTriggerButton::None => return None,
     };
 
@@ -107,8 +100,7 @@ pub fn evaluate_button_flags(
 type RawInputCallback = Box<dyn Fn(ShortcutState) + Send + Sync + 'static>;
 
 static TRIGGER: AtomicU8 = AtomicU8::new(0);
-static CALLBACK: parking_lot::Mutex<Option<RawInputCallback>> =
-    parking_lot::Mutex::new(None);
+static CALLBACK: parking_lot::Mutex<Option<RawInputCallback>> = parking_lot::Mutex::new(None);
 
 pub struct MouseRawInputHandle {
     hwnd: HWND,
@@ -199,7 +191,7 @@ where
     let (tx, rx) = std::sync::mpsc::sync_channel::<isize>(1);
 
     std::thread::Builder::new()
-        .name("murmur-raw-mouse-input".to_string())
+        .name("HushWrite-raw-mouse-input".to_string())
         .spawn(move || unsafe {
             let hinstance = match GetModuleHandleW(None) {
                 Ok(h) => h,
@@ -210,7 +202,7 @@ where
                 }
             };
 
-            let class_name = windows::core::w!("MurmurRawInputHiddenWindow");
+            let class_name = windows::core::w!("HushWriteRawInputHiddenWindow");
             let wc = WNDCLASSW {
                 lpfnWndProc: Some(raw_input_wndproc),
                 hInstance: hinstance.into(),
@@ -224,7 +216,7 @@ where
             let hwnd = match CreateWindowExW(
                 WINDOW_EX_STYLE(0),
                 class_name,
-                windows::core::w!("MurmurRawInputHidden"),
+                windows::core::w!("HushWriteRawInputHidden"),
                 WS_OVERLAPPED,
                 0,
                 0,
@@ -294,7 +286,10 @@ mod tests {
 
     #[test]
     fn parse_mouse_trigger_buttons() {
-        assert_eq!(MouseTriggerButton::from_str("none"), MouseTriggerButton::None);
+        assert_eq!(
+            MouseTriggerButton::from_str("none"),
+            MouseTriggerButton::None
+        );
         assert_eq!(
             MouseTriggerButton::from_str("mouse_middle"),
             MouseTriggerButton::Middle
@@ -316,24 +311,15 @@ mod tests {
     #[test]
     fn evaluate_button_4_transitions() {
         assert_eq!(
-            evaluate_button_flags(
-                MouseTriggerButton::Button4,
-                RI_MOUSE_BUTTON_4_DOWN as u16
-            ),
+            evaluate_button_flags(MouseTriggerButton::Button4, RI_MOUSE_BUTTON_4_DOWN as u16),
             Some(ShortcutState::Pressed)
         );
         assert_eq!(
-            evaluate_button_flags(
-                MouseTriggerButton::Button4,
-                RI_MOUSE_BUTTON_4_UP as u16
-            ),
+            evaluate_button_flags(MouseTriggerButton::Button4, RI_MOUSE_BUTTON_4_UP as u16),
             Some(ShortcutState::Released)
         );
         assert_eq!(
-            evaluate_button_flags(
-                MouseTriggerButton::Button4,
-                RI_MOUSE_BUTTON_5_DOWN as u16
-            ),
+            evaluate_button_flags(MouseTriggerButton::Button4, RI_MOUSE_BUTTON_5_DOWN as u16),
             None
         );
     }
@@ -341,24 +327,15 @@ mod tests {
     #[test]
     fn evaluate_button_5_transitions() {
         assert_eq!(
-            evaluate_button_flags(
-                MouseTriggerButton::Button5,
-                RI_MOUSE_BUTTON_5_DOWN as u16
-            ),
+            evaluate_button_flags(MouseTriggerButton::Button5, RI_MOUSE_BUTTON_5_DOWN as u16),
             Some(ShortcutState::Pressed)
         );
         assert_eq!(
-            evaluate_button_flags(
-                MouseTriggerButton::Button5,
-                RI_MOUSE_BUTTON_5_UP as u16
-            ),
+            evaluate_button_flags(MouseTriggerButton::Button5, RI_MOUSE_BUTTON_5_UP as u16),
             Some(ShortcutState::Released)
         );
         assert_eq!(
-            evaluate_button_flags(
-                MouseTriggerButton::Button5,
-                RI_MOUSE_BUTTON_4_DOWN as u16
-            ),
+            evaluate_button_flags(MouseTriggerButton::Button5, RI_MOUSE_BUTTON_4_DOWN as u16),
             None
         );
     }
@@ -373,10 +350,7 @@ mod tests {
             Some(ShortcutState::Pressed)
         );
         assert_eq!(
-            evaluate_button_flags(
-                MouseTriggerButton::Middle,
-                RI_MOUSE_MIDDLE_BUTTON_UP as u16
-            ),
+            evaluate_button_flags(MouseTriggerButton::Middle, RI_MOUSE_MIDDLE_BUTTON_UP as u16),
             Some(ShortcutState::Released)
         );
     }

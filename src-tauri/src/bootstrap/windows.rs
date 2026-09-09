@@ -113,7 +113,7 @@ pub fn apply_window_vibrancy(app: &AppHandle) {
 /**
  * SOURCE OF TRUTH KEYWORDS: show_first_window
  * WHAT:  Opens onboarding on a fresh install, and nothing at all afterwards.
- * WHY:   Murmur is invisible until summoned — that is the product.
+ * WHY:   HushWrite is invisible until summoned — that is the product.
  * WHERE: The last step of setup.
  */
 pub fn show_first_window(app: &AppHandle, db: &Database) -> AppResult<()> {
@@ -140,15 +140,15 @@ pub fn show_first_window(app: &AppHandle, db: &Database) -> AppResult<()> {
 }
 
 /**
- * SOURCE OF TRUTH KEYWORDS: show_dashboard_on_launch, MURMUR_SHOW_DASHBOARD
+ * SOURCE OF TRUTH KEYWORDS: show_dashboard_on_launch, HushWrite_SHOW_DASHBOARD
  * WHAT:  Opens the dashboard at launch when the environment asks for it.
  * WHERE: Read once at the end of setup.
  */
 pub fn show_dashboard_on_launch(app: &AppHandle) {
-    if std::env::var("MURMUR_SHOW_DASHBOARD").is_err() {
+    if std::env::var("HushWrite_SHOW_DASHBOARD").is_err() {
         return;
     }
-    tracing::info!("MURMUR_SHOW_DASHBOARD set — opening the dashboard");
+    tracing::info!("HushWrite_SHOW_DASHBOARD set — opening the dashboard");
     crate::tray::show_dashboard(app);
 }
 
@@ -207,8 +207,8 @@ mod windows_pill {
     use windows::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
     use windows::Win32::UI::WindowsAndMessaging::{
         CallWindowProcW, DefWindowProcW, IsWindowVisible, SetWindowLongPtrW, SetWindowPos,
-        GWLP_WNDPROC, HWND_TOPMOST, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE,
-        WM_ACTIVATE, WM_ACTIVATEAPP, WNDPROC,
+        GWLP_WNDPROC, HWND_TOPMOST, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, WM_ACTIVATE,
+        WM_ACTIVATEAPP, WNDPROC,
     };
 
     static PREV_WNDPROC: AtomicIsize = AtomicIsize::new(0);

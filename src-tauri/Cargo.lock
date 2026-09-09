@@ -3,6 +3,58 @@
 version = 4
 
 [[package]]
+name = "HushWrite"
+version = "0.1.0"
+dependencies = [
+ "arboard",
+ "async-trait",
+ "audioadapter-buffers",
+ "block2",
+ "core-foundation 0.10.1",
+ "core-graphics",
+ "cpal",
+ "dirs 6.0.0",
+ "earshot",
+ "hex",
+ "objc2",
+ "objc2-app-kit",
+ "objc2-av-foundation",
+ "objc2-foundation",
+ "once_cell",
+ "parking_lot",
+ "qbsdiff",
+ "reqwest",
+ "ringbuf",
+ "rubato",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "specta",
+ "specta-typescript",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-dialog",
+ "tauri-plugin-global-shortcut",
+ "tauri-plugin-notification",
+ "tauri-plugin-opener",
+ "tauri-plugin-process",
+ "tauri-plugin-single-instance",
+ "tauri-plugin-updater",
+ "tauri-specta",
+ "thiserror 2.0.20",
+ "tokio",
+ "tracing",
+ "tracing-appender",
+ "tracing-subscriber",
+ "uuid",
+ "whisper-rs",
+ "window-vibrancy 0.8.0",
+ "windows 0.58.0",
+]
+
+[[package]]
 name = "Inflector"
 version = "0.11.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2771,58 +2823,6 @@ dependencies = [
  "serde",
  "thiserror 2.0.20",
  "windows-sys 0.61.2",
-]
-
-[[package]]
-name = "murmur"
-version = "0.1.0"
-dependencies = [
- "arboard",
- "async-trait",
- "audioadapter-buffers",
- "block2",
- "core-foundation 0.10.1",
- "core-graphics",
- "cpal",
- "dirs 6.0.0",
- "earshot",
- "hex",
- "objc2",
- "objc2-app-kit",
- "objc2-av-foundation",
- "objc2-foundation",
- "once_cell",
- "parking_lot",
- "qbsdiff",
- "reqwest",
- "ringbuf",
- "rubato",
- "rusqlite",
- "serde",
- "serde_json",
- "sha2 0.11.0",
- "specta",
- "specta-typescript",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-dialog",
- "tauri-plugin-global-shortcut",
- "tauri-plugin-notification",
- "tauri-plugin-opener",
- "tauri-plugin-process",
- "tauri-plugin-single-instance",
- "tauri-plugin-updater",
- "tauri-specta",
- "thiserror 2.0.20",
- "tokio",
- "tracing",
- "tracing-appender",
- "tracing-subscriber",
- "uuid",
- "whisper-rs",
- "window-vibrancy 0.8.0",
- "windows 0.58.0",
 ]
 
 [[package]]

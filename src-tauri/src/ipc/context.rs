@@ -122,7 +122,7 @@ impl SessionHandle {
         self.sender.send(event).await.map_err(|_| {
             AppError::new(
                 ErrorCode::Internal,
-                "Murmur's recorder stopped responding. Restarting the app will fix it.",
+                "HushWrite's recorder stopped responding. Restarting the app will fix it.",
             )
         })
     }

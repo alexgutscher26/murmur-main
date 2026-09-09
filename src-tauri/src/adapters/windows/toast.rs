@@ -18,9 +18,9 @@ impl WindowsToast {
      */
     pub fn notify_delivery(app: &AppHandle, text: &str, is_clipboard_only: bool) {
         let title = if is_clipboard_only {
-            "Murmur — Text Copied to Clipboard"
+            "HushWrite — Text Copied to Clipboard"
         } else {
-            "Murmur — Text Delivered"
+            "HushWrite — Text Delivered"
         };
 
         let snippet: String = if text.chars().count() > 120 {
@@ -48,7 +48,7 @@ impl WindowsToast {
         if let Err(err) = app
             .notification()
             .builder()
-            .title(format!("Murmur — {summary}"))
+            .title(format!("HushWrite — {summary}"))
             .body(detail)
             .show()
         {
@@ -102,7 +102,7 @@ impl WindowsToast {
         if let Err(err) = app
             .notification()
             .builder()
-            .title("Murmur is ready whenever you are")
+            .title("HushWrite is ready whenever you are")
             .body(&body)
             .show()
         {

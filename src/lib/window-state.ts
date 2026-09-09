@@ -11,7 +11,7 @@ import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 export const APP_NORMAL_WIDTH = 1000;
 export const APP_NORMAL_HEIGHT = 660;
 
-const OLD_BOUNDS_STORAGE_KEY = "murmur_dashboard_window_bounds";
+const OLD_BOUNDS_STORAGE_KEY = "HushWrite_dashboard_window_bounds";
 
 export async function enforceNormalWindowSize() {
   try {

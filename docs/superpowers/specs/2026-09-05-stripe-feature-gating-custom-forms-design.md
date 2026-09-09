@@ -8,7 +8,7 @@
 
 ## 1. Overview & Architecture
 
-Murmur is a privacy-first, local-first voice dictation application for macOS and Windows. The commercialization model offers:
+HushWrite is a privacy-first, local-first voice dictation application for macOS and Windows. The commercialization model offers:
 
 1. **Free Starter Tier:** 100% on-device Whisper Base model, up to 25 custom dictionary words, standard punctuation, sub-200ms latency.
 2. **Pro Lifetime License ($89 one-time):** Whisper Large v3 Turbo & Medium models, Smart Context Engine, automatic filler word stripping, unlimited dictionary words, voice snippets, and air-gapped offline verification.
@@ -59,15 +59,15 @@ This specification establishes:
 
 - **Visuals:** Confetti animation triggered on mount, modern translucent card, celebratory checkmark.
 - **License Generator:**
-  - Deterministically or cryptographically generates a valid Murmur license key matching desktop activation patterns:
+  - Deterministically or cryptographically generates a valid HushWrite license key matching desktop activation patterns:
     - Lifetime: `LIFETIME-XXXX-XXXX-XXXX`
     - Annual: `PRO-XXXX-XXXX-XXXX`
     - Student: `STUDENT-XXXX-XXXX-XXXX`
     - Switcher: `SWITCHER-XXXX-XXXX-XXXX`
 - **User Actions:**
   - **Copy License Key:** Copies key to clipboard with visual toast feedback.
-  - **Activate in Murmur:** Deep-link `murmur://activate?key={KEY}` with fallback instructions.
-  - **Activation Instructions:** 3-step guide: (1) Open Murmur, (2) Navigate to Billing, (3) Click Activate Key.
+  - **Activate in HushWrite:** Deep-link `HushWrite://activate?key={KEY}` with fallback instructions.
+  - **Activation Instructions:** 3-step guide: (1) Open HushWrite, (2) Navigate to Billing, (3) Click Activate Key.
   - **Download Desktop App:** Quick links to macOS (.dmg) and Windows (.exe / .msix).
 
 ---
@@ -124,7 +124,7 @@ This specification establishes:
 - **Modal Controls:**
   - Headline and description tailored to the feature attempted.
   - "Start 14-Day Free Trial" button (if not already started).
-  - "Upgrade on Murmur.app" button (opens pricing page via Tauri opener).
+  - "Upgrade on HushWrite.app" button (opens pricing page via Tauri opener).
   - "Enter License Key" accordion to directly input and activate key.
 
 #### C. Gated UI Enhancements

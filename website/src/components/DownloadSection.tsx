@@ -24,7 +24,7 @@ export function DownloadSection() {
 
   const handleDownloadClick = (filename: string, platformName: string) => {
     setDownloadToast({
-      title: `Downloading Murmur for ${platformName}`,
+      title: `Downloading HushWrite for ${platformName}`,
       desc: `Your download (${filename}) has started directly. Check your Downloads folder.`,
     });
     setTimeout(() => {
@@ -50,19 +50,19 @@ export function DownloadSection() {
   const cliCommands = [
     {
       platform: "Windows Winget",
-      command: "winget install WebProdigies.Murmur",
+      command: "winget install WebProdigies.HushWrite",
     },
     {
       platform: "Windows PowerShell",
-      command: "irm https://murmur.app/downloads/murmur-setup.exe -OutFile murmur-setup.exe; .\\murmur-setup.exe",
+      command: "irm https://HushWrite.app/downloads/HushWrite-setup.exe -OutFile HushWrite-setup.exe; .\\HushWrite-setup.exe",
     },
     {
       platform: "macOS Homebrew",
-      command: "brew install --cask murmur",
+      command: "brew install --cask HushWrite",
     },
     {
       platform: "Source / GitHub Clone",
-      command: "git clone https://github.com/webprodigies/murmur.git",
+      command: "git clone https://github.com/webprodigies/HushWrite.git",
     },
   ];
 
@@ -85,7 +85,7 @@ export function DownloadSection() {
             <span className="text-xs font-mono font-medium text-neutral-800">Ready to Dictate</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
-            Download Murmur. Free forever.
+            Download HushWrite. Free forever.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
             No credit card, account, or cloud telemetry required. Installs and runs in under 60
@@ -179,18 +179,18 @@ export function DownloadSection() {
 
             <div className="flex flex-col sm:flex-row gap-2.5">
               <a
-                href="/downloads/Murmur_0.1.0_x64-setup.exe"
-                download="Murmur_0.1.0_x64-setup.exe"
-                onClick={() => handleDownloadClick("Murmur_0.1.0_x64-setup.exe", "Windows (.exe)")}
+                href="/downloads/HushWrite_0.1.0_x64-setup.exe"
+                download="HushWrite_0.1.0_x64-setup.exe"
+                onClick={() => handleDownloadClick("HushWrite_0.1.0_x64-setup.exe", "Windows (.exe)")}
                 className="flex-1 text-center text-xs sm:text-sm font-semibold text-white bg-[#141416] hover:bg-neutral-800 py-3.5 px-4 rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Download className="w-4 h-4 text-emerald-400" />
                 <span>Windows Installer (.exe)</span>
               </a>
               <a
-                href="/downloads/Murmur_0.1.0_x64_en-US.msi"
-                download="Murmur_0.1.0_x64_en-US.msi"
-                onClick={() => handleDownloadClick("Murmur_0.1.0_x64_en-US.msi", "Windows MSI")}
+                href="/downloads/HushWrite_0.1.0_x64_en-US.msi"
+                download="HushWrite_0.1.0_x64_en-US.msi"
+                onClick={() => handleDownloadClick("HushWrite_0.1.0_x64_en-US.msi", "Windows MSI")}
                 className="flex-1 text-center text-xs sm:text-sm font-semibold text-neutral-800 hover:bg-neutral-50 bg-white border border-neutral-200/90 py-3.5 px-4 rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Download className="w-4 h-4 text-neutral-500" />

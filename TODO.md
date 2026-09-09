@@ -1,4 +1,4 @@
-# Murmur — Feature & Improvement Backlog
+# HushWrite — Feature & Improvement Backlog
 
 > Organized by area. Items are roughly priority-ordered within each section.
 > Prefix legend: [BUG] · [PERF] · [FEAT] · [DX] · [UX] · [INFRA] · [WIN] · [SEC] · [BIZ] · [SEO] · [CONTENT] · [MARKETING] · [VIRALITY]
@@ -102,7 +102,7 @@
 - [ ] [WIN] [PERF] Low-latency audio path via WASAPI event-driven mode — Switch from the current callback-polling model to IAudioClient::SetEventHandle + a dedicated high-priority thread (SetThreadPriority(THREAD_PRIORITY_TIME_CRITICAL)) to reduce jitter below 2ms.
 - [ ] [WIN] [UX] Per-monitor DPI awareness v2 — Declare PerMonitorV2 in the app manifest so the pill and dashboard scale correctly when dragged across mixed-DPI displays (e.g. laptop 200% + external 100%).
 - [ ] [WIN] [BUG] Tray icon disappears after Explorer crash — Register a TaskbarCreated message handler (RegisterWindowMessage(L"TaskbarCreated")) and re-add the tray icon when Explorer restarts.
-- [ ] [WIN] [SEC] Memory-safe clipboard clear on lock — On WM_WTSSESSION_CHANGE with WTS_SESSION_LOCK, zero out the clipboard if it contains a Murmur-set value using EmptyClipboard() followed by CloseClipboard().
+- [ ] [WIN] [SEC] Memory-safe clipboard clear on lock — On WM_WTSSESSION_CHANGE with WTS_SESSION_LOCK, zero out the clipboard if it contains a HushWrite-set value using EmptyClipboard() followed by CloseClipboard().
 - [ ] [WIN] [INFRA] ARM64 Windows build — Add an aarch64-pc-windows-msvc target to the release CI matrix for Snapdragon X Elite / Surface Pro devices.
   - Validate whisper.cpp compiles with MSVC on ARM64 (requires CMake flag -DWHISPER_BLAS=OFF and possible NEON SIMD adjustments)
   - Add a GitHub Actions runner with windows-arm64 runner label once available, or use cross-compilation from x86_64 with QEMU
@@ -164,7 +164,7 @@
 - [ ] [PERF] Encoder/decoder split threading — Pin the Whisper encoder to performance cores and the decoder to efficiency cores using Windows thread affinity masks, measured against the auto-tuning benchmark.
 - [ ] [BUG] Model selector shows stale download progress after network error — The download progress bar stays at a non-zero value if the download errors out. Reset download_progress to 0 and show the error state in the model card on failure.
 - [ ] [BUG] Empty segment after long silence — When the user holds the hotkey for >5s without speaking, Whisper decodes the silence and emits an empty or hallucination-only segment that passes through to delivery. Add a minimum-words guard (>=1 non-noise word) before triggering delivery.
-- [ ] [DX] Model benchmarking CLI — A murmur-bench binary that accepts a WAV file and prints decode time, RTF, and WER against a reference transcript. Used by contributors to validate model changes without running the full app.
+- [ ] [DX] Model benchmarking CLI — A HushWrite-bench binary that accepts a WAV file and prints decode time, RTF, and WER against a reference transcript. Used by contributors to validate model changes without running the full app.
 
 ---
 
@@ -178,7 +178,7 @@
 - [x] [FEAT] Markdown mode — A toggle that reformats dictated text as Markdown: "heading level 2 best practices" becomes ## Best Practices, "bullet point foo" becomes - foo.
 - [x] [FEAT] Email / message mode — Strip filler words and structure the output as a professional email draft with subject, greeting, body, and sign-off detection.
 - [x] [FEAT] Named entity normalization — Detect proper nouns from the user's dictionary and apply their canonical capitalization (e.g. always correct "iphone" to "iPhone", "openai" to "OpenAI").
-- [x] [FEAT] Correction learning — When the user edits a Murmur-typed string immediately after paste detected via accessibility APIs, record the before/after pair and auto-add it to the corrections dictionary.
+- [x] [FEAT] Correction learning — When the user edits a HushWrite-typed string immediately after paste detected via accessibility APIs, record the before/after pair and auto-add it to the corrections dictionary.
 - [x] [UX] Inline correction UI — After pasting, show a 3-second floating undo button ("Undo dictation") that restores the pre-paste clipboard content and removes the typed text.
 - [ ] [FEAT] Smart sentence-boundary capitalization — Detect sentence boundaries based on pause duration (VAD silence > 400ms) and capitalize the first word of the new sentence automatically, even mid-session.
 - [x] [FEAT] Abbreviation expansion — "eg" to "e.g.", "ie" to "i.e.", "etc" to "etc.", "vs" to "vs.", with a per-language list. User-configurable opt-out per abbreviation.
@@ -195,7 +195,7 @@
 
 ## Clipboard & Delivery
 
-- [x] [BUG] Clipboard restore races with password managers — Some password managers (1Password, Bitwarden) monitor clipboard changes. When Murmur sets the clipboard and then restores it, some managers capture the interim transcript. Add a delay or use SetClipboardData with GMEM_DDESHARE to suppress clipboard history capture.
+- [x] [BUG] Clipboard restore races with password managers — Some password managers (1Password, Bitwarden) monitor clipboard changes. When HushWrite sets the clipboard and then restores it, some managers capture the interim transcript. Add a delay or use SetClipboardData with GMEM_DDESHARE to suppress clipboard history capture.
 - [x] [FEAT] Delivery method: direct keyboard simulation — Instead of clipboard-paste, use SendInput with KEYEVENTF_UNICODE to inject text character-by-character. Slower but works in apps that disable paste (some security tools, game launchers).
 - [x] [FEAT] Delivery method: Windows Accessibility API — IUIAutomation SetValue on the focused element as a third delivery tier for apps that support neither paste nor SendInput unicode.
 - [x] [FEAT] Delivery confirmation — After paste, verify the text landed by reading the focused element's value via UIA and comparing. Surface a "Delivery failed" notification if it does not match.
@@ -291,7 +291,7 @@
 ## Privacy & Security
 
 - [x] [SEC] Transcript encryption at rest — Encrypt session raw_text and final_text columns in SQLite using SQLCipher or an application-level AES-256-GCM key stored in Windows Credential Manager.
-- [x] [SEC] Auto-purge on lock screen — When Windows locks, automatically clear the in-memory transcript buffer and the clipboard if it contains a Murmur-set value.
+- [x] [SEC] Auto-purge on lock screen — When Windows locks, automatically clear the in-memory transcript buffer and the clipboard if it contains a HushWrite-set value.
 - [x] [FEAT] Configurable data retention — The RETENTION_DAYS key exists. Build a background job that runs purge_older_than() on launch and on a daily timer.
 - [x] [FEAT] Audit log — Write an append-only log separate from the sessions table recording session timestamps, durations, and delivery outcomes but never the transcript text for enterprise compliance.
 - [x] [FEAT] Remote wipe / data clear — A "Delete all data" option in settings that drops all sessions, dictionary entries, and resets all settings to defaults in one step.
@@ -351,7 +351,7 @@
 - [ ] [FEAT] Variable name suggester — Speak "variable for user email address" and get three casing variants shown in the pill as clickable chips. Click one to insert.
 - [ ] [FEAT] Test name generator — Speak "test that login fails with wrong password" and output `it("should fail login with wrong password", ...)` or the Rust `#[test] fn login_fails_with_wrong_password()` equivalent depending on the active app profile.
 - [ ] [FEAT] Regex dictation mode — Speak "regex for email pattern" and insert a canonical regex. Maintain a curated library of 50 common regex patterns addressable by spoken name.
-- [ ] [FEAT] IDE extension for VS Code — Show Murmur recording status in the status bar, start/stop dictation from the command palette, and insert transcript at the active editor cursor position via `vscode.TextEditor.edit` without clipboard round-trip.
+- [ ] [FEAT] IDE extension for VS Code — Show HushWrite recording status in the status bar, start/stop dictation from the command palette, and insert transcript at the active editor cursor position via `vscode.TextEditor.edit` without clipboard round-trip.
 - [ ] [FEAT] Cursor / Windsurf AI composer integration — When dictating inside the Cursor AI composer input, detect the composer window via UIA and inject via `IValueProvider::SetValue` rather than clipboard for reliability.
 - [ ] [DX] Developer SDK / local WebSocket API — Document the local WebSocket API with TypeScript types and a 10-line example showing a third-party app receiving real-time transcripts.
 
@@ -395,12 +395,12 @@
   - Build both `x86_64-pc-windows-msvc` and `aarch64-pc-windows-msvc` targets
   - Run `cargo clippy` and `cargo test` in the matrix before packaging
   - Upload artifacts to the GitHub release as `.exe`, `.msi`, and `.msix`
-- [x] [INFRA] Winget package — Official multi-YAML manifests (`WebProdigies.Murmur`) under `winget/manifests/` and automated generator script (`scripts/generate_winget_manifest.py`) for `winget install murmur`.
+- [x] [INFRA] Winget package — Official multi-YAML manifests (`WebProdigies.HushWrite`) under `winget/manifests/` and automated generator script (`scripts/generate_winget_manifest.py`) for `winget install HushWrite`.
 - [ ] [INFRA] Chocolatey package — Publish a Chocolatey package for enterprise environments.
   - Create `nuspec` manifest and install/uninstall PowerShell scripts
   - Submit to the Chocolatey Community Repository
   - Add Chocolatey badge to README
-- [ ] [INFRA] Homebrew Cask (macOS) — Publish a Homebrew Cask formula so macOS users can `brew install --cask murmur`.
+- [ ] [INFRA] Homebrew Cask (macOS) — Publish a Homebrew Cask formula so macOS users can `brew install --cask HushWrite`.
 - [ ] [FEAT] In-app beta program enrollment — A one-click "Join Beta" option in General > Updates that switches the update channel to beta and shows a brief explanation of what beta means.
 - [x] [FEAT] Release notes in-app — When an update is downloaded and ready to install, show a formatted "What's new" panel parsed from the GitHub release body.
 
@@ -410,14 +410,14 @@
 
 - [ ] [INFRA] Crash reporter — Integrate `sentry-rust` or a local crash dump writer using `MiniDumpWriteDump` to capture panics and unhandled errors with a stack trace. Gate behind a user opt-in during onboarding.
   - If sentry-rust: use a self-hosted Sentry instance (no data leaves user control unless they opt in explicitly)
-  - If local dump: write to `%APPDATA%\Murmur\crashes\` and offer to email/open the dump file from the next launch dialog
-- [ ] [INFRA] Health-check endpoint — Expose a local HTTP endpoint (e.g. `localhost:PORT/health`) so OS-level monitoring scripts can verify Murmur is alive without the GUI.
+  - If local dump: write to `%APPDATA%\HushWrite\crashes\` and offer to email/open the dump file from the next launch dialog
+- [ ] [INFRA] Health-check endpoint — Expose a local HTTP endpoint (e.g. `localhost:PORT/health`) so OS-level monitoring scripts can verify HushWrite is alive without the GUI.
   - Returns JSON `{ "status": "ok", "version": "0.1.0", "uptime_seconds": 3600, "sessions_today": 12 }`
   - Bind only to `127.0.0.1` — never expose externally
   - Port is randomized at first launch and stored in registry to avoid collisions
 - [ ] [INFRA] Structured logging with log rotation — The current `tracing-appender` setup writes to a single log file. Add rolling file appender with size-based rotation and keep only the last 5 files.
   - Max file size: 10MB before rotation
-  - Files named `murmur.log`, `murmur.log.1`, ... `murmur.log.5`
+  - Files named `HushWrite.log`, `HushWrite.log.1`, ... `HushWrite.log.5`
   - On startup, delete any rotated files older than 14 days
 - [ ] [INFRA] Metrics export — Emit session latency, word count, and decode time metrics to a local Prometheus-compatible endpoint for power users who run local monitoring stacks.
 - [ ] [DX] Integration test harness for Windows — The e2e tests in `session/e2e_tests.rs` mock audio. Add a real-audio integration test that captures from a virtual audio device (VB-Audio Cable or similar) on CI.
@@ -432,7 +432,7 @@
 - [ ] [INFRA] Plugin architecture — Extract delivery methods (clipboard, accessibility, keyboard) and enhancement rules into a plugin trait so third-party developers can add delivery backends without forking the core.
   - Define a `DeliveryPlugin` trait with `fn can_deliver(&self, target: &AppTarget) -> bool` and `fn deliver(&self, text: &str, target: &AppTarget) -> Result<()>`
   - Ship three built-in plugins: `ClipboardDelivery`, `SendInputDelivery`, `UIAutomationDelivery`
-  - Load plugins from `%APPDATA%\Murmur\plugins\` at startup
+  - Load plugins from `%APPDATA%\HushWrite\plugins\` at startup
 - [ ] [INFRA] Graceful shutdown — On SIGTERM or window close, wait for any in-flight session to complete delivery before exiting. Current behavior drops the session if the user quits mid-dictation.
 - [ ] [DX] Error code registry — Assign a unique error code to every `AppError` variant (e.g. `MRM-1001` for `AudioDeviceLost`) and document them in `docs/ERROR_CODES.md` so users can search for solutions.
 
@@ -465,7 +465,7 @@
 ## Power-User Customization & Vocabulary Ownership
 
 - [x] [FEAT] Smart per-app context formatting engine (Slack, Cursor, Notion, Gmail).
-- [x] [FEAT] Adaptive Tone & Style Engine ("Make Murmur sound like you") — Interactive persona switcher for Formal, Casual, Very Casual, Concise, and Developer syntax styles.
+- [x] [FEAT] Adaptive Tone & Style Engine ("Make HushWrite sound like you") — Interactive persona switcher for Formal, Casual, Very Casual, Concise, and Developer syntax styles.
 - [x] [FEAT] Voice-triggered text-expander snippets & macros — Speak trigger words (e.g. "bug template", "status update", "pr template", "meeting notes") to instantly insert structured markdown schemas.
 - [x] [FEAT] Creator & scriptwriting voice macros — YouTube video script outlines, 3-part viral hook frameworks, Substack newsletter drafts, social captions, podcast show notes, and 60s sponsor ad reads.
 - [x] [FEAT] Dedicated Content Creators Hub (`/creators` & `/content-creators`) — Interactive creator voice playground, creator app workflow integration (Notion, Google Docs, Descript, Final Cut, Obsidian), and unreleased script IP privacy comparison vs Wispr Flow.
@@ -474,7 +474,7 @@
   - Export: one entry per line, CSV format `trigger,replacement,type,enabled`
   - Import: validate schema, deduplicate against existing entries, show a preview diff before confirming
   - Support drag-and-drop import from file manager
-- [ ] [FEAT] Project & workspace-scoped dictionaries — Auto-load `.murmur/dictionary.json` from the active git repository or workspace folder.
+- [ ] [FEAT] Project & workspace-scoped dictionaries — Auto-load `.HushWrite/dictionary.json` from the active git repository or workspace folder.
   - Watch for working directory changes via shell integration or file watcher
   - Merge project dictionary with global dictionary, with project entries taking priority
   - Show which dictionary is active in the pill via a small "Project" badge
@@ -487,7 +487,7 @@
   - File picker accepting `.bin` files in whisper.cpp GGUF format
   - Validate the file header magic bytes before accepting
   - Show the model file size, parameter count (from header), and a "Custom" badge in the model picker
-  - Warn that custom models are not covered by Murmur support
+  - Warn that custom models are not covered by HushWrite support
 - [x] [FEAT] Dictionary versioning & changelog — Track changes to the user dictionary over time (word added, modified, deleted) with timestamps, so users can undo accidental bulk imports.
 - [ ] [FEAT] Shared team dictionary (Pro tier) — A team admin can publish a shared dictionary via a signed JSON URL that team members subscribe to. Dictionary entries are merged read-only (cannot be deleted by individual users).
 - [ ] [FEAT] Voice macro conditional logic — A simple condition syntax in macros: "if app == Slack then use casual tone else use formal tone". Evaluated at inject time.
@@ -503,13 +503,13 @@
 - [x] [MARKETING] Record and publish short outcome-driven demonstration clips for X, LinkedIn, Reddit, and Product Hunt: "Dictating a full GitHub issue in Airplane Mode with 0 bytes sent."
 - [x] [MARKETING] Dedicated LinkedIn and X (Twitter) outcome demonstration package & guide — Added `X_LINKEDIN_THREAD_DEMO` campaign storyboard in `marketingClips.ts` and published guide `/blog/how-to-dictate-linkedin-posts-x-threads-voice`.
 - [x] [SEO] Add `/dictation-for-medical-professionals` and `/hipaa-voice-notes` landing pages targeting healthcare vertical.
-  - Include a disclaimer (Murmur is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims)
+  - Include a disclaimer (HushWrite is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims)
   - Emphasize local processing, no cloud upload, configurable retention policy
-  - FAQ: "Does Murmur store my patient notes?", "Does Murmur sell data to healthcare analytics vendors?"
+  - FAQ: "Does HushWrite store my patient notes?", "Does HushWrite sell data to healthcare analytics vendors?"
 - [x] [SEO] Schema markup for `Review` and `AggregateRating` — Collect 10+ user reviews and add structured data to the homepage for rich snippet star ratings in Google search.
-- [x] [CONTENT] "How I reduced meeting note time by 80% with local dictation" — a narrative technical blog post with a reproducible workflow using Murmur + Notion.
-- [x] [CONTENT] Benchmark article: "Murmur vs. Wispr Flow vs. Superwhisper — 2026 latency & accuracy comparison" with reproducible test methodology published on GitHub.
-- [x] [CONTENT] Privacy deep-dive: "Where does your voice data go in popular dictation apps?" — comparative analysis (Otter.ai, Dragon, Whisper via OpenAI API vs. Murmur local).
+- [x] [CONTENT] "How I reduced meeting note time by 80% with local dictation" — a narrative technical blog post with a reproducible workflow using HushWrite + Notion.
+- [x] [CONTENT] Benchmark article: "HushWrite vs. Wispr Flow vs. Superwhisper — 2026 latency & accuracy comparison" with reproducible test methodology published on GitHub.
+- [x] [CONTENT] Privacy deep-dive: "Where does your voice data go in popular dictation apps?" — comparative analysis (Otter.ai, Dragon, Whisper via OpenAI API vs. HushWrite local).
 - [x] [MARKETING] Product Hunt launch — Prepare PH listing assets: tagline, description (260 chars), 3 product screenshots, 1 demo GIF, Maker bio, first-comment talking points, and a 25% launch-day coupon code.
 - [x] [MARKETING] Reddit AMA and community posts — Engage r/productivity, r/MachineLearning, r/selfhosted, r/rust with transparent posts about the local-first architecture and open-source model choice.
 
@@ -520,15 +520,15 @@
 - [x] [BIZ] Hybrid pricing model: Free Starter + $49 Core Lifetime perpetual license + $8/mo / $49/yr Pro tier + $119 Privacy Professional tier.
 - [x] [BIZ] Student and Open Source Developer 50% discount program ($29 Core Lifetime).
 - [x] [BIZ] Switcher acquisition offer: 40% off first year / $20 off Lifetime for users migrating from Wispr Flow or Superwhisper.
-- [x] [VIRALITY] Shareable custom vocabulary and voice-command packs (`.murmur/pack.json`) with community pack directory.
+- [x] [VIRALITY] Shareable custom vocabulary and voice-command packs (`.HushWrite/pack.json`) with community pack directory.
 - [x] [VIRALITY] In-app post-activation referral trigger: prompt users with personal referral invite only after 50 successful dictations (never during onboarding).
 - [x] [VIRALITY] "Made with local dictation" exportable badge templates for GitHub issues, PRs, and documentation.
 - [ ] [SEC] Privacy Professional tamper-evident local audit logger & OS Keychain encrypted configuration export.
 - [ ] [BIZ] Enterprise self-hosted license — A volume license key (offline-verifiable, no phone-home) that unlocks centralized IT policy enforcement, fleet-level dictionary sync via shared network path, and usage reporting exports for compliance.
 - [ ] [BIZ] Reseller / MSP partner program — A partner portal where managed service providers can purchase seats in bulk at a 30% discount and manage their clients' licenses under a unified dashboard.
 - [ ] [BIZ] Affiliate program — A referral link system with 30% recurring commission for content creators, YouTubers, and productivity bloggers who refer paying customers.
-- [ ] [VIRALITY] Community voice pack directory — A curated, versioned registry at `packs.murmur.app` (or a GitHub repo) listing community-contributed domain packs (medical, legal, coding, creative writing) with one-click install.
-- [ ] [VIRALITY] "Murmur Power User" certification — A shareable badge awarded after 10,000 dictated words and a quiz on advanced features. Meant for community recognition and LinkedIn sharing.
+- [ ] [VIRALITY] Community voice pack directory — A curated, versioned registry at `packs.HushWrite.app` (or a GitHub repo) listing community-contributed domain packs (medical, legal, coding, creative writing) with one-click install.
+- [ ] [VIRALITY] "HushWrite Power User" certification — A shareable badge awarded after 10,000 dictated words and a quiz on advanced features. Meant for community recognition and LinkedIn sharing.
 - [ ] [BIZ] Annual subscription auto-renew reminder — Email users 30 and 7 days before their annual subscription renews with a "Lock in current pricing" offer for multi-year prepayment.
 - [ ] [BIZ] Churned user win-back flow — If a Pro subscriber cancels, wait 30 days then send a single re-engagement email with 3 months free to try again.
 
@@ -563,12 +563,12 @@
 ## Integrations
 
 - [ ] [FEAT] Browser extension — A Chrome/Edge extension that lets the dictation pill appear inside browser text fields without the clipboard round-trip, using the extension's input event injection API.
-  - Extension communicates with the Murmur desktop app via the native messaging host API
+  - Extension communicates with the HushWrite desktop app via the native messaging host API
   - The extension registers a background service worker that listens for transcript events from the native host
   - Inject text using `InputEvent` with `inputType: "insertText"` for maximum compatibility
-  - Show a small Murmur icon in focused text fields as a visual affordance
-- [ ] [FEAT] VS Code extension — Trigger Murmur from VS Code's command palette and have the transcript inserted at the cursor via the VS Code extension API (`editor.edit`).
-  - Commands: `murmur.startDictation`, `murmur.stopDictation`, `murmur.cancelDictation`
+  - Show a small HushWrite icon in focused text fields as a visual affordance
+- [ ] [FEAT] VS Code extension — Trigger HushWrite from VS Code's command palette and have the transcript inserted at the cursor via the VS Code extension API (`editor.edit`).
+  - Commands: `HushWrite.startDictation`, `HushWrite.stopDictation`, `HushWrite.cancelDictation`
   - Show a status bar item that pulses during recording
   - Subscribe to transcript events from the local WebSocket API
 - [ ] [FEAT] REST / WebSocket API — Expose a local WebSocket server so third-party apps can subscribe to transcript events in real time (e.g. for streaming captions on OBS).
@@ -577,17 +577,17 @@
   - Authentication: a session token stored in registry, required in the `Authorization: Bearer` header on upgrade
   - Document with an OpenAPI 3.1 spec and a 10-line JavaScript client example
 - [ ] [FEAT] AutoHotkey / PowerShell trigger — Document and expose a named pipe or local socket that external scripts can write to in order to start/stop sessions programmatically.
-  - Named pipe: `\\.\pipe\MurmurControl`
+  - Named pipe: `\\.\pipe\HushWriteControl`
   - Protocol: line-delimited JSON commands `{ "command": "start_session" }` / `{ "command": "stop_session" }`
   - Document in `docs/SCRIPTING.md` with 5 AutoHotkey v2 examples
-- [ ] [FEAT] Whisper API compatibility layer — Expose a local HTTP endpoint that accepts audio files and returns transcripts in the OpenAI Whisper API format, so existing tools (Raycast, Obsidian plugins) can use Murmur as a local Whisper backend.
+- [ ] [FEAT] Whisper API compatibility layer — Expose a local HTTP endpoint that accepts audio files and returns transcripts in the OpenAI Whisper API format, so existing tools (Raycast, Obsidian plugins) can use HushWrite as a local Whisper backend.
   - Endpoint: `POST http://127.0.0.1:{port}/v1/audio/transcriptions`
   - Accept: `multipart/form-data` with `file` and optional `language`, `model`, `response_format` fields
   - Return: OpenAI-compatible JSON `{ "text": "..." }` or verbose JSON with word timestamps
   - Rate limit: 10 concurrent requests max to prevent VRAM exhaustion
-- [ ] [FEAT] Obsidian plugin — A community Obsidian plugin that starts Murmur dictation from a ribbon icon or command palette and inserts the final transcript at the active cursor in the current note.
+- [ ] [FEAT] Obsidian plugin — A community Obsidian plugin that starts HushWrite dictation from a ribbon icon or command palette and inserts the final transcript at the active cursor in the current note.
 - [ ] [FEAT] Notion integration (webhook-based) — After a session, optionally POST the transcript to a user-configured Notion page via the Notion API. Authentication via a user-provided Notion integration token stored in Windows Credential Manager.
-- [ ] [FEAT] Raycast extension (macOS) — A Raycast extension that surfaces a "Dictate with Murmur" command and shows the 5 most recent transcripts in a Raycast list view.
+- [ ] [FEAT] Raycast extension (macOS) — A Raycast extension that surfaces a "Dictate with HushWrite" command and shows the 5 most recent transcripts in a Raycast list view.
 - [ ] [FEAT] OBS WebSocket caption overlay — When the local WebSocket API is active, provide a ready-to-import OBS source preset that displays the live partial transcript as a caption overlay during streams or recordings.
 
 ---
@@ -621,7 +621,7 @@
 
 - [ ] [UX] Full keyboard navigation in the dashboard — Every interactive element (button, input, tab, list item) must be reachable and operable without a mouse. Tab order must be logical and visible with a clear focus ring.
 - [ ] [UX] High-contrast mode support — Test the dashboard and pill in Windows High Contrast mode (Aquatic, Desert, Dusk, Night Sky) and fix any elements that become invisible or unreadable.
-- [ ] [UX] Screen reader session announcements — When a session starts, announce "Murmur recording started". When it ends, announce "Transcript delivered: [N] words". Use `aria-live="assertive"` for recording events and `aria-live="polite"` for delivery.
+- [ ] [UX] Screen reader session announcements — When a session starts, announce "HushWrite recording started". When it ends, announce "Transcript delivered: [N] words". Use `aria-live="assertive"` for recording events and `aria-live="polite"` for delivery.
 - [ ] [UX] Focus trap in modals — The settings modal, update dialog, and onboarding overlay must trap focus so Tab never escapes to the background content behind the overlay.
 - [ ] [UX] Color-independent status indicators — All status indicators (mic level, delivery status, error states) must have a non-color cue (icon, text, or pattern) in addition to color so colorblind users get the same information.
 - [ ] [UX] Minimum tap target size — All clickable elements in the pill and dashboard must be at least 44x44px to support motor-impaired users.
@@ -661,13 +661,13 @@
 
 ## Community & Ecosystem
 
-- [ ] [COMMUNITY] Discord server — A public Discord community for Murmur users and contributors with channels for `#announcements`, `#feature-requests`, `#bug-reports`, `#showcase` (share your voice packs), and `#dev` (contributor discussion).
-- [ ] [COMMUNITY] Community voice pack directory — A GitHub repository (`murmur-community/packs`) where contributors can PR their domain-specific voice packs (medical, legal, coding, creative writing) following a schema and review process.
+- [ ] [COMMUNITY] Discord server — A public Discord community for HushWrite users and contributors with channels for `#announcements`, `#feature-requests`, `#bug-reports`, `#showcase` (share your voice packs), and `#dev` (contributor discussion).
+- [ ] [COMMUNITY] Community voice pack directory — A GitHub repository (`HushWrite-community/packs`) where contributors can PR their domain-specific voice packs (medical, legal, coding, creative writing) following a schema and review process.
 - [ ] [COMMUNITY] Public feature roadmap — A public GitHub project board or `ROADMAP.md` showing the current quarter's planned features, in-progress items, and the next quarter's backlog, updated monthly.
 - [ ] [COMMUNITY] User feedback widget — A subtle in-app thumbs-up/thumbs-down feedback button visible after each session (never during) that stores the rating locally and batches it for optional opt-in submission.
 - [ ] [COMMUNITY] Open beta program — A public beta channel where users can opt in to pre-release builds, with a dedicated `#beta-feedback` Discord channel and a structured feedback form linked from each beta release.
 - [ ] [COMMUNITY] Contributor recognition — A `CONTRIBUTORS.md` file automatically updated by CI after each merged PR, listing contributors alphabetically with their contributions. Linked from the README and the About page in the dashboard.
-- [ ] [DX] GitHub issue templates — Structured templates for Bug Report, Feature Request, and Security Vulnerability with required fields (reproduction steps, expected vs. actual behavior, system info, Murmur version).
+- [ ] [DX] GitHub issue templates — Structured templates for Bug Report, Feature Request, and Security Vulnerability with required fields (reproduction steps, expected vs. actual behavior, system info, HushWrite version).
 - [ ] [DX] GitHub PR template — A PR checklist template requiring: description of change, testing done, screenshots (for UI changes), and confirmation that SOT headers are present in new files.
 
 ---
@@ -678,7 +678,7 @@
 
 - [ ] [FEAT] macOS ARM64 (Apple Silicon) release — Official `aarch64-apple-darwin` build with Metal acceleration enabled by default. Requires CI runner with Apple Silicon (GitHub `macos-14` runner).
 - [ ] [FEAT] Linux support (experimental) — An `x86_64-unknown-linux-gnu` AppImage build. Audio capture via PipeWire / ALSA. Text injection via `xdotool` or `ydotool` for Wayland.
-- [ ] [FEAT] Android companion app (voice capture only) — A minimal Android app that captures audio and streams it to the desktop Murmur app via local Wi-Fi for dictation while away from the keyboard.
+- [ ] [FEAT] Android companion app (voice capture only) — A minimal Android app that captures audio and streams it to the desktop HushWrite app via local Wi-Fi for dictation while away from the keyboard.
 - [ ] [FEAT] iOS companion app — Same as Android: audio capture over local network, no cloud.
 - [ ] [FEAT] iPad split-screen optimization — When running the companion app in iPad split-screen, show the pill in the companion app's view rather than the desktop.
 
@@ -699,3 +699,5 @@
 ---
 
 _Last updated: 2026-09-04. Items without dates are open-ended backlog._
+
+its not removeing filer words

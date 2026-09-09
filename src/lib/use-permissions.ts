@@ -56,7 +56,7 @@ export function usePermissions(): CommandState<PermissionReport[]> {
   /**
    * WHAT:  Rust pushes the grants whenever they actually change.
    * WHY:   This is the load-bearing one, and the focus listener below is the
-   *        fallback rather than the mechanism. Murmur is an accessory app that
+   *        fallback rather than the mechanism. HushWrite is an accessory app that
    *        usually has NO window on screen while the user is in System
    *        Settings, so there is frequently no focus event to hang a re-check
    *        on — the app went on reporting "not granted" after it had been

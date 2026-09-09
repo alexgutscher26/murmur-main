@@ -69,7 +69,7 @@ export function AppGridMarquee() {
           Works instantly anywhere you can place a cursor
         </h2>
         <p className="text-sm sm:text-base text-neutral-600 max-w-xl mx-auto font-normal">
-          No browser plugins, no custom integrations, and zero clipboard overwrites. Murmur
+          No browser plugins, no custom integrations, and zero clipboard overwrites. HushWrite
           simulates native OS keyboard events directly into the frontmost window.
         </p>
       </div>

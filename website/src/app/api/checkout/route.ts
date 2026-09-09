@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
               name: pricing.name,
               description: pricing.discountApplied
                 ? `Includes special discount: ${pricing.discountApplied}`
-                : "Murmur 100% on-device voice-to-text with Whisper Large v3 Turbo.",
+                : "HushWrite 100% on-device voice-to-text with Whisper Large v3 Turbo.",
             },
             unit_amount: pricing.amountCents,
             ...(isSubscription

@@ -3,7 +3,7 @@
  *   SOUND_START, SOUND_STOP, SOUND_FAILED
  * WHAT:  The three short sounds that confirm a recording started, stopped, or
  *        failed.
- * WHY:   Without them you do not trust that the hotkey registered. Murmur has
+ * WHY:   Without them you do not trust that the hotkey registered. HushWrite has
  *        no window, no Dock icon and — in the moment you press the key — no
  *        visible pill yet, so the sound is the ONLY immediate confirmation that
  *        anything happened. That is why this is a feature and not decoration.

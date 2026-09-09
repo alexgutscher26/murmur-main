@@ -59,7 +59,7 @@ pub fn bind_dictation(app: &AppHandle, binding: &HotkeyBinding) -> AppResult<()>
             }
             None => Err(AppError::new(
                 ErrorCode::HotkeyRegistrationFailed,
-                "Murmur could not watch for that key. Check permissions and try again.",
+                "HushWrite could not watch for that key. Check permissions and try again.",
             )
             .recoverable()),
         };
@@ -74,7 +74,7 @@ pub fn bind_dictation(app: &AppHandle, binding: &HotkeyBinding) -> AppResult<()>
         .map_err(|err| {
             AppError::new(
                 ErrorCode::HotkeyRegistrationFailed,
-                "Murmur could not register its hotkey. Another app may already be using it.",
+                "HushWrite could not register its hotkey. Another app may already be using it.",
             )
             .recoverable()
             .with_detail(err)

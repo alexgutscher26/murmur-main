@@ -1,6 +1,6 @@
 /**
  * SOURCE OF TRUTH KEYWORDS: ShortcutsModal, keyboard-shortcuts, reference-panel, keycaps
- * WHAT:  The keyboard shortcuts and voice commands reference modal in Murmur.
+ * WHAT:  The keyboard shortcuts and voice commands reference modal in HushWrite.
  * WHY:   Displays global hotkeys, app navigation shortcuts, and spoken formatting commands
  *        with styled keycaps using design system tokens.
  * WHERE: Triggered from the dashboard header, settings view, or pressing '?' on keyboard.
@@ -43,7 +43,7 @@ const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
       {
         label: "Toggle Dashboard Window",
         keys: ["Option / Alt", "Shift", "Space"],
-        description: "Open, focus, or minimize the Murmur dashboard window.",
+        description: "Open, focus, or minimize the HushWrite dashboard window.",
       },
       {
         label: "Instant Cancel & Clear",
@@ -84,7 +84,7 @@ const SHORTCUT_CATEGORIES: ShortcutCategory[] = [
       {
         label: "Open Shortcuts Help",
         keys: ["?"],
-        description: "Toggle this shortcut cheatsheet from anywhere in Murmur.",
+        description: "Toggle this shortcut cheatsheet from anywhere in HushWrite.",
       },
     ],
   },

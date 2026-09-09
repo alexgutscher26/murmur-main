@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Winget Manifest Generator for Murmur.
+Winget Manifest Generator for HushWrite.
 
 Generates official Windows Package Manager (Winget) multi-YAML manifests
 for submission to the microsoft/winget-pkgs community repository.
@@ -8,9 +8,9 @@ for submission to the microsoft/winget-pkgs community repository.
 Usage:
     python scripts/generate_winget_manifest.py \
         --version 0.1.0 \
-        --installer-url https://github.com/webprodigies/murmur/releases/download/v0.1.0/murmur_0.1.0_x64-setup.exe \
+        --installer-url https://github.com/webprodigies/HushWrite/releases/download/v0.1.0/HushWrite_0.1.0_x64-setup.exe \
         --installer-sha256 <SHA256_HEX> \
-        --output-dir winget/manifests/w/WebProdigies/Murmur/0.1.0
+        --output-dir winget/manifests/w/WebProdigies/HushWrite/0.1.0
 """
 
 import argparse
@@ -20,7 +20,7 @@ import os
 def generate_manifests(version: str, installer_url: str, sha256: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
 
-    pkg_id = "WebProdigies.Murmur"
+    pkg_id = "WebProdigies.HushWrite"
 
     version_yaml = f"""# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.6.0.schema.json
 
@@ -46,7 +46,7 @@ Installers:
     InstallerType: nullsoft
     InstallerUrl: {installer_url}
     InstallerSha256: {sha256}
-    ProductCode: Murmur
+    ProductCode: HushWrite
 ManifestType: installer
 ManifestVersion: 1.6.0
 """
@@ -57,21 +57,21 @@ PackageIdentifier: {pkg_id}
 PackageVersion: {version}
 PackageLocale: en-US
 Publisher: WebProdigies
-PublisherUrl: https://murmur.app
-PublisherSupportUrl: https://github.com/webprodigies/murmur/issues
-PrivacyUrl: https://murmur.app/privacy
+PublisherUrl: https://HushWrite.app
+PublisherSupportUrl: https://github.com/webprodigies/HushWrite/issues
+PrivacyUrl: https://HushWrite.app/privacy
 Author: WebProdigies
-PackageName: Murmur
-PackageUrl: https://murmur.app
+PackageName: HushWrite
+PackageUrl: https://HushWrite.app
 License: MIT
-LicenseUrl: https://github.com/webprodigies/murmur/blob/main/LICENSE
+LicenseUrl: https://github.com/webprodigies/HushWrite/blob/main/LICENSE
 Copyright: Copyright (c) 2026 WebProdigies
 ShortDescription: Private, local AI voice dictation that never leaves your computer.
 Description: |
-  Murmur is a private, local-first voice dictation application for macOS and Windows.
+  HushWrite is a private, local-first voice dictation application for macOS and Windows.
   It runs OpenAI Whisper models locally on your GPU (Metal / DirectML) with sub-200ms latency,
   app-aware formatting, and custom phonetic dictionaries. Zero cloud audio upload.
-Moniker: murmur
+Moniker: HushWrite
 Tags:
   - dictation
   - speech-to-text
@@ -79,7 +79,7 @@ Tags:
   - whisper
   - local-ai
   - privacy
-ReleaseNotesUrl: https://github.com/webprodigies/murmur/releases/tag/v{version}
+ReleaseNotesUrl: https://github.com/webprodigies/HushWrite/releases/tag/v{version}
 ManifestType: defaultLocale
 ManifestVersion: 1.6.0
 """
@@ -97,7 +97,7 @@ ManifestVersion: 1.6.0
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate Winget manifests for Murmur.")
+    parser = argparse.ArgumentParser(description="Generate Winget manifests for HushWrite.")
     parser.add_argument("--version", required=True, help="Release version (e.g. 0.1.0)")
     parser.add_argument("--installer-url", required=True, help="Download URL of the Windows NSIS/MSI installer")
     parser.add_argument("--installer-sha256", default="0" * 64, help="SHA256 checksum of the installer")
@@ -105,7 +105,7 @@ def main():
 
     args = parser.parse_args()
 
-    out_dir = args.output_dir or f"winget/manifests/w/WebProdigies/Murmur/{args.version}"
+    out_dir = args.output_dir or f"winget/manifests/w/WebProdigies/HushWrite/{args.version}"
     generate_manifests(args.version, args.installer_url, args.installer_sha256, out_dir)
 
 

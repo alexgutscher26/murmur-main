@@ -164,11 +164,9 @@ impl TapDetector {
                 }
 
                 // A clean tap. It extends the run only if it arrived in time.
-                let in_time = self
-                    .first_tap_ms
-                    .is_some_and(|first| {
-                        now_ms.saturating_sub(first) <= DOUBLE_TAP_WINDOW.as_millis() as u64
-                    });
+                let in_time = self.first_tap_ms.is_some_and(|first| {
+                    now_ms.saturating_sub(first) <= DOUBLE_TAP_WINDOW.as_millis() as u64
+                });
                 self.taps = if in_time { self.taps + 1 } else { 1 };
                 self.first_tap_ms = Some(now_ms);
 
@@ -251,7 +249,7 @@ pub fn watch_modifier_tap(
     let on_trigger = Arc::new(on_trigger);
 
     std::thread::Builder::new()
-        .name("murmur-modifier-tap".into())
+        .name("HushWrite-modifier-tap".into())
         .spawn(move || {
             /*
              * SOURCE OF TRUTH KEYWORDS: reinstall_loop, TapDisabledByTimeout,
@@ -283,106 +281,106 @@ pub fn watch_modifier_tap(
             let mut reported_failure = false;
 
             while !thread_stop.load(Ordering::Relaxed) {
-            // Re-created per install: a tap that was disabled mid-gesture must
-            // not resume with half a gesture remembered.
-            let state = parking_lot::Mutex::new((TapDetector::new(), 0u64));
-            let start = std::time::Instant::now();
+                // Re-created per install: a tap that was disabled mid-gesture must
+                // not resume with half a gesture remembered.
+                let state = parking_lot::Mutex::new((TapDetector::new(), 0u64));
+                let start = std::time::Instant::now();
 
-            let reinstall = Arc::new(AtomicBool::new(false));
-            let callback_reinstall = Arc::clone(&reinstall);
-            let on_trigger = Arc::clone(&on_trigger);
-            let loop_stop = Arc::clone(&thread_stop);
+                let reinstall = Arc::new(AtomicBool::new(false));
+                let callback_reinstall = Arc::clone(&reinstall);
+                let on_trigger = Arc::clone(&on_trigger);
+                let loop_stop = Arc::clone(&thread_stop);
 
-            let installed = CGEventTap::with_enabled(
-                CGEventTapLocation::HID,
-                CGEventTapPlacement::HeadInsertEventTap,
-                // Listen-only: we observe and never modify or drop.
-                CGEventTapOptions::ListenOnly,
-                vec![CGEventType::FlagsChanged, CGEventType::KeyDown],
-                move |_proxy, event_type, event| {
-                    let now_ms = start.elapsed().as_millis() as u64;
-                    let mut guard = state.lock();
-                    let (detector, previous_flags) = &mut *guard;
+                let installed = CGEventTap::with_enabled(
+                    CGEventTapLocation::HID,
+                    CGEventTapPlacement::HeadInsertEventTap,
+                    // Listen-only: we observe and never modify or drop.
+                    CGEventTapOptions::ListenOnly,
+                    vec![CGEventType::FlagsChanged, CGEventType::KeyDown],
+                    move |_proxy, event_type, event| {
+                        let now_ms = start.elapsed().as_millis() as u64;
+                        let mut guard = state.lock();
+                        let (detector, previous_flags) = &mut *guard;
 
-                    let observed = match event_type {
-                        // The system just switched us off. Ask the thread to
-                        // install a fresh tap; re-enabling this one from inside
-                        // its own callback would need the port we do not hold.
-                        CGEventType::TapDisabledByTimeout
-                        | CGEventType::TapDisabledByUserInput => {
-                            tracing::warn!(
-                                ?event_type,
-                                "the modifier tap was disabled by macOS; reinstalling"
-                            );
-                            callback_reinstall.store(true, Ordering::Relaxed);
-                            return CallbackResult::Keep;
-                        }
-                        CGEventType::KeyDown => Some(TapEvent::KeyPressed),
-                        CGEventType::FlagsChanged => {
-                            let flags = event.get_flags().bits();
-                            let changed = flags ^ *previous_flags;
-                            *previous_flags = flags;
+                        let observed = match event_type {
+                            // The system just switched us off. Ask the thread to
+                            // install a fresh tap; re-enabling this one from inside
+                            // its own callback would need the port we do not hold.
+                            CGEventType::TapDisabledByTimeout
+                            | CGEventType::TapDisabledByUserInput => {
+                                tracing::warn!(
+                                    ?event_type,
+                                    "the modifier tap was disabled by macOS; reinstalling"
+                                );
+                                callback_reinstall.store(true, Ordering::Relaxed);
+                                return CallbackResult::Keep;
+                            }
+                            CGEventType::KeyDown => Some(TapEvent::KeyPressed),
+                            CGEventType::FlagsChanged => {
+                                let flags = event.get_flags().bits();
+                                let changed = flags ^ *previous_flags;
+                                *previous_flags = flags;
 
-                            if changed & watched != 0 {
-                                // Our modifier moved. Down only counts as the
-                                // start of a gesture when it is alone.
-                                if flags & watched != 0 {
-                                    if flags & ALL_MODIFIER_FLAGS & !watched != 0 {
-                                        Some(TapEvent::OtherModifierChanged)
+                                if changed & watched != 0 {
+                                    // Our modifier moved. Down only counts as the
+                                    // start of a gesture when it is alone.
+                                    if flags & watched != 0 {
+                                        if flags & ALL_MODIFIER_FLAGS & !watched != 0 {
+                                            Some(TapEvent::OtherModifierChanged)
+                                        } else {
+                                            Some(TapEvent::ModifierDown)
+                                        }
                                     } else {
-                                        Some(TapEvent::ModifierDown)
+                                        Some(TapEvent::ModifierUp)
                                     }
+                                } else if changed & ALL_MODIFIER_FLAGS != 0 {
+                                    Some(TapEvent::OtherModifierChanged)
                                 } else {
-                                    Some(TapEvent::ModifierUp)
+                                    None
                                 }
-                            } else if changed & ALL_MODIFIER_FLAGS != 0 {
-                                Some(TapEvent::OtherModifierChanged)
-                            } else {
-                                None
+                            }
+                            _ => None,
+                        };
+
+                        if let Some(observed) = observed {
+                            if detector.on_event(observed, now_ms) == TapOutcome::Fire {
+                                on_trigger();
                             }
                         }
-                        _ => None,
-                    };
 
-                    if let Some(observed) = observed {
-                        if detector.on_event(observed, now_ms) == TapOutcome::Fire {
-                            on_trigger();
+                        CallbackResult::Keep
+                    },
+                    || {
+                        thread_started.store(true, Ordering::Relaxed);
+                        // Wakes every 250ms so the stop flag and a reinstall
+                        // request are both noticed promptly.
+                        while !loop_stop.load(Ordering::Relaxed)
+                            && !reinstall.load(Ordering::Relaxed)
+                        {
+                            CFRunLoop::run_in_mode(
+                                unsafe { core_foundation::runloop::kCFRunLoopDefaultMode },
+                                Duration::from_millis(250),
+                                false,
+                            );
                         }
-                    }
+                    },
+                );
 
-                    CallbackResult::Keep
-                },
-                || {
-                    thread_started.store(true, Ordering::Relaxed);
-                    // Wakes every 250ms so the stop flag and a reinstall
-                    // request are both noticed promptly.
-                    while !loop_stop.load(Ordering::Relaxed)
-                        && !reinstall.load(Ordering::Relaxed)
-                    {
-                        CFRunLoop::run_in_mode(
-                            unsafe { core_foundation::runloop::kCFRunLoopDefaultMode },
-                            Duration::from_millis(250),
-                            false,
+                if installed.is_err() {
+                    // Logged once, not every retry: Accessibility may simply not be
+                    // granted yet, and a line every two seconds forever would bury
+                    // everything else in the file.
+                    if !reported_failure {
+                        reported_failure = true;
+                        tracing::error!(
+                            "could not install the modifier event tap; Accessibility is probably \
+                         not granted. Retrying, so granting it takes effect without a restart."
                         );
                     }
-                },
-            );
-
-            if installed.is_err() {
-                // Logged once, not every retry: Accessibility may simply not be
-                // granted yet, and a line every two seconds forever would bury
-                // everything else in the file.
-                if !reported_failure {
-                    reported_failure = true;
-                    tracing::error!(
-                        "could not install the modifier event tap; Accessibility is probably \
-                         not granted. Retrying, so granting it takes effect without a restart."
-                    );
+                    std::thread::sleep(Duration::from_secs(2));
+                } else {
+                    reported_failure = false;
                 }
-                std::thread::sleep(Duration::from_secs(2));
-            } else {
-                reported_failure = false;
-            }
             }
         })
         .ok()?;
@@ -442,7 +440,10 @@ mod tests {
         for round in 0..4 {
             let t = round * 300;
             assert_eq!(d.on_event(TapEvent::ModifierDown, t), TapOutcome::Waiting);
-            assert_eq!(d.on_event(TapEvent::KeyPressed, t + 20), TapOutcome::Waiting);
+            assert_eq!(
+                d.on_event(TapEvent::KeyPressed, t + 20),
+                TapOutcome::Waiting
+            );
             assert_eq!(
                 d.on_event(TapEvent::ModifierUp, t + 40),
                 TapOutcome::Waiting,
@@ -482,8 +483,6 @@ mod tests {
             "a hold is a mode, not a gesture"
         );
     }
-
-
 
     #[test]
     fn an_up_with_no_down_is_ignored() {

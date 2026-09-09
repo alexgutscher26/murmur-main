@@ -1,9 +1,9 @@
 /**
- * SOURCE OF TRUTH KEYWORDS: Dashboard, MurmurShell, navItems, useHashRoute,
+ * SOURCE OF TRUTH KEYWORDS: Dashboard, HushWriteShell, navItems, useHashRoute,
  *   dictationHotkey, StatsView, HistoryView, SettingsView, ShortcutsModal, ChangelogModal
  * WHAT:  The dashboard shell redesigned with rich modern aesthetics:
  *        - Window bar with sidebar toggle, user avatar, bell
- *        - Expanded left sidebar (Murmur branding, navigation items,
+ *        - Expanded left sidebar (HushWrite branding, navigation items,
  *          team invite, free month, settings with badge, help)
  *        - Spacious rounded white canvas card hosting active views
  * WHERE: Mounted by src/entries/dashboard.tsx.
@@ -264,7 +264,7 @@ export function Dashboard() {
               </div>
               {!sidebarCollapsed && (
                 <span className="font-bold text-base tracking-tight text-stone-900 dark:text-white">
-                  Murmur
+                  HushWrite
                 </span>
               )}
             </div>
@@ -328,7 +328,7 @@ export function Dashboard() {
               <button
                 type="button"
                 onClick={() => {
-                  const url = referralStatus.data?.referral_url || "https://murmur.app/pricing";
+                  const url = referralStatus.data?.referral_url || "https://HushWrite.app/pricing";
                   void unwrapCommand(() => commands.copyText({ text: url })).then(() =>
                     showToast("Personal referral link copied to clipboard!"),
                   );
@@ -382,7 +382,7 @@ export function Dashboard() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-amber-950 dark:text-amber-200">
-                      Finish Setting Up Murmur
+                      Finish Setting Up HushWrite
                     </span>
                     <span className="rounded-md bg-amber-200/60 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800 dark:bg-amber-900/60 dark:text-amber-300">
                       Step {savedStepIndex + 1} of 5

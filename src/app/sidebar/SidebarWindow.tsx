@@ -50,7 +50,7 @@ export function SidebarWindow({ items, activeRoute, onSelect }: SidebarWindowPro
       aria-label="Sections"
       className="flex h-full w-full flex-col items-center gap-[var(--rail-item-gap)] p-[var(--rail-padding)]"
     >
-      <Mark label="Murmur" className="mb-[var(--rail-mark-gap)] shrink-0" />
+      <Mark label="HushWrite" className="mb-[var(--rail-mark-gap)] shrink-0" />
 
       {items.map((item) => {
         const Icon = iconFor(item.icon);

@@ -141,7 +141,7 @@ export function DictionaryManager() {
       if (!hasDomainPackAccess) {
         setGatedFeatureName(`${pack.name} Vocabulary Pack`);
         setGatedDescription(
-          `The ${pack.name} pack is part of Murmur Pro domain packs, including specialized phonetic mappings.`,
+          `The ${pack.name} pack is part of HushWrite Pro domain packs, including specialized phonetic mappings.`,
         );
         setProModalOpen(true);
         return;

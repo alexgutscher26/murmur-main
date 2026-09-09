@@ -159,7 +159,7 @@ pub fn settings_capability() -> Capability {
             toggle(
                 keys::LAUNCH_AT_LOGIN,
                 "Launch at login",
-                "Start Murmur automatically when you log in.",
+                "Start HushWrite automatically when you log in.",
                 SettingSection::General,
                 false,
             ),
@@ -191,14 +191,14 @@ pub fn settings_capability() -> Capability {
             toggle(
                 keys::CHECK_UPDATES,
                 "Check for updates",
-                "Check for a new version on launch and once a day. This is the only network request Murmur makes after setup.",
+                "Check for a new version on launch and once a day. This is the only network request HushWrite makes after setup.",
                 SettingSection::General,
                 true,
             ),
             choice(
                 keys::UPDATE_CHANNEL,
                 "Update channel",
-                "Select which update channel Murmur checks for new desktop releases.",
+                "Select which update channel HushWrite checks for new desktop releases.",
                 SettingSection::General,
                 &[
                     ("stable", "Stable", "Official thoroughly tested production releases."),

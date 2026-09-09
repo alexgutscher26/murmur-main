@@ -1,6 +1,6 @@
 /**
  * SOURCE OF TRUTH KEYWORDS: ProFeatureModal, feature-gating, license-activation, trial-activation
- * WHAT:  The Pro Feature Gate Modal in Murmur desktop app.
+ * WHAT:  The Pro Feature Gate Modal in HushWrite desktop app.
  * WHY:   Presents a sleek, translucent dialog whenever a Free user attempts to access
  *        a gated capability (Large v3 Turbo, Context Engine, filler removal, unlimited dictionary).
  * WHERE: Triggered from ModelManager, AppProfiles, DictionaryManager, and SettingsView.
@@ -23,7 +23,7 @@ export function ProFeatureModal({
   isOpen,
   onClose,
   featureName = "Pro Capability",
-  description = "This feature requires Murmur Pro for peak accuracy and custom context adaptation.",
+  description = "This feature requires HushWrite Pro for peak accuracy and custom context adaptation.",
   benefits = [
     "Whisper Large v3 Turbo & Medium models with sub-200ms latency",
     "Smart Context Engine with per-app formatting (VS Code, Slack, Notion)",
@@ -56,9 +56,9 @@ export function ProFeatureModal({
 
   const handleOpenPricing = async () => {
     try {
-      await openUrl("https://murmur.app/pricing");
+      await openUrl("https://HushWrite.app/pricing");
     } catch {
-      window.open("https://murmur.app/pricing", "_blank");
+      window.open("https://HushWrite.app/pricing", "_blank");
     }
   };
 
@@ -105,7 +105,7 @@ export function ProFeatureModal({
         <div className="flex items-center gap-2 mb-3">
           <span className="flex items-center gap-1 rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-caption font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
             <Sparkles className="size-3" />
-            MURMUR PRO
+            HushWrite PRO
           </span>
           <span className="flex items-center gap-1 text-caption text-text-tertiary">
             <Lock className="size-3" /> Locked on Free

@@ -1,4 +1,4 @@
-# Murmur — Technical Plan
+# HushWrite — Technical Plan
 
 Companion to `01-IDEATION.md`. Implementation-level gotchas live in `03-IMPLEMENTATION-NOTES.md`; visual values in `04-DESIGN-SYSTEM.md`; the file tree in `05-PROJECT-STRUCTURE.md`. That document says what to build. This one says how, and why each choice is the one that survives contact with feature #40.
 
@@ -292,7 +292,7 @@ audio in ──▶ ring buffer ──▶ VAD finds a silence boundary
 
 ## 8. Data model
 
-One SQLite file at `~/Library/Application Support/com.murmur.app/murmur.db`, WAL mode, versioned migrations applied by `PRAGMA user_version`.
+One SQLite file at `~/Library/Application Support/com.HushWrite.app/HushWrite.db`, WAL mode, versioned migrations applied by `PRAGMA user_version`.
 
 ```sql
 sessions (
@@ -416,9 +416,9 @@ Phase 2 is the risk concentration. If measured latency there misses the target, 
 
 **Two things must be settled BEFORE the first public tag. Both become permanent afterwards.**
 
-1. **The updater private key has no passphrase, and it exists on exactly one machine.** `~/.murmur-updater.key`, chmod 600, gitignored. Its public half is compiled into every binary that ships, so after the first release the keypair can never be rotated for installs already in the wild — losing this file strands every existing installation on whatever version it has, permanently, with no recovery path. It belongs in a password manager, and adding a passphrase is free today and impossible later.
+1. **The updater private key has no passphrase, and it exists on exactly one machine.** `~/.HushWrite-updater.key`, chmod 600, gitignored. Its public half is compiled into every binary that ships, so after the first release the keypair can never be rotated for installs already in the wild — losing this file strands every existing installation on whatever version it has, permanently, with no recovery path. It belongs in a password manager, and adding a passphrase is free today and impossible later.
 
-2. **`plugins.updater.endpoints` is a guess.** It points at `github.com/webprodigies/murmur`, inferred rather than read, because the project has no git remote to read one from. If the real slug differs, the update check will silently find nothing — no error, no prompt, just an app that never updates and never says why. One value, and it has to be right before the first tag rather than after it.
+2. **`plugins.updater.endpoints` is a guess.** It points at `github.com/webprodigies/HushWrite`, inferred rather than read, because the project has no git remote to read one from. If the real slug differs, the update check will silently find nothing — no error, no prompt, just an app that never updates and never says why. One value, and it has to be right before the first tag rather than after it.
 
 Releases are published as **drafts**, so a broken build is never what every install auto-downloads.
 

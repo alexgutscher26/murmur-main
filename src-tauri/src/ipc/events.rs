@@ -53,7 +53,7 @@ pub struct TranscriptDelivered {
  * WHAT:  The OS grants, pushed whenever one of them actually changes.
  * WHY:   A permission is granted in System Settings — a DIFFERENT app — and
  *        nothing in our process is told. The UI used to re-check on window
- *        focus, which is the obvious answer and is not enough: Murmur is an
+ *        focus, which is the obvious answer and is not enough: HushWrite is an
  *        accessory app that often has no window on screen at all when the
  *        switch is flipped, and the operator reported the app never noticing
  *        even after quitting and relaunching.

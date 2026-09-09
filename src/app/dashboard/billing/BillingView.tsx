@@ -1,7 +1,7 @@
 /**
  * SOURCE OF TRUTH KEYWORDS: BillingView, usePlan, plan-management, feature-gates, design-tokens, syncSubscription, checkStatus
- * WHAT:  The Plan & Billing management view in the Murmur desktop app.
- * WHY:   Uses Murmur's native design tokens (bg-surface, bg-elevated, hairline, text-text-primary)
+ * WHAT:  The Plan & Billing management view in the HushWrite desktop app.
+ * WHY:   Uses HushWrite's native design tokens (bg-surface, bg-elevated, hairline, text-text-primary)
  *        so it seamlessly matches the translucent glass aesthetics in light & dark modes.
  * WHERE: Routed from the capability registry's Billing nav entry.
  */
@@ -41,7 +41,7 @@ export function BillingView() {
   const referralStatus = useCommand(commands.getReferralStatus, []);
 
   const handleCopyReferral = () => {
-    const url = referralStatus.data?.referral_url || "https://murmur.app/pricing";
+    const url = referralStatus.data?.referral_url || "https://HushWrite.app/pricing";
     void unwrapCommand(() => commands.copyText({ text: url })).then(() => {
       setCopiedReferral(true);
       setTimeout(() => setCopiedReferral(false), 2000);
@@ -92,7 +92,7 @@ export function BillingView() {
     try {
       const endpoints = [
         "http://localhost:3000/api/billing/portal",
-        "https://murmur.app/api/billing/portal",
+        "https://HushWrite.app/api/billing/portal",
       ];
       let portalUrl: string | null = null;
       for (const ep of endpoints) {
@@ -114,10 +114,10 @@ export function BillingView() {
       if (portalUrl) {
         await handleOpenLink(portalUrl);
       } else {
-        await handleOpenLink("https://murmur.app/pricing");
+        await handleOpenLink("https://HushWrite.app/pricing");
       }
     } catch {
-      await handleOpenLink("https://murmur.app/pricing");
+      await handleOpenLink("https://HushWrite.app/pricing");
     }
   };
 
@@ -216,7 +216,7 @@ export function BillingView() {
           </div>
           <button
             type="button"
-            onClick={() => handleOpenLink("https://murmur.app/pricing")}
+            onClick={() => handleOpenLink("https://HushWrite.app/pricing")}
             className="hairline h-8 rounded-input bg-text-primary px-3 text-caption font-semibold text-opaque-elevated hover:opacity-90 transition-opacity shrink-0 cursor-pointer"
           >
             Reactivate Pro
@@ -232,7 +232,7 @@ export function BillingView() {
               Current Plan
             </span>
             <span className="rounded-full bg-text-primary px-2.5 py-0.5 text-caption font-semibold text-opaque-elevated">
-              {tier === "starter" ? "Free Tier" : tier === "pro" ? "Murmur Pro" : "Team License"}
+              {tier === "starter" ? "Free Tier" : tier === "pro" ? "HushWrite Pro" : "Team License"}
             </span>
             {isTrial && (
               <span className="hairline rounded-full bg-sunken px-2 py-0.5 text-caption text-text-secondary">
@@ -292,7 +292,7 @@ export function BillingView() {
         </div>
         <button
           type="button"
-          onClick={() => handleOpenLink("https://murmur.app/pricing")}
+          onClick={() => handleOpenLink("https://HushWrite.app/pricing")}
           className="hairline h-8 rounded-input bg-sunken px-3 text-caption font-semibold text-text-primary transition-colors hover:bg-sunken-strong shrink-0 cursor-pointer"
         >
           Claim Switcher Deal →
@@ -320,7 +320,7 @@ export function BillingView() {
         </div>
         <button
           type="button"
-          onClick={() => handleOpenLink("https://murmur.app/pricing")}
+          onClick={() => handleOpenLink("https://HushWrite.app/pricing")}
           className="hairline h-8 rounded-input bg-sunken px-3 text-caption font-semibold text-text-primary transition-colors hover:bg-sunken-strong shrink-0 cursor-pointer"
         >
           Apply for 50% Grant →
@@ -379,10 +379,10 @@ export function BillingView() {
           </p>
           <button
             type="button"
-            onClick={() => handleOpenLink("https://murmur.app/pricing")}
+            onClick={() => handleOpenLink("https://HushWrite.app/pricing")}
             className="text-caption text-text-secondary hover:text-text-primary underline transition-colors"
           >
-            Buy license on murmur.app ↗
+            Buy license on HushWrite.app ↗
           </button>
         </div>
         <form onSubmit={handleActivate} className="flex flex-col sm:flex-row gap-2">
@@ -407,7 +407,7 @@ export function BillingView() {
         )}
         {keyError && (
           <p className="text-caption font-mono text-danger mt-2">
-            ✕ Invalid key format. Enter a valid Murmur Pro, Team, Student, or Switcher key.
+            ✕ Invalid key format. Enter a valid HushWrite Pro, Team, Student, or Switcher key.
           </p>
         )}
 
@@ -579,7 +579,7 @@ export function BillingView() {
                   <>
                     <button
                       type="button"
-                      onClick={() => handleOpenLink("https://murmur.app/pricing")}
+                      onClick={() => handleOpenLink("https://HushWrite.app/pricing")}
                       className="w-full text-center text-caption font-semibold py-2 rounded-input bg-text-primary text-opaque-elevated transition-opacity hover:opacity-90 shadow-xs"
                     >
                       Buy Pro License ({proBilling === "lifetime" ? "$89" : "$49/yr"}) ↗
@@ -599,7 +599,7 @@ export function BillingView() {
                     type="button"
                     onClick={() =>
                       handleOpenLink(
-                        "mailto:sales@murmur.app?subject=Team%20Inquiry%20from%20Desktop%20App",
+                        "mailto:sales@HushWrite.app?subject=Team%20Inquiry%20from%20Desktop%20App",
                       )
                     }
                     className="hairline w-full text-center text-caption font-semibold py-2 rounded-input bg-sunken text-text-primary transition-colors hover:bg-sunken-strong"
@@ -644,7 +644,7 @@ export function BillingView() {
           type="button"
           onClick={() =>
             handleOpenLink(
-              "mailto:support@murmur.app?subject=Student%2FOSS%20Discount%20Request&body=Hi%20Murmur%20Team%2C%0A%0AI%20am%20a%20student%20%2F%20OSS%20maintainer%20applying%20for%20the%2050%25%20grant.%0A%0AProof%20of%20enrollment%20or%20GitHub%20profile%3A%20%0A%0AThank%20you!",
+              "mailto:support@HushWrite.app?subject=Student%2FOSS%20Discount%20Request&body=Hi%20HushWrite%20Team%2C%0A%0AI%20am%20a%20student%20%2F%20OSS%20maintainer%20applying%20for%20the%2050%25%20grant.%0A%0AProof%20of%20enrollment%20or%20GitHub%20profile%3A%20%0A%0AThank%20you!",
             )
           }
           className="hairline h-8 rounded-input bg-sunken px-3 text-caption font-semibold text-text-primary transition-colors hover:bg-sunken-strong shrink-0"

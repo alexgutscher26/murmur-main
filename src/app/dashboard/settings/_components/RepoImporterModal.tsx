@@ -1,7 +1,7 @@
 /**
  * SOURCE OF TRUTH KEYWORDS: RepoImporterModal, extract_symbols, codebase_glossary, developer_vocabulary
  * WHAT:  Extracts custom symbols, identifiers, camelCase, PascalCase, and package names
- *        from codebases, package.json, or Cargo.toml into Murmur's local SQLite vocabulary.
+ *        from codebases, package.json, or Cargo.toml into HushWrite's local SQLite vocabulary.
  * WHY:   Developers dictate project-specific function names, variables, and components that
  *        standard models get wrong. 1-click repository import makes accuracy instantaneous.
  * WHERE: Triggered from DictionaryManager in Settings.
@@ -203,7 +203,7 @@ export function RepoImporterModal({ isOpen, onClose, onImported }: RepoImporterM
                 Paste your project's{" "}
                 <code className="rounded bg-sunken px-1 font-mono text-[11px]">package.json</code>,{" "}
                 <code className="rounded bg-sunken px-1 font-mono text-[11px]">Cargo.toml</code>, or
-                TypeScript/Python source code below. Murmur will automatically extract your
+                TypeScript/Python source code below. HushWrite will automatically extract your
                 identifiers and phonetic triggers.
               </p>
               <textarea

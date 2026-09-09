@@ -23,12 +23,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://murmur.app"),
-  title: "Murmur · Private On-Device AI Voice Dictation | macOS & Windows",
+  metadataBase: new URL("https://HushWrite.app"),
+  title: "HushWrite · Private On-Device AI Voice Dictation | macOS & Windows",
   description:
     "Dictate anywhere. Nothing leaves your device. Fast, polished voice dictation for macOS and Windows that never sends your voice or transcripts off your computer.",
   keywords: [
-    "Murmur",
+    "HushWrite",
     "private speech to text",
     "on device voice dictation",
     "whisper ai offline",
@@ -37,19 +37,19 @@ export const metadata: Metadata = {
     "Tauri 2",
     "Rust",
   ],
-  authors: [{ name: "Murmur Contributors" }],
+  authors: [{ name: "HushWrite Contributors" }],
   openGraph: {
-    title: "Murmur · Speak naturally. Write anywhere. Keep it private.",
+    title: "HushWrite · Speak naturally. Write anywhere. Keep it private.",
     description:
       "Turn your voice into polished text in any app—processed locally on your PC or Mac. No uploaded audio. No cloud transcript history.",
-    url: "https://murmur.app",
-    siteName: "Murmur",
+    url: "https://HushWrite.app",
+    siteName: "HushWrite",
     images: [
       {
         url: "/128x128@2x.png",
         width: 256,
         height: 256,
-        alt: "Murmur Logo",
+        alt: "HushWrite Logo",
       },
     ],
     locale: "en_US",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Murmur · Dictate anywhere. Nothing leaves your device.",
+    title: "HushWrite · Dictate anywhere. Nothing leaves your device.",
     description:
       "Fast, polished on-device AI voice dictation. 100% private by architecture. Free forever & open source.",
     images: ["/128x128@2x.png"],

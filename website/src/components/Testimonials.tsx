@@ -13,7 +13,7 @@ interface Testimonial {
 const TESTIMONIALS: Testimonial[] = [
   {
     quote:
-      "Murmur completely replaced cloud dictation tools for my daily engineering work. I write code comments, PR reviews, and Slack messages with my voice. Being 100% offline and free is an incredible achievement.",
+      "HushWrite completely replaced cloud dictation tools for my daily engineering work. I write code comments, PR reviews, and Slack messages with my voice. Being 100% offline and free is an incredible achievement.",
     author: "Elena Rostova",
     role: "Staff Software Engineer",
     tag: "Engineering",
@@ -21,7 +21,7 @@ const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "As a physician, HIPAA compliance is strictly non-negotiable. I cannot use cloud speech tools. Murmur runs locally on my laptop with zero network traffic and recognizes medical terminology reliably.",
+      "As a physician, HIPAA compliance is strictly non-negotiable. I cannot use cloud speech tools. HushWrite runs locally on my laptop with zero network traffic and recognizes medical terminology reliably.",
     author: "Dr. Julian Vance",
     role: "Clinical Neurologist",
     tag: "Healthcare",
@@ -29,7 +29,7 @@ const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "I dictated over 40,000 words of my latest manuscript with Murmur. The filler word removal cleans false starts without interrupting my natural drafting rhythm.",
+      "I dictated over 40,000 words of my latest manuscript with HushWrite. The filler word removal cleans false starts without interrupting my natural drafting rhythm.",
     author: "Marcus Sterling",
     role: "Author & Essayist",
     tag: "Writing",
@@ -45,7 +45,7 @@ const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "Murmur is faster than paid cloud alternatives because it eliminates the network latency roundtrip entirely. Solid native engineering in Rust.",
+      "HushWrite is faster than paid cloud alternatives because it eliminates the network latency roundtrip entirely. Solid native engineering in Rust.",
     author: "Chloe Dubois",
     role: "Product Manager",
     tag: "Product",
@@ -61,7 +61,7 @@ const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "Attorney-client privilege cannot survive unvetted cloud audio streaming. Murmur's local air-gapped processing is the only dictation architecture our compliance committee cleared for confidential litigation briefs.",
+      "Attorney-client privilege cannot survive unvetted cloud audio streaming. HushWrite's local air-gapped processing is the only dictation architecture our compliance committee cleared for confidential litigation briefs.",
     author: "Sarah Lin, Esq.",
     role: "Partner, Tech IP Litigation",
     tag: "Legal",
@@ -85,7 +85,7 @@ const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "Our security policy banned cloud transcription bots company-wide. Murmur passed our internal packet inspection and security audit with flying colors. 100% on-device is the future.",
+      "Our security policy banned cloud transcription bots company-wide. HushWrite passed our internal packet inspection and security audit with flying colors. 100% on-device is the future.",
     author: "Priya Nair",
     role: "VP of Engineering",
     tag: "Executive",

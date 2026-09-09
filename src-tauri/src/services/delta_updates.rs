@@ -1,7 +1,7 @@
 /*!
  * SOURCE OF TRUTH KEYWORDS: delta_updates, bsdiff, bspatch, patch_application,
  *   binary_diff, sha256_verification
- * WHAT:  Binary delta update service for Murmur.
+ * WHAT:  Binary delta update service for HushWrite.
  * WHY:   Full desktop installers for macOS and Windows are ~60-100 MB.
  *        Delta updates compute binary diffs (bsdiff) between version N-1 and N,
  *        reducing download payload to 2-5 MB (a 90-95% reduction in bandwidth).
@@ -10,10 +10,10 @@
  * WHERE: Imported by ipc/commands/updates.rs; verified in unit tests below.
  */
 
+use serde::{Deserialize, Serialize};
+use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-use sha2::{Digest, Sha256};
-use serde::{Deserialize, Serialize};
 
 use crate::error::{AppError, ErrorCode};
 
@@ -65,9 +65,10 @@ pub fn find_matching_delta_patch<'a>(
     let platform = manifest.platforms.get(platform_key)?;
     let norm_current = normalize_version(current_version);
 
-    platform.patches.iter().find(|p| {
-        normalize_version(&p.from_version) == norm_current
-    })
+    platform
+        .patches
+        .iter()
+        .find(|p| normalize_version(&p.from_version) == norm_current)
 }
 
 /// Verifies whether the SHA-256 hash of `data` matches `expected_hex` (case-insensitive).
@@ -123,7 +124,7 @@ pub fn get_staged_exe_path(current_exe: &Path) -> PathBuf {
     let file_name = current_exe
         .file_name()
         .and_then(|n| n.to_str())
-        .unwrap_or("murmur");
+        .unwrap_or("HushWrite");
     staged.set_file_name(format!("{file_name}.patch_staged"));
     staged
 }
@@ -141,15 +142,17 @@ mod tests {
 
     #[test]
     fn test_binary_diff_and_patch_roundtrip() {
-        let old_binary = b"ELF/PE-HEADER-ORIGINAL-MACHINE-CODE-v1.0.0-MURMUR-BASE-BINARY-XYZ1234567890";
-        let new_binary = b"ELF/PE-HEADER-UPDATED-MACHINE-CODE-v1.1.0-MURMUR-OPTIMIZED-DIRECTML-XYZ1234567890-ADDITIONAL-FEATURE-DATA";
+        let old_binary =
+            b"ELF/PE-HEADER-ORIGINAL-MACHINE-CODE-v1.0.0-HushWrite-BASE-BINARY-XYZ1234567890";
+        let new_binary = b"ELF/PE-HEADER-UPDATED-MACHINE-CODE-v1.1.0-HushWrite-OPTIMIZED-DIRECTML-XYZ1234567890-ADDITIONAL-FEATURE-DATA";
 
         // 1. Create patch
         let patch = create_binary_patch(old_binary, new_binary).expect("patch creation succeeds");
         assert!(!patch.is_empty());
 
         // 2. Apply patch
-        let reconstructed = apply_binary_patch(old_binary, &patch).expect("patch application succeeds");
+        let reconstructed =
+            apply_binary_patch(old_binary, &patch).expect("patch application succeeds");
         assert_eq!(&reconstructed[..], &new_binary[..]);
 
         // 3. Verify SHA-256
@@ -158,7 +161,10 @@ mod tests {
         let expected_hash = hex::encode(hasher.finalize());
 
         assert!(verify_binary_sha256(&reconstructed, &expected_hash));
-        assert!(!verify_binary_sha256(&reconstructed, "0000000000000000000000000000000000000000000000000000000000000000"));
+        assert!(!verify_binary_sha256(
+            &reconstructed,
+            "0000000000000000000000000000000000000000000000000000000000000000"
+        ));
     }
 
     #[test]
@@ -198,7 +204,10 @@ mod tests {
         // Matching version
         let patch = find_matching_delta_patch(&manifest, "windows-x86_64", "v0.1.0");
         assert!(patch.is_some());
-        assert_eq!(patch.unwrap().url, "https://example.com/patch_0.1.0_to_0.2.0.patch");
+        assert_eq!(
+            patch.unwrap().url,
+            "https://example.com/patch_0.1.0_to_0.2.0.patch"
+        );
 
         // Non-matching version
         let missing = find_matching_delta_patch(&manifest, "windows-x86_64", "v0.0.9");

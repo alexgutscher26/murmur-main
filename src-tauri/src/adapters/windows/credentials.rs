@@ -2,7 +2,7 @@
  * SOURCE OF TRUTH KEYWORDS: WindowsCredentialStore, CredWriteW, CredReadW,
  *   CredDeleteW, CRED_TYPE_GENERIC, CRED_PERSIST_LOCAL_MACHINE
  * WHAT:  Secure key and secret storage backed by Windows Credential Manager.
- * WHY:   Murmur promises voice privacy and data safety on device. Storing
+ * WHY:   HushWrite promises voice privacy and data safety on device. Storing
  *        encryption keys (for future audio export, transcripts, or credentials)
  *        in plaintext files inside AppData exposes them to any unprivileged
  *        process. Windows Credential Manager secures credentials per-user with
@@ -16,7 +16,7 @@ use windows::Win32::Security::Credentials::{
     CRED_PERSIST_LOCAL_MACHINE, CRED_TYPE_GENERIC,
 };
 
-const DEFAULT_TARGET_PREFIX: &str = "Murmur/Secret/";
+const DEFAULT_TARGET_PREFIX: &str = "HushWrite/Secret/";
 
 pub struct WindowsCredentialStore;
 
@@ -27,8 +27,10 @@ impl WindowsCredentialStore {
      * WHY:   Encrypts with DPAPI at rest; isolated to the local user account.
      */
     pub fn store_secret(key: &str, secret: &[u8]) -> bool {
-        let target_name: Vec<u16> = format!("{DEFAULT_TARGET_PREFIX}{key}\0").encode_utf16().collect();
-        let user_name: Vec<u16> = "MurmurUser\0".encode_utf16().collect();
+        let target_name: Vec<u16> = format!("{DEFAULT_TARGET_PREFIX}{key}\0")
+            .encode_utf16()
+            .collect();
+        let user_name: Vec<u16> = "HushWriteUser\0".encode_utf16().collect();
 
         let credential = CREDENTIALW {
             Flags: CRED_FLAGS(0),
@@ -53,7 +55,9 @@ impl WindowsCredentialStore {
      * WHAT:  Retrieves a previously stored secret/key from Windows Credential Manager.
      */
     pub fn read_secret(key: &str) -> Option<Vec<u8>> {
-        let target_name: Vec<u16> = format!("{DEFAULT_TARGET_PREFIX}{key}\0").encode_utf16().collect();
+        let target_name: Vec<u16> = format!("{DEFAULT_TARGET_PREFIX}{key}\0")
+            .encode_utf16()
+            .collect();
 
         unsafe {
             let mut cred_ptr: *mut CREDENTIALW = std::ptr::null_mut();
@@ -95,7 +99,9 @@ impl WindowsCredentialStore {
      * WHAT:  Deletes a secret from Windows Credential Manager.
      */
     pub fn delete_secret(key: &str) -> bool {
-        let target_name: Vec<u16> = format!("{DEFAULT_TARGET_PREFIX}{key}\0").encode_utf16().collect();
+        let target_name: Vec<u16> = format!("{DEFAULT_TARGET_PREFIX}{key}\0")
+            .encode_utf16()
+            .collect();
 
         unsafe { CredDeleteW(PCWSTR(target_name.as_ptr()), CRED_TYPE_GENERIC, 0).is_ok() }
     }

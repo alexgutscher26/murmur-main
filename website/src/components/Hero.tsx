@@ -109,7 +109,7 @@ Alex`,
     formattedOutput: `### Bug: Memory Profile & Network Egress in Air-Gap Mode
 
 **Steps to Reproduce:**
-1. Toggle Airplane / Air-Gap Mode in Murmur Settings
+1. Toggle Airplane / Air-Gap Mode in HushWrite Settings
 2. Disconnect Wi-Fi and Ethernet (\`0 bytes/sec\` egress)
 3. Dictate 5 continuous paragraphs into the issue editor
 
@@ -255,15 +255,15 @@ export function Hero() {
       {/* Two CTA Buttons matching the screenshot */}
       <div className="relative flex flex-col sm:flex-row items-center gap-3.5 mb-14 z-10">
         <a
-          href="mailto:sales@murmur.app?subject=Murmur%20Enterprise%20and%20Team%20Inquiry"
+          href="mailto:sales@HushWrite.app?subject=HushWrite%20Enterprise%20and%20Team%20Inquiry"
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-50 border border-neutral-200/90 shadow-sm text-sm font-semibold text-neutral-800 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
         >
           <Mail className="w-4 h-4 text-neutral-500" />
           <span>Talk to Sales</span>
         </a>
         <a
-          href="/downloads/Murmur_0.1.0_x64-setup.exe"
-          download="Murmur_0.1.0_x64-setup.exe"
+          href="/downloads/HushWrite_0.1.0_x64-setup.exe"
+          download="HushWrite_0.1.0_x64-setup.exe"
           onClick={handleHeroDownload}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white text-sm font-semibold shadow-md transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
         >
@@ -322,7 +322,7 @@ export function Hero() {
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                   </span>
                   <span className="text-xs font-mono text-neutral-700 font-medium group-hover:text-neutral-950">
-                    Murmur ready · Click to dictate
+                    HushWrite ready · Click to dictate
                   </span>
                 </>
               )}

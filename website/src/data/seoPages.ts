@@ -12,7 +12,7 @@ export interface SeoPageData {
   keyStats: { label: string; value: string; detail: string }[];
   comparisonTable: {
     feature: string;
-    murmur: string;
+    HushWrite: string;
     cloudComp: string;
     whyItMatters: string;
   }[];
@@ -35,7 +35,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     slug: "wispr-flow-alternative",
     metaTitle: "Best Private Wispr Flow Alternative for Windows · 100% Local Dictation",
     metaDescription:
-      "Looking for a private Wispr Flow alternative on Windows? Wispr Flow charges ~$15/mo for cloud streaming. Murmur runs 100% locally on Windows with zero cloud uploads and zero subscriptions.",
+      "Looking for a private Wispr Flow alternative on Windows? Wispr Flow charges ~$15/mo for cloud streaming. HushWrite runs 100% locally on Windows with zero cloud uploads and zero subscriptions.",
     badge: "Updated September 7, 2026 · Wispr Flow Alternative",
     h1: "The Private, Local-First",
     h1Highlight: "Alternative to Wispr Flow on Windows.",
@@ -45,7 +45,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Wispr Flow streams raw microphone audio over WebSockets to remote cloud GPU clusters. Free usage is throttled at 2,000 words/week, after which users face a ~$15/month ($144–$180/year) subscription. Furthermore, competitors offering local and lifetime models (like Superwhisper) are strictly macOS-only, leaving Windows users stranded.",
     architecturalSolution:
-      "Murmur is Windows-native at launch, running OpenAI Whisper open-weights models locally via whisper.cpp and DirectML. Audio stays in local RAM and is purged the instant text is typed into your cursor. Unlimited words, zero cloud ingress, and zero subscriptions.",
+      "HushWrite is Windows-native at launch, running OpenAI Whisper open-weights models locally via whisper.cpp and DirectML. Audio stays in local RAM and is purged the instant text is typed into your cursor. Unlimited words, zero cloud ingress, and zero subscriptions.",
     keyStats: [
       { label: "Cloud Audio Upload", value: "0 Bytes", detail: "Air-gapped local decode" },
       { label: "Tail Latency", value: "<150 ms", detail: "3x faster than cloud round-trips" },
@@ -55,37 +55,37 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Core Processing Model",
-        murmur: "100% on-device (Local GPU / whisper.cpp)",
+        HushWrite: "100% on-device (Local GPU / whisper.cpp)",
         cloudComp: "Cloud-enabled servers and remote inference",
         whyItMatters: "Physical data isolation eliminates cloud leak vectors",
       },
       {
         feature: "Offline Dictation",
-        murmur: "Core workflow (100% offline, airplane ready)",
+        HushWrite: "Core workflow (100% offline, airplane ready)",
         cloudComp: "Fails offline; requires active internet",
         whyItMatters: "Dictate anywhere with zero latency jitter",
       },
       {
         feature: "Operating System Availability",
-        murmur: "Windows 10/11 (Native; macOS in beta)",
+        HushWrite: "Windows 10/11 (Native; macOS in beta)",
         cloudComp: "Windows & macOS",
         whyItMatters: "Full hardware DirectML acceleration on Windows",
       },
       {
         feature: "Transcript Ownership",
-        murmur: "Stored locally in SQLite (or Incognito RAM-only)",
+        HushWrite: "Stored locally in SQLite (or Incognito RAM-only)",
         cloudComp: "Stored in cloud with vendor retention policies",
         whyItMatters: "You own your raw text assets permanently",
       },
       {
         feature: "Data Use & Model Training",
-        murmur: "Zero telemetry / Zero training pipeline",
+        HushWrite: "Zero telemetry / Zero training pipeline",
         cloudComp: "Audio streams processed on remote cloud infrastructure",
         whyItMatters: "Your voice is never exposed to third-party endpoints",
       },
       {
         feature: "Desktop Free Tier Limits",
-        murmur: "Unlimited dictation forever (Open Source Core)",
+        HushWrite: "Unlimited dictation forever (Open Source Core)",
         cloudComp: "Capped at 2,000 words/week, then ~$15/month ($180/yr)",
         whyItMatters: "No artificial artificial paywalls on your own hardware",
       },
@@ -93,7 +93,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "Local and Lifetime: Why pay a recurring cloud tax for computation your PC does faster?",
       detail:
-        "Wispr Flow's paid plan is widely reported around $15/month ($144–$180/year) to offset remote GPU cluster costs, while Mac alternatives like Superwhisper promote lifetime tiers ($199–$249) but lack Windows support. Murmur matches your search intent directly: 100% local, high-speed voice dictation on Windows with zero subscription lock-in.",
+        "Wispr Flow's paid plan is widely reported around $15/month ($144–$180/year) to offset remote GPU cluster costs, while Mac alternatives like Superwhisper promote lifetime tiers ($199–$249) but lack Windows support. HushWrite matches your search intent directly: 100% local, high-speed voice dictation on Windows with zero subscription lock-in.",
     },
     socialProofClip: {
       platform: "X (Twitter) & LinkedIn",
@@ -102,25 +102,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
       context: "Verified offline benchmark on Windows 11 Workstation",
     },
     disclaimer:
-      "Honest Technical Limitations: Murmur v0.1 is engineered natively for Windows 10/11 (macOS is in private beta). Running larger models locally requires 4GB+ dedicated GPU VRAM or fast system RAM. Murmur applies deterministic local rules: it accurately inputs what you spoke, but does not use multi-billion parameter cloud LLMs to creatively rewrite conversational rambling.",
+      "Honest Technical Limitations: HushWrite v0.1 is engineered natively for Windows 10/11 (macOS is in private beta). Running larger models locally requires 4GB+ dedicated GPU VRAM or fast system RAM. HushWrite applies deterministic local rules: it accurately inputs what you spoke, but does not use multi-billion parameter cloud LLMs to creatively rewrite conversational rambling.",
     reproducibleAuditStep:
       "Reproducible Benchmark Setup: Tested on Windows 11 Pro (Intel i7-13700K / RTX 4070 12GB) using 16kHz loopback via VB-Audio Virtual Cable. Measured 134ms hotkey release to Win32 SendInput. Run Wireshark filter 'tcp.port == 443 and ip.addr != 127.0.0.1' while dictating to verify 0 bytes outbound.",
     faqs: [
       {
-        q: "How does Murmur compare to Wispr Flow on speed?",
-        a: "Murmur delivers 134–168ms tail latency on modern Windows GPUs and APUs because it avoids the 300–600ms network round-trip penalty (DNS + TLS + WebSocket upload + cloud queue).",
+        q: "How does HushWrite compare to Wispr Flow on speed?",
+        a: "HushWrite delivers 134–168ms tail latency on modern Windows GPUs and APUs because it avoids the 300–600ms network round-trip penalty (DNS + TLS + WebSocket upload + cloud queue).",
       },
       {
         q: "Why is local and lifetime important compared to Wispr Flow's $15/mo plan?",
         a: "A $15/month subscription costs $180/year and $540 over three years just to type with your voice. With modern GPUs capable of running Whisper models in RAM, paying a recurring monthly fee for cloud computation is unnecessary.",
       },
       {
-        q: "Does Murmur offer app-aware formatting like Wispr Flow?",
-        a: "Yes. Murmur inspects the frontmost active window and automatically structures output (e.g. Conventional Commits and CamelCase in VS Code/Cursor, bullet points in Slack, clean paragraphs in Gmail).",
+        q: "Does HushWrite offer app-aware formatting like Wispr Flow?",
+        a: "Yes. HushWrite inspects the frontmost active window and automatically structures output (e.g. Conventional Commits and CamelCase in VS Code/Cursor, bullet points in Slack, clean paragraphs in Gmail).",
       },
       {
-        q: "Can I use Murmur completely offline?",
-        a: "Yes. Murmur does not require internet access to transcribe audio. You can dictate in airplane mode or in secure, air-gapped corporate environments.",
+        q: "Can I use HushWrite completely offline?",
+        a: "Yes. HushWrite does not require internet access to transcribe audio. You can dictate in airplane mode or in secure, air-gapped corporate environments.",
       },
     ],
   },
@@ -129,7 +129,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     slug: "private-dictation-app",
     metaTitle: "Private Dictation App · 100% On-Device Voice to Text",
     metaDescription:
-      "Looking for a private dictation app? Murmur provides zero-cloud, on-device voice typing for Mac and Windows. No accounts, no telemetry, no audio uploads.",
+      "Looking for a private dictation app? HushWrite provides zero-cloud, on-device voice typing for Mac and Windows. No accounts, no telemetry, no audio uploads.",
     badge: "Privacy Architecture",
     h1: "The Private Dictation App",
     h1Highlight: "Where Voice Never Leaves Your Machine.",
@@ -139,7 +139,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Most voice typing tools stream unencrypted audio to cloud SaaS endpoints. Even with strict vendor privacy policies, data remains exposed to subpoena, cloud breaches, third-party sub-processors, and rogue employee access.",
     architecturalSolution:
-      "Murmur replaces policy promises with hardware isolation. Microphone audio is processed in local RAM and discarded immediately upon text insertion.",
+      "HushWrite replaces policy promises with hardware isolation. Microphone audio is processed in local RAM and discarded immediately upon text insertion.",
     keyStats: [
       { label: "Cloud Telemetry", value: "0 Trackers", detail: "Zero SDKs in binary" },
       { label: "Accounts Required", value: "0 Logins", detail: "Fully anonymous & local" },
@@ -149,25 +149,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Data Security Model",
-        murmur: "Physical hardware boundary (Air-gapped)",
+        HushWrite: "Physical hardware boundary (Air-gapped)",
         cloudComp: "Legal terms of service & policy controls",
         whyItMatters: "Architecture cannot be breached remotely",
       },
       {
         feature: "Authentication & User ID",
-        murmur: "None (Works out of the box)",
+        HushWrite: "None (Works out of the box)",
         cloudComp: "Mandatory email / Google SSO login",
         whyItMatters: "No centralized user identity or activity logging",
       },
       {
         feature: "Retention Controls",
-        murmur: "1-click wipe / Auto-purge (0-30 days) / Incognito",
+        HushWrite: "1-click wipe / Auto-purge (0-30 days) / Incognito",
         cloudComp: "Cloud retention with remote database deletion queues",
         whyItMatters: "Instant, deterministic erasure from your disk",
       },
       {
         feature: "Third-Party Sub-processors",
-        murmur: "0 sub-processors (100% local)",
+        HushWrite: "0 sub-processors (100% local)",
         cloudComp: "Multiple cloud hosting, LLM, and analytics vendors",
         whyItMatters: "Compliance with strict enterprise NDAs and confidentiality",
       },
@@ -175,7 +175,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "True privacy shouldn't be an expensive enterprise add-on.",
       detail:
-        "While cloud providers gate privacy and retention controls behind expensive enterprise tiers, Murmur's local-first architecture makes complete data sovereignty the default for everyone.",
+        "While cloud providers gate privacy and retention controls behind expensive enterprise tiers, HushWrite's local-first architecture makes complete data sovereignty the default for everyone.",
     },
     socialProofClip: {
       platform: "Reddit (r/privacy)",
@@ -184,15 +184,15 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
       context: "Independent security audit review",
     },
     reproducibleAuditStep:
-      "Run `pktmon filter add -n murmur && pktmon start --etw` on Windows while dictating. Verify 0 packets emitted.",
+      "Run `pktmon filter add -n HushWrite && pktmon start --etw` on Windows while dictating. Verify 0 packets emitted.",
     faqs: [
       {
-        q: "Do I need to create an account to use Murmur?",
-        a: "No. Murmur requires zero logins, email addresses, or API keys. You download the app and start dictating immediately.",
+        q: "Do I need to create an account to use HushWrite?",
+        a: "No. HushWrite requires zero logins, email addresses, or API keys. You download the app and start dictating immediately.",
       },
       {
-        q: "Can I use Murmur in high-security air-gapped workstations?",
-        a: "Yes. Once the local model weight is on your machine, Murmur can run with network interfaces physically disabled.",
+        q: "Can I use HushWrite in high-security air-gapped workstations?",
+        a: "Yes. Once the local model weight is on your machine, HushWrite can run with network interfaces physically disabled.",
       },
     ],
   },
@@ -211,7 +211,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Cloud voice tools fail on airplanes, spotty train Wi-Fi, and remote work retreats. Built-in macOS dictation lacks intelligent punctuation, filler word removal, and app-aware formatting.",
     architecturalSolution:
-      "Murmur leverages Apple Silicon unified memory architecture and Metal GPU compute to run Whisper locally with sub-200ms latency and less than 1.2% battery drain per hour.",
+      "HushWrite leverages Apple Silicon unified memory architecture and Metal GPU compute to run Whisper locally with sub-200ms latency and less than 1.2% battery drain per hour.",
     keyStats: [
       { label: "Hardware Backend", value: "Apple Metal", detail: "Optimized for M1-M4 chips" },
       { label: "Latency", value: "~160 ms", detail: "Instantaneous tail decode" },
@@ -221,25 +221,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Apple Silicon Optimization",
-        murmur: "Native Metal & Unified Memory execution",
+        HushWrite: "Native Metal & Unified Memory execution",
         cloudComp: "Generic web/Electron shell",
         whyItMatters: "Maximum battery efficiency and lowest thermal footprint",
       },
       {
         feature: "Airplane & Travel Ready",
-        murmur: "100% offline (Zero Wi-Fi dependency)",
+        HushWrite: "100% offline (Zero Wi-Fi dependency)",
         cloudComp: "Completely unusable without network",
         whyItMatters: "Work continuously at 35,000 feet without disruptions",
       },
       {
         feature: "Global macOS Shortcut",
-        murmur: "Option + Space (Universal hook in any window)",
+        HushWrite: "Option + Space (Universal hook in any window)",
         cloudComp: "Non-native shortcuts with window focus loss",
         whyItMatters: "Direct text injection at active cursor",
       },
       {
         feature: "Punctuation & Formatting",
-        murmur: "Local regex rules & filler word removal",
+        HushWrite: "Local regex rules & filler word removal",
         cloudComp: "Basic raw transcription or cloud LLM",
         whyItMatters: "Clean, paste-ready markdown and emails",
       },
@@ -247,7 +247,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "Use the M-series hardware you already paid for.",
       detail:
-        "Your Mac contains one of the most capable Neural Engines on the market. Murmur puts that silicon to work so you never have to rent cloud GPUs for voice typing.",
+        "Your Mac contains one of the most capable Neural Engines on the market. HushWrite puts that silicon to work so you never have to rent cloud GPUs for voice typing.",
     },
     socialProofClip: {
       platform: "YouTube Shorts & TikTok",
@@ -263,8 +263,8 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
         a: "Whisper Base (Q5_0, ~140MB) or Small (~460MB) provides near-instant sub-180ms latency with minimal RAM usage on 8GB and 16GB Macs.",
       },
       {
-        q: "Does Murmur support Apple Silicon M-series chips natively?",
-        a: "Yes. Murmur is compiled natively for arm64 with Apple Metal acceleration.",
+        q: "Does HushWrite support Apple Silicon M-series chips natively?",
+        a: "Yes. HushWrite is compiled natively for arm64 with Apple Metal acceleration.",
       },
     ],
   },
@@ -283,7 +283,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Windows Speech Recognition and cloud alternatives either provide poor accuracy, upload voice data to remote servers, or fail to paste properly into elevated Win32 and developer applications.",
     architecturalSolution:
-      "Murmur integrates DirectML and native Windows SendInput/UIAutomation APIs to deliver smooth, reliable dictation into Cursor, PowerShell, Word, and Slack without cloud lag.",
+      "HushWrite integrates DirectML and native Windows SendInput/UIAutomation APIs to deliver smooth, reliable dictation into Cursor, PowerShell, Word, and Slack without cloud lag.",
     keyStats: [
       { label: "GPU Acceleration", value: "DirectML / CUDA", detail: "NVIDIA, AMD & Intel" },
       { label: "Hotkey", value: "Alt + Space", detail: "Conflict-free system hook" },
@@ -293,25 +293,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Windows Hardware Acceleration",
-        murmur: "DirectML & CUDA GPU offloading",
+        HushWrite: "DirectML & CUDA GPU offloading",
         cloudComp: "CPU-only or cloud streaming",
         whyItMatters: "Decodes 5x faster with minimal CPU overhead",
       },
       {
         feature: "Elevated App Text Injection",
-        murmur: "Native SendInput with UIPI elevation fallback",
+        HushWrite: "Native SendInput with UIPI elevation fallback",
         cloudComp: "Fails silently in Task Manager / IDEs",
         whyItMatters: "Reliable text paste across all your desktop tools",
       },
       {
         feature: "Windows System Menu Conflicts",
-        murmur: "Suppresses SC_KEYMENU conflicts automatically",
+        HushWrite: "Suppresses SC_KEYMENU conflicts automatically",
         cloudComp: "Triggers Windows system menus inadvertently",
         whyItMatters: "Smooth, frustration-free Alt+Space experience",
       },
       {
         feature: "Offline Functionality",
-        murmur: "100% offline (No Microsoft cloud telemetry)",
+        HushWrite: "100% offline (No Microsoft cloud telemetry)",
         cloudComp: "Dependent on cloud connection",
         whyItMatters: "Dictate in secure enterprise environments",
       },
@@ -319,7 +319,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "Harness your discrete or integrated GPU without cloud subscriptions.",
       detail:
-        "Whether you run an NVIDIA RTX GPU, AMD Radeon, or Intel Iris Xe, Murmur runs Whisper directly on your hardware at full speed without monthly fees.",
+        "Whether you run an NVIDIA RTX GPU, AMD Radeon, or Intel Iris Xe, HushWrite runs Whisper directly on your hardware at full speed without monthly fees.",
     },
     socialProofClip: {
       platform: "Product Hunt & Reddit",
@@ -328,11 +328,11 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
       context: "Windows 11 software engineer review",
     },
     reproducibleAuditStep:
-      "Open Windows Task Manager. Dictate for 30 seconds. Verify 0% network bandwidth usage from Murmur.exe.",
+      "Open Windows Task Manager. Dictate for 30 seconds. Verify 0% network bandwidth usage from HushWrite.exe.",
     faqs: [
       {
-        q: "Does Murmur support Windows 11 arm64 devices (Snapdragon X Elite)?",
-        a: "Yes. Murmur runs on x64 and arm64 Windows devices with DirectML hardware acceleration.",
+        q: "Does HushWrite support Windows 11 arm64 devices (Snapdragon X Elite)?",
+        a: "Yes. HushWrite runs on x64 and arm64 Windows devices with DirectML hardware acceleration.",
       },
       {
         q: "How do I trigger dictation on Windows?",
@@ -355,7 +355,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Raw Whisper scripts require manual Python environments, lack global desktop hotkey hooks, struggle with real-time streaming latency, and don't provide automatic app formatting.",
     architecturalSolution:
-      "Murmur wraps whisper.cpp in a high-performance native Rust desktop application, providing an instant floating pill UI, custom phonetic biasing, and background warm VRAM states.",
+      "HushWrite wraps whisper.cpp in a high-performance native Rust desktop application, providing an instant floating pill UI, custom phonetic biasing, and background warm VRAM states.",
     keyStats: [
       { label: "Engine Core", value: "whisper.cpp", detail: "Optimized C++ inference" },
       { label: "Real-Time Factor", value: "< 0.08x", detail: "10s audio decoded in <0.8s" },
@@ -365,25 +365,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Inference Stack",
-        murmur: "Native whisper.cpp with Metal/DirectML",
+        HushWrite: "Native whisper.cpp with Metal/DirectML",
         cloudComp: "Cloud API wrapper (OpenAI Whisper API)",
         whyItMatters: "Zero cloud API costs and zero network latency",
       },
       {
         feature: "Custom Vocabulary Biasing",
-        murmur: "Local phonetic dictionary steers beam search",
+        HushWrite: "Local phonetic dictionary steers beam search",
         cloudComp: "Generic prompt prefixes or none",
         whyItMatters: "Flawless accuracy on proprietary jargon",
       },
       {
         feature: "Background Warm State",
-        murmur: "VRAM model persistence (<5ms wakeup)",
+        HushWrite: "VRAM model persistence (<5ms wakeup)",
         cloudComp: "Cold start delays or server queueing",
         whyItMatters: "Dictation starts the instant you press the hotkey",
       },
       {
         feature: "License & Ownership",
-        murmur: "100% Open Source (MIT)",
+        HushWrite: "100% Open Source (MIT)",
         cloudComp: "Proprietary closed-source SaaS",
         whyItMatters: "Inspect, audit, and modify the code freely",
       },
@@ -404,11 +404,11 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     faqs: [
       {
         q: "Which Whisper model sizes are supported?",
-        a: "Murmur supports Tiny, Base, Small, Medium, and Large-v3-Turbo in quantized Q4_0, Q5_0, and F16 formats.",
+        a: "HushWrite supports Tiny, Base, Small, Medium, and Large-v3-Turbo in quantized Q4_0, Q5_0, and F16 formats.",
       },
       {
         q: "Can I bring my own fine-tuned Whisper model?",
-        a: "Yes. Murmur supports loading custom GGUF and whisper.cpp compatible model weights.",
+        a: "Yes. HushWrite supports loading custom GGUF and whisper.cpp compatible model weights.",
       },
     ],
   },
@@ -428,7 +428,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Generic dictation tools struggle with CamelCase, snake_case, CLI flags, and code syntax—and cloud dictation violates corporate IP and NDA policies by transmitting proprietary code.",
     architecturalSolution:
-      "Murmur detects active IDEs (Cursor, VS Code, JetBrains, Terminal), applies programming formatting rules, and uses your custom dictionary to bias for framework names and APIs.",
+      "HushWrite detects active IDEs (Cursor, VS Code, JetBrains, Terminal), applies programming formatting rules, and uses your custom dictionary to bias for framework names and APIs.",
     keyStats: [
       { label: "Code Accuracy", value: "98.4%", detail: "Phonetic biasing for APIs" },
       { label: "Commit Syntax", value: "Conventional", detail: "feat(scope): message" },
@@ -442,25 +442,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Proprietary Code Protection",
-        murmur: "100% on-device (Zero code egress)",
+        HushWrite: "100% on-device (Zero code egress)",
         cloudComp: "Code snippets uploaded to cloud SaaS",
         whyItMatters: "Compliance with strict corporate IP policies & NDAs",
       },
       {
         feature: "Conventional Commits Formatting",
-        murmur: "Auto-formats feat:, fix:, refactor: syntax",
+        HushWrite: "Auto-formats feat:, fix:, refactor: syntax",
         cloudComp: "Outputs unpunctuated raw text",
         whyItMatters: "Paste commit messages directly without editing",
       },
       {
         feature: "CLI & Terminal Support",
-        murmur: "Handles hyphens, flags (--force), and paths",
+        HushWrite: "Handles hyphens, flags (--force), and paths",
         cloudComp: "Inserts words like 'dash dash force'",
         whyItMatters: "Dictate shell commands without syntax corruption",
       },
       {
         feature: "Portable Team Dictionary",
-        murmur: "Shareable `.murmur/dictionary.json` in git",
+        HushWrite: "Shareable `.HushWrite/dictionary.json` in git",
         cloudComp: "Cloud-locked per-user account settings",
         whyItMatters: "Sync team jargon and acronyms across your repo",
       },
@@ -473,19 +473,19 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     socialProofClip: {
       platform: "X (Twitter) & GitHub",
       quote:
-        "“Dictating PR descriptions and Jira tickets in Cursor using Murmur is 3x faster than typing. It understands TypeScript types flawlessly.”",
+        "“Dictating PR descriptions and Jira tickets in Cursor using HushWrite is 3x faster than typing. It understands TypeScript types flawlessly.”",
       context: "Senior Frontend Engineer review",
     },
     reproducibleAuditStep:
       "Dictate an API key format or code snippet. Inspect Little Snitch logs to confirm 0 network packets left your machine.",
     faqs: [
       {
-        q: "How does Murmur format code terms like CamelCase?",
-        a: "Murmur includes built-in context rules for developer environments that automatically convert phrases like 'handle auth token' into `handleAuthToken` or conventional commit syntax.",
+        q: "How does HushWrite format code terms like CamelCase?",
+        a: "HushWrite includes built-in context rules for developer environments that automatically convert phrases like 'handle auth token' into `handleAuthToken` or conventional commit syntax.",
       },
       {
         q: "Can I share a dictionary file with my engineering team?",
-        a: "Yes. You can commit a `.murmur/dictionary.json` file to your git repository so every developer on the team gets instant phonetic biasing for project-specific terms.",
+        a: "Yes. You can commit a `.HushWrite/dictionary.json` file to your git repository so every developer on the team gets instant phonetic biasing for project-specific terms.",
       },
     ],
   },
@@ -504,7 +504,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Cloud transcription vendors require complex Business Associate Agreements (BAAs), expose PHI to cloud breaches, and risk compliance violations if audio snippets are retained for AI fine-tuning.",
     architecturalSolution:
-      "Because Murmur never transmits audio or text off your physical computer, no Protected Health Information (PHI) ever traverses third-party servers, eliminating cloud attack surfaces by design.",
+      "Because HushWrite never transmits audio or text off your physical computer, no Protected Health Information (PHI) ever traverses third-party servers, eliminating cloud attack surfaces by design.",
     keyStats: [
       { label: "Cloud PHI Egress", value: "0 Bytes", detail: "Physical on-device isolation" },
       {
@@ -518,25 +518,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "PHI Cloud Transmission",
-        murmur: "0 Bytes (Never leaves physical workstation)",
+        HushWrite: "0 Bytes (Never leaves physical workstation)",
         cloudComp: "Streamed over internet to cloud servers",
         whyItMatters: "Eliminates man-in-the-middle and cloud breach risks",
       },
       {
         feature: "Third-Party Data Sub-processors",
-        murmur: "0 vendors (100% local machine)",
+        HushWrite: "0 vendors (100% local machine)",
         cloudComp: "Multiple cloud hosting and AI vendors",
         whyItMatters: "Simplifies HIPAA compliance audits and risk reviews",
       },
       {
         feature: "Model Improvement Data Use",
-        murmur: "Non-existent (Zero training pipelines)",
+        HushWrite: "Non-existent (Zero training pipelines)",
         cloudComp: "Must be actively audited and opted out",
         whyItMatters: "Guaranteed that patient discussions never train public models",
       },
       {
         feature: "EHR Integration",
-        murmur: "Direct native cursor insertion (Epic, Cerner)",
+        HushWrite: "Direct native cursor insertion (Epic, Cerner)",
         cloudComp: "Requires custom browser extensions or portals",
         whyItMatters: "Works seamlessly across any clinical software",
       },
@@ -544,12 +544,12 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "Physical data sovereignty is the strongest compliance guarantee.",
       detail:
-        "Instead of relying on cloud vendor promises and complex BAA negotiations, Murmur provides an auditable architecture where PHI never touches the internet in the first place.",
+        "Instead of relying on cloud vendor promises and complex BAA negotiations, HushWrite provides an auditable architecture where PHI never touches the internet in the first place.",
     },
     socialProofClip: {
       platform: "LinkedIn (Healthcare IT)",
       quote:
-        "“Our clinical staff uses Murmur for chart notes on air-gapped laptops. Zero HIPAA anxiety because no audio leaves the room.”",
+        "“Our clinical staff uses HushWrite for chart notes on air-gapped laptops. Zero HIPAA anxiety because no audio leaves the room.”",
       context: "Clinical IT Director case study",
     },
     reproducibleAuditStep:
@@ -557,11 +557,11 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     faqs: [
       {
         q: "Why is an on-device architecture HIPAA-friendly?",
-        a: "HIPAA compliance focuses heavily on safeguarding electronic Protected Health Information (ePHI) from unauthorized access. By keeping all audio and text strictly on local hardware with zero network transmission, Murmur eliminates cloud transit and third-party storage vulnerabilities.",
+        a: "HIPAA compliance focuses heavily on safeguarding electronic Protected Health Information (ePHI) from unauthorized access. By keeping all audio and text strictly on local hardware with zero network transmission, HushWrite eliminates cloud transit and third-party storage vulnerabilities.",
       },
       {
         q: "Can medical terminology and medication names be added?",
-        a: "Yes. You can add brand names, dosage formats, and specialized medical vocabulary into Murmur's custom dictionary for accurate phonetic transcription.",
+        a: "Yes. You can add brand names, dosage formats, and specialized medical vocabulary into HushWrite's custom dictionary for accurate phonetic transcription.",
       },
     ],
   },
@@ -580,7 +580,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Streaming confidential client conversations or case strategy to cloud transcription SaaS vendors risks waiving attorney-client privilege, breaching ethical confidentiality obligations, and violating client NDAs.",
     architecturalSolution:
-      "Murmur processes all speech recognition locally in volatile RAM. No transcripts are stored in the cloud, no third-party vendor has access, and local history can be wiped with a single click.",
+      "HushWrite processes all speech recognition locally in volatile RAM. No transcripts are stored in the cloud, no third-party vendor has access, and local history can be wiped with a single click.",
     keyStats: [
       { label: "Privilege Risk", value: "Zero Waiving", detail: "0 bytes leave your machine" },
       { label: "Confidentiality", value: "100% Local", detail: "No cloud sub-processors" },
@@ -590,25 +590,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Attorney-Client Privilege",
-        murmur: "Fully preserved (No third-party disclosure)",
+        HushWrite: "Fully preserved (No third-party disclosure)",
         cloudComp: "Risk of disclosure to cloud sub-processors",
         whyItMatters: "Compliance with ABA Model Rule 1.6 (Confidentiality)",
       },
       {
         feature: "Client NDA Compliance",
-        murmur: "100% compliant with air-gapped restrictions",
+        HushWrite: "100% compliant with air-gapped restrictions",
         cloudComp: "Requires explicit client consent for cloud AI",
         whyItMatters: "Meet strict enterprise client security requirements",
       },
       {
         feature: "Case Name & Citation Biasing",
-        murmur: "Local custom dictionary for case citations",
+        HushWrite: "Local custom dictionary for case citations",
         cloudComp: "Generic cloud vocabulary",
         whyItMatters: "Accurately transcribe case names and statutory citations",
       },
       {
         feature: "Subpoena & Cloud Discovery Risk",
-        murmur: "Zero remote records to subpoena",
+        HushWrite: "Zero remote records to subpoena",
         cloudComp: "Remote cloud servers hold audio & transcripts",
         whyItMatters: "Your data cannot be seized from a third-party vendor",
       },
@@ -616,12 +616,12 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "Eliminate legal malpractice risks from cloud voice transcription.",
       detail:
-        "Protecting privileged communications shouldn't require compromising on dictation speed. Murmur delivers instantaneous transcription while ensuring your ethics compliance remains ironclad.",
+        "Protecting privileged communications shouldn't require compromising on dictation speed. HushWrite delivers instantaneous transcription while ensuring your ethics compliance remains ironclad.",
     },
     socialProofClip: {
       platform: "LegalTech Review",
       quote:
-        "“Murmur allows our litigation team to dictate case briefs at 220 WPM with complete confidence that client privilege is 100% protected.”",
+        "“HushWrite allows our litigation team to dictate case briefs at 220 WPM with complete confidence that client privilege is 100% protected.”",
       context: "Managing Partner, Commercial Litigation Firm",
     },
     reproducibleAuditStep:
@@ -652,7 +652,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Cloud voice typing tools stream high-bandwidth audio across public networks, adding latency, consuming battery, and creating centralized databases of user voice recordings.",
     architecturalSolution:
-      "Murmur isolates transcription inside local GPU memory. Decoded text is typed directly into your cursor via native OS input injection, and audio RAM is freed immediately.",
+      "HushWrite isolates transcription inside local GPU memory. Decoded text is typed directly into your cursor via native OS input injection, and audio RAM is freed immediately.",
     keyStats: [
       { label: "Audio Egress", value: "0.00 KB/s", detail: "Zero network packets sent" },
       { label: "Offline Speed", value: "170 ms", detail: "Unaffected by network lag" },
@@ -662,25 +662,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Outbound Network Traffic",
-        murmur: "0 Bytes during dictation and decode",
+        HushWrite: "0 Bytes during dictation and decode",
         cloudComp: "Continuous audio and transcript streaming",
         whyItMatters: "Verifiable with Wireshark and Little Snitch",
       },
       {
         feature: "Latency on Weak Wi-Fi",
-        murmur: "Sub-200ms regardless of connection quality",
+        HushWrite: "Sub-200ms regardless of connection quality",
         cloudComp: "High jitter, timeouts, and dropped sentences",
         whyItMatters: "Consistent, instantaneous performance anywhere",
       },
       {
         feature: "Account & Cloud Auth",
-        murmur: "Zero accounts / Zero login tokens",
+        HushWrite: "Zero accounts / Zero login tokens",
         cloudComp: "Mandatory cloud authentication tokens",
         whyItMatters: "No centralized user profiling",
       },
       {
         feature: "Network Kill-Switch",
-        murmur: "Compatible with air-gap mode & firewalls",
+        HushWrite: "Compatible with air-gap mode & firewalls",
         cloudComp: "Fails instantly when blocked",
         whyItMatters: "Enforce strict security boundaries",
       },
@@ -688,12 +688,12 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "The fastest network request is the one you never make.",
       detail:
-        "By eliminating network hops entirely, Murmur delivers faster perceived speed, lower battery consumption, and absolute privacy.",
+        "By eliminating network hops entirely, HushWrite delivers faster perceived speed, lower battery consumption, and absolute privacy.",
     },
     socialProofClip: {
       platform: "Mastodon / X",
       quote:
-        "“Monitored Murmur with Little Snitch in alert mode during an hour-long dictation session. Zero alerts. Real local AI.”",
+        "“Monitored HushWrite with Little Snitch in alert mode during an hour-long dictation session. Zero alerts. Real local AI.”",
       context: "Security researcher audit",
     },
     reproducibleAuditStep:
@@ -701,7 +701,7 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     faqs: [
       {
         q: "How can I prove no audio leaves my computer?",
-        a: "Use standard network packet capture tools like Wireshark on Windows or LuLu/Little Snitch on macOS. You can monitor the Murmur process PID during active dictation to verify zero network packets are emitted.",
+        a: "Use standard network packet capture tools like Wireshark on Windows or LuLu/Little Snitch on macOS. You can monitor the HushWrite process PID during active dictation to verify zero network packets are emitted.",
       },
     ],
   },
@@ -720,9 +720,9 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Choosing a dictation tool often forces a compromise between privacy and polish: either use crude offline tools that lack formatting or surrender confidential voice data to cloud SaaS vendors.",
     architecturalSolution:
-      "Murmur bridges the gap by combining modern push-to-talk polish and app-aware formatting with a strictly local, open-source Whisper C++ inference engine.",
+      "HushWrite bridges the gap by combining modern push-to-talk polish and app-aware formatting with a strictly local, open-source Whisper C++ inference engine.",
     keyStats: [
-      { label: "Top Pick", value: "Murmur", detail: "Best overall for privacy & speed" },
+      { label: "Top Pick", value: "HushWrite", detail: "Best overall for privacy & speed" },
       { label: "Architecture", value: "100% On-Device", detail: "Zero cloud streaming" },
       { label: "Pricing", value: "Free (MIT)", detail: "No recurring subscriptions" },
       {
@@ -733,26 +733,26 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     ],
     comparisonTable: [
       {
-        feature: "Murmur",
-        murmur: "100% Local (Metal / DirectML) · Free MIT",
+        feature: "HushWrite",
+        HushWrite: "100% Local (Metal / DirectML) · Free MIT",
         cloudComp: "Sub-200ms latency, zero telemetry, app-aware rules",
         whyItMatters: "Best overall for speed, polish, and privacy",
       },
       {
         feature: "Wispr Flow",
-        murmur: "Cloud-based SaaS ($15/mo or $144/yr)",
+        HushWrite: "Cloud-based SaaS ($15/mo or $144/yr)",
         cloudComp: "Polished UI, but streams audio to remote GPU servers",
         whyItMatters: "Good for general users, but unsuitable for sensitive work",
       },
       {
         feature: "Superwhisper",
-        murmur: "Hybrid Local/Cloud ($200 Lifetime)",
+        HushWrite: "Hybrid Local/Cloud ($200 Lifetime)",
         cloudComp: "macOS-only, uses cloud LLMs for advanced formatting",
         whyItMatters: "Solid Mac tool, but closed source with hybrid cloud features",
       },
       {
         feature: "Apple Built-in Dictation",
-        murmur: "OS Integrated (Free)",
+        HushWrite: "OS Integrated (Free)",
         cloudComp: "Lacks smart punctuation, filler removal, and app context",
         whyItMatters: "Pre-installed, but basic formatting and accuracy",
       },
@@ -760,24 +760,24 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "Compare total cost of ownership over 2 years.",
       detail:
-        "Wispr Flow costs $288 over two years. Superwhisper costs $200. Murmur is 100% free and open-source forever, giving you unlimited local dictation powered by your own computer.",
+        "Wispr Flow costs $288 over two years. Superwhisper costs $200. HushWrite is 100% free and open-source forever, giving you unlimited local dictation powered by your own computer.",
     },
     socialProofClip: {
       platform: "Tech Blog Review",
       quote:
-        "“If you value your data privacy and want instant, sub-200ms dictation, Murmur is hands down the best choice on macOS and Windows.”",
+        "“If you value your data privacy and want instant, sub-200ms dictation, HushWrite is hands down the best choice on macOS and Windows.”",
       context: "2026 AI Productivity Tool Roundup",
     },
     reproducibleAuditStep:
-      "Benchmark Murmur alongside any cloud dictation tool on identical audio. Compare tail insertion speed and network packet logs.",
+      "Benchmark HushWrite alongside any cloud dictation tool on identical audio. Compare tail insertion speed and network packet logs.",
     faqs: [
       {
         q: "What makes a dictation tool truly private?",
         a: "A truly private dictation tool processes all microphone audio locally on your device's CPU/GPU and never transmits voice recordings or transcripts across the network. Privacy by architecture is fundamentally safer than privacy by policy.",
       },
       {
-        q: "Is Murmur completely free?",
-        a: "Yes. Murmur is open source under the MIT license with no artificial word caps or subscription tiers.",
+        q: "Is HushWrite completely free?",
+        a: "Yes. HushWrite is open source under the MIT license with no artificial word caps or subscription tiers.",
       },
     ],
   },
@@ -796,9 +796,9 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Legacy clinical dictation systems and cloud AI scribes stream patient conversations across remote internet servers. This requires complex Business Associate Agreements (BAAs), exposes healthcare providers to catastrophic breach liabilities, and subjects sensitive encounters to third-party cloud data retention.",
     architecturalSolution:
-      "Murmur executes OpenAI Whisper open weights directly on your workstation's local GPU via whisper.cpp. Audio streams exist purely in temporary RAM and are erased the moment text is typed into your EHR. With built-in Air-Gap Mode, all outbound network sockets are hard-killed.",
+      "HushWrite executes OpenAI Whisper open weights directly on your workstation's local GPU via whisper.cpp. Audio streams exist purely in temporary RAM and are erased the moment text is typed into your EHR. With built-in Air-Gap Mode, all outbound network sockets are hard-killed.",
     disclaimer:
-      "Regulatory & Compliance Disclaimer: Murmur is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims or medical certification representations. Murmur is general-purpose, open-source local dictation software engineered to process all audio and text strictly on-device with zero external network transmission.",
+      "Regulatory & Compliance Disclaimer: HushWrite is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims or medical certification representations. HushWrite is general-purpose, open-source local dictation software engineered to process all audio and text strictly on-device with zero external network transmission.",
     keyStats: [
       { label: "Cloud Egress", value: "0 Bytes", detail: "Hard-isolated local decode" },
       { label: "EHR Latency", value: "<180 ms", detail: "Instant cursor insertion" },
@@ -808,25 +808,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Audio Transmission Vector",
-        murmur: "0 Bytes (Never leaves physical workstation)",
+        HushWrite: "0 Bytes (Never leaves physical workstation)",
         cloudComp: "Streamed to external cloud clusters over public internet",
         whyItMatters: "Eliminates man-in-the-middle attacks and external breach liability",
       },
       {
         feature: "Third-Party Data Access",
-        murmur: "None (Zero servers, zero vendor analytics)",
+        HushWrite: "None (Zero servers, zero vendor analytics)",
         cloudComp: "Cloud infrastructure providers, sub-processors, and vendors",
         whyItMatters: "Minimizes security surface area and simplifies IT audits",
       },
       {
         feature: "Retention & Auto-Purge",
-        murmur: "User-configurable (Auto-purge on lock screen & daily retention sweep)",
+        HushWrite: "User-configurable (Auto-purge on lock screen & daily retention sweep)",
         cloudComp: "Default cloud database storage with opaque deletion timelines",
         whyItMatters: "Enforces strict organizational sanitization schedules",
       },
       {
         feature: "EHR Cursor Insertion",
-        murmur: "Native OS accessibility injection across all EHR applications",
+        HushWrite: "Native OS accessibility injection across all EHR applications",
         cloudComp: "Proprietary browser extensions or isolated web portals",
         whyItMatters: "Works seamlessly in Epic Hyperdrive, Cerner Millennium, and desktop charts",
       },
@@ -834,32 +834,32 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "Clinical documentation speed shouldn't compromise patient confidentiality.",
       detail:
-        "Medical practitioners spend up to 2 hours per day on EHR documentation. Murmur delivers instantaneous voice typing at over 150 words per minute while keeping all patient interactions confined to your physical machine.",
+        "Medical practitioners spend up to 2 hours per day on EHR documentation. HushWrite delivers instantaneous voice typing at over 150 words per minute while keeping all patient interactions confined to your physical machine.",
     },
     socialProofClip: {
       platform: "Clinical Workflow Review",
       quote:
-        "“Murmur lets me dictate patient visit summaries directly into Epic twice as fast as typing, and our hospital IT team approved it immediately because zero network packets leave my machine.”",
+        "“HushWrite lets me dictate patient visit summaries directly into Epic twice as fast as typing, and our hospital IT team approved it immediately because zero network packets leave my machine.”",
       context: "Internal Medicine Specialist",
     },
     reproducibleAuditStep:
       "Run Windows Packet Monitor (pktmon) or macOS LuLu while dictating a test clinical note. Verify that zero outbound network traffic is generated during recording and transcription.",
     faqs: [
       {
-        q: "Does Murmur store my patient notes?",
-        a: "No. By default, Murmur operates in-memory in RAM and types directly into whichever application window holds your cursor. Any optional local history database can be configured with an automated retention purge (e.g. 1 day, or disabled entirely), and Murmur automatically clears in-memory buffers when your computer is locked.",
+        q: "Does HushWrite store my patient notes?",
+        a: "No. By default, HushWrite operates in-memory in RAM and types directly into whichever application window holds your cursor. Any optional local history database can be configured with an automated retention purge (e.g. 1 day, or disabled entirely), and HushWrite automatically clears in-memory buffers when your computer is locked.",
       },
       {
-        q: "Does Murmur sell data to healthcare analytics vendors?",
-        a: "No. Murmur contains zero telemetry, zero analytics trackers, zero advertisements, and zero remote connections. There are no corporate servers or data pipelines collecting user information.",
+        q: "Does HushWrite sell data to healthcare analytics vendors?",
+        a: "No. HushWrite contains zero telemetry, zero analytics trackers, zero advertisements, and zero remote connections. There are no corporate servers or data pipelines collecting user information.",
       },
       {
-        q: "Does Murmur require a Business Associate Agreement (BAA)?",
-        a: "A HIPAA BAA is legally required when a third-party vendor creates, receives, maintains, or transmits Protected Health Information (PHI) on your organization's behalf. Because Murmur never receives, transmits, or hosts any of your data, it acts as local workstation software rather than an external data processor. Please note Murmur makes no official compliance claims; consult your organization's compliance officer.",
+        q: "Does HushWrite require a Business Associate Agreement (BAA)?",
+        a: "A HIPAA BAA is legally required when a third-party vendor creates, receives, maintains, or transmits Protected Health Information (PHI) on your organization's behalf. Because HushWrite never receives, transmits, or hosts any of your data, it acts as local workstation software rather than an external data processor. Please note HushWrite makes no official compliance claims; consult your organization's compliance officer.",
       },
       {
-        q: "How does Murmur handle medical terms and drug names?",
-        a: "Murmur includes custom phonetic dictionary support. You can add complex medical terminology, generic pharmaceuticals, anatomical terms, or clinic-specific acronyms to ensure consistent, accurate transcription.",
+        q: "How does HushWrite handle medical terms and drug names?",
+        a: "HushWrite includes custom phonetic dictionary support. You can add complex medical terminology, generic pharmaceuticals, anatomical terms, or clinic-specific acronyms to ensure consistent, accurate transcription.",
       },
     ],
   },
@@ -879,9 +879,9 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     coreProblem:
       "Mental health, psychiatric evaluations, and sensitive clinical consultations require absolute patient confidentiality. Traditional cloud dictation apps upload audio to third-party servers, creating significant data breach exposure and regulatory overhead under HIPAA privacy and security rules.",
     architecturalSolution:
-      "Murmur is engineered with an air-gapped security model. Voice recognition runs locally on your workstation's Apple Silicon Neural Engine or NVIDIA/AMD DirectX GPU. No remote APIs are called, and all temporary recording buffers are instantly sanitized upon completion.",
+      "HushWrite is engineered with an air-gapped security model. Voice recognition runs locally on your workstation's Apple Silicon Neural Engine or NVIDIA/AMD DirectX GPU. No remote APIs are called, and all temporary recording buffers are instantly sanitized upon completion.",
     disclaimer:
-      "Regulatory & Compliance Disclaimer: Murmur is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims. Murmur is an open-source, local-first dictation tool designed to eliminate cloud transmission by running speech-to-text exclusively on local hardware.",
+      "Regulatory & Compliance Disclaimer: HushWrite is not a certified HIPAA Business Associate and makes no healthcare-specific compliance claims. HushWrite is an open-source, local-first dictation tool designed to eliminate cloud transmission by running speech-to-text exclusively on local hardware.",
     keyStats: [
       { label: "Cloud Egress", value: "0.00 KB", detail: "Complete hardware isolation" },
       { label: "Transcription Speed", value: "Sub-200ms", detail: "Real-time GPU inference" },
@@ -891,25 +891,25 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     comparisonTable: [
       {
         feature: "Processing Location",
-        murmur: "100% On-Device (Workstation CPU/GPU)",
+        HushWrite: "100% On-Device (Workstation CPU/GPU)",
         cloudComp: "Remote Cloud Data Centers",
         whyItMatters: "Protected Health Information never touches third-party infrastructure",
       },
       {
         feature: "Cloud Vendor Breach Risk",
-        murmur: "Zero (No cloud footprint exists)",
+        HushWrite: "Zero (No cloud footprint exists)",
         cloudComp: "Subject to vendor supply-chain and cloud security breaches",
         whyItMatters: "Guarantees patient discussion privacy by architectural design",
       },
       {
         feature: "Hardware Isolation Mode",
-        murmur: "In-app Air-Gap kill-switch closes all sockets",
+        HushWrite: "In-app Air-Gap kill-switch closes all sockets",
         cloudComp: "Requires persistent high-speed internet connection",
         whyItMatters: "Can be operated on strictly air-gapped hospital workstations",
       },
       {
         feature: "Subscription & Licensing",
-        murmur: "Free & Open Source (MIT License)",
+        HushWrite: "Free & Open Source (MIT License)",
         cloudComp: "Expensive per-seat clinical subscription fees ($30–$100/mo)",
         whyItMatters: "Accessible to independent practices, non-profits, and large clinics alike",
       },
@@ -917,32 +917,32 @@ export const SEO_PAGES: Record<string, SeoPageData> = {
     pricingNarrative: {
       headline: "Protecting patient trust starts with physical data ownership.",
       detail:
-        "Therapy and medical progress notes contain the most sensitive details of human lives. Murmur ensures these words remain strictly between the practitioner and the patient's local medical record.",
+        "Therapy and medical progress notes contain the most sensitive details of human lives. HushWrite ensures these words remain strictly between the practitioner and the patient's local medical record.",
     },
     socialProofClip: {
       platform: "Mental Health Practice Case Study",
       quote:
-        "“As a private practice psychologist, I cannot risk streaming session summaries over the internet. Murmur gives me Whisper-level dictation speed without a single byte leaving my MacBook.”",
+        "“As a private practice psychologist, I cannot risk streaming session summaries over the internet. HushWrite gives me Whisper-level dictation speed without a single byte leaving my MacBook.”",
       context: "Licensed Clinical Psychologist",
     },
     reproducibleAuditStep:
       "Disconnect your workstation from the internet or enable Airplane Mode. Press your dictation hotkey and record a complete progress note. Observe instant, flawless local transcription.",
     faqs: [
       {
-        q: "Does Murmur store my patient notes?",
-        a: "No. Murmur transcribes spoken audio into memory and immediately inserts the formatted text into your open documentation tool or EHR. It does not upload or retain patient notes on external servers, and local retention can be set to immediate purge.",
+        q: "Does HushWrite store my patient notes?",
+        a: "No. HushWrite transcribes spoken audio into memory and immediately inserts the formatted text into your open documentation tool or EHR. It does not upload or retain patient notes on external servers, and local retention can be set to immediate purge.",
       },
       {
-        q: "Does Murmur sell data to healthcare analytics vendors?",
-        a: "No. Murmur is an open-source tool with zero tracking, zero external telemetry, and no business model based on data monetization. All code is auditable on GitHub.",
+        q: "Does HushWrite sell data to healthcare analytics vendors?",
+        a: "No. HushWrite is an open-source tool with zero tracking, zero external telemetry, and no business model based on data monetization. All code is auditable on GitHub.",
       },
       {
         q: "Can clinical staff verify that zero data leaves the computer?",
-        a: "Yes. Because Murmur is fully open source and runs locally, healthcare IT staff can monitor the process with Wireshark, Little Snitch, or Windows Packet Monitor to independently confirm that zero bytes are transmitted during dictation.",
+        a: "Yes. Because HushWrite is fully open source and runs locally, healthcare IT staff can monitor the process with Wireshark, Little Snitch, or Windows Packet Monitor to independently confirm that zero bytes are transmitted during dictation.",
       },
       {
-        q: "How does Murmur compare to cloud clinical voice apps?",
-        a: "Cloud clinical voice apps require network connectivity, cost monthly subscriptions, and introduce third-party vendor risks. Murmur runs at lower latency (<200ms) with zero subscription fees and zero cloud exposure.",
+        q: "How does HushWrite compare to cloud clinical voice apps?",
+        a: "Cloud clinical voice apps require network connectivity, cost monthly subscriptions, and introduce third-party vendor risks. HushWrite runs at lower latency (<200ms) with zero subscription fees and zero cloud exposure.",
       },
     ],
   },

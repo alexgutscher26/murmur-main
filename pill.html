@@ -11,12 +11,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Murmur</title>
+    <title>HushWrite</title>
     <!-- Apply stored theme before first paint to prevent flash of wrong theme.
          Mirrors the logic in src/lib/theme.ts — must stay in sync. -->
     <script>
       (function () {
-        var t = localStorage.getItem("murmur_theme_preference");
+        var t = localStorage.getItem("HushWrite_theme_preference");
         var isDark =
           t === "dark" ||
           (t !== "light" &&

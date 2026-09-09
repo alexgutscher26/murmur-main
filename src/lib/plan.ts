@@ -1,6 +1,6 @@
 /**
  * SOURCE OF TRUTH KEYWORDS: PlanTier, usePlan, canUseTurboModel, canUseContextEngine, canUseFillerStripper, canUseVoiceSnippets, canUseTeamDictionarySync, checkRemoteLicenseStatus
- * WHAT:  Single source of truth for plan licensing, subscription validation, and feature gating in the Murmur desktop app.
+ * WHAT:  Single source of truth for plan licensing, subscription validation, and feature gating in the HushWrite desktop app.
  * WHY:   Centralizes tier capabilities (Starter vs Pro vs Team) and synchronizes subscription cancellations/renewals with Stripe while preserving 100% offline privacy for perpetual Lifetime licenses.
  * WHERE: Consumed by BillingView, SettingsView, model selectors, and enhancement settings.
  */
@@ -31,7 +31,7 @@ export interface SubscriptionCheckResult {
   message: string;
 }
 
-const STORAGE_KEY = "murmur.license_plan";
+const STORAGE_KEY = "HushWrite.license_plan";
 
 const DEFAULT_STATE: PlanState = {
   tier: "starter",
@@ -83,7 +83,7 @@ function saveState(next: PlanState) {
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      window.dispatchEvent(new CustomEvent("murmur-plan-changed", { detail: next }));
+      window.dispatchEvent(new CustomEvent("HushWrite-plan-changed", { detail: next }));
     } catch {}
   }
   listeners.forEach((listener) => listener());
@@ -103,13 +103,13 @@ function subscribe(listener: () => void) {
   };
   if (typeof window !== "undefined") {
     window.addEventListener("storage", handleStorage);
-    window.addEventListener("murmur-plan-changed", handleCustom);
+    window.addEventListener("HushWrite-plan-changed", handleCustom);
   }
   return () => {
     listeners.delete(listener);
     if (typeof window !== "undefined") {
       window.removeEventListener("storage", handleStorage);
-      window.removeEventListener("murmur-plan-changed", handleCustom);
+      window.removeEventListener("HushWrite-plan-changed", handleCustom);
     }
   };
 }
@@ -197,7 +197,7 @@ export async function checkRemoteLicenseStatus(key: string): Promise<Subscriptio
   // 2. Endpoints to verify active subscription or cancellation
   const endpoints = [
     "http://localhost:3000/api/license/verify",
-    "https://murmur.app/api/license/verify",
+    "https://HushWrite.app/api/license/verify",
   ];
 
   for (const url of endpoints) {

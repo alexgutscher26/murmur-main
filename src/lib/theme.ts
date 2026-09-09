@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 
 export type ThemeChoice = "system" | "light" | "dark";
 
-const THEME_STORAGE_KEY = "murmur_theme_preference";
+const THEME_STORAGE_KEY = "HushWrite_theme_preference";
 
 export function getStoredTheme(): ThemeChoice {
   if (typeof window === "undefined") return "system";

@@ -11,8 +11,8 @@
 ## Global Constraints
 
 - Do not break existing Tauri bindings or Rust SOT headers.
-- Maintain responsive, high-aesthetic light and dark mode styles matching Murmur's design system.
-- Offline-friendly and privacy-respecting: Murmur desktop app must validate license keys locally without mandatory telemetry or phoning home.
+- Maintain responsive, high-aesthetic light and dark mode styles matching HushWrite's design system.
+- Offline-friendly and privacy-respecting: HushWrite desktop app must validate license keys locally without mandatory telemetry or phoning home.
 - Graceful degradation: If `STRIPE_SECRET_KEY` is not present in `.env`, the checkout endpoint must smoothly generate a simulated checkout flow to allow testing in development without crashing.
 
 ---
@@ -95,10 +95,10 @@
 **Interfaces:**
 
 - Consumes: Query params `session_id`, `plan`, `code`.
-- Produces: Confetti celebration page showing customer license key, 1-click copy, deep link to open Murmur desktop, and desktop download links.
+- Produces: Confetti celebration page showing customer license key, 1-click copy, deep link to open HushWrite desktop, and desktop download links.
 
 - [ ] **Step 1: Implement `website/src/app/pricing/success/page.tsx`**
-      Build celebratory UI with canvas-confetti, formatted license key display (e.g. `LIFETIME-XXXX-XXXX`), copy-to-clipboard, `murmur://activate?key=...` link, and step-by-step activation guide.
+      Build celebratory UI with canvas-confetti, formatted license key display (e.g. `LIFETIME-XXXX-XXXX`), copy-to-clipboard, `HushWrite://activate?key=...` link, and step-by-step activation guide.
 - [ ] **Step 2: Test `/pricing/success` with sample params**
 - [ ] **Step 3: Commit success page**
       `git add website/src/app/pricing/success/page.tsx`
@@ -123,7 +123,7 @@
 - Produces: `ProFeatureModal` shown when Starter users attempt locked actions; lock badges on gated controls; inline key activation.
 
 - [ ] **Step 1: Create `src/components/global/ProFeatureModal.tsx`**
-      Dialog explaining the attempted locked feature, offering "Start 14-Day Free Trial", "Upgrade on Murmur.app", or "Enter License Key".
+      Dialog explaining the attempted locked feature, offering "Start 14-Day Free Trial", "Upgrade on HushWrite.app", or "Enter License Key".
 - [ ] **Step 2: Update `src/lib/plan.ts`**
       Ensure all license formats (`LIFETIME-`, `PRO-`, `SWITCHER-`, `STUDENT-`, `OSS-`, `TEAM-`) are recognized and exported cleanly.
 - [ ] **Step 3: Wire feature gate interceptors to `ModelManager.tsx`, `AppProfiles.tsx`, and `DictionaryManager.tsx`**

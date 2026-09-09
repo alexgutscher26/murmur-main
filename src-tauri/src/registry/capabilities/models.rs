@@ -32,7 +32,7 @@ pub fn models_capability() -> Capability {
             SettingDef {
                 key: text(keys::LANGUAGE),
                 label: text("Language"),
-                description: text("Pin your language for a little more speed and accuracy, or let Murmur detect it."),
+                description: text("Pin your language for a little more speed and accuracy, or let HushWrite detect it."),
                 section: SettingSection::Transcription,
                 kind: SettingKind::DynamicChoice {
                     source: ChoiceSource::Languages,

@@ -171,7 +171,7 @@ export default function BlogIndexPage() {
             href="/#download"
             className="inline-block text-sm font-semibold text-neutral-950 bg-white hover:bg-neutral-100 px-6 py-2.5 rounded-xl transition-colors shadow-md"
           >
-            Download Free Murmur
+            Download Free HushWrite
           </a>
         </div>
       </section>

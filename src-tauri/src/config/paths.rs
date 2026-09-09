@@ -17,7 +17,7 @@ use std::path::{Path, PathBuf};
 use crate::error::{AppError, AppResult, ErrorCode};
 
 /// Matches the bundle identifier so the app's data sits where macOS expects it.
-pub const APP_DIR_NAME: &str = "com.webprodigies.murmur";
+pub const APP_DIR_NAME: &str = "com.webprodigies.HushWrite";
 
 /**
  * SOURCE OF TRUTH KEYWORDS: AppPaths
@@ -26,7 +26,7 @@ pub const APP_DIR_NAME: &str = "com.webprodigies.murmur";
  */
 #[derive(Debug, Clone)]
 pub struct AppPaths {
-    /// ~/Library/Application Support/com.murmur.app
+    /// ~/Library/Application Support/com.HushWrite.app
     pub data_dir: PathBuf,
     /// Model weights and their Core ML encoders.
     pub models_dir: PathBuf,
@@ -39,7 +39,7 @@ pub struct AppPaths {
     /**
      * SOURCE OF TRUTH KEYWORDS: bundled_models_dir, one_download
      * WHAT:  Models shipped INSIDE the app bundle, if any.
-     * WHY:   Murmur is distributed as a single download that works the moment
+     * WHY:   HushWrite is distributed as a single download that works the moment
      *        it opens — no second wait, no first-run fetch, nothing to go wrong
      *        on a bad connection. The weights ride along in Contents/Resources
      *        and are used from there, read-only, rather than being copied into
@@ -67,7 +67,7 @@ impl AppPaths {
         let base = dirs::data_dir().ok_or_else(|| {
             AppError::new(
                 ErrorCode::Io,
-                "Murmur could not find your Application Support folder.",
+                "HushWrite could not find your Application Support folder.",
             )
         })?;
 
@@ -76,7 +76,7 @@ impl AppPaths {
             models_dir: data_dir.join("models"),
             logs_dir: data_dir.join("logs"),
             audio_dir: data_dir.join("audio"),
-            db_path: data_dir.join("murmur.db"),
+            db_path: data_dir.join("HushWrite.db"),
             data_dir,
             bundled_models_dir: None,
         };
@@ -168,8 +168,10 @@ impl AppPaths {
      *        of a rule this silent is how the bug came back.
      */
     pub fn model_coreml_dir(&self, model_id: &str) -> PathBuf {
-        self.models_dir
-            .join(format!("ggml-{}-encoder.mlmodelc", strip_quantisation(model_id)))
+        self.models_dir.join(format!(
+            "ggml-{}-encoder.mlmodelc",
+            strip_quantisation(model_id)
+        ))
     }
 
     pub fn data_dir(&self) -> &Path {
@@ -215,7 +217,10 @@ mod tests {
         // The bug this guards: an encoder installed under the quantised name is
         // never opened, and nothing reports the failure.
         assert_eq!(strip_quantisation("large-v3-turbo-q5_0"), "large-v3-turbo");
-        assert_eq!(strip_quantisation("large-v3-turbo-q3_k_m"), "large-v3-turbo");
+        assert_eq!(
+            strip_quantisation("large-v3-turbo-q3_k_m"),
+            "large-v3-turbo"
+        );
         assert_eq!(strip_quantisation("small-q5_1"), "small");
         // Unquantised names are untouched.
         assert_eq!(strip_quantisation("large-v3-turbo"), "large-v3-turbo");
@@ -228,22 +233,22 @@ mod tests {
     #[test]
     fn the_coreml_directory_uses_the_unquantised_name() {
         let paths = AppPaths {
-            data_dir: PathBuf::from("/tmp/murmur"),
-            models_dir: PathBuf::from("/tmp/murmur/models"),
+            data_dir: PathBuf::from("/tmp/HushWrite"),
+            models_dir: PathBuf::from("/tmp/HushWrite/models"),
             bundled_models_dir: None,
-            logs_dir: PathBuf::from("/tmp/murmur/logs"),
-            audio_dir: PathBuf::from("/tmp/murmur/audio"),
-            db_path: PathBuf::from("/tmp/murmur/murmur.db"),
+            logs_dir: PathBuf::from("/tmp/HushWrite/logs"),
+            audio_dir: PathBuf::from("/tmp/HushWrite/audio"),
+            db_path: PathBuf::from("/tmp/HushWrite/HushWrite.db"),
         };
 
         assert_eq!(
             paths.model_coreml_dir("large-v3-turbo-q5_0"),
-            PathBuf::from("/tmp/murmur/models/ggml-large-v3-turbo-encoder.mlmodelc")
+            PathBuf::from("/tmp/HushWrite/models/ggml-large-v3-turbo-encoder.mlmodelc")
         );
         // The weights themselves DO keep the quantised name.
         assert_eq!(
             paths.model_file("large-v3-turbo-q5_0"),
-            PathBuf::from("/tmp/murmur/models/ggml-large-v3-turbo-q5_0.bin")
+            PathBuf::from("/tmp/HushWrite/models/ggml-large-v3-turbo-q5_0.bin")
         );
     }
 }

@@ -189,7 +189,7 @@ export function InteractivePlayground() {
     setLiveTranscript("Simulating microphone audio capture...");
     setTimeout(() => {
       setLiveTranscript(
-        "Murmur transcribed: Local speech recognition is fast, private, and powerful.",
+        "HushWrite transcribed: Local speech recognition is fast, private, and powerful.",
       );
       setIsLiveMic(false);
     }, 3000);
@@ -223,10 +223,10 @@ export function InteractivePlayground() {
             </span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
-            Test Murmur in your browser.
+            Test HushWrite in your browser.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Experience how Murmur turns unstructured messy speech into formatted writing while
+            Experience how HushWrite turns unstructured messy speech into formatted writing while
             stripping filler words with zero cloud latency.
           </p>
         </div>

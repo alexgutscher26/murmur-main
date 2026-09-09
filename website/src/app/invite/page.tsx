@@ -21,7 +21,7 @@ import { Footer } from "@/components/Footer";
 
 function InviteContent() {
   const searchParams = useSearchParams();
-  const refCode = searchParams.get("ref") || "MURMUR-PROMO";
+  const refCode = searchParams.get("ref") || "HushWrite-PROMO";
   const [copied, setCopied] = useState(false);
 
   const handleCopyCode = () => {
@@ -122,7 +122,7 @@ function InviteContent() {
             className="w-full sm:w-auto py-3 px-6 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
           >
             <Download className="size-4" />
-            <span>Download Murmur Free</span>
+            <span>Download HushWrite Free</span>
           </Link>
           <Link
             href={`/pricing?ref=${encodeURIComponent(refCode)}`}

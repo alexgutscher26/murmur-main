@@ -1,6 +1,6 @@
 /**
  * SOURCE OF TRUTH KEYWORDS: ChangelogModal, whats-new, release-notes, in-app-changelog
- * WHAT:  The "What's New in Murmur" release notes modal in the desktop app.
+ * WHAT:  The "What's New in HushWrite" release notes modal in the desktop app.
  * WHY:   Presents version highlights (on-device whisper models, theme switcher,
  *        search, backup/restore, shortcuts panel, pro features, directml acceleration).
  * WHERE: Triggered from dashboard header "What's New" pill or settings view.
@@ -95,7 +95,7 @@ const RELEASES: ReleaseEntry[] = [
       },
       {
         icon: <ShieldCheck className="size-4 text-text-primary" />,
-        title: "Murmur Pro & Team Plans",
+        title: "HushWrite Pro & Team Plans",
         description:
           "Unlock Large v3 Turbo, automatic filler word stripper (ums/ahs), unlimited dictionary words, and centralized team dictionary sync.",
       },
@@ -127,7 +127,7 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
         <div className="hairline border-b border-[var(--border-hairline)] px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="size-5 text-text-primary" />
-            <h3 className="text-body font-bold text-text-primary">What's New in Murmur</h3>
+            <h3 className="text-body font-bold text-text-primary">What's New in HushWrite</h3>
           </div>
           <button
             type="button"
@@ -187,7 +187,7 @@ export function ChangelogModal({ isOpen, onClose }: ChangelogModalProps) {
 
         {/* Modal Footer */}
         <div className="hairline border-t border-[var(--border-hairline)] px-5 py-3 bg-surface flex items-center justify-between text-caption text-text-secondary">
-          <span>Murmur updates automatically via GitHub Releases.</span>
+          <span>HushWrite updates automatically via GitHub Releases.</span>
           <button
             type="button"
             onClick={onClose}

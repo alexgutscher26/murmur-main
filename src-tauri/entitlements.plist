@@ -12,7 +12,7 @@
          The failure that produced this file: the app was signed with an
          identity, gained Hardened Runtime, carried no entitlements, and then
          recorded pure silence. Every visible signal said it should work —
-         Murmur was listed and enabled under Microphone, the device opened, the
+         HushWrite was listed and enabled under Microphone, the device opened, the
          pipeline ran — and the transcript came back empty. The permission
          check even reported NotDetermined, because a Hardened Runtime process
          without the entitlement cannot meaningfully ask.

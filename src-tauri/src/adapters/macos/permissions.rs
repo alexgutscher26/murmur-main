@@ -1,7 +1,7 @@
 /*!
  * SOURCE OF TRUTH KEYWORDS: MacosPermissions, check, request, open_privacy_pane,
  *   AXIsProcessTrusted, authorization_status, PRIVACY_PANE_URL
- * WHAT:  Reads and requests the two macOS grants Murmur needs, and deep-links
+ * WHAT:  Reads and requests the two macOS grants HushWrite needs, and deep-links
  *        into System Settings when one has been denied.
  * WHY:   The single most important fact about TCC, and the reason this file is
  *        shaped the way it is: **a permission dialog appears exactly once per
@@ -104,7 +104,7 @@ impl MacosPermissions {
     fn accessibility_state() -> PermissionState {
         /*
          * SOURCE OF TRUTH KEYWORDS: accessibility_is_one_toggle, AXIsProcessTrusted
-         * WHAT:  Whether the user has granted Murmur Accessibility — the single
+         * WHAT:  Whether the user has granted HushWrite Accessibility — the single
          *        switch in Privacy & Security > Accessibility.
          * WHY:   `AXIsProcessTrusted` and NOTHING ELSE, and the "nothing else"
          *        is the fix. An earlier version required
@@ -129,15 +129,14 @@ impl MacosPermissions {
          *        are the same thing. Posting is cross-checked below because a
          *        mismatch is diagnostic, but it does NOT gate the answer.
          *
-         *        Murmur does not need Input Monitoring. The modifier-tap
+         *        HushWrite does not need Input Monitoring. The modifier-tap
          *        watcher is the only thing that listens, it is used only for a
          *        modifier-only hotkey, it fails soft, and it retries — so it
          *        must never hold the whole app's permission state hostage.
          */
         // SAFETY: parameterless boolean queries into system frameworks. Neither
         // prompts, and both are safe from any thread.
-        let (trusted, can_post) =
-            unsafe { (AXIsProcessTrusted(), CGPreflightPostEventAccess()) };
+        let (trusted, can_post) = unsafe { (AXIsProcessTrusted(), CGPreflightPostEventAccess()) };
 
         if trusted != can_post {
             // Genuinely diagnostic: Accessibility grants both, so these two
@@ -148,7 +147,7 @@ impl MacosPermissions {
                 ax_trusted = trusted,
                 can_post_events = can_post,
                 "Accessibility and the post-event grant disagree — a stale TCC row. \
-                 Remove Murmur under Privacy & Security > Accessibility with the minus \
+                 Remove HushWrite under Privacy & Security > Accessibility with the minus \
                  button, then allow it again."
             );
         }
@@ -263,7 +262,7 @@ impl PermissionProvider for MacosPermissions {
             .map_err(|err| {
                 AppError::new(
                     ErrorCode::Internal,
-                    "Murmur could not open System Settings. Open Privacy & Security yourself and grant access there.",
+                    "HushWrite could not open System Settings. Open Privacy & Security yourself and grant access there.",
                 )
                 .with_detail(err)
             })?;

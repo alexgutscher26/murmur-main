@@ -31,12 +31,12 @@ const PERMISSION_COPY: Readonly<
 > = {
   MICROPHONE: {
     label: "Microphone",
-    why: "Murmur cannot hear you without it.",
+    why: "HushWrite cannot hear you without it.",
     required: true,
   },
   ACCESSIBILITY: {
     label: "Accessibility",
-    why: "Lets Murmur paste for you. Without it, your words still go to the clipboard.",
+    why: "Lets HushWrite paste for you. Without it, your words still go to the clipboard.",
     required: false,
   },
 };

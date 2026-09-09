@@ -118,7 +118,7 @@ pub fn measure_realtime_factor(
     state.full(warmup_params, &warmup).map_err(|err| {
         AppError::new(
             ErrorCode::EngineNotReady,
-            "Murmur could not warm up the transcription model.",
+            "HushWrite could not warm up the transcription model.",
         )
         .with_detail(format!("{err:?}"))
     })?;
@@ -136,7 +136,7 @@ pub fn measure_realtime_factor(
     state.full(params, &probe).map_err(|err| {
         AppError::new(
             ErrorCode::EngineNotReady,
-            "Murmur could not measure transcription speed on this Mac.",
+            "HushWrite could not measure transcription speed on this Mac.",
         )
         .with_detail(format!("{err:?}"))
     })?;

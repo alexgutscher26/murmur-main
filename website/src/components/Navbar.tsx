@@ -36,7 +36,7 @@ export function Navbar() {
           </div>
           <div className="flex items-center gap-2">
             <span className="font-bold text-sm tracking-tight text-neutral-900 group-hover:text-black transition-colors">
-              Murmur
+              HushWrite
             </span>
           </div>
         </Link>
@@ -65,7 +65,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           {/* GitHub Star */}
           <a
-            href="https://github.com/webprodigies/murmur"
+            href="https://github.com/webprodigies/HushWrite"
             target="_blank"
             rel="noopener noreferrer"
             className="group hidden sm:inline-flex items-center gap-2 text-xs font-semibold text-neutral-700 hover:text-neutral-950 bg-white hover:bg-neutral-50 border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
@@ -159,7 +159,7 @@ export function Navbar() {
                   Download free for Mac & Windows
                 </Link>
                 <a
-                  href="https://github.com/webprodigies/murmur"
+                  href="https://github.com/webprodigies/HushWrite"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full text-center text-sm font-semibold text-neutral-800 hover:text-neutral-950 bg-white hover:bg-neutral-50 border border-neutral-200/90 py-3 px-4 rounded-xl shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"

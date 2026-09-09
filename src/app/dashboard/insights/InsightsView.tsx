@@ -482,7 +482,7 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
 
   // Handle Share button click
   const handleShare = useCallback(() => {
-    const text = `🎙️ My Murmur Insights:\n• ${speakingWpm} Words Per Minute\n• ${formatCount(totalWords)} total words dictated\n• ${streakDays}-day streak\n• ${totalFixes} automatic AI corrections`;
+    const text = `🎙️ My HushWrite Insights:\n• ${speakingWpm} Words Per Minute\n• ${formatCount(totalWords)} total words dictated\n• ${streakDays}-day streak\n• ${totalFixes} automatic AI corrections`;
     void unwrapCommand(() => commands.copyText({ text })).then(() => {
       setCopiedShare(true);
       setTimeout(() => setCopiedShare(false), 2000);
@@ -593,14 +593,14 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
               <SpeedometerGauge wpm={speakingWpm} />
             </div>
 
-            {/* Card 2: FIXES MADE BY MURMUR */}
+            {/* Card 2: FIXES MADE BY HushWrite */}
             <div className="rounded-2xl border border-hairline bg-elevated/70 p-6 backdrop-blur-sm shadow-sm flex flex-col justify-between">
               <div>
                 <div className="text-4xl font-extrabold tracking-tight text-text-primary">
                   {formatCount(totalFixes)}
                 </div>
                 <div className="mt-1 text-xs font-semibold uppercase tracking-wider text-text-tertiary">
-                  FIXES MADE BY MURMUR
+                  FIXES MADE BY HushWrite
                 </div>
               </div>
 
@@ -620,7 +620,7 @@ export function InsightsView({ hotkey: _hotkey, mode: _mode }: InsightsViewProps
                     {formatCount(dictionaryFixes)} dictionary fixes
                   </span>
                   <InfoTooltip
-                    content="Custom spelling rules applied from your Murmur Dictionary."
+                    content="Custom spelling rules applied from your HushWrite Dictionary."
                     align="end"
                   />
                 </div>

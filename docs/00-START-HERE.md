@@ -1,4 +1,4 @@
-# Murmur — start here
+# HushWrite — start here
 
 A local-first, free, blazing-fast speech-to-text app for macOS. Press a hotkey, talk, press it again, and your words are pasted where you were typing.
 

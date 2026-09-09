@@ -3,7 +3,7 @@
  *   updates_enabled, CHECK_UPDATES, UpdaterExt, updater_disabled
  * WHAT:  The two update commands: ask GitHub Releases whether a newer signed
  *        build exists, and install one.
- * WHY:   This is the ONLY network request Murmur makes after setup, and the
+ * WHY:   This is the ONLY network request HushWrite makes after setup, and the
  *        product promise is that it can be switched off — so the setting is
  *        checked BEFORE the updater is ever constructed, in both commands.
  *        Not before the request: before the client exists. A gate that builds
@@ -81,10 +81,11 @@ fn updates_enabled(db: &Database) -> bool {
         return false;
     }
 
-    let stored = settings::get_setting(db, keys::CHECK_UPDATES).ok().flatten();
-    let value = stored.or_else(|| {
-        registry::setting_def(keys::CHECK_UPDATES).map(|def| def.default.clone())
-    });
+    let stored = settings::get_setting(db, keys::CHECK_UPDATES)
+        .ok()
+        .flatten();
+    let value = stored
+        .or_else(|| registry::setting_def(keys::CHECK_UPDATES).map(|def| def.default.clone()));
     matches!(value, Some(SettingValue::Bool(true)))
 }
 
@@ -94,7 +95,7 @@ fn updates_enabled(db: &Database) -> bool {
 fn updater_error(err: tauri_plugin_updater::Error) -> AppError {
     AppError::new(
         ErrorCode::Network,
-        "Murmur could not reach the update server. Check your connection and try again.",
+        "HushWrite could not reach the update server. Check your connection and try again.",
     )
     .recoverable()
     .with_detail(err)
@@ -177,7 +178,7 @@ pub async fn install_update(state: State<'_, AppState>) -> Result<(), AppError> 
         if !matches!(ctx.state.current_state(), SessionState::Idle) {
             return Err(AppError::new(
                 ErrorCode::SessionAlreadyActive,
-                "Murmur is in the middle of a dictation. Finish it and try again.",
+                "HushWrite is in the middle of a dictation. Finish it and try again.",
             )
             .recoverable());
         }
@@ -249,8 +250,14 @@ mod tests {
         })
         .expect("serialises");
 
-        assert_eq!(disabled.get("kind").and_then(|k| k.as_str()), Some("DISABLED"));
-        assert_eq!(current.get("kind").and_then(|k| k.as_str()), Some("UP_TO_DATE"));
+        assert_eq!(
+            disabled.get("kind").and_then(|k| k.as_str()),
+            Some("DISABLED")
+        );
+        assert_eq!(
+            current.get("kind").and_then(|k| k.as_str()),
+            Some("UP_TO_DATE")
+        );
         assert_ne!(disabled.get("kind"), current.get("kind"));
     }
 }

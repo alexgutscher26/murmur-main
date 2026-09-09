@@ -1,4 +1,4 @@
-# Murmur — Project Structure
+# HushWrite — Project Structure
 
 The tree is decided here so it is not improvised per feature. A file that does not have an obvious home in this layout is a signal the design is drifting.
 
@@ -10,7 +10,7 @@ This is the tree as built, not as imagined. If a file has no obvious home in it,
 the design is drifting.
 
 ```
-murmur/
+HushWrite/
 ├── CLAUDE.md                        # the rulebook — read first, every session
 ├── README.md · LICENSE (MIT)
 ├── docs/                            # 00–06, this set

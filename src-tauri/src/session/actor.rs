@@ -34,9 +34,7 @@ use crate::ports::engine::TranscribeRequest;
 use crate::ports::permissions::{OsPermission, PermissionState};
 use crate::services;
 use crate::telemetry::{now_ms, LatencyRecorder};
-use crate::types::{
-    LanguageCode, LanguageHint, LatencyStage, SessionId, SessionState,
-};
+use crate::types::{LanguageCode, LanguageHint, LatencyStage, SessionId, SessionState};
 
 use super::delivery::{FinishedRecording, PendingDelivery};
 use super::machine::{Effect, SessionEvent, SessionMachine};
@@ -326,9 +324,7 @@ impl SessionActor {
             Effect::PersistRow { session_id } => self.persist_row(session_id),
             Effect::StartCapture => self.start_capture().await,
             Effect::StopCapture => self.stop_capture(),
-            Effect::HandOffToDelivery { session_id } => {
-                self.hand_off_to_delivery(session_id).await
-            }
+            Effect::HandOffToDelivery { session_id } => self.hand_off_to_delivery(session_id).await,
             Effect::StartCountdown { duration_ms } => {
                 self.cancel_deadline = Some(Instant::now() + Duration::from_millis(duration_ms));
             }
@@ -374,7 +370,8 @@ impl SessionActor {
         // and so the app that had focus when the hotkey fired is the one whose
         // profile applies.
         self.settings = SessionSettings::load_for_app(&self.ctx.db, app_bundle_id.as_deref());
-        self.machine.set_cancel_countdown_ms(self.settings.cancel_countdown_ms);
+        self.machine
+            .set_cancel_countdown_ms(self.settings.cancel_countdown_ms);
         self.machine
             .set_discard_on_escape(self.settings.discard_on_escape);
 
@@ -426,14 +423,14 @@ impl SessionActor {
 
         // The engine warms on a background thread at launch, and that takes a
         // few seconds — model load plus a hash of a 574MB file. Someone who
-        // launches Murmur and immediately presses the hotkey would otherwise
+        // launches HushWrite and immediately presses the hotkey would otherwise
         // record happily, decode into nothing, and be handed silence with no
         // explanation. Failing fast with a sentence they can act on is far
         // better than a recording that quietly produces no words.
         if !self.ctx.ports.engine.is_ready() {
             let err = AppError::new(
                 ErrorCode::EngineNotReady,
-                "Murmur is still starting up. Try again in a moment.",
+                "HushWrite is still starting up. Try again in a moment.",
             )
             .recoverable()
             .with_action(crate::error::ErrorAction::Retry);
@@ -460,11 +457,7 @@ impl SessionActor {
             Err(err) => {
                 drop(timer);
                 tracing::warn!(error = %err, "could not open the microphone");
-                let _ = self
-                    .ctx
-                    .session
-                    .send(SessionEvent::ArmingFailed(err))
-                    .await;
+                let _ = self.ctx.session.send(SessionEvent::ArmingFailed(err)).await;
             }
         }
     }
@@ -673,7 +666,10 @@ impl SessionActor {
         let deadline = Duration::from_millis(pending.settings.finalize_timeout_ms);
 
         if let Some(tail) = tail {
-            if self.worker.submit_tail(tail, request, deadline, session_id.clone()) {
+            if self
+                .worker
+                .submit_tail(tail, request, deadline, session_id.clone())
+            {
                 in_flight += 1;
             } else {
                 tracing::warn!("the tail could not be queued; delivering what we have");
@@ -700,13 +696,20 @@ impl SessionActor {
         let session = self.ctx.session.clone();
         tokio::spawn(async move {
             tokio::time::sleep(deadline).await;
-            let _ = session.send(SessionEvent::DeliveryTimedOut(session_id)).await;
+            let _ = session
+                .send(SessionEvent::DeliveryTimedOut(session_id))
+                .await;
         });
     }
 
     /// Queues a finished recording for its turn to be pasted.
     async fn finish(&mut self, pending: PendingDelivery) {
-        if self.deliveries.send(FinishedRecording { pending }).await.is_err() {
+        if self
+            .deliveries
+            .send(FinishedRecording { pending })
+            .await
+            .is_err()
+        {
             tracing::error!("the delivery worker is gone; a transcript was lost");
         }
     }
@@ -741,7 +744,7 @@ impl SessionActor {
             .events
             .set_pill_visible(!matches!(state, SessionState::Idle));
 
-        // Audible confirmation. Murmur has no window at the moment the hotkey
+        // Audible confirmation. HushWrite has no window at the moment the hotkey
         // fires, so for that instant this is the ONLY feedback that it worked.
         if self.settings.audio_feedback {
             use crate::adapters::os::{play_feedback, FeedbackSound};
@@ -766,9 +769,7 @@ impl SessionActor {
                  * happens after the decode, so the "off" sound arrived a second
                  * or two after he had already let go of the key.
                  */
-                _ if was_capturing && !state.is_capturing() => {
-                    play_feedback(FeedbackSound::Stop)
-                }
+                _ if was_capturing && !state.is_capturing() => play_feedback(FeedbackSound::Stop),
                 _ => {}
             }
         }

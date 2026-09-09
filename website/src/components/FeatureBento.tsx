@@ -9,7 +9,7 @@ const JOBS = [
     feature: "Clean-up and formatting",
     audience: "Busy operators, executives & consultants",
     description:
-      "Speak freely with false starts and filler words. Murmur strips ums, ahs, and repetitions, injects proper punctuation, and outputs clean paragraphs ready to send.",
+      "Speak freely with false starts and filler words. HushWrite strips ums, ahs, and repetitions, injects proper punctuation, and outputs clean paragraphs ready to send.",
     pill: "Smart cleanup",
     pillDetail: "Auto-punctuation",
     icon: Sparkles,
@@ -53,7 +53,7 @@ const JOBS = [
     feature: "Custom vocabulary / dictionary",
     audience: "Engineers, medical teams & specialized domains",
     description:
-      "Add proprietary names, code symbols, technical acronyms, or medication terms. Murmur biases recognition weights to achieve flawless accuracy.",
+      "Add proprietary names, code symbols, technical acronyms, or medication terms. HushWrite biases recognition weights to achieve flawless accuracy.",
     pill: "Custom dictionary",
     pillDetail: "Phonetic biasing",
     icon: Sliders,

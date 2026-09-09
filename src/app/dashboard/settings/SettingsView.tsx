@@ -324,7 +324,7 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
         isOpen={proModalOpen}
         onClose={() => setProModalOpen(false)}
         featureName="Filler Word Removal"
-        description="Automatically remove ums, uhs, and verbal hesitations in real-time with Murmur Pro."
+        description="Automatically remove ums, uhs, and verbal hesitations in real-time with HushWrite Pro."
       />
     </div>
   );

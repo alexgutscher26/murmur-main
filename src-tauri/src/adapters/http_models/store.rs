@@ -135,8 +135,9 @@ impl HttpModelStore {
     ) -> AppResult<Self> {
         let builder = reqwest::Client::builder()
             .connect_timeout(CONNECT_TIMEOUT)
-            .user_agent(concat!("murmur/", env!("CARGO_PKG_VERSION")));
-        let client = super::catalog::configure_air_gap_client_builder(builder, air_gapped).build()?;
+            .user_agent(concat!("HushWrite/", env!("CARGO_PKG_VERSION")));
+        let client =
+            super::catalog::configure_air_gap_client_builder(builder, air_gapped).build()?;
 
         Ok(Self {
             paths,
@@ -155,7 +156,7 @@ impl HttpModelStore {
         descriptor_for(id).ok_or_else(|| {
             AppError::new(
                 ErrorCode::NotFound,
-                "Murmur does not offer that transcription model.",
+                "HushWrite does not offer that transcription model.",
             )
             .with_detail(format!("unknown model id {id}"))
         })
@@ -268,8 +269,7 @@ impl HttpModelStore {
         // else, so a failure here is logged rather than surfaced.
         match serde_json::to_string(&marker) {
             Ok(encoded) => {
-                if let Err(err) =
-                    tokio::fs::write(self.verified_marker_file(entry), encoded).await
+                if let Err(err) = tokio::fs::write(self.verified_marker_file(entry), encoded).await
                 {
                     tracing::warn!(model = entry.id, error = %err, "could not record verification");
                 }
@@ -352,7 +352,8 @@ impl HttpModelStore {
                     ModelState::Ready
                 } else {
                     ModelState::Failed {
-                        message: "This model file is damaged or incomplete. Download it again.".to_string(),
+                        message: "This model file is damaged or incomplete. Download it again."
+                            .to_string(),
                     }
                 },
             );
@@ -837,7 +838,8 @@ mod tests {
      */
     #[tokio::test]
     async fn listing_models_never_hashes() {
-        let dir = std::env::temp_dir().join(format!("murmur-list-test-{}", uuid::Uuid::new_v4()));
+        let dir =
+            std::env::temp_dir().join(format!("HushWrite-list-test-{}", uuid::Uuid::new_v4()));
         let paths = AppPaths {
             data_dir: dir.clone(),
             models_dir: dir.join("models"),
@@ -877,7 +879,8 @@ mod tests {
 
     #[tokio::test]
     async fn listing_models_restores_from_valid_marker_file() {
-        let dir = std::env::temp_dir().join(format!("murmur-marker-test-{}", uuid::Uuid::new_v4()));
+        let dir =
+            std::env::temp_dir().join(format!("HushWrite-marker-test-{}", uuid::Uuid::new_v4()));
         let paths = AppPaths {
             data_dir: dir.clone(),
             models_dir: dir.join("models"),
@@ -901,7 +904,9 @@ mod tests {
             modified_ms: mtime,
         };
         let marker_path = paths.models_dir.join(format!("ggml-{}.verified", entry.id));
-        tokio::fs::write(&marker_path, serde_json::to_string(&marker).unwrap()).await.unwrap();
+        tokio::fs::write(&marker_path, serde_json::to_string(&marker).unwrap())
+            .await
+            .unwrap();
 
         let store = HttpModelStore::new(paths, Arc::new(crate::ports::NullEventSink)).unwrap();
         let status = store.status(&ModelId(entry.id.to_string())).await.unwrap();
@@ -993,7 +998,12 @@ mod tests {
         );
         // Case is not meaningful in a hex digest, and rejecting on it would
         // re-hash 574MB every launch for nothing.
-        assert!(marker_still_describes(&marker, "E1D2C3B4A5", SIZE, Some(MTIME)));
+        assert!(marker_still_describes(
+            &marker,
+            "E1D2C3B4A5",
+            SIZE,
+            Some(MTIME)
+        ));
 
         // Each of the three, alone, must invalidate.
         assert!(
@@ -1016,10 +1026,19 @@ mod tests {
 
     #[test]
     fn quantisation_suffixes_are_stripped_the_way_whisper_cpp_strips_them() {
-        assert_eq!(strip_quantisation_suffix("large-v3-turbo-q5_0"), "large-v3-turbo");
-        assert_eq!(strip_quantisation_suffix("large-v3-turbo-q3_k_m"), "large-v3-turbo");
+        assert_eq!(
+            strip_quantisation_suffix("large-v3-turbo-q5_0"),
+            "large-v3-turbo"
+        );
+        assert_eq!(
+            strip_quantisation_suffix("large-v3-turbo-q3_k_m"),
+            "large-v3-turbo"
+        );
         assert_eq!(strip_quantisation_suffix("small-q5_1"), "small");
-        assert_eq!(strip_quantisation_suffix("large-v3-turbo"), "large-v3-turbo");
+        assert_eq!(
+            strip_quantisation_suffix("large-v3-turbo"),
+            "large-v3-turbo"
+        );
         assert_eq!(strip_quantisation_suffix("base-english"), "base-english");
         assert_eq!(strip_quantisation_suffix("tiny"), "tiny");
     }

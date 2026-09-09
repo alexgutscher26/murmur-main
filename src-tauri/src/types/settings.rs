@@ -152,12 +152,71 @@ pub enum KeyModifier {
  * WHERE: HotkeyBinding::bindable.
  */
 pub const BINDABLE_KEYS: &[&str] = &[
-    "Space", "Enter", "Tab", "Backquote", "Backslash", "Semicolon", "Quote", "Comma", "Period",
-    "Slash", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12", "F13",
-    "F14", "F15", "F16", "F17", "F18", "F19", "KeyA", "KeyB", "KeyC", "KeyD", "KeyE", "KeyF",
-    "KeyG", "KeyH", "KeyI", "KeyJ", "KeyK", "KeyL", "KeyM", "KeyN", "KeyO", "KeyP", "KeyQ", "KeyR",
-    "KeyS", "KeyT", "KeyU", "KeyV", "KeyW", "KeyX", "KeyY", "KeyZ", "Digit0", "Digit1", "Digit2",
-    "Digit3", "Digit4", "Digit5", "Digit6", "Digit7", "Digit8", "Digit9",
+    "Space",
+    "Enter",
+    "Tab",
+    "Backquote",
+    "Backslash",
+    "Semicolon",
+    "Quote",
+    "Comma",
+    "Period",
+    "Slash",
+    "F1",
+    "F2",
+    "F3",
+    "F4",
+    "F5",
+    "F6",
+    "F7",
+    "F8",
+    "F9",
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F15",
+    "F16",
+    "F17",
+    "F18",
+    "F19",
+    "KeyA",
+    "KeyB",
+    "KeyC",
+    "KeyD",
+    "KeyE",
+    "KeyF",
+    "KeyG",
+    "KeyH",
+    "KeyI",
+    "KeyJ",
+    "KeyK",
+    "KeyL",
+    "KeyM",
+    "KeyN",
+    "KeyO",
+    "KeyP",
+    "KeyQ",
+    "KeyR",
+    "KeyS",
+    "KeyT",
+    "KeyU",
+    "KeyV",
+    "KeyW",
+    "KeyX",
+    "KeyY",
+    "KeyZ",
+    "Digit0",
+    "Digit1",
+    "Digit2",
+    "Digit3",
+    "Digit4",
+    "Digit5",
+    "Digit6",
+    "Digit7",
+    "Digit8",
+    "Digit9",
 ];
 
 impl HotkeyBinding {
@@ -174,7 +233,7 @@ impl HotkeyBinding {
      *           code)` — a chord, not a key monitor — so there is nothing to
      *           register. More importantly it would be wrong even if it were
      *           possible: Option is held constantly to type accented characters
-     *           and as a modifier in every app, so binding it means Murmur
+     *           and as a modifier in every app, so binding it means HushWrite
      *           starts recording while you type. Detecting a tap-and-release of
      *           a lone modifier means a CGEventTap on flagsChanged, which is a
      *           different mechanism, needs Accessibility, and still fires on a
@@ -303,7 +362,10 @@ mod tests {
             modifiers: vec![KeyModifier::Option],
             key: String::new(),
         };
-        assert!(binding.bindable().is_ok(), "the operator asked for this one");
+        assert!(
+            binding.bindable().is_ok(),
+            "the operator asked for this one"
+        );
         assert_eq!(binding.sole_modifier(), Some(KeyModifier::Option));
 
         // The same thing as the capture control reports it: the modifier's own

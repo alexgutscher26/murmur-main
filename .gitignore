@@ -27,7 +27,7 @@ dist-ssr
 # updated again; committing it means anyone can sign an update for our users.
 *.key
 *.key.pub
-.murmur-updater.key*
+.HushWrite-updater.key*
 
 # Rust build output. 24GB of it, and every byte is reproducible from source.
 src-tauri/target/

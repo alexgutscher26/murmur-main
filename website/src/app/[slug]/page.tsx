@@ -20,16 +20,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!page) return {};
 
   return {
-    title: `${page.metaTitle} · Murmur`,
+    title: `${page.metaTitle} · HushWrite`,
     description: page.metaDescription,
     alternates: {
-      canonical: `https://murmur.app/${slug}`,
+      canonical: `https://HushWrite.app/${slug}`,
     },
     openGraph: {
       title: page.metaTitle,
       description: page.metaDescription,
-      url: `https://murmur.app/${slug}`,
-      siteName: "Murmur",
+      url: `https://HushWrite.app/${slug}`,
+      siteName: "HushWrite",
       type: "website",
     },
   };
@@ -46,7 +46,7 @@ export default async function HighIntentSeoPage({ params }: Props) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "Murmur",
+    name: "HushWrite",
     applicationCategory: "ProductivityApplication",
     operatingSystem: "macOS, Windows",
     offers: {
@@ -115,7 +115,7 @@ export default async function HighIntentSeoPage({ params }: Props) {
               href="/#download"
               className="text-sm font-semibold text-white bg-[#141416] hover:bg-neutral-800 px-6 py-3 rounded-xl transition-all shadow-md"
             >
-              Download Murmur Free
+              Download HushWrite Free
             </Link>
             <Link
               href="/privacy"
@@ -207,7 +207,7 @@ export default async function HighIntentSeoPage({ params }: Props) {
                 <tr className="border-b border-neutral-200 text-neutral-700 font-mono bg-neutral-50/80">
                   <th className="p-3.5 pr-4 w-1/4">Buyer Concern</th>
                   <th className="p-3.5 px-4 w-2/5 bg-neutral-100/70 text-neutral-950 font-bold border-x border-neutral-200">
-                    Murmur (Local-First)
+                    HushWrite (Local-First)
                   </th>
                   <th className="p-3.5 px-4 w-1/3 text-neutral-500">
                     Cloud Alternatives (e.g. Wispr)
@@ -224,7 +224,7 @@ export default async function HighIntentSeoPage({ params }: Props) {
                       </div>
                     </td>
                     <td className="p-3.5 px-4 bg-emerald-50/30 border-x border-neutral-200 text-emerald-800 font-semibold">
-                      {row.murmur}
+                      {row.HushWrite}
                     </td>
                     <td className="p-3.5 px-4 text-neutral-600">{row.cloudComp}</td>
                   </tr>
@@ -289,14 +289,14 @@ export default async function HighIntentSeoPage({ params }: Props) {
             Ready to dictate without cloud exposure?
           </h2>
           <p className="text-sm text-neutral-400 max-w-md mx-auto mb-6 leading-relaxed">
-            Download Murmur for macOS and Windows. Free, open source, and 100% on-device.
+            Download HushWrite for macOS and Windows. Free, open source, and 100% on-device.
           </p>
           <div className="flex justify-center gap-3">
             <Link
               href="/#download"
               className="text-sm font-semibold text-neutral-950 bg-white hover:bg-neutral-100 px-6 py-2.5 rounded-xl transition-colors shadow-md"
             >
-              Download Murmur
+              Download HushWrite
             </Link>
             <Link
               href="/"

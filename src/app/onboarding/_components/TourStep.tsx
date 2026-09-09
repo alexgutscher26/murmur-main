@@ -11,7 +11,7 @@
  *        honestly a counter, and pretending otherwise would be architecture for
  *        its own sake.
  *
- *        THE THIRD SLIDE IS THE PRODUCT. Murmur transcribes on the user's own
+ *        THE THIRD SLIDE IS THE PRODUCT. HushWrite transcribes on the user's own
  *        machine, and nothing in the app said so anywhere — a person could use
  *        it for a week believing their voice was being uploaded. That is the
  *        single most valuable sentence here and it gets its own slide rather
@@ -107,7 +107,7 @@ export function TourStep({
     <section className="flex h-full flex-col items-center justify-center gap-6 px-8 relative">
       <PrivacyModal isOpen={privacyOpen} onClose={() => setPrivacyOpen(false)} />
 
-      <Mark size="lg" label="Murmur" />
+      <Mark size="lg" label="HushWrite" />
 
       <TourMedia key={slide.media} src={slide.media} title={title} />
 
@@ -142,7 +142,7 @@ export function TourStep({
           onClick={() => (isLast ? onDone() : setIndex((current) => current + 1))}
           className="h-[var(--control-height)] rounded-input bg-text-primary px-4 text-body font-medium text-opaque-elevated transition-opacity hover:opacity-90"
         >
-          {isLast ? "Set up Murmur" : "Next"}
+          {isLast ? "Set up HushWrite" : "Next"}
         </button>
 
         {/* Balances the back button so the primary action stays optically

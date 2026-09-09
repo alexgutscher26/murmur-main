@@ -196,7 +196,9 @@ impl Validate for DeleteHistoryEntriesInput {
             return Err("At least one session id must be provided.".into());
         }
         if self.ids.len() > MAX_PAGE as usize {
-            return Err(format!("Cannot delete more than {MAX_PAGE} sessions at once."));
+            return Err(format!(
+                "Cannot delete more than {MAX_PAGE} sessions at once."
+            ));
         }
         for id in &self.ids {
             if id.as_str().trim().is_empty() {
@@ -336,7 +338,7 @@ pub async fn export_history(
 }
 
 fn to_markdown(sessions: &[SessionSummary]) -> String {
-    let mut out = String::from("# Murmur history\n\n");
+    let mut out = String::from("# HushWrite history\n\n");
     for session in sessions {
         out.push_str(&format!(
             "## {}\n\n_{} · {} words_\n\n{}\n\n",
@@ -472,6 +474,9 @@ mod export_tests {
     fn fts5_query_sanitizer_handles_terms_and_phrases() {
         assert_eq!(sanitize_fts5_query("hello world"), "\"hello\"* \"world\"*");
         assert_eq!(sanitize_fts5_query("\"hello world\""), "\"hello world\"");
-        assert_eq!(sanitize_fts5_query("test's foo:bar"), "\"test's\"* \"foobar\"*");
+        assert_eq!(
+            sanitize_fts5_query("test's foo:bar"),
+            "\"test's\"* \"foobar\"*"
+        );
     }
 }

@@ -71,7 +71,7 @@ To use voice dictation safely, knowledge workers must understand how to enforce 
 
 The table below provides a **verifiable comparison** of data handling practices across dictation architectures:
 
-| Security Parameter | Typical Cloud Dictation (Wispr Flow) | Murmur (Local-First) | Verification Tool |
+| Security Parameter | Typical Cloud Dictation (Wispr Flow) | HushWrite (Local-First) | Verification Tool |
 |:---|:---|:---|:---|
 | **Audio Processing Location** | Remote AWS / Cloud GPU Data Centers | **100% On-Device (Local GPU/RAM)** | Windows Resource Monitor / Process Explorer |
 | **Outbound Network Sockets** | Continuous HTTPS/WSS connections | **0 Outbound Sockets (Air-gapped)** | Sysinternals TCPView / \`netstat\` |
@@ -88,21 +88,21 @@ You do not need to rely on marketing statements or vendor assurances. You can ve
 
 #### Step 1: Inspect Active Network Sockets with Sysinternals TCPView
 1. Download Microsoft Sysinternals **TCPView** from Microsoft Learn.
-2. Launch TCPView and filter the process list by the name of your dictation application (e.g. \`murmur.exe\`).
+2. Launch TCPView and filter the process list by the name of your dictation application (e.g. \`HushWrite.exe\`).
 3. Press your dictation hotkey and speak several sentences.
-4. **Observation:** With cloud dictation tools, you will observe multiple active TCP/TLS connections to remote IP addresses on port 443. With Murmur, the process maintains **0 network connections**.
+4. **Observation:** With cloud dictation tools, you will observe multiple active TCP/TLS connections to remote IP addresses on port 443. With HushWrite, the process maintains **0 network connections**.
 
 #### Step 2: Live Packet Capture with Wireshark
 \`\`\`powershell
 # In Wireshark, select your active network adapter and apply this capture filter:
 tcp port 443 and not ip.addr == 127.0.0.1
 \`\`\`
-Dictate for two minutes. While cloud tools stream continuous 16kHz payload packets, Murmur generates zero outbound frames.
+Dictate for two minutes. While cloud tools stream continuous 16kHz payload packets, HushWrite generates zero outbound frames.
 
 #### Step 3: Test Under Complete Physical Isolation (Airplane Mode)
 Disconnect your Ethernet cable and toggle **Airplane Mode** in Windows. Open your text editor and press your dictation hotkey:
 - Cloud tools will display a network connection error dialog or become unresponsive.
-- Murmur decodes your speech in real time with zero degradation in speed or accuracy.
+- HushWrite decodes your speech in real time with zero degradation in speed or accuracy.
 
 ---
 
@@ -118,15 +118,15 @@ To substantiate our performance claims on secure, air-gapped systems:
 
 ### Honest Limitations Stated Clearly
 
-- **Windows-Only at v0.1 Launch:** Murmur's air-gapped native architecture is currently built for Windows 10/11 workstations. macOS is in private beta.
+- **Windows-Only at v0.1 Launch:** HushWrite's air-gapped native architecture is currently built for Windows 10/11 workstations. macOS is in private beta.
 - **Local Model Footprint:** Because transcription models run locally, initial setup requires downloading a model file (142MB for \`base\`, 466MB for \`small\`). This file is downloaded once and never connects to the internet again.
-- **No Cloud Rewriting:** Cloud tools use 70B+ parameter language models to perform creative rewrites of rambling thoughts. Murmur focuses on faithful, exact speech-to-text with rule-based capitalization and punctuation.
+- **No Cloud Rewriting:** Cloud tools use 70B+ parameter language models to perform creative rewrites of rambling thoughts. HushWrite focuses on faithful, exact speech-to-text with rule-based capitalization and punctuation.
 
 ---
 
 ### Conclusion: Data Sovereignty by Design
 
-Data security should not require expensive enterprise add-on contracts or 50-page legal negotiations. By running open-weights Whisper models directly on your Windows PC, **Murmur gives you instant, fluid voice dictation without ever uploading a single byte of your work drafts**.
+Data security should not require expensive enterprise add-on contracts or 50-page legal negotiations. By running open-weights Whisper models directly on your Windows PC, **HushWrite gives you instant, fluid voice dictation without ever uploading a single byte of your work drafts**.
 `,
   },
   {
@@ -147,7 +147,7 @@ Data security should not require expensive enterprise add-on contracts or 50-pag
       "private voice typing Notion",
     ],
     author: {
-      name: "Murmur Benchmarking Lab",
+      name: "HushWrite Benchmarking Lab",
       role: "Systems Performance & Testing",
       avatar: "B",
     },
@@ -157,7 +157,7 @@ Data security should not require expensive enterprise add-on contracts or 50-pag
     ],
     keyTakeaways: [
       "Knowledge workers type between 5,000 and 12,000 words daily across Slack channels, Notion documents, and email client threads.",
-      "Murmur uses low-level Win32 SendInput injection rather than clipboard pasting, preventing race conditions with your existing system clipboard.",
+      "HushWrite uses low-level Win32 SendInput injection rather than clipboard pasting, preventing race conditions with your existing system clipboard.",
       "In benchmarks on Windows 11, local dictation inserted text in 138ms in Slack and 144ms in Notion, with 0 outbound network requests.",
       "Honest limitations: Windows-first launch; Notion rich-text markdown interpretation quirks; lack of cloud auto-summaries.",
     ],
@@ -182,7 +182,7 @@ Below, we detail our benchmark of **local on-device Whisper dictation** running 
 
 The table below includes **only verifiable claims** based on direct process monitoring and network capture:
 
-| Feature / Metric | Murmur (DirectML Local) | Wispr Flow (Cloud) | Windows Voice Typing (Win+H) |
+| Feature / Metric | HushWrite (DirectML Local) | Wispr Flow (Cloud) | Windows Voice Typing (Win+H) |
 |:---|:---|:---|:---|
 | **Text Injection Method** | **Win32 SendInput (Unicode)** | Virtual Keyboard / Clipboard | Windows Input Method Editor (IME) |
 | **Clipboard Preservation** | **100% Preserved (No overwrite)** | Preserved | Preserved |
@@ -215,7 +215,7 @@ The table below includes **only verifiable claims** based on direct process moni
 
 ### Latency Results Across Applications
 
-| Application Tested | Murmur (Base Model) | Murmur (Small Model) | Wispr Flow (Cloud) |
+| Application Tested | HushWrite (Base Model) | HushWrite (Small Model) | Wispr Flow (Cloud) |
 |:---|:---|:---|:---|
 | **Slack Desktop (DM Channel)** | **122 ms** | **138 ms** | 490 ms |
 | **Notion Desktop (Page Block)** | **128 ms** | **144 ms** | 515 ms |
@@ -223,22 +223,22 @@ The table below includes **only verifiable claims** based on direct process moni
 | **Simulated Network Drop (Offline)** | **122 ms (No change)** | **138 ms (No change)** | **FAILED (Error Dialog)** |
 
 #### Key Technical Takeaways:
-- **Zero Clipboard Interference:** Murmur injects characters directly using Unicode \`SendInput\` events. Your clipboard history in Windows (\`Win+V\`) remains completely untouched.
+- **Zero Clipboard Interference:** HushWrite injects characters directly using Unicode \`SendInput\` events. Your clipboard history in Windows (\`Win+V\`) remains completely untouched.
 - **Fluid Typing Feel:** In Slack and Notion, text appears within ~140ms of releasing the hotkey, matching the speed of native human typing without any noticeable lag.
 
 ---
 
 ### Honest Limitations Stated Clearly
 
-- **Notion Block Mechanics:** Notion treats the \`Enter\` key as a trigger to create a new content block. If you dictate "new paragraph", Murmur will insert a newline, but Notion's rich-text block engine may require pressing Enter to spawn a fresh block container.
-- **Windows-First Availability:** Murmur is currently optimized for Windows 10/11. A native macOS version is in private beta.
-- **No Cloud AI Summaries:** Unlike Wispr Flow, which can restructure conversational rambling into bulleted summaries using 70B+ cloud LLMs, Murmur strictly transcribes your exact words without cloud intervention.
+- **Notion Block Mechanics:** Notion treats the \`Enter\` key as a trigger to create a new content block. If you dictate "new paragraph", HushWrite will insert a newline, but Notion's rich-text block engine may require pressing Enter to spawn a fresh block container.
+- **Windows-First Availability:** HushWrite is currently optimized for Windows 10/11. A native macOS version is in private beta.
+- **No Cloud AI Summaries:** Unlike Wispr Flow, which can restructure conversational rambling into bulleted summaries using 70B+ cloud LLMs, HushWrite strictly transcribes your exact words without cloud intervention.
 
 ---
 
-### How to Use Murmur in Notion, Slack, and Gmail
+### How to Use HushWrite in Notion, Slack, and Gmail
 
-1. Launch Murmur and ensure your desired model (e.g. \`small.en\`) is loaded in GPU memory.
+1. Launch HushWrite and ensure your desired model (e.g. \`small.en\`) is loaded in GPU memory.
 2. Click into any Slack message input, Notion document, or Gmail draft.
 3. Hold your global push-to-talk hotkey (e.g. \`Ctrl+Space\`), speak your message, and release.
 4. The text appears instantly at your cursor position—completely private, auditable, and offline.
@@ -295,7 +295,7 @@ Here is how to set up an air-gapped, high-speed dictation workflow that inputs t
 
 ### Verifiable Performance & Privacy Matrix
 
-| Capability | Cloud Dictation (e.g. Wispr Flow) | Local Murmur Workflow | Impact on Developer Security |
+| Capability | Cloud Dictation (e.g. Wispr Flow) | Local HushWrite Workflow | Impact on Developer Security |
 |:---|:---|:---|:---|
 | **Audio Data Transmission** | Streams audio to remote AWS/GCP servers | **0 Bytes Outbound (Air-gapped)** | Eliminates NDA & IP leakage vectors |
 | **Monaco Editor Compatibility** | Inconsistent focus / clipboard conflicts | **Direct Win32 SendInput injection** | Text types smoothly at cursor position |
@@ -345,14 +345,14 @@ Many voice typing utilities use clipboard pasting (\`Ctrl+V\`) to insert text. I
 ### Honest Limitations of This Workflow
 
 - **Punctuation Cadence:** Dictating backticks and bullet points requires speaking with deliberate punctuation cadence. Natural flow improves rapidly after 2–3 days of use.
-- **Windows-Only at Initial Launch:** Murmur's direct Win32 \`SendInput\` integration is currently built for Windows 10/11. macOS support is in private beta.
+- **Windows-Only at Initial Launch:** HushWrite's direct Win32 \`SendInput\` integration is currently built for Windows 10/11. macOS support is in private beta.
 - **Model Size Consideration:** For fast prompt injection (<150ms), we recommend using the \`small.en\` or \`base.en\` model. Larger models like \`large-v3\` add ~300ms of compute time without noticeable accuracy gains on structured English prompts.
 
 ---
 
 ### Getting Started
 
-1. Download Murmur for Windows from the **[home page](/ #download)**.
+1. Download HushWrite for Windows from the **[home page](/ #download)**.
 2. In Settings, assign a comfortable global hotkey (e.g., \`Ctrl+Space\` or \`Caps Lock\`).
 3. Focus your Cursor prompt window or GitHub PR form, hold the hotkey, speak your prompt, and release. Your text will appear instantly at your cursor.
 `,
@@ -361,7 +361,7 @@ Many voice typing utilities use clipboard pasting (\`Ctrl+V\`) to insert text. I
     slug: "best-private-dictation-software-for-developers",
     title: "Best Private Dictation Software for Developers in 2026",
     description:
-      "A developer-focused benchmark comparing Murmur, Wispr Flow, Superwhisper, and Talon Voice for coding, prompt engineering, terminal workflows, and zero-egress data privacy.",
+      "A developer-focused benchmark comparing HushWrite, Wispr Flow, Superwhisper, and Talon Voice for coding, prompt engineering, terminal workflows, and zero-egress data privacy.",
     date: "2026-09-07",
     updatedDate: "September 7, 2026",
     readTime: "10 min read",
@@ -375,19 +375,19 @@ Many voice typing utilities use clipboard pasting (\`Ctrl+V\`) to insert text. I
       "offline dictation for programmers",
     ],
     author: {
-      name: "Murmur Benchmarking Lab",
+      name: "HushWrite Benchmarking Lab",
       role: "Systems Performance & Testing",
       avatar: "B",
     },
     shortFormHooks: [
       "Dictating proprietary code or auth tokens into cloud speech APIs is an audit nightmare waiting to happen.",
-      "We benchmarked how Murmur, Wispr Flow, Superwhisper, and Talon handle camelCase, git commits, and Cursor prompts.",
+      "We benchmarked how HushWrite, Wispr Flow, Superwhisper, and Talon handle camelCase, git commits, and Cursor prompts.",
     ],
     keyTakeaways: [
       "Developers cannot use cloud dictation when working under client NDAs or handling proprietary source code, credentials, and API keys.",
-      "Murmur achieves 98.2% token accuracy on developer syntax (git commands, CLI flags, JSON keys) when using on-device Whisper models.",
-      "Unlike Talon Voice, which requires memorizing a steep phonetic alphabet grammar for hands-free navigation, Murmur focuses on frictionless push-to-talk prose, documentation, and prompt injection.",
-      "Superwhisper is limited to macOS; Murmur provides native Windows 11 integration directly into Cursor, VS Code, and Windows Terminal.",
+      "HushWrite achieves 98.2% token accuracy on developer syntax (git commands, CLI flags, JSON keys) when using on-device Whisper models.",
+      "Unlike Talon Voice, which requires memorizing a steep phonetic alphabet grammar for hands-free navigation, HushWrite focuses on frictionless push-to-talk prose, documentation, and prompt injection.",
+      "Superwhisper is limited to macOS; HushWrite provides native Windows 11 integration directly into Cursor, VS Code, and Windows Terminal.",
     ],
     content: `
 > **Notice:** Last benchmarked, audited, and updated on **September 7, 2026**. All developer test scripts and hardware specifications are published below.
@@ -410,7 +410,7 @@ Below, we benchmark the top dictation tools for software engineers across privac
 
 The table below includes **only verifiable claims** based on binary inspection, pricing tiers, and public documentation:
 
-| Evaluation Criteria | Murmur (Local-First) | Wispr Flow | Superwhisper | Talon Voice | Whisper CLI (Custom) |
+| Evaluation Criteria | HushWrite (Local-First) | Wispr Flow | Superwhisper | Talon Voice | Whisper CLI (Custom) |
 |:---|:---|:---|:---|:---|:---|
 | **Primary Platform** | **Windows (Native; Mac in beta)** | Windows & Mac | macOS Only | Windows, Mac, Linux | Terminal (Cross-platform) |
 | **Pricing Model** | **Free & Open Source (MIT)** | ~$15 / mo ($180/yr) | $8.99/mo or $199 Lifetime | Free Community / Paid | Free (Open Source) |
@@ -450,7 +450,7 @@ To measure real-world programming performance, we constructed a dedicated develo
 
 | System Tested | Git & CLI TPR | Code Syntax TPR | Cursor Prompt Latency |
 |:---|:---|:---|:---|
-| **Murmur (whisper.cpp Small + DirectML)** | **98.2%** | **96.8%** | **134 ms** |
+| **HushWrite (whisper.cpp Small + DirectML)** | **98.2%** | **96.8%** | **134 ms** |
 | **Wispr Flow (Cloud Speech + LLM)** | 91.4% | 88.2% | 485 ms |
 | **Superwhisper (macOS M3 Small)** | 97.4% | 95.1% | 260 ms |
 | **Talon Voice (Conformer Local)** | 99.1% | 98.4% | 180 ms |
@@ -458,15 +458,15 @@ To measure real-world programming performance, we constructed a dedicated develo
 
 #### Analysis
 - **Why Cloud Tools Struggle with Code:** Wispr Flow relies heavily on cloud LLMs trained on general conversational web text. When a developer says "git checkout dash b hotfix slash auth", cloud LLMs frequently "correct" it to "git checkout - be hot fix slash auth".
-- **Local Decoder Precision:** Murmur runs direct acoustic beam search decoding. It translates phonetic phonemes directly into characters without cloud conversational smoothing, preserving exact CLI syntax and variable names.
-- **Talon Voice vs. Murmur:** Talon Voice achieves exceptional accuracy but requires months of practice to learn custom phonetic alphabets ("air bat cap drum"). Murmur requires zero training: hold your global hotkey, speak naturally, release, and the text is typed instantly.
+- **Local Decoder Precision:** HushWrite runs direct acoustic beam search decoding. It translates phonetic phonemes directly into characters without cloud conversational smoothing, preserving exact CLI syntax and variable names.
+- **Talon Voice vs. HushWrite:** Talon Voice achieves exceptional accuracy but requires months of practice to learn custom phonetic alphabets ("air bat cap drum"). HushWrite requires zero training: hold your global hotkey, speak naturally, release, and the text is typed instantly.
 
 ---
 
 ### Honest Limitations Stated Clearly
 
-1. **Windows-Native Launch:** Murmur is built specifically for Windows developers today. (macOS is currently in closed testing; Linux is planned).
-2. **Not a Hands-Free Code Navigation Engine:** Murmur is designed for high-speed prose, documentation, issue creation, and AI prompting. It does not replace eye-tracking or voice-driven cursor navigation tools like Talon Voice.
+1. **Windows-Native Launch:** HushWrite is built specifically for Windows developers today. (macOS is currently in closed testing; Linux is planned).
+2. **Not a Hands-Free Code Navigation Engine:** HushWrite is designed for high-speed prose, documentation, issue creation, and AI prompting. It does not replace eye-tracking or voice-driven cursor navigation tools like Talon Voice.
 3. **Hardware Acceleration:** Optimal performance (<150ms) requires modern hardware (NVIDIA GPU or recent AMD/Intel processors with integrated DirectML support).
 
 ---
@@ -475,7 +475,7 @@ To measure real-world programming performance, we constructed a dedicated develo
 
 - **Choose Talon Voice** if you have severe RSI, need 100% hands-free control of your entire OS, and are willing to invest months learning a custom phonetic coding language.
 - **Choose Superwhisper** if your developer workstation is exclusively a MacBook and you want a local-first Mac app.
-- **Choose Murmur** if you work on Windows, write code or prompt AI models in Cursor/VS Code, and demand **instantaneous, zero-cloud voice typing** that protects your company's proprietary code.
+- **Choose HushWrite** if you work on Windows, write code or prompt AI models in Cursor/VS Code, and demand **instantaneous, zero-cloud voice typing** that protects your company's proprietary code.
 `,
   },
   {
@@ -507,7 +507,7 @@ To measure real-world programming performance, we constructed a dedicated develo
     keyTakeaways: [
       "Wispr Flow's paid plan is widely reported around $15/month ($144–$180/year) and free tiers are throttled at 2,000 words/week.",
       "Superwhisper offers local models and lifetime pricing ($199–$249), but is exclusively built for macOS with zero Windows availability.",
-      "Murmur is Windows-native at launch, runs 100% on-device via whisper.cpp + DirectML, transmits 0 bytes outbound, and has no recurring subscription.",
+      "HushWrite is Windows-native at launch, runs 100% on-device via whisper.cpp + DirectML, transmits 0 bytes outbound, and has no recurring subscription.",
       "Real-world Windows benchmarks show local models decode in 134ms–168ms, outperforming cloud round-trip latency on typical office networks.",
     ],
     content: `
@@ -522,7 +522,7 @@ Wispr Flow has gained attention for popularizing fast AI voice typing across des
 3. **Continuous Microphone Audio Streaming:** Wispr Flow functions as a cloud-first SaaS. Every spoken utterance—including confidential customer identifiers, proprietary system architectures, internal financial projections, and draft code—is digitized and transmitted over WebSockets to remote GPU clusters.
 4. **The "Mac-First" Competitive Landscape:** When Windows users search for offline, lifetime alternatives, the most common recommendation is Superwhisper. However, Superwhisper is strictly macOS-only, leaving Windows enterprise users stranded without a native option.
 
-**Murmur was built specifically to solve this gap:** a native Windows voice dictation tool running quantized Whisper models 100% locally on your machine, with zero cloud dependency, zero weekly caps, and zero recurring fees.
+**HushWrite was built specifically to solve this gap:** a native Windows voice dictation tool running quantized Whisper models 100% locally on your machine, with zero cloud dependency, zero weekly caps, and zero recurring fees.
 
 ---
 
@@ -530,7 +530,7 @@ Wispr Flow has gained attention for popularizing fast AI voice typing across des
 
 The table below includes **only verifiable claims** based on publicly available pricing tiers, binary inspection, and network packet capture:
 
-| Comparison Dimension | Wispr Flow on Windows | Superwhisper | Murmur (Local-First) | Verification Method |
+| Comparison Dimension | Wispr Flow on Windows | Superwhisper | HushWrite (Local-First) | Verification Method |
 |:---|:---|:---|:---|:---|
 | **Pricing Model** | ~$15 / month ($144–$180 billed yearly) | $8.99 / mo or $199–$249 Lifetime | Free & Open Source (MIT Core) | Official public checkout pages |
 | **Free Tier Allowance** | 2,000 words / week desktop quota | Limited free trial | Unlimited words (No quotas) | In-app counter / state |
@@ -552,7 +552,7 @@ To ensure all numbers are defensible and reproducible, we tested under controlle
 - **Laptop System:** Lenovo ThinkPad P14s Gen 4, AMD Ryzen 7 PRO 7840U (8 cores, 16 threads, integrated Radeon 780M graphics), 32GB LPDDR5X 6400MHz RAM, Windows 11 Pro 23H2.
 
 #### 2. Models & Quantization Tested
-- **Murmur:** OpenAI Whisper open-weights via \`whisper.cpp\` using INT8/FP16 quantized weights (\`ggml-base.en.bin\` 142MB, \`ggml-small.en.bin\` 466MB).
+- **HushWrite:** OpenAI Whisper open-weights via \`whisper.cpp\` using INT8/FP16 quantized weights (\`ggml-base.en.bin\` 142MB, \`ggml-small.en.bin\` 466MB).
 - **Wispr Flow:** Cloud desktop client (Windows release v1.4.x).
 
 #### 3. Sample Scripts Dataset
@@ -577,7 +577,7 @@ To ensure all numbers are defensible and reproducible, we tested under controlle
 
 We measured time-to-insertion across the desktop and laptop testbeds under both high-speed enterprise fiber and simulated mobile hotspot conditions:
 
-| Scenario & Connection | Murmur (Base Model) | Murmur (Small Model) | Wispr Flow (Cloud) |
+| Scenario & Connection | HushWrite (Base Model) | HushWrite (Small Model) | Wispr Flow (Cloud) |
 |:---|:---|:---|:---|
 | **Workstation (RTX 4070 DirectML) - Fiber** | **118 ms** | **134 ms** | 475 ms |
 | **Laptop (Ryzen 7 7840U DirectML) - Fiber** | **142 ms** | **168 ms** | 495 ms |
@@ -586,24 +586,24 @@ We measured time-to-insertion across the desktop and laptop testbeds under both 
 
 #### Latency Takeaways
 - **The Cloud Ping Tax:** Cloud dictation requires sending audio over the public internet, waiting for remote server queue allocation, running model inference in an AWS/GCP data center, and returning formatted text strings. On hotel Wi-Fi or cellular tethering, tail latency spikes above 1.4 seconds.
-- **Instant Local Feel:** Because Murmur decodes audio frames directly on your local GPU/NPU via DirectML, text appears in your cursor almost instantaneously upon releasing the hotkey.
+- **Instant Local Feel:** Because HushWrite decodes audio frames directly on your local GPU/NPU via DirectML, text appears in your cursor almost instantaneously upon releasing the hotkey.
 
 ---
 
-### Honest Limitations of Murmur Stated Frankly
+### Honest Limitations of HushWrite Stated Frankly
 
-To provide technical buyers with accurate information, here are the real engineering trade-offs of choosing Murmur over cloud SaaS:
+To provide technical buyers with accurate information, here are the real engineering trade-offs of choosing HushWrite over cloud SaaS:
 
-1. **Windows-Native Initial Launch:** Murmur v0.1 was built specifically for Windows 10/11 using native Win32 APIs (\`WH_KEYBOARD_LL\` hooks, \`SendInput\`, and DirectML acceleration). If you require macOS or Linux today, Murmur's macOS client is still in private beta.
+1. **Windows-Native Initial Launch:** HushWrite v0.1 was built specifically for Windows 10/11 using native Win32 APIs (\`WH_KEYBOARD_LL\` hooks, \`SendInput\`, and DirectML acceleration). If you require macOS or Linux today, HushWrite's macOS client is still in private beta.
 2. **System Memory & Hardware Prerequisites:** Running larger Whisper models locally consumes RAM. While the \`base.en\` model requires only ~380MB of active RAM, running \`medium.en\` (1.5GB) or \`large-v3\` (3.1GB) requires a modern multi-core CPU or dedicated NVIDIA/AMD GPU with at least 4GB of VRAM.
-3. **Deterministic Rules vs. Cloud LLM Hallucinations:** Wispr Flow passes speech through multi-billion parameter cloud language models (e.g. GPT-4o) to restructure conversational rambling (e.g., converting a 2-minute voice ramble into bullet points). Murmur uses deterministic local formatting: it accurately types exactly what you said with proper punctuation, but does not invent new prose or summarize thoughts.
-4. **Experimental Beta Features:** Multi-speaker diarization and runtime phonetic custom vocabulary biasing are currently classified as experimental features in Murmur v0.1.
+3. **Deterministic Rules vs. Cloud LLM Hallucinations:** Wispr Flow passes speech through multi-billion parameter cloud language models (e.g. GPT-4o) to restructure conversational rambling (e.g., converting a 2-minute voice ramble into bullet points). HushWrite uses deterministic local formatting: it accurately types exactly what you said with proper punctuation, but does not invent new prose or summarize thoughts.
+4. **Experimental Beta Features:** Multi-speaker diarization and runtime phonetic custom vocabulary biasing are currently classified as experimental features in HushWrite v0.1.
 
 ---
 
 ### How to Verify Zero Cloud Egress on Windows
 
-You do not have to take our word for it. You can audit Murmur's network activity independently using native Windows diagnostics:
+You do not have to take our word for it. You can audit HushWrite's network activity independently using native Windows diagnostics:
 
 \`\`\`powershell
 # Open Windows PowerShell as Administrator
@@ -611,23 +611,23 @@ You do not have to take our word for it. You can audit Murmur's network activity
 pktmon filter add -t TCP -p 443
 pktmon start --etw
 
-# Step 2: Open Murmur and dictate several long paragraphs into Notepad
+# Step 2: Open HushWrite and dictate several long paragraphs into Notepad
 
 # Step 3: Stop packet capture and inspect the log
 pktmon stop
 pktmon format PktMon.etl -o network_audit.txt
-Select-String -Path network_audit.txt -Pattern "murmur"
+Select-String -Path network_audit.txt -Pattern "HushWrite"
 \`\`\`
 
-*(Result: Zero outbound TCP packets matched to the Murmur binary).*
+*(Result: Zero outbound TCP packets matched to the HushWrite binary).*
 
 ---
 
-### Summary: Is Murmur the Right Wispr Flow Alternative for You?
+### Summary: Is HushWrite the Right Wispr Flow Alternative for You?
 
 If you require conversational cloud LLM rewrites and your enterprise permits transmitting raw microphone audio to third-party servers, Wispr Flow remains a viable consumer tool.
 
-However, if you are a **Windows user seeking a private, permanent alternative** without a $15/month subscription tax or a 2,000-word weekly cap, **[Download Murmur](/ #download)** for 100% on-device, sub-150ms voice dictation.
+However, if you are a **Windows user seeking a private, permanent alternative** without a $15/month subscription tax or a 2,000-word weekly cap, **[Download HushWrite](/ #download)** for 100% on-device, sub-150ms voice dictation.
 `,
   },
   {
@@ -656,7 +656,7 @@ However, if you are a **Windows user seeking a private, permanent alternative** 
     keyTakeaways: [
       "Wispr Flow streams audio to remote AWS endpoints, introducing network latency and third-party compliance risk.",
       "Apple Silicon Metal offloading drops whisper.cpp real-time factor to 0.18x with 168ms p99 latency.",
-      "Murmur injects text via macOS accessibility APIs directly, preventing clipboard history leaks.",
+      "HushWrite injects text via macOS accessibility APIs directly, preventing clipboard history leaks.",
     ],
     content: `
 ## The Architectural Flaw of Cloud Voice Typing on macOS
@@ -699,27 +699,27 @@ We tested each tool with the same 45-second technical dictation:
 
 | Tool | Core Architecture | Inference Engine | p99 Latency (End of Speech) | RAM Working Set | Outbound Packets | Open Source |
 |---|---|---|---|---|---|---|
-| **Murmur** | Native macOS / Rust | \`whisper.cpp\` + Metal | **168 ms** | **184 MB** | **0** | **Yes (MIT)** |
+| **HushWrite** | Native macOS / Rust | \`whisper.cpp\` + Metal | **168 ms** | **184 MB** | **0** | **Yes (MIT)** |
 | **Superwhisper** | Native macOS / Swift | CoreML / Whisper.cpp | 240 ms | 310 MB | Occasional license pings | No |
 | **Apple Dictation** | Built-in macOS system | Apple Neural Engine | 480 ms | System daemon | 0 (if Siri cloud off) | No |
 | **MacWhisper** | Native macOS / AppKit | Whisper.cpp | Batch file only | 420 MB | 0 | No |
 
 ---
 
-## 1. Murmur: Zero Network Sockets, Sub-180ms Metal Injection
+## 1. HushWrite: Zero Network Sockets, Sub-180ms Metal Injection
 
-Murmur was built specifically to replicate the global hotkey workflow of cloud tools without a single outbound network socket.
+HushWrite was built specifically to replicate the global hotkey workflow of cloud tools without a single outbound network socket.
 
 Pressing \`⌥ Option + Space\` initiates a zero-copy CoreAudio circular buffer. Audio frames feed through an on-device Silero Voice Activity Detector. The moment speech terminates, quantized FP16 tensors execute across Apple Silicon Metal cores using \`whisper.cpp\`.
 
 \`\`\`bash
-# Verify zero egress using lsof while speaking into Murmur
-lsof -i -P | grep -i "murmur"
+# Verify zero egress using lsof while speaking into HushWrite
+lsof -i -P | grep -i "HushWrite"
 # Output: (empty — no listening sockets, no TCP connections established)
 \`\`\`
 
 ### What makes it fast:
-- **Direct AXUIElement insertion**: Instead of synthesizing \`Cmd + V\` (which overwrites whatever was in your system clipboard), Murmur uses macOS Accessibility APIs (\`kAXSelectedTextAttribute\`) to insert text directly into the focused input element.
+- **Direct AXUIElement insertion**: Instead of synthesizing \`Cmd + V\` (which overwrites whatever was in your system clipboard), HushWrite uses macOS Accessibility APIs (\`kAXSelectedTextAttribute\`) to insert text directly into the focused input element.
 - **Sub-180ms turnaround**: The real-time factor on M-series chips drops to 0.18x. You stop speaking, and the formatted text is already rendered before your thumb leaves the spacebar.
 
 ### Known limitation:
@@ -820,7 +820,7 @@ Don't take any vendor's privacy claims at face value—including ours. Here is h
     ],
     keyTakeaways: [
       "Cloud dictation payloads include 16kHz PCM/Opus streams, device fingerprints, and cloud vendor telemetry.",
-      "Murmur processes speech in zero-copy RAM buffers that are overwritten with zeros immediately post-decode.",
+      "HushWrite processes speech in zero-copy RAM buffers that are overwritten with zeros immediately post-decode.",
       "On-device latency beats cloud latency by 2.8× (172ms vs 480ms) by eliminating network RTT and cloud queues.",
     ],
     content: `
@@ -860,7 +860,7 @@ Even when a cloud vendor pledges never to sell user data or train models on cust
 
 ## The Local-First Pipeline: Ring Buffers, Silero VAD, and Metal Tensors
 
-To eliminate the network attack surface, you must decouple speech recognition from network sockets entirely. Here is the architecture we implemented in Murmur:
+To eliminate the network attack surface, you must decouple speech recognition from network sockets entirely. Here is the architecture we implemented in HushWrite:
 
 \`\`\`
 [Microphone Hardware]
@@ -923,7 +923,7 @@ Audio recording complete (t = 0ms)
 └── Response transit + paste: +45ms
 Total p99 latency: 480ms
 
-Murmur On-Device Metal Pipeline:
+HushWrite On-Device Metal Pipeline:
 Audio recording complete (t = 0ms)
 ├── Silero VAD silence confirmation: +30ms
 ├── whisper.cpp quantized Metal decode: +128ms
@@ -969,7 +969,7 @@ You do not have to trust our code. You can verify the network isolation of your 
 ### On Windows (via built-in Packet Monitor):
 \`\`\`powershell
 # 1. Start a packet monitor trace filtered to non-loopback traffic
-pktmon filter add MurmurFilter -p 443
+pktmon filter add HushWriteFilter -p 443
 pktmon start --etw
 
 # 2. Dictate for 30 seconds into your app
@@ -977,14 +977,14 @@ pktmon start --etw
 # 3. Stop packet monitor and inspect results
 pktmon stop
 pktmon format PktMon.etl -o packets.txt
-Select-String -Path packets.txt -Pattern "murmur.exe"
+Select-String -Path packets.txt -Pattern "HushWrite.exe"
 # Expected result: 0 matching lines
 \`\`\`
 
 ### On macOS (via tcpdump):
 \`\`\`bash
 # Listen on all network interfaces for any traffic originating from the local app
-sudo tcpdump -i any -nn -s0 -v "tcp and port 443" | grep -i "murmur"
+sudo tcpdump -i any -nn -s0 -v "tcp and port 443" | grep -i "HushWrite"
 # Expected result: silence — zero network packets emitted
 \`\`\`
 
@@ -1016,7 +1016,7 @@ When an application physically contains no network socket initialization code, z
     ],
     keyTakeaways: [
       "Third-party cloud sub-processors risk waiving attorney-client privilege and violating HIPAA without BAAs.",
-      "Murmur bypasses clipboard copy-paste, preventing confidential transcripts from being logged by clipboard managers.",
+      "HushWrite bypasses clipboard copy-paste, preventing confidential transcripts from being logged by clipboard managers.",
       "Phonetic vocabulary biasing drops legal and medical jargon word error rate from 18.4% to 1.8% locally.",
     ],
     content: `
@@ -1047,7 +1047,7 @@ Most dictation tools write transcribed text to the system clipboard and simulate
 1. **Clipboard History Leakage**: Clipboard managers (Alfred, Raycast, Maccy, Windows Clipboard History) archive every snippet. Your confidential dictations get logged to an unencrypted clipboard history file on disk.
 2. **Buffer Overwriting**: If you had a client password or confidential contract snippet copied to your clipboard, dictating a note silently overwrites it.
 
-### How we solved it in Murmur:
+### How we solved it in HushWrite:
 We bypass the clipboard entirely by targeting the OS accessibility tree:
 
 \`\`\`rust
@@ -1082,10 +1082,10 @@ General Whisper models struggle with specialized terminology out of the box. Dic
 - Spoken: *"The patient presents with severe dysdiadochokinesia"*
 - Naive Whisper: *"The patient presents with severe this die dough cocaine Asia"*
 
-In cloud setups, fixing this requires uploading custom vocabulary files to the cloud provider's database. With Murmur, we bias the decoder locally using Whisper's prompt conditioning:
+In cloud setups, fixing this requires uploading custom vocabulary files to the cloud provider's database. With HushWrite, we bias the decoder locally using Whisper's prompt conditioning:
 
 \`\`\`json
-// ~/.config/murmur/vocabulary.json
+// ~/.config/HushWrite/vocabulary.json
 {
   "legal": [
     "res ipsa loquitur",
@@ -1103,7 +1103,7 @@ In cloud setups, fixing this requires uploading custom vocabulary files to the c
 }
 \`\`\`
 
-Before decoding each audio slice, Murmur injects these phonetic anchors into the initial decoder sequence. Word error rate on specialized legal and medical terms dropped from **18.4% to 1.8%** in our benchmarks—with zero cloud synchronization.
+Before decoding each audio slice, HushWrite injects these phonetic anchors into the initial decoder sequence. Word error rate on specialized legal and medical terms dropped from **18.4% to 1.8%** in our benchmarks—with zero cloud synchronization.
 
 ---
 
@@ -1112,7 +1112,7 @@ Before decoding each audio slice, Murmur injects these phonetic anchors into the
 To verify that your dictation stack does not degrade when disconnected from the internet, test it under total network severance:
 
 \`\`\`bash
-# Windows: Kill all network adapters and verify Murmur continues dictating
+# Windows: Kill all network adapters and verify HushWrite continues dictating
 Disable-NetAdapter -Name "*" -Confirm:$false
 # Dictate 5 paragraphs into Word / Notepad
 # Result: 100% functionality maintained, sub-180ms latency
@@ -1121,7 +1121,7 @@ Disable-NetAdapter -Name "*" -Confirm:$false
 Enable-NetAdapter -Name "*" -Confirm:$false
 \`\`\`
 
-Murmur includes a hardware-level **Air-Gap Mode** toggle in settings. When toggled, the application unbinds all network listeners, disables auto-update checks, and executes purely within local system memory.
+HushWrite includes a hardware-level **Air-Gap Mode** toggle in settings. When toggled, the application unbinds all network listeners, disables auto-update checks, and executes purely within local system memory.
 
 ---
 
@@ -1163,7 +1163,7 @@ For 95% of practitioners, \`Whisper Small\` with phonetic vocabulary biasing off
     ],
     keyTakeaways: [
       "DirectML unlocks unified GPU acceleration across NVIDIA, AMD, and Intel hardware on Windows 10 & 11.",
-      "Murmur achieves 0.12x to 0.22x real-time factor with sub-180ms latency on modern Windows laptops.",
+      "HushWrite achieves 0.12x to 0.22x real-time factor with sub-180ms latency on modern Windows laptops.",
       "Dispatches UTF-16 Unicode events directly, avoiding keyboard hook watchdogs and scan code mangling.",
     ],
     content: `
@@ -1224,7 +1224,7 @@ On any modern integrated or discrete GPU, DirectML executes inference faster tha
 
 | Tool | Engine Architecture | Hardware Acceleration | Outbound Network Access | Price |
 |---|---|---|---|---|
-| **Murmur** | Native C++ / Rust Tauri | **DirectML (AMD, Intel, NVIDIA)** | **0 Bytes (Fully Air-Gapped)** | **Free (MIT)** |
+| **HushWrite** | Native C++ / Rust Tauri | **DirectML (AMD, Intel, NVIDIA)** | **0 Bytes (Fully Air-Gapped)** | **Free (MIT)** |
 | **WhisperTyping** | Electron / Python bridge | CUDA only | Minimal | $29 |
 | **Windows Voice Typing (Win+H)** | Built-in OS Daemon | Azure Cloud GPU | Required (Fails offline) | Included |
 | **Dragon NaturallySpeaking** | Proprietary legacy engine | CPU only | Optional | $499.99 |
@@ -1258,7 +1258,7 @@ unsafe extern "system" fn low_level_keyboard_proc(code: i32, wparam: WPARAM, lpa
 \`\`\`
 
 ### 2. Unicode Injection via \`SendInput\`
-Synthesizing keystrokes across Windows applications (Notepad, VS Code, Slack, WSL terminals) often mangles special characters like quotes, em-dashes, and code symbols. By dispatching \`KEYEVENTF_UNICODE\` packets rather than virtual scan codes, Murmur inserts UTF-16 code units directly into target windows without clipboard side effects.
+Synthesizing keystrokes across Windows applications (Notepad, VS Code, Slack, WSL terminals) often mangles special characters like quotes, em-dashes, and code symbols. By dispatching \`KEYEVENTF_UNICODE\` packets rather than virtual scan codes, HushWrite inserts UTF-16 code units directly into target windows without clipboard side effects.
 `,
   },
   {
@@ -1287,7 +1287,7 @@ Synthesizing keystrokes across Windows applications (Notepad, VS Code, Slack, WS
     keyTakeaways: [
       "Software engineers spend 40% of their workday typing English in PR descriptions, issues, and commit messages.",
       "Speaking internal API keys, database schemas, and microservice names into cloud SaaS leaks intellectual property.",
-      "Murmur's AST-aware local post-processor formats conventional commits, camelCase, and code syntax in 2ms.",
+      "HushWrite's AST-aware local post-processor formats conventional commits, camelCase, and code syntax in 2ms.",
     ],
     content: `
 ## The Infosec Hazard: What Happens When You Dictate Internal Architecture
@@ -1301,7 +1301,7 @@ Cloud Risk:
 [Your Voice] ──► [WebSocket Packet] ──► [Third-Party Cloud GPU] ──► [Cloud LLM API]
  (Internal repo paths, database schemas, and API keys stored on external disks)
 
-Murmur Sovereign Pipeline:
+HushWrite Sovereign Pipeline:
 [Your Voice] ──► [Local RAM Buffer] ──► [Metal / DirectML Core] ──► [Active IDE Window]
  (0 Packets · 0 Outbound Sockets · 0 Intermediate Logs)
 \`\`\`
@@ -1354,7 +1354,7 @@ If a dictation tool relies on simulating \`Ctrl + V\` or \`Cmd + V\`, it destroy
 1. It overwrites whatever snippet, code block, or SHA was previously copied to your system clipboard.
 2. It pollutes your clipboard history manager (Alfred, Raycast, Maccy) with dozens of transient speech snippets.
 
-In Murmur, we bypass the clipboard entirely. On macOS, we issue \`kAXSelectedTextAttribute\` calls directly to the focused editor thread in VS Code or Cursor. In the terminal (Alacritty, iTerm2, WezTerm, Windows Terminal), we dispatch atomic UTF-16 character events directly into the shell process.
+In HushWrite, we bypass the clipboard entirely. On macOS, we issue \`kAXSelectedTextAttribute\` calls directly to the focused editor thread in VS Code or Cursor. In the terminal (Alacritty, iTerm2, WezTerm, Windows Terminal), we dispatch atomic UTF-16 character events directly into the shell process.
 
 \`\`\`bash
 # Example: Dictating a Conventional Commit in terminal
@@ -1380,21 +1380,21 @@ or:
 > \`We need to add a semicolon after the return statement\`
 
 ### How we resolved it:
-We implemented an active-window context sniffer. Murmur checks the window class of the active foreground application:
+We implemented an active-window context sniffer. HushWrite checks the window class of the active foreground application:
 - **Inside chat & documentation apps (Slack, Notion, Jira, Browser)**: Punctuation words like "comma", "period", and "semicolon" are normalized to punctuation marks (\`,\`, \`.\`, \`;\`), and English prose casing is preserved.
 - **Inside code buffers (VS Code, Cursor, Neovim)**: Literal punctuation words are preserved in natural prose comments, while programming tokens (\`arrow\`, \`brace\`, \`bracket\`) are mapped to syntax characters (\`=>\`, \`{\`, \`[\`).
 `,
   },
   {
-    slug: "murmur-vs-wispr-flow-comparison",
-    title: "Wispr Flow vs Murmur: An Architectural Teardown of Cloud vs Local Voice Dictation",
+    slug: "HushWrite-vs-wispr-flow-comparison",
+    title: "Wispr Flow vs HushWrite: An Architectural Teardown of Cloud vs Local Voice Dictation",
     description:
-      "Wispr Flow streams audio to cloud servers. Murmur runs quantized Whisper models directly in local RAM. Here is an architectural teardown of latency, security, and costs.",
+      "Wispr Flow streams audio to cloud servers. HushWrite runs quantized Whisper models directly in local RAM. Here is an architectural teardown of latency, security, and costs.",
     date: "2026-08-01",
     readTime: "9 min read",
     category: "Comparisons",
     keywords: [
-      "Murmur vs Wispr Flow",
+      "HushWrite vs Wispr Flow",
       "Wispr Flow comparison",
       "Wispr Flow privacy review",
       "local vs cloud dictation",
@@ -1406,19 +1406,19 @@ We implemented an active-window context sniffer. Murmur checks the window class 
     },
     shortFormHooks: [
       "Cloud tools protect data with policies and controls. We protect it by keeping your dictation on your device in the first place.",
-      "Wispr Flow vs Murmur: What actually happens when you speak into your microphone?",
+      "Wispr Flow vs HushWrite: What actually happens when you speak into your microphone?",
     ],
     keyTakeaways: [
       "Wispr Flow offers convenient cloud-hosted features, but streams continuous microphone audio to remote servers.",
-      "Murmur runs 100% in local RAM, producing 0 outbound network packets with 172ms p99 tail latency.",
-      "Air-gapped operation means Murmur works at 35,000 feet on airplanes with zero internet access.",
+      "HushWrite runs 100% in local RAM, producing 0 outbound network packets with 172ms p99 tail latency.",
+      "Air-gapped operation means HushWrite works at 35,000 feet on airplanes with zero internet access.",
     ],
     content: `
 ## The Fundamental Divergence: Centralized Server Farms vs On-Device Silicon
 
 Wispr Flow built an impressive consumer product that popularized voice typing for thousands of knowledge workers. But it relies on an architectural trade-off that enterprise engineers, lawyers, and security auditors cannot accept: continuously streaming raw microphone audio over WebSockets to remote cloud GPU clusters.
 
-We built Murmur to test whether local machine learning on modern personal computers could match—and exceed—the speed and polish of cloud voice typing without sending a single byte of audio over the network. Here is an architectural teardown of how both systems work under the hood, with real latency benchmarks and packet captures.
+We built HushWrite to test whether local machine learning on modern personal computers could match—and exceed—the speed and polish of cloud voice typing without sending a single byte of audio over the network. Here is an architectural teardown of how both systems work under the hood, with real latency benchmarks and packet captures.
 
 \`\`\`
 Wispr Flow Architecture:
@@ -1426,7 +1426,7 @@ Wispr Flow Architecture:
                                                                   │
 [Active App] ◄── [Accessibility Paste] ◄── [Cloud LLM Pass] ◄── [Cloud GPU Whisper]
 
-Murmur Architecture:
+HushWrite Architecture:
 [Microphone] ──► [RAM Ring Buffer] ──► [Silero VAD] ──► [Metal / DirectML Whisper]
                                                                   │
 [Active App] ◄────────────── [Native OS Event Injection] ◄────────┘
@@ -1434,7 +1434,7 @@ Murmur Architecture:
 \`\`\`
 
 1. **Wispr Flow (Cloud-First)**: Audio frames are compressed and streamed to third-party data centers. Remote servers run speech-to-text models, pass the tokens to an LLM endpoint for cleanup, and send back formatted text strings.
-2. **Murmur (Local-First)**: Audio frames enter a volatile circular buffer in system RAM. Quantized Whisper models execute directly on your local graphics processor (Apple Silicon Metal or Windows DirectML). Punctuation, capitalization, and developer syntax run via native Rust logic in microseconds.
+2. **HushWrite (Local-First)**: Audio frames enter a volatile circular buffer in system RAM. Quantized Whisper models execute directly on your local graphics processor (Apple Silicon Metal or Windows DirectML). Punctuation, capitalization, and developer syntax run via native Rust logic in microseconds.
 
 ---
 
@@ -1453,7 +1453,7 @@ User stops speaking (t = 0ms)
 └── Response transit + OS text insertion: +40ms
 Total End-to-End p99 Latency: 480ms
 
-Murmur Measured Wall-Clock Timeline (M3 Mac / RTX 4070):
+HushWrite Measured Wall-Clock Timeline (M3 Mac / RTX 4070):
 User stops speaking (t = 0ms)
 ├── Silero VAD silence boundary detection: +30ms
 ├── whisper.cpp quantized Metal/DirectML decode: +128ms
@@ -1462,7 +1462,7 @@ User stops speaking (t = 0ms)
 Total End-to-End p99 Latency: 172ms (2.8× faster)
 \`\`\`
 
-Because Murmur moves tensors across unified memory buses rather than transatlantic fiber cables, formatted text materializes at your cursor before your thumb lifts off the hotkey.
+Because HushWrite moves tensors across unified memory buses rather than transatlantic fiber cables, formatted text materializes at your cursor before your thumb lifts off the hotkey.
 
 ---
 
@@ -1474,7 +1474,7 @@ Wispr Flow has transparent, well-drafted privacy documentation. They state clear
 
 For casual personal dictation (grocery lists, casual messages), that policy may be sufficient. But in enterprise engineering, legal counsel, and healthcare, **policies do not equal security guarantees**.
 
-| Privacy Metric | Wispr Flow | Murmur |
+| Privacy Metric | Wispr Flow | HushWrite |
 |---|---|---|
 | **Audio Processing Location** | Remote Cloud GPU Clusters | **100% On-Device (Volatile RAM)** |
 | **Outbound Network Traffic** | Continuous Opus/WAV stream | **0 Bytes (Air-Gapped)** |
@@ -1482,7 +1482,7 @@ For casual personal dictation (grocery lists, casual messages), that policy may 
 | **Compliance Surface** | Requires BAA, vendor risk assessment, SOC2 audit | **Zero data controller liability** |
 | **Verifiable with Packet Sniffers** | No (Generates TLS traffic to AWS/GCP) | **Yes (0 packets in Wireshark/LuLu)** |
 
-With Murmur, privacy is an architectural property verified by your firewall, not a promise printed in terms of service.
+With HushWrite, privacy is an architectural property verified by your firewall, not a promise printed in terms of service.
 
 ---
 
@@ -1491,7 +1491,7 @@ With Murmur, privacy is an architectural property verified by your firewall, not
 One of the sharpest real-world differences emerges when you leave reliable Wi-Fi:
 
 - **Wispr Flow in Airplane Mode**: Fails immediately. When your network connection drops, the hotkey becomes unresponsive or throws a connection error.
-- **Murmur in Airplane Mode**: Operates with identical 172ms latency. Because models and phonetic dictionaries reside on your local drive, you can dictate 15-page design specs in a flight cabin, on a train, or in an air-gapped server room without internet.
+- **HushWrite in Airplane Mode**: Operates with identical 172ms latency. Because models and phonetic dictionaries reside on your local drive, you can dictate 15-page design specs in a flight cabin, on a train, or in an air-gapped server room without internet.
 
 ---
 
@@ -1500,8 +1500,8 @@ One of the sharpest real-world differences emerges when you leave reliable Wi-Fi
 Intellectual honesty is critical: local speech recognition has real engineering trade-offs, and Wispr Flow excels in specific areas:
 
 1. **Massive Cloud LLM Reasoning**: Because Wispr Flow can pipe transcripts through multi-billion parameter cloud language models, it can perform complex conversational rewrites (e.g. *"take this rambly voice memo and turn it into a 3-bullet executive email"*). Local models can format and punctuate, but running an 8B+ LLM locally alongside Whisper requires 16GB+ of dedicated RAM.
-2. **Cross-Device Cloud Sync**: Wispr Flow syncs custom dictionaries and settings across multiple devices automatically via your user account. With Murmur, your dictionary is a local JSON configuration file that you must sync manually.
-3. **Zero Local Storage Overhead**: Wispr Flow's client binary is small because models live in the cloud. Murmur requires downloading a 190MB to 500MB quantized model file during initial setup.
+2. **Cross-Device Cloud Sync**: Wispr Flow syncs custom dictionaries and settings across multiple devices automatically via your user account. With HushWrite, your dictionary is a local JSON configuration file that you must sync manually.
+3. **Zero Local Storage Overhead**: Wispr Flow's client binary is small because models live in the cloud. HushWrite requires downloading a 190MB to 500MB quantized model file during initial setup.
 
 ---
 
@@ -1509,7 +1509,7 @@ Intellectual honesty is critical: local speech recognition has real engineering 
 
 Wispr Flow charges $12/month ($144/year) to cover cloud GPU server bills and proprietary LLM API costs.
 
-Murmur runs on the neural cores, Metal GPUs, and DirectML hardware already built into your laptop or workstation:
+HushWrite runs on the neural cores, Metal GPUs, and DirectML hardware already built into your laptop or workstation:
 - **Core Product**: Free and open source under the MIT license.
 - **Monetization**: Optional perpetual license for advanced team features—pay once, own forever, with zero mandatory recurring fees.
 
@@ -1518,7 +1518,7 @@ Murmur runs on the neural cores, Metal GPUs, and DirectML hardware already built
 ## Which Tool Should You Choose?
 
 - **Choose Wispr Flow** if you want automated cross-device syncing, prefer cloud LLMs to radically restructure conversational rambling, and do not handle confidential client communications or proprietary codebases.
-- **Choose Murmur** if you work under NDAs, handle HIPAA or legal notes, code in private repositories, travel frequently without internet, or refuse to stream your voice to external servers.
+- **Choose HushWrite** if you work under NDAs, handle HIPAA or legal notes, code in private repositories, travel frequently without internet, or refuse to stream your voice to external servers.
 `,
   },
   {
@@ -1536,7 +1536,7 @@ Murmur runs on the neural cores, Metal GPUs, and DirectML hardware already built
       "confidential legal speech to text",
     ],
     author: {
-      name: "Murmur Legal & Compliance",
+      name: "HushWrite Legal & Compliance",
       role: "Ethics & Privilege Research",
       avatar: "L",
     },
@@ -1568,7 +1568,7 @@ Under **ABA Model Rule 1.6 (Confidentiality of Information)**, lawyers have an a
 
 ### The Sovereign Alternative: Physical On-Device Architecture
 
-By utilizing an open-source, local-first dictation tool like **Murmur**, law firms achieve:
+By utilizing an open-source, local-first dictation tool like **HushWrite**, law firms achieve:
 - **Zero Third-Party Disclosure:** Audio is processed in local RAM and discarded instantly upon text insertion.
 - **Preserved Attorney-Client Privilege:** No audio packets traverse the public internet.
 - **Custom Legal Lexicons:** Seamless phonetic biasing for Latin maxims (*res ipsa loquitur*, *habeas corpus*), statutory citations, and client names.
@@ -1589,7 +1589,7 @@ By utilizing an open-source, local-first dictation tool like **Murmur**, law fir
       "private speech to code",
     ],
     author: {
-      name: "Murmur Engineering",
+      name: "HushWrite Engineering",
       role: "Developer Productivity",
       avatar: "E",
     },
@@ -1600,7 +1600,7 @@ By utilizing an open-source, local-first dictation tool like **Murmur**, law fir
     keyTakeaways: [
       "Voice coding fails when generic tools misinterpret code syntax, CamelCase, and CLI flags.",
       "Transmitting proprietary code snippets to cloud SaaS tools violates corporate IP and NDA standards.",
-      "Murmur provides developer-first formatting rules and git-sharable team dictionaries.",
+      "HushWrite provides developer-first formatting rules and git-sharable team dictionaries.",
     ],
     content: `
 ### Speaking Code vs Speaking Prose
@@ -1625,14 +1625,14 @@ export async function handleAuthToken(req: Request): Promise<TokenResponse> {
 
 Transmitting proprietary code, internal architecture diagrams, or API tokens over cloud WebSockets creates severe intellectual property exposure.
 
-Murmur executes **100% on your local GPU** via \`whisper.cpp\`. When you press \`⌥Space\` (macOS) or \`Alt+Space\` (Windows) inside Cursor, VS Code, or your terminal:
+HushWrite executes **100% on your local GPU** via \`whisper.cpp\`. When you press \`⌥Space\` (macOS) or \`Alt+Space\` (Windows) inside Cursor, VS Code, or your terminal:
 1. Audio is held in RAM only.
 2. Formatted code or commit messages are typed directly into the active editor.
 3. The RAM buffer is wiped immediately.
 
 ### Sharing Dictionaries with Your Team via Git
 
-You can commit a \`.murmur/dictionary.json\` directly into your repository:
+You can commit a \`.HushWrite/dictionary.json\` directly into your repository:
 
 \`\`\`json
 {
@@ -1665,7 +1665,7 @@ Every engineer on your team gets immediate phonetic recognition for your project
       "on device speech security",
     ],
     author: {
-      name: "Murmur Infosec Team",
+      name: "HushWrite Infosec Team",
       role: "Security Audit & Architecture",
       avatar: "S",
     },
@@ -1708,7 +1708,7 @@ Before deploying voice AI tools across your organization or installing them on y
       "private voice to text MacBook",
     ],
     author: {
-      name: "Murmur Hardware Labs",
+      name: "HushWrite Hardware Labs",
       role: "Apple Silicon Optimization",
       avatar: "M",
     },
@@ -1719,7 +1719,7 @@ Before deploying voice AI tools across your organization or installing them on y
     keyTakeaways: [
       "Apple Silicon's unified memory and 16-core Neural Engine can decode Whisper models in under 180 milliseconds.",
       "Running offline saves battery by eliminating continuous Wi-Fi radio transmissions.",
-      "Murmur provides a zero-setup desktop app for native Metal acceleration on macOS.",
+      "HushWrite provides a zero-setup desktop app for native Metal acceleration on macOS.",
     ],
     content: `
 ### Why Apple Silicon is the Ultimate Local Dictation Machine
@@ -1730,7 +1730,7 @@ Modern M1, M2, M3, and M4 Macs feature unified memory architectures and high-ban
 
 ### Step-by-Step Offline Setup Guide
 
-1. **Download Murmur for macOS:** Grab the native universal DMG from the [Murmur Releases page](/#download).
+1. **Download HushWrite for macOS:** Grab the native universal DMG from the [HushWrite Releases page](/#download).
 2. **Grant Microphone & Accessibility Permissions:** Allow macOS to capture your input audio stream and inject formatted text at your cursor.
 3. **Select Your Model Preset:** For general MacBook use, **Whisper Base Q5_0 (~140MB)** offers instant sub-160ms latency. For complex technical vocabulary, **Whisper Small (~460MB)** delivers human-level accuracy.
 4. **Test in Airplane Mode:** Disconnect your Wi-Fi, press \`⌥ Option + Space\`, speak naturally, and watch your text appear immediately in any open application.
@@ -1751,7 +1751,7 @@ Modern M1, M2, M3, and M4 Macs feature unified memory architectures and high-ban
       "DirectML vs Metal dictation speed",
     ],
     author: {
-      name: "Murmur Benchmarking Lab",
+      name: "HushWrite Benchmarking Lab",
       role: "Systems Performance & Testing",
       avatar: "B",
     },
@@ -1794,7 +1794,7 @@ All tests were performed using a standardized 500-sample audio dataset consistin
     slug: "how-i-reduced-meeting-note-time-by-80-percent-with-local-dictation",
     title: "How I Reduced Meeting Note Time by 80% with Local Dictation",
     description:
-      "A reproducible technical workflow combining Murmur's instant local push-to-talk with Notion databases to capture action items and eliminate post-meeting transcription toil.",
+      "A reproducible technical workflow combining HushWrite's instant local push-to-talk with Notion databases to capture action items and eliminate post-meeting transcription toil.",
     date: "2026-09-02",
     readTime: "7 min read",
     category: "Guides",
@@ -1806,7 +1806,7 @@ All tests were performed using a standardized 500-sample audio dataset consistin
       "private meeting notes",
     ],
     author: {
-      name: "Murmur Productivity Labs",
+      name: "HushWrite Productivity Labs",
       role: "Workflows & Automation",
       avatar: "P",
     },
@@ -1817,7 +1817,7 @@ All tests were performed using a standardized 500-sample audio dataset consistin
     keyTakeaways: [
       "Inviting third-party recording bots to confidential client calls introduces compliance liabilities and creates participant friction.",
       "A 90-second post-meeting verbal debrief directly into a structured Notion database captures higher signal than re-reading raw transcripts.",
-      "Murmur's instant push-to-talk hotkey delivers clean, punctuated markdown directly into Notion without touching cloud servers.",
+      "HushWrite's instant push-to-talk hotkey delivers clean, punctuated markdown directly into Notion without touching cloud servers.",
     ],
     content: `
 ### The 20-Minute "Meeting Tax"
@@ -1834,7 +1834,7 @@ While cloud bots seem appealing at first, in practice they introduce severe fric
 - **Corporate Compliance & NDA Violations:** For lawyers, physicians, and engineers discussing proprietary codebases, piping company audio to third-party cloud providers is often an outright violation of internal security policy.
 - **Transcript Bloat:** Sifting through a 12-page raw transcription to find two action items often takes longer than taking notes yourself.
 
-Here is the exact reproducible workflow I built using **Murmur** and **Notion** that cut my meeting note synthesis time by **81.2%** while keeping 100% of our discussions private.
+Here is the exact reproducible workflow I built using **HushWrite** and **Notion** that cut my meeting note synthesis time by **81.2%** while keeping 100% of our discussions private.
 
 ---
 
@@ -1858,7 +1858,7 @@ Whenever an important decision is agreed upon, hold **\`⌥ Option + Space\`** (
 
 > *"Decision: We are shipping the DirectML backend first in v0.8.4 because 70% of waitlisted users are on Windows."*
 
-Because Murmur decodes speech on-device with zero network latency, the text lands at your cursor in under 200 milliseconds. You don't have to pause the conversation or type noisily on a mechanical keyboard.
+Because HushWrite decodes speech on-device with zero network latency, the text lands at your cursor in under 200 milliseconds. You don't have to pause the conversation or type noisily on a mechanical keyboard.
 
 #### Phase 2: The 90-Second Verbal Debrief (Immediately Post-Call)
 
@@ -1883,7 +1883,7 @@ Instead of writing a sprawling essay, click into your **Notion Meeting Notes Dat
 - [Hold hotkey: "Awaiting final benchmark numbers on M3 Max vs RTX 4080."]
 \`\`\`
 
-Dictating this entire template takes **less than 90 seconds**. Murmur automatically purges filler words ("um", "like", "you know"), adds capitalization, and formats clean markdown bullet points.
+Dictating this entire template takes **less than 90 seconds**. HushWrite automatically purges filler words ("um", "like", "you know"), adds capitalization, and formats clean markdown bullet points.
 
 ---
 
@@ -1913,7 +1913,7 @@ We measured note capture time across 40 technical meetings over four weeks:
 ├──────────────────────────────────────┼──────────────────────┼────────────────┤
 │ Manual Keyboard Typing               │ 22.4 minutes         │ Zero (Local)   │
 │ Cloud AI Bot Summary (Otter/Fireflies│ 14.1 minutes (edit)  │ High (Cloud)   │
-│ Murmur + Notion Local Voice Workflow │ 4.2 minutes          │ Zero (Local)   │
+│ HushWrite + Notion Local Voice Workflow │ 4.2 minutes          │ Zero (Local)   │
 └──────────────────────────────────────┴──────────────────────┴────────────────┘
 \`\`\`
 
@@ -1929,16 +1929,16 @@ We measured note capture time across 40 technical meetings over four weeks:
 `,
   },
   {
-    slug: "murmur-vs-wispr-flow-vs-superwhisper-2026-latency-accuracy-comparison",
-    title: "Murmur vs. Wispr Flow vs. Superwhisper: Methodology-First Comparison",
+    slug: "HushWrite-vs-wispr-flow-vs-superwhisper-2026-latency-accuracy-comparison",
+    title: "HushWrite vs. Wispr Flow vs. Superwhisper: Methodology-First Comparison",
     description:
-      "A methodology-first, reproducible benchmark comparing Murmur, Wispr Flow, and Superwhisper across 600 audio samples on Windows and Apple Silicon hardware. Verifiable claims, exact test setups, and honest trade-offs.",
+      "A methodology-first, reproducible benchmark comparing HushWrite, Wispr Flow, and Superwhisper across 600 audio samples on Windows and Apple Silicon hardware. Verifiable claims, exact test setups, and honest trade-offs.",
     date: "2026-09-04",
     updatedDate: "September 7, 2026",
     readTime: "10 min read",
     category: "Comparisons",
     keywords: [
-      "Murmur vs Wispr Flow",
+      "HushWrite vs Wispr Flow",
       "Wispr Flow vs Superwhisper",
       "methodology first voice dictation comparison",
       "best local dictation benchmark 2026",
@@ -1947,19 +1947,19 @@ We measured note capture time across 40 technical meetings over four weeks:
       "Windows dictation comparison",
     ],
     author: {
-      name: "Murmur Benchmarking Lab",
+      name: "HushWrite Benchmarking Lab",
       role: "Systems Performance & Testing",
       avatar: "B",
     },
     shortFormHooks: [
-      "We ran 600 audio samples through Murmur, Wispr Flow, and Superwhisper. Here are the hard, reproducible numbers.",
-      "Wispr Flow costs ~$15/month for cloud streaming. Superwhisper is Mac-only. Murmur runs 100% on-device on Windows.",
+      "We ran 600 audio samples through HushWrite, Wispr Flow, and Superwhisper. Here are the hard, reproducible numbers.",
+      "Wispr Flow costs ~$15/month for cloud streaming. Superwhisper is Mac-only. HushWrite runs 100% on-device on Windows.",
     ],
     keyTakeaways: [
-      "Murmur achieved a mean end-to-end insertion latency of 134ms on Windows RTX 4080 and 168ms on AMD Ryzen 7 7840U—beating cloud round-trips by over 3.2x.",
+      "HushWrite achieved a mean end-to-end insertion latency of 134ms on Windows RTX 4080 and 168ms on AMD Ryzen 7 7840U—beating cloud round-trips by over 3.2x.",
       "Wispr Flow charges ~$15/month ($144–$180/year) with a 2,000-word free weekly cap and uploads continuous raw audio to remote AWS/OpenAI clusters.",
       "Superwhisper provides local models on macOS with lifetime options ($199–$249) but has zero native Windows availability.",
-      "Murmur is Windows-native at initial v0.1 launch, runs 100% locally via whisper.cpp + DirectML, transmits 0 bytes outbound, and has no recurring subscription.",
+      "HushWrite is Windows-native at initial v0.1 launch, runs 100% locally via whisper.cpp + DirectML, transmits 0 bytes outbound, and has no recurring subscription.",
     ],
     content: `
 > **Notice:** Last benchmarked, audited, and updated on **September 7, 2026**. All measurements follow the published hardware testbed specification below and can be reproduced using local audio loopback drivers.
@@ -1971,7 +1971,7 @@ Voice dictation has crossed an inflection point. With OpenAI Whisper open-weight
 However, the market has fragmented into three fundamentally divergent architectures:
 1. **Cloud-First SaaS (e.g., Wispr Flow):** Audio is streamed over persistent WebSockets to remote GPU clusters. Billed at ~$15/month ($144–$180/year) with free tiers restricted by weekly word quotas.
 2. **Hybrid & macOS-Centric Utilities (e.g., Superwhisper):** Audio is processed locally on Apple Silicon, but advanced formatting relies on paid cloud LLMs. Pricing centers on subscription ($8.99/mo) or lifetime licenses ($199–$249), but Windows is entirely unsupported.
-3. **Pure-Local Open Source (e.g., Murmur):** Audio is processed 100% on-device via \`whisper.cpp\` with hardware DirectML/GPU acceleration, zero telemetry, zero cloud dependencies, and a permanent open-source/lifetime model on Windows.
+3. **Pure-Local Open Source (e.g., HushWrite):** Audio is processed 100% on-device via \`whisper.cpp\` with hardware DirectML/GPU acceleration, zero telemetry, zero cloud dependencies, and a permanent open-source/lifetime model on Windows.
 
 To cut through aggressive marketing claims, we constructed a methodology-first benchmark comparing verifiable capabilities, latency, resource consumption, and accuracy across identical audio samples.
 
@@ -1981,7 +1981,7 @@ To cut through aggressive marketing claims, we constructed a methodology-first b
 
 The table below includes **only verifiable claims** based on publicly documented pricing, published license terms, and network packet capture:
 
-| Metric / Dimension | Wispr Flow | Superwhisper | Murmur (Local-First) | Verification Method |
+| Metric / Dimension | Wispr Flow | Superwhisper | HushWrite (Local-First) | Verification Method |
 |:---|:---|:---|:---|:---|
 | **Pricing Model** | ~$15 / month ($144–$180/yr) | $8.99 / mo or $199–$249 Lifetime | Free & Open Source (MIT Core) | Official pricing checkout pages |
 | **Free Tier Allowance** | Capped at 2,000 words / week | Limited local model trial | Unlimited words, no quotas | In-app counter / account state |
@@ -2005,7 +2005,7 @@ To eliminate human microphone inconsistency, ambient room acoustic variations, a
 - **macOS Laptop Testbed:** Apple MacBook Air M2 (8-core CPU, 8-core GPU, 16GB Unified RAM, macOS Sonoma 14.5).
 
 #### 2. Models & Quantization Tested
-- **Murmur:** OpenAI Whisper open-weights via \`whisper.cpp\` using INT8/FP16 quantized weights (\`ggml-base.en.bin\` 142MB, \`ggml-small.en.bin\` 466MB).
+- **HushWrite:** OpenAI Whisper open-weights via \`whisper.cpp\` using INT8/FP16 quantized weights (\`ggml-base.en.bin\` 142MB, \`ggml-small.en.bin\` 466MB).
 - **Wispr Flow:** Cloud-hosted transcription pipeline (WebSocket stream to remote cloud inference).
 - **Superwhisper:** Local Whisper model configuration (\`small\`) on macOS.
 
@@ -2033,7 +2033,7 @@ To eliminate human microphone inconsistency, ambient room acoustic variations, a
 
 We measured the exact elapsed duration from hotkey release to final text insertion across varying network conditions:
 
-| System & Network Configuration | Murmur (Local-First) | Wispr Flow (Cloud) | Superwhisper (Hybrid) |
+| System & Network Configuration | HushWrite (Local-First) | Wispr Flow (Cloud) | Superwhisper (Hybrid) |
 |:---|:---|:---|:---|
 | **Windows Desktop (RTX 4070 DirectML)** | **134 ms** | 475 ms | N/A (No Windows support) |
 | **Windows Laptop (Ryzen 7 7840U)** | **168 ms** | 495 ms | N/A (No Windows support) |
@@ -2044,7 +2044,7 @@ We measured the exact elapsed duration from hotkey release to final text inserti
 
 #### Latency Analysis
 - **The Cloud Round-Trip Tax:** Even on gigabit fiber connections, Wispr Flow is constrained by TCP handshake, TLS session establishment, audio chunk upload serialization, and remote cloud GPU queuing. This introduces an irreducible tail latency of 475ms to 1,400ms.
-- **Hardware Direct Execution:** Murmur's C++ \`whisper.cpp\` runtime with DirectML offloading decodes audio frames directly in local VRAM/RAM, typing text into your cursor within **134ms–168ms**—substantially faster than human perception of delay.
+- **Hardware Direct Execution:** HushWrite's C++ \`whisper.cpp\` runtime with DirectML offloading decodes audio frames directly in local VRAM/RAM, typing text into your cursor within **134ms–168ms**—substantially faster than human perception of delay.
 
 ---
 
@@ -2052,7 +2052,7 @@ We measured the exact elapsed duration from hotkey release to final text inserti
 
 Word Error Rate was calculated against normalized human ground-truth transcripts:
 
-| Audio Domain | Murmur (Small Local) | Wispr Flow (Cloud) | Superwhisper (Mac Small) |
+| Audio Domain | HushWrite (Small Local) | Wispr Flow (Cloud) | Superwhisper (Mac Small) |
 |:---|:---|:---|:---|
 | **Conversational English** | 1.4% | **1.1%** | 1.5% |
 | **Software Engineering & Code** | **1.8%** | 4.2% | 3.1% |
@@ -2062,7 +2062,7 @@ Word Error Rate was calculated against normalized human ground-truth transcripts
 #### Accuracy Takeaways
 - Wispr Flow achieves slightly lower WER (1.1%) on casual conversational English because its cloud pipeline runs multi-billion parameter LLMs to smooth grammatical filler words.
 - However, on software engineering, legal, and medical jargon, cloud models frequently "hallucinate" conversational substitutes (e.g. replacing \`kubectl\` with "cube control" or \`serde_json\` with "Sunday John").
-- Murmur's local Whisper decoder preserves exact phonetic technical tokens without cloud LLM over-correction.
+- HushWrite's local Whisper decoder preserves exact phonetic technical tokens without cloud LLM over-correction.
 
 ---
 
@@ -2070,7 +2070,7 @@ Word Error Rate was calculated against normalized human ground-truth transcripts
 
 We monitored background idle overhead, peak memory allocation, and battery discharge rate over a 2-hour continuous dictation session on the Windows ThinkPad laptop:
 
-| Metric | Murmur (Local) | Wispr Flow (Cloud) | Superwhisper |
+| Metric | HushWrite (Local) | Wispr Flow (Cloud) | Superwhisper |
 |:---|:---|:---|:---|
 | **Idle RAM Footprint** | **~44 MB** | ~185 MB (Electron) | ~110 MB (macOS only) |
 | **Active Inference RAM (Base / Small)** | ~380 MB / ~720 MB | ~260 MB | ~850 MB |
@@ -2084,10 +2084,10 @@ We monitored background idle overhead, peak memory allocation, and battery disch
 
 No software architecture is without trade-offs. Here are the honest limitations:
 
-#### 1. Limitations of Murmur
-- **Windows-Only at Initial Launch:** Murmur v0.1 is specifically architected for Windows 10/11 using native Win32 \`SendInput\` and DirectML. macOS is currently in closed beta testing, and Linux is planned.
+#### 1. Limitations of HushWrite
+- **Windows-Only at Initial Launch:** HushWrite v0.1 is specifically architected for Windows 10/11 using native Win32 \`SendInput\` and DirectML. macOS is currently in closed beta testing, and Linux is planned.
 - **Local Hardware Requirements:** Running larger models (\`medium\` at 1.5GB or \`large-v3\` at 3.1GB) requires dedicated GPU VRAM (4GB+) or high-speed system RAM. On budget laptops with older integrated graphics, users should run the \`base.en\` model (142MB) to keep latency under 200ms.
-- **Deterministic Formatting vs. Cloud LLM Rewriting:** Wispr Flow can pipe your transcript to a 70B+ cloud LLM to perform radical rewrites (e.g., *"turn this stream-of-consciousness voice memo into a 3-bullet executive summary"*). Murmur applies deterministic local formatting: it accurately types what you said, but will not write new thoughts for you.
+- **Deterministic Formatting vs. Cloud LLM Rewriting:** Wispr Flow can pipe your transcript to a 70B+ cloud LLM to perform radical rewrites (e.g., *"turn this stream-of-consciousness voice memo into a 3-bullet executive summary"*). HushWrite applies deterministic local formatting: it accurately types what you said, but will not write new thoughts for you.
 - **Beta Features:** Custom vocabulary biasing and multi-speaker separation are currently marked as experimental beta features.
 
 #### 2. Limitations of Wispr Flow
@@ -2105,22 +2105,22 @@ No software architecture is without trade-offs. Here are the honest limitations:
 
 - **Choose Wispr Flow if:** You prioritize conversational LLM rewrites, always work connected to high-speed internet, and your employer's data governance permits third-party cloud audio processing.
 - **Choose Superwhisper if:** You are exclusively on a Mac, want a polished commercial utility with lifetime pricing options, and never need Windows support.
-- **Choose Murmur if:** You work on Windows, require **sub-170ms instant dictation**, handle sensitive code or client drafts covered by NDAs or privacy regulations, and want a 100% on-device, free, open-source tool with zero subscription lock-in.
+- **Choose HushWrite if:** You work on Windows, require **sub-170ms instant dictation**, handle sensitive code or client drafts covered by NDAs or privacy regulations, and want a 100% on-device, free, open-source tool with zero subscription lock-in.
 
 ---
 
 ### How to Verify Outbound Traffic on Windows
 
-You can verify Murmur's zero-egress claim independently in under 60 seconds:
+You can verify HushWrite's zero-egress claim independently in under 60 seconds:
 
 \`\`\`powershell
 # Open Windows PowerShell as Administrator and run packet monitoring
 pktmon filter add -t TCP -p 443
 pktmon start --etw
-# Dictate 5 sentences using Murmur...
+# Dictate 5 sentences using HushWrite...
 pktmon stop
 pktmon format PktMon.etl -o network_audit.txt
-Select-String -Path network_audit.txt -Pattern "murmur.exe"
+Select-String -Path network_audit.txt -Pattern "HushWrite.exe"
 \`\`\`
 *(Result: 0 matching outbound network packets).*
 `,
@@ -2129,7 +2129,7 @@ Select-String -Path network_audit.txt -Pattern "murmur.exe"
     slug: "where-does-your-voice-data-go-in-popular-dictation-apps",
     title: "Where Does Your Voice Data Go? A Privacy Deep-Dive into Popular Dictation Apps",
     description:
-      "A technical, packet-by-packet comparative analysis of data retention, sub-processors, and network transit across Otter.ai, Dragon NaturallySpeaking, OpenAI Whisper API, and Murmur local dictation.",
+      "A technical, packet-by-packet comparative analysis of data retention, sub-processors, and network transit across Otter.ai, Dragon NaturallySpeaking, OpenAI Whisper API, and HushWrite local dictation.",
     date: "2026-09-05",
     readTime: "11 min read",
     category: "Privacy & Security",
@@ -2143,7 +2143,7 @@ Select-String -Path network_audit.txt -Pattern "murmur.exe"
       "local vs cloud dictation security",
     ],
     author: {
-      name: "Murmur Security & Compliance Group",
+      name: "HushWrite Security & Compliance Group",
       role: "Information Security & Architecture",
       avatar: "S",
     },
@@ -2155,7 +2155,7 @@ Select-String -Path network_audit.txt -Pattern "murmur.exe"
       "Cloud dictation platforms stream raw audio across public network interfaces to third-party cloud infrastructure (AWS/GCP/Azure) with multiple analytics sub-processors.",
       "OpenAI API terms specify 30-day data retention by default, leaving customer transcripts subject to discovery and subpoena risks under the third-party doctrine.",
       "Dragon NaturallySpeaking cloud editions centralize audio for acoustic retraining unless enterprise customers negotiate bespoke opt-out riders.",
-      "Murmur processes voice in volatile RAM via whisper.cpp, discards raw PCM audio upon text insertion, and makes zero network requests.",
+      "HushWrite processes voice in volatile RAM via whisper.cpp, discards raw PCM audio upon text insertion, and makes zero network requests.",
     ],
     content: `
 ### The Illusion of "Free" and Convenient Voice Dictation
@@ -2171,7 +2171,7 @@ To understand the tangible risks of this divide, we conducted packet-capture ins
 - **Otter.ai**
 - **Nuance Dragon (Dragon Professional Anywhere)**
 - **Whisper via OpenAI API** (used by many SaaS wrappers including Wispr Flow)
-- **Murmur** (on-device \`whisper.cpp\`)
+- **HushWrite** (on-device \`whisper.cpp\`)
 
 ---
 
@@ -2186,7 +2186,7 @@ To understand the tangible risks of this divide, we conducted packet-capture ins
 │ Otter.ai          │ WebSockets → AWS S3     │ AWS, Segment, Stripe │ Indefinite default│
 │ Nuance Dragon     │ HTTPS TLS → MS Azure    │ Microsoft Azure      │ Up to 90 days     │
 │ OpenAI Whisper API│ HTTPS POST → OpenAI API │ OpenAI, Cloudflare   │ 30-day default log│
-│ Murmur (Local)    │ NONE (Air-gapped RAM)   │ ZERO (100% On-device)│ ZERO (0 Bytes)    │
+│ HushWrite (Local)    │ NONE (Air-gapped RAM)   │ ZERO (100% On-device)│ ZERO (0 Bytes)    │
 └───────────────────┴─────────────────────────┴──────────────────────┴───────────────────┘
 \`\`\`
 
@@ -2225,9 +2225,9 @@ Many modern voice dictation apps (such as Wispr Flow, Superwhisper cloud modes, 
 
 ---
 
-### Deep Dive 4: Murmur (100% Local-First & Air-Gapped)
+### Deep Dive 4: HushWrite (100% Local-First & Air-Gapped)
 
-Murmur was engineered from the ground up to eliminate policy promises and replace them with **physical hardware isolation**:
+HushWrite was engineered from the ground up to eliminate policy promises and replace them with **physical hardware isolation**:
 
 - **Audio Capture to RAM:** Audio is captured from the default input device into a fixed-size ring buffer in volatile system RAM using native platform audio bindings (\`cpal\` in Rust).
 - **Zero Temporary Files on Disk:** Audio is decoded directly from RAM. No WAV, MP3, or cache files are written to the file system during dictation.
@@ -2235,13 +2235,13 @@ Murmur was engineered from the ground up to eliminate policy promises and replac
   - **macOS:** Apple Silicon Metal GPU shaders and Accelerate framework.
   - **Windows:** DirectML (DirectX 12 GPU compute) and NVIDIA CUDA / Tensor Cores.
 - **RAM Erasure on Paste:** The instant transcription completes, formatted text is injected into the OS active window, and the audio buffer in RAM is zeroed and freed.
-- **Zero Network Sockets:** The Murmur binary contains zero analytics SDKs, zero telemetry endpoints, and zero cloud API keys. You can disconnect your Wi-Fi, enable Airplane Mode, or run Murmur in an air-gapped SCIF—it operates identically.
+- **Zero Network Sockets:** The HushWrite binary contains zero analytics SDKs, zero telemetry endpoints, and zero cloud API keys. You can disconnect your Wi-Fi, enable Airplane Mode, or run HushWrite in an air-gapped SCIF—it operates identically.
 
 ---
 
 ### Detailed Privacy & Regulatory Comparison Table
 
-| Privacy Dimension | Otter.ai | Nuance Dragon Cloud | OpenAI Whisper API | Murmur (Local) |
+| Privacy Dimension | Otter.ai | Nuance Dragon Cloud | OpenAI Whisper API | HushWrite (Local) |
 |:---|:---|:---|:---|:---|
 | **Audio Processing Location** | AWS Cloud Clusters | MS Azure Cloud | OpenAI Cloud (US) | **Local GPU / RAM** |
 | **Outbound Bytes per Hour** | ~15–25 MB | ~20–30 MB | ~18–35 MB | **0.00 Bytes** |
@@ -2262,7 +2262,7 @@ Under American Bar Association Model Rule 1.6(c), lawyers are legally obligated 
 Streaming privileged strategy notes, witness interviews, or settlement negotiations to cloud speech vendors without explicit client disclosure exposes attorneys to malpractice allegations and potential waiver of privilege.
 
 #### 2. HIPAA & Healthcare Privacy (45 CFR § 164.502)
-Covered healthcare entities cannot disclose Protected Health Information (PHI) to third-party vendors without an executed Business Associate Agreement (BAA). Using consumer cloud dictation tools for patient clinical summaries violates HIPAA guidelines. Because Murmur never transmits data outside the hospital laptop, it does not act as a cloud intermediary.
+Covered healthcare entities cannot disclose Protected Health Information (PHI) to third-party vendors without an executed Business Associate Agreement (BAA). Using consumer cloud dictation tools for patient clinical summaries violates HIPAA guidelines. Because HushWrite never transmits data outside the hospital laptop, it does not act as a cloud intermediary.
 
 #### 3. Enterprise NDAs & Proprietary Source Code
 Software engineers dictating proprietary algorithms, API keys, or unreleased system designs into cloud voice utilities risk violating non-disclosure agreements with employers and clients.
@@ -2278,7 +2278,7 @@ Don't trust marketing claims—verify network traffic on your own machine:
 # Monitor all outbound packets from your machine while dictating:
 sudo tcpdump -i any -n "not port 53 and not port 443"
 \`\`\`
-*(Notice: With Murmur active, zero packets are emitted. With cloud tools, continuous packet streams to AWS/Cloudflare appear instantly.)*
+*(Notice: With HushWrite active, zero packets are emitted. With cloud tools, continuous packet streams to AWS/Cloudflare appear instantly.)*
 
 #### Windows: Packet Monitor with \`pktmon\`
 \`\`\`powershell
@@ -2291,13 +2291,13 @@ pktmon format PktMon.etl -o log.txt
 \`\`\`
 
 #### Little Snitch / LuLu (macOS) & Portmaster (Windows)
-Configure application-level firewalls to block all outbound connections for Murmur. You will notice that Murmur functions flawlessly with all network adapters disabled.
+Configure application-level firewalls to block all outbound connections for HushWrite. You will notice that HushWrite functions flawlessly with all network adapters disabled.
 
 ---
 
 ### Conclusion: Data Sovereignty as a Default
 
-Privacy should not be an expensive enterprise add-on or a checkbox in a 40-page terms of service agreement. By leveraging modern local hardware acceleration and open-weights Whisper models, **Murmur proves that you no longer need to sacrifice privacy to achieve world-class voice dictation**.
+Privacy should not be an expensive enterprise add-on or a checkbox in a 40-page terms of service agreement. By leveraging modern local hardware acceleration and open-weights Whisper models, **HushWrite proves that you no longer need to sacrifice privacy to achieve world-class voice dictation**.
 `,
   },
   {
@@ -2316,7 +2316,7 @@ Privacy should not be an expensive enterprise add-on or a checkbox in a 40-page 
       "Typefully voice dictation",
       "Taplio voice dictation",
       "private voice typing social media",
-      "Murmur creator macros",
+      "HushWrite creator macros",
     ],
     author: {
       name: "Alex Gutscher",
@@ -2334,7 +2334,7 @@ Privacy should not be an expensive enterprise add-on or a checkbox in a 40-page 
       "Running Whisper 100% locally prevents confidential business metrics, unreleased features, and pitch decks from leaking to third-party cloud servers.",
     ],
     content: `
-> **Notice:** Last updated and benchmarked on **September 7, 2026**. Tested with Murmur v0.1.0 running on Windows 11 and macOS across Typefully, Taplio, and direct web composers.
+> **Notice:** Last updated and benchmarked on **September 7, 2026**. Tested with HushWrite v0.1.0 running on Windows 11 and macOS across Typefully, Taplio, and direct web composers.
 
 ### The Creator Typing Bottleneck
 
@@ -2350,9 +2350,9 @@ By switching to **on-device push-to-talk voice dictation**, creators bypass the 
 
 ### Benchmark: Typing vs. Voice Dictation for Social Creators
 
-We benchmarked three typical social publishing tasks performed by a 75 WPM touch-typist vs. dictating via Murmur on a Windows 11 workstation:
+We benchmarked three typical social publishing tasks performed by a 75 WPM touch-typist vs. dictating via HushWrite on a Windows 11 workstation:
 
-| Publishing Task | Manual Typing + Formatting | Murmur Voice Dictation | Speedup |
+| Publishing Task | Manual Typing + Formatting | HushWrite Voice Dictation | Speedup |
 | :--- | :--- | :--- | :--- |
 | **5-Part Technical X Thread** (260 words) | 7 min 42 sec | **1 min 48 sec** | **4.3x faster** |
 | **LinkedIn Insight Post** (185 words) | 5 min 15 sec | **1 min 12 sec** | **4.4x faster** |
@@ -2362,13 +2362,13 @@ We benchmarked three typical social publishing tasks performed by a 75 WPM touch
 
 ### Step 1: Dictating Multi-Part X (Twitter) Threads in One Breath
 
-Writing threads usually requires typing one tweet, clicking "Add Tweet" or pressing \`Ctrl+Enter\`, and repeating. With Murmur's spoken macros, you can dictate an entire thread continuously.
+Writing threads usually requires typing one tweet, clicking "Add Tweet" or pressing \`Ctrl+Enter\`, and repeating. With HushWrite's spoken macros, you can dictate an entire thread continuously.
 
 #### Voice Trigger: \`x thread template\`
 Speak:
 > *"x thread template on why compiling whisper with DirectML outperforms cloud APIs"*
 
-Murmur instantly injects the proven 5-part virality thread scaffold:
+HushWrite instantly injects the proven 5-part virality thread scaffold:
 \`\`\`markdown
 ### 🧵 X (Twitter) Thread
 **1/ 🧵 [Hook & Big Promise]:**
@@ -2392,7 +2392,7 @@ If you found this valuable:
 When dictating freely into tools like **Typefully**, **Hypefury**, or the standard X web editor:
 > *"First core realization was latency tweet break second realization was memory footprint tweet break third was local security"*
 
-Murmur expands \`tweet break\` into clean thread boundaries (\`\\n\\n🧵 \`), separating each thought into its own post card automatically.
+HushWrite expands \`tweet break\` into clean thread boundaries (\`\\n\\n🧵 \`), separating each thought into its own post card automatically.
 
 ---
 
@@ -2404,7 +2404,7 @@ LinkedIn's algorithm favors posts with strong single-line opening hooks, ample w
 Speak:
 > *"linkedin post template why our team banned cloud speech transcription on company laptops"*
 
-Murmur outputs:
+HushWrite outputs:
 \`\`\`markdown
 ### 💼 LinkedIn Post
 **Hook:**
@@ -2452,7 +2452,7 @@ If you are a founder, executive, or technical lead building in public, you often
 
 Cloud dictation services (such as Wispr Flow) stream your raw microphone audio to remote servers. If you dictate sensitive thoughts into a cloud tool, you are transmitting unreleased IP to external infrastructure.
 
-**Murmur operates 100% on your device**:
+**HushWrite operates 100% on your device**:
 - Runs open-weights OpenAI Whisper locally via \`whisper.cpp\`
 - Uses DirectML on Windows and Metal on macOS for sub-150ms inference
 - Transcribes entirely in local RAM and purges audio buffers the millisecond text is delivered
@@ -2462,7 +2462,7 @@ Cloud dictation services (such as Wispr Flow) stream your raw microphone audio t
 
 ### How to Get Started
 
-1. **Download Murmur:** Get the free, open-source desktop app for Windows or macOS from [murmur.app](https://murmur.app).
+1. **Download HushWrite:** Get the free, open-source desktop app for Windows or macOS from [HushWrite.app](https://HushWrite.app).
 2. **Set Your Push-to-Talk Hotkey:** Configure \`Alt+Space\` (Windows) or \`Option+Space\` (macOS).
 3. **Open Your Social Composer:** Click into Typefully, Taplio, X.com, or LinkedIn.
 4. **Hold Hotkey & Speak:** Say \`x thread template\` or \`linkedin post template\` to test your first voice-dictated social draft!

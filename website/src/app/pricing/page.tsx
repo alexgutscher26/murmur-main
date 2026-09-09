@@ -79,7 +79,7 @@ const PRICING_FAQS = [
       "Pro Lifetime ($89 one-time) lets you own the software forever on up to 2 personal devices with 1 full year of continuous updates included. After year 1, your version remains yours to use offline indefinitely with zero subscriptions. Pro Annual ($49/year) is for users who prefer continuous ongoing model upgrades, driver tuning, and priority support as a low annual expense.",
   },
   {
-    question: "Does Murmur ever send my audio or text to the cloud?",
+    question: "Does HushWrite ever send my audio or text to the cloud?",
     answer:
       "Never. Every model inference, dictionary lookup, and text transformation runs 100% locally on your computer's CPU and GPU via whisper.cpp. Audio is processed directly in RAM and discarded immediately.",
   },
@@ -237,7 +237,7 @@ function PricingContent() {
         "Priority business SLA & dedicated support",
       ],
       ctaText: "Contact Team Sales",
-      ctaHref: "mailto:sales@murmur.app?subject=Team%20Inquiry",
+      ctaHref: "mailto:sales@HushWrite.app?subject=Team%20Inquiry",
       isPrimary: false,
     },
   ];
@@ -639,7 +639,7 @@ function PricingContent() {
               Export your shortcuts or install curated community packs in one click. Your team can
               sync vocabularies via plain{" "}
               <code className="text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200/60 font-mono">
-                .murmur/pack.json
+                .HushWrite/pack.json
               </code>{" "}
               files.
             </p>

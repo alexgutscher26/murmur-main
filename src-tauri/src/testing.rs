@@ -89,7 +89,7 @@ pub fn synthesise_speech_with_voice(
     name: &str,
     voice: Option<&str>,
 ) -> Option<Vec<f32>> {
-    let path: PathBuf = std::env::temp_dir().join(format!("murmur-fixture-{name}.wav"));
+    let path: PathBuf = std::env::temp_dir().join(format!("HushWrite-fixture-{name}.wav"));
 
     if !path.exists() {
         let mut command = std::process::Command::new("say");

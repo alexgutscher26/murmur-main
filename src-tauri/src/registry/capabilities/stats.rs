@@ -11,7 +11,7 @@ pub fn stats_capability() -> Capability {
     Capability {
         key: CapabilityKey::Stats,
         name: text("Stats"),
-        description: text("How much you have dictated, and how fast Murmur actually is."),
+        description: text("How much you have dictated, and how fast HushWrite actually is."),
         requires: vec![],
         engine_needs: vec![],
         nav: Some(NavDef {

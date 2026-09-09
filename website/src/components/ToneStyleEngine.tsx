@@ -93,10 +93,10 @@ export function ToneStyleEngine() {
             </span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-bold text-neutral-950 tracking-[-0.03em] mb-4">
-            Make Murmur sound like you.
+            Make HushWrite sound like you.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Murmur adapts to how you write in different apps. Set a different style for messages,
+            HushWrite adapts to how you write in different apps. Set a different style for messages,
             work chats, emails, and code editors—computed 100% locally on your machine.
           </p>
         </div>

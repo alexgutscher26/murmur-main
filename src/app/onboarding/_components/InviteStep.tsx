@@ -46,7 +46,7 @@ export function InviteStep({
       <div className="my-auto flex w-full max-w-md flex-col items-center gap-4 py-5 mx-auto">
         {/* Identity & Heading */}
         <div className="flex flex-col items-center gap-2 text-center">
-          <Mark size="lg" label="Murmur" />
+          <Mark size="lg" label="HushWrite" />
 
           <div className="flex flex-col items-center gap-1 mt-1">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-accent-soft/40 px-2.5 py-0.5 text-caption font-medium text-accent">
@@ -55,7 +55,7 @@ export function InviteStep({
             </div>
             <h1 className="text-title text-text-primary">You&rsquo;re all set!</h1>
             <p className="max-w-xs text-body text-text-secondary text-balance">
-              Murmur is running in the background and ready whenever you want to speak.
+              HushWrite is running in the background and ready whenever you want to speak.
             </p>
           </div>
         </div>
@@ -119,7 +119,7 @@ export function InviteStep({
             <div className="flex flex-col">
               <span className="text-label text-text-primary font-medium">Custom Vocabulary</span>
               <span className="text-caption text-text-secondary">
-                Teach Murmur custom acronyms, technical terms, and names in your Dictionary anytime.
+                Teach HushWrite custom acronyms, technical terms, and names in your Dictionary anytime.
               </span>
             </div>
           </div>
@@ -143,11 +143,11 @@ export function InviteStep({
               "flex items-center justify-center gap-2 cursor-pointer",
             )}
           >
-            <span>Start using Murmur</span>
+            <span>Start using HushWrite</span>
             <ArrowRight className="size-4" />
           </button>
           <span className="text-caption text-text-tertiary text-center">
-            Look for Murmur in your menu bar or system tray anytime.
+            Look for HushWrite in your menu bar or system tray anytime.
           </span>
         </div>
       </div>

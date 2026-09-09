@@ -10,9 +10,9 @@
  */
 
 const COMMON_TLDS: &[&str] = &[
-    "com", "org", "net", "io", "dev", "ai", "app", "co", "edu", "gov",
-    "xyz", "info", "me", "tech", "site", "online", "cloud", "agency",
-    "uk", "de", "ca", "fr", "jp", "au", "eu", "ch", "nl", "se", "es",
+    "com", "org", "net", "io", "dev", "ai", "app", "co", "edu", "gov", "xyz", "info", "me", "tech",
+    "site", "online", "cloud", "agency", "uk", "de", "ca", "fr", "jp", "au", "eu", "ch", "nl",
+    "se", "es",
 ];
 
 /// Normalizes spoken URLs, email addresses, and filesystem paths.
@@ -49,9 +49,14 @@ fn format_spoken_emails(text: &str) -> String {
                     .chars()
                     .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
                     .collect::<String>();
-                let clean_tld = tld_word.trim_end_matches([',', '.', '!', '?', ';', ':']).to_lowercase();
+                let clean_tld = tld_word
+                    .trim_end_matches([',', '.', '!', '?', ';', ':'])
+                    .to_lowercase();
 
-                if COMMON_TLDS.contains(&clean_tld.as_str()) && is_valid_ident(prev_word) && is_valid_ident(domain_part) {
+                if COMMON_TLDS.contains(&clean_tld.as_str())
+                    && is_valid_ident(prev_word)
+                    && is_valid_ident(domain_part)
+                {
                     // Pop previous word from result
                     result.pop();
                     result.push(format!("{prev_word}@{domain_part}.{clean_tld}{punct}"));
@@ -69,7 +74,10 @@ fn format_spoken_emails(text: &str) -> String {
 }
 
 fn is_valid_ident(word: &str) -> bool {
-    !word.is_empty() && word.chars().all(|c| c.is_alphanumeric() || c == '_' || c == '-' || c == '.')
+    !word.is_empty()
+        && word
+            .chars()
+            .all(|c| c.is_alphanumeric() || c == '_' || c == '-' || c == '.')
 }
 
 /// Normalizes spoken URLs like "https colon slash slash github dot com slash rust"
@@ -78,7 +86,8 @@ fn format_spoken_urls(text: &str) -> String {
 
     // Protocols
     // Protocols
-    out = super::dictionary::replace_whole_words(&out, "https colon slash slash", "https://", false);
+    out =
+        super::dictionary::replace_whole_words(&out, "https colon slash slash", "https://", false);
     out = super::dictionary::replace_whole_words(&out, "http colon slash slash", "http://", false);
     out = super::dictionary::replace_whole_words(&out, "colon slash slash", "://", false);
     out = super::dictionary::replace_whole_words(&out, "https : / /", "https://", false);
@@ -103,26 +112,30 @@ fn format_spoken_urls(text: &str) -> String {
         out = out.replace(&spaced_dot, &replaced);
     }
 
-    // Connect slashes following URL protocols or domains: "https://github.com slash murmur" -> "https://github.com/murmur"
+    // Connect slashes following URL protocols or domains: "https://github.com slash HushWrite" -> "https://github.com/HushWrite"
     let mut words: Vec<String> = out.split_whitespace().map(|s| s.to_string()).collect();
     let mut i = 0;
     while i < words.len() {
         let is_url_token = words[i].starts_with("http://")
             || words[i].starts_with("https://")
             || words[i].starts_with("www.")
-            || COMMON_TLDS.iter().any(|&tld| words[i].contains(&format!(".{tld}")));
+            || COMMON_TLDS
+                .iter()
+                .any(|&tld| words[i].contains(&format!(".{tld}")));
 
         if is_url_token && i + 1 < words.len() {
             let j = i + 1;
             while j < words.len() {
                 if words[j].eq_ignore_ascii_case("slash") || words[j] == "/" {
                     if j + 1 < words.len() {
-                        let next_segment = words[j + 1].trim_end_matches([',', '.', '!', '?', ';', ':']);
+                        let next_segment =
+                            words[j + 1].trim_end_matches([',', '.', '!', '?', ';', ':']);
                         let punct = words[j + 1]
                             .chars()
                             .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
                             .collect::<String>();
-                        words[i] = format!("{}/{next_segment}{punct}", words[i].trim_end_matches('/'));
+                        words[i] =
+                            format!("{}/{next_segment}{punct}", words[i].trim_end_matches('/'));
                         words.remove(j);
                         words.remove(j);
                         if !punct.is_empty() {
@@ -170,7 +183,11 @@ fn format_spoken_paths(text: &str) -> String {
         let starts_path = clean == "slash"
             || clean == "tilde"
             || clean == "dot"
-            || (clean.len() == 1 && (clean == "c" || clean == "d") && i + 2 < words.len() && words[i + 1].eq_ignore_ascii_case("colon") && words[i + 2].eq_ignore_ascii_case("backslash"));
+            || (clean.len() == 1
+                && (clean == "c" || clean == "d")
+                && i + 2 < words.len()
+                && words[i + 1].eq_ignore_ascii_case("colon")
+                && words[i + 2].eq_ignore_ascii_case("backslash"));
 
         if starts_path && i + 1 < words.len() {
             let mut path_tokens = Vec::new();
@@ -211,8 +228,12 @@ fn format_spoken_paths(text: &str) -> String {
             }
 
             // A valid path has at least one separator ("/" or "\" or "~") and segments
-            let has_separator = path_tokens.iter().any(|t| t == "/" || t == "\\" || t == "~");
-            let has_ident = path_tokens.iter().any(|t| is_valid_ident(t) && t != "/" && t != "\\" && t != "~" && t != ".");
+            let has_separator = path_tokens
+                .iter()
+                .any(|t| t == "/" || t == "\\" || t == "~");
+            let has_ident = path_tokens
+                .iter()
+                .any(|t| is_valid_ident(t) && t != "/" && t != "\\" && t != "~" && t != ".");
 
             if has_separator && has_ident && path_tokens.len() >= 3 {
                 let mut assembled = String::new();
@@ -220,7 +241,11 @@ fn format_spoken_paths(text: &str) -> String {
                     if tok == "/" || tok == "\\" || tok == ":" {
                         assembled.push_str(tok);
                     } else if tok == "." {
-                        if idx > 0 && !assembled.ends_with('/') && !assembled.ends_with('\\') && !assembled.ends_with('.') {
+                        if idx > 0
+                            && !assembled.ends_with('/')
+                            && !assembled.ends_with('\\')
+                            && !assembled.ends_with('.')
+                        {
                             assembled.push('.');
                         } else {
                             assembled.push_str(tok);
@@ -257,8 +282,8 @@ pub mod tests {
             "check www.google.com"
         );
         assert_eq!(
-            normalize_urls_and_paths("open https colon slash slash github dot com slash murmur"),
-            "open https://github.com/murmur"
+            normalize_urls_and_paths("open https colon slash slash github dot com slash HushWrite"),
+            "open https://github.com/HushWrite"
         );
     }
 

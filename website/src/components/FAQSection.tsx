@@ -13,47 +13,47 @@ const FAQS: FAQItem[] = [
   {
     question: "Does any audio or personal data leave my computer?",
     answer:
-      "Never. All audio capture, Voice Activity Detection (VAD), Whisper model inference, and text formatting run exclusively on your local CPU and GPU. The only network calls Murmur makes are the initial model weight download from official Hugging Face mirrors and an optional update check.",
+      "Never. All audio capture, Voice Activity Detection (VAD), Whisper model inference, and text formatting run exclusively on your local CPU and GPU. The only network calls HushWrite makes are the initial model weight download from official Hugging Face mirrors and an optional update check.",
   },
   {
-    question: "How is Murmur completely free compared to paid cloud alternatives?",
+    question: "How is HushWrite completely free compared to paid cloud alternatives?",
     answer:
-      "Cloud dictation apps pay ongoing GPU cluster server costs to process your audio remotely. Murmur uses your local machine's neural engine and GPU instead of renting cloud servers, allowing the project to remain free and open source forever.",
+      "Cloud dictation apps pay ongoing GPU cluster server costs to process your audio remotely. HushWrite uses your local machine's neural engine and GPU instead of renting cloud servers, allowing the project to remain free and open source forever.",
   },
   {
-    question: "How does Murmur paste text into my active application?",
+    question: "How does HushWrite paste text into my active application?",
     answer:
-      "When you trigger the global shortcut, Murmur detects the frontmost window. When you finish speaking, Murmur injects the transcribed text directly at your active cursor position and restores your previous clipboard state in milliseconds.",
+      "When you trigger the global shortcut, HushWrite detects the frontmost window. When you finish speaking, HushWrite injects the transcribed text directly at your active cursor position and restores your previous clipboard state in milliseconds.",
   },
   {
     question: "Can I use toggle mode instead of holding down the hotkey?",
     answer:
-      "Yes. Murmur supports both hold-to-talk and toggle mode where a single tap starts recording and a second tap finishes dictation. You can configure this in Settings.",
+      "Yes. HushWrite supports both hold-to-talk and toggle mode where a single tap starts recording and a second tap finishes dictation. You can configure this in Settings.",
   },
   {
     question: "How do I add custom jargon and teammate names?",
     answer:
-      "Add names, abbreviations, and technical terms to your custom dictionary in Settings. Murmur biases Whisper recognition weights toward those terms for zero spelling mistakes.",
+      "Add names, abbreviations, and technical terms to your custom dictionary in Settings. HushWrite biases Whisper recognition weights toward those terms for zero spelling mistakes.",
   },
   {
-    question: "Does Murmur work without an internet connection?",
+    question: "Does HushWrite work without an internet connection?",
     answer:
-      "Yes. Once your chosen Whisper model weights are downloaded, Murmur operates completely offline in air-gapped environments with no internet access required.",
+      "Yes. Once your chosen Whisper model weights are downloaded, HushWrite operates completely offline in air-gapped environments with no internet access required.",
   },
   {
     question: "What system permissions are required?",
     answer:
-      "Murmur requires microphone access for audio recording and accessibility permissions on macOS (or UI Automation on Windows) to paste text into your active target window.",
+      "HushWrite requires microphone access for audio recording and accessibility permissions on macOS (or UI Automation on Windows) to paste text into your active target window.",
   },
   {
     question: "Which languages are supported?",
     answer:
-      "Murmur supports all 99 languages included in OpenAI Whisper models, with automatic language identification enabled by default.",
+      "HushWrite supports all 99 languages included in OpenAI Whisper models, with automatic language identification enabled by default.",
   },
   {
     question: "Which operating systems and hardware are supported?",
     answer:
-      "Murmur is natively built for macOS 13+ (Apple Silicon M1/M2/M3/M4 with Metal acceleration and Intel x86_64) and Windows 10/11 64-bit (with DirectX 12 / DirectML and CUDA GPU acceleration). Linux support is tracked on our GitHub roadmap.",
+      "HushWrite is natively built for macOS 13+ (Apple Silicon M1/M2/M3/M4 with Metal acceleration and Intel x86_64) and Windows 10/11 64-bit (with DirectX 12 / DirectML and CUDA GPU acceleration). Linux support is tracked on our GitHub roadmap.",
   },
 ];
 
@@ -88,7 +88,7 @@ export function FAQSection() {
             Frequently asked questions.
           </h2>
           <p className="text-neutral-600 text-base sm:text-lg leading-relaxed">
-            Everything you need to know about Murmur performance, privacy, and local architecture.
+            Everything you need to know about HushWrite performance, privacy, and local architecture.
           </p>
         </div>
 
