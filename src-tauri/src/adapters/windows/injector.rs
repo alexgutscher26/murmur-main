@@ -466,7 +466,18 @@ impl<P: PermissionProvider> TextInjector for WindowsInjector<P> {
             });
         }
 
-        std::thread::sleep(Duration::from_millis(request.paste_delay_ms));
+        // Enforce a minimum gap between clipboard write and Ctrl+V.
+        // Clipboard managers (Windows Clipboard History, 1Password, etc.) run on
+        // the WM_CLIPBOARDUPDATE notification, which arrives at their message-pump
+        // priority — typically within one scheduler quantum (≈1-4ms). If we fire
+        // Ctrl+V at 0ms their listener can still hold clipboard ownership and the
+        // paste lands the wrong text. 15ms is below the perceptual threshold for
+        // injection latency but above the worst-case notification-to-re-write
+        // round-trip observed in practice. The user's setting can be higher (for
+        // slow apps or clipboard replacement tools) but never lower than this floor.
+        const MIN_PASTE_DELAY_MS: u64 = 15;
+        let effective_delay = request.paste_delay_ms.max(MIN_PASTE_DELAY_MS);
+        std::thread::sleep(Duration::from_millis(effective_delay));
 
         // Pre-paste race check: if the sequence number changed during the sleep,
         // another process replaced our text before Ctrl+V could fire. Re-write

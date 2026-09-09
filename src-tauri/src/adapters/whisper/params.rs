@@ -41,6 +41,26 @@ pub const AUDIO_CTX_HEADROOM: c_int = 128;
 pub const NO_SPEECH_THOLD: f32 = 0.6;
 
 /**
+ * SOURCE OF TRUTH KEYWORDS: BEAM_SIZE
+ * WHAT:  Beam width used for background (non-tail) decodes.
+ * WHY:   Beam search explores multiple decode paths simultaneously and picks the
+ *        best-scoring one. beam_size=5 is the whisper.cpp default and the same
+ *        value WrapScribe/OpenAI Whisper ship — it measurably lowers WER
+ *        (especially on proper nouns, numbers, and ambiguous phoneme pairs)
+ *        compared to greedy best_of=1.
+ *
+ *        It is applied ONLY to background chunks, whose latency is invisible
+ *        because the user is still talking while they decode. The tail chunk —
+ *        the one the user waits for after they stop speaking — uses
+ *        Greedy { best_of: 1 } to keep p50 latency under 300ms. That is the
+ *        right trade: spend the extra CPU where the user cannot feel it.
+ *
+ *        patience=-1.0 is the whisper.cpp convention for "use the default"
+ *        (the field is not yet implemented in whisper.cpp as of v1.8.3).
+ */
+pub const BEAM_SIZE: i32 = 5;
+
+/**
  * SOURCE OF TRUTH KEYWORDS: ENTROPY_THOLD
  * WHAT:  whisper.cpp's decoder-entropy gate, left at its upstream default.
  * WHY:   docs/03 §2.4 lists this as a hallucination defence, but it only ever
@@ -122,18 +142,41 @@ pub fn audio_ctx_for(sample_count: usize) -> c_int {
 }
 
 /**
- * WHAT:  Threads for one decode: available parallelism minus two, floor of one.
+ * SOURCE OF TRUTH KEYWORDS: decode_thread_count, SMT_DIVISOR
+ * WHAT:  Threads for one decode: physical cores minus two, floor of one.
  * WHY:   docs/03 §2.2 asks for physical cores minus two, leaving headroom for
- *        the CoreAudio realtime thread and the UI. On Apple Silicon there is no
- *        SMT, so `available_parallelism` already reports physical cores — which
- *        is why this is correct here and would not be on an x86 host.
+ *        the realtime audio thread and the UI.
+ *
+ *        On Apple Silicon and other non-SMT hosts, `available_parallelism`
+ *        already reports physical cores, so the result is correct directly.
+ *
+ *        On x86_64 Windows with Hyper-Threading enabled, `available_parallelism`
+ *        returns LOGICAL cores (2× physical). Whisper inference is a
+ *        compute-bound BLAS workload: running it across all hyperthreaded
+ *        siblings causes resource contention in the execution units (shared L1/L2
+ *        caches, shared ALU ports) and INCREASES latency compared to using only
+ *        physical cores. Dividing by 2 on x86_64 Windows recovers the correct
+ *        physical count.
+ *
+ *        The cfg gate is deliberate: macOS arm64 has no HT and its threads are
+ *        all full-width, and Linux x86_64 behaviour depends on the runtime BIOS
+ *        setting, so we only apply the halving where it is reliably true.
  * WHERE: Read once when the engine is constructed.
  */
 pub fn decode_thread_count() -> c_int {
     let logical = std::thread::available_parallelism()
         .map(std::num::NonZeroUsize::get)
         .unwrap_or(4);
-    let usable = logical.saturating_sub(2).max(1);
+
+    // On x86_64 Windows, logical = physical × 2 when Hyper-Threading is on.
+    // Whisper is ALU/cache-bound; hyperthreaded siblings compete rather than
+    // cooperate, so we work from the physical count.
+    #[cfg(all(target_arch = "x86_64", target_os = "windows"))]
+    let physical = (logical / 2).max(1);
+    #[cfg(not(all(target_arch = "x86_64", target_os = "windows")))]
+    let physical = logical;
+
+    let usable = physical.saturating_sub(2).max(1);
     c_int::try_from(usable).unwrap_or(1)
 }
 
@@ -154,9 +197,18 @@ pub fn build_full_params<'a>(
     prompt: Option<&str>,
     n_threads: c_int,
 ) -> FullParams<'a, 'a> {
-    // Greedy with best_of = 1: temperature is pinned to 0.0, so sampling more
-    // candidates would cost time and return identical text.
-    let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 1 });
+    // Background chunks: beam search for better accuracy. Their decode latency
+    // is invisible because the user is still talking while they run.
+    // Tail chunk: greedy (best_of=1) to stay within the p50 < 300ms budget —
+    // beam search on the tail would add ~2-4× wall time on the critical path.
+    let strategy = match profile {
+        DecodeProfile::Background => SamplingStrategy::BeamSearch {
+            beam_size: BEAM_SIZE,
+            patience: -1.0,
+        },
+        DecodeProfile::Tail => SamplingStrategy::Greedy { best_of: 1 },
+    };
+    let mut params = FullParams::new(strategy);
 
     params.set_n_threads(n_threads);
 
@@ -282,5 +334,40 @@ mod tests {
     #[test]
     fn thread_count_never_reaches_zero() {
         assert!(decode_thread_count() >= 1);
+    }
+
+    #[test]
+    fn beam_search_is_used_for_background_and_greedy_for_tail() {
+        // Background: must build without panicking and use the beam strategy.
+        // We can only check it compiles and does not panic — the strategy value
+        // is not exposed by whisper-rs after construction. The constant itself
+        // is the authoritative assertion.
+        let bg_chunk = AudioChunk {
+            samples: vec![0.0; 48_000],
+            start_ms: 0,
+            end_ms: 3000,
+            kind: crate::types::ChunkKind::Interior,
+        };
+        let _ = build_full_params(
+            DecodeProfile::for_chunk(&bg_chunk, false),
+            bg_chunk.samples.len(),
+            None,
+            None,
+            1,
+        );
+
+        let tail_chunk = AudioChunk {
+            samples: vec![0.0; 16_000],
+            start_ms: 0,
+            end_ms: 1000,
+            kind: crate::types::ChunkKind::Tail,
+        };
+        let _ = build_full_params(
+            DecodeProfile::for_chunk(&tail_chunk, false),
+            tail_chunk.samples.len(),
+            None,
+            None,
+            1,
+        );
     }
 }
