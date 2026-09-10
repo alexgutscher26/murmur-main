@@ -128,7 +128,11 @@ impl TextEnhancer for RuleEnhancer {
         // 7b. Abbreviations: expand Latin and spoken abbreviations (eg -> e.g., ie -> i.e., etc -> etc.).
         // Executed after casing so internal periods in abbreviations do not cause spurious sentence capitalization.
         if context.expand_abbreviations {
-            out = abbreviations::expand_abbreviations(&out, language, &context.disabled_abbreviations);
+            out = abbreviations::expand_abbreviations(
+                &out,
+                language,
+                &context.disabled_abbreviations,
+            );
         }
 
         // 8. The terminal stop, last, so nothing capitalises after it.
@@ -198,7 +202,9 @@ mod tests {
             used_at: None,
         }];
 
-        let out = enhancer.enhance("clod clod is great", &ctx).expect("enhance");
+        let out = enhancer
+            .enhance("clod clod is great", &ctx)
+            .expect("enhance");
         assert_eq!(out, "Claude is great.");
     }
 
@@ -235,7 +241,10 @@ mod tests {
         let raw = "that costs twenty dollars on the third floor comma visit https colon slash slash github dot com";
 
         let out = enhancer.enhance(raw, &context()).expect("enhance");
-        assert_eq!(out, "That costs $20 on the 3rd floor, visit https://github.com.");
+        assert_eq!(
+            out,
+            "That costs $20 on the 3rd floor, visit https://github.com."
+        );
     }
 
     #[test]

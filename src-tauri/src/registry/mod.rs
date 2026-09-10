@@ -84,7 +84,10 @@ pub fn nav_items() -> Vec<&'static NavDef> {
 }
 
 pub fn hotkey_defs() -> Vec<&'static HotkeyDef> {
-    CAPABILITIES.iter().filter_map(|c| c.hotkey.as_ref()).collect()
+    CAPABILITIES
+        .iter()
+        .filter_map(|c| c.hotkey.as_ref())
+        .collect()
 }
 
 /**

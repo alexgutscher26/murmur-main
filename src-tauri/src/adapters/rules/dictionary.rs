@@ -4,8 +4,8 @@
  * WHERE: Consumed by adapters/rules/mod.rs and text.rs.
  */
 
-use crate::types::{DictionaryEntry, MatchKind};
 use super::spoken::normalize_named_entities;
+use crate::types::{DictionaryEntry, MatchKind};
 
 /**
  * WHAT:  Applies the user's replacement table.

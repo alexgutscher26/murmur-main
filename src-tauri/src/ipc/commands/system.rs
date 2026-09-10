@@ -36,7 +36,8 @@ pub struct ApiVersionInfo {
     pub min_compatible_version: u32,
 }
 
-const API_VERSION: CommandSpec = CommandSpec::new("get_api_version", CapabilityKey::Onboarding).reports();
+const API_VERSION: CommandSpec =
+    CommandSpec::new("get_api_version", CapabilityKey::Onboarding).reports();
 
 #[tauri::command]
 #[specta::specta]
@@ -139,9 +140,7 @@ const DEVICES: CommandSpec =
 
 #[tauri::command]
 #[specta::specta]
-pub async fn list_input_devices(
-    state: State<'_, AppState>,
-) -> Result<Vec<DeviceInfo>, AppError> {
+pub async fn list_input_devices(state: State<'_, AppState>) -> Result<Vec<DeviceInfo>, AppError> {
     execute(&state, DEVICES, (), |ctx, ()| async move {
         ctx.ports().audio.list_devices()
     })
@@ -207,9 +206,9 @@ pub async fn wipe_all_data(state: State<'_, AppState>) -> Result<WipeResult, App
     execute(&state, WIPE, (), |ctx, ()| async move {
         let sessions_deleted = services::sessions::delete_all_sessions(ctx.db())? as u32;
         let dictionary_entries_deleted = {
-            let n: u64 = ctx.db().with_connection(|conn| {
-                Ok(conn.execute("DELETE FROM dictionary", [])? as u64)
-            })?;
+            let n: u64 = ctx
+                .db()
+                .with_connection(|conn| Ok(conn.execute("DELETE FROM dictionary", [])? as u64))?;
             n as u32
         };
         let settings_deleted = services::settings::delete_all_settings(ctx.db())? as u32;
@@ -240,4 +239,3 @@ pub async fn wipe_all_data(state: State<'_, AppState>) -> Result<WipeResult, App
     })
     .await
 }
-

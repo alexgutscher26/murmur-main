@@ -21,11 +21,11 @@ pub mod transcript;
 
 pub use audio::{AudioChunk, AudioLevel, CaptureMode, ChunkKind, DeviceInfo, TARGET_SAMPLE_RATE};
 pub use dictionary::{DictionaryChangeLogEntry, DictionaryEntry, DictionaryId, MatchKind};
-pub use language::{language_label, language_options, LanguageOption, AUTO_LANGUAGE};
 pub use engine::{
     DownloadProgress, EngineCapabilities, EngineFeature, EngineId, LanguageSupport,
     ModelDescriptor, ModelId, ModelState,
 };
+pub use language::{language_label, language_options, LanguageOption, AUTO_LANGUAGE};
 pub use metrics::{
     ActivityDay, LanguageCount, LatencyStage, LatencySummary, MetricSample, ReferralStatus,
     StatsSummary,

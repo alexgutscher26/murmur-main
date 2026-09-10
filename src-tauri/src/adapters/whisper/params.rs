@@ -303,7 +303,10 @@ mod tests {
         assert_eq!(audio_ctx_for(TARGET_SAMPLE_RATE as usize * 10), 628);
 
         // 30 seconds and beyond can never exceed the model's own context.
-        assert_eq!(audio_ctx_for(TARGET_SAMPLE_RATE as usize * 30), FULL_AUDIO_CTX);
+        assert_eq!(
+            audio_ctx_for(TARGET_SAMPLE_RATE as usize * 30),
+            FULL_AUDIO_CTX
+        );
         assert_eq!(
             audio_ctx_for(TARGET_SAMPLE_RATE as usize * 600),
             FULL_AUDIO_CTX

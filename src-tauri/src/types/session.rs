@@ -106,10 +106,7 @@ impl SessionState {
 
     /// True once the session can no longer change without a new hotkey press.
     pub fn is_terminal(&self) -> bool {
-        matches!(
-            self,
-            SessionState::Idle | SessionState::Failed { .. }
-        )
+        matches!(self, SessionState::Idle | SessionState::Failed { .. })
     }
 }
 

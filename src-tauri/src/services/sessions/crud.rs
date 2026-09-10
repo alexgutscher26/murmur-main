@@ -67,11 +67,7 @@ pub struct SessionResult {
     pub error_message: Option<String>,
 }
 
-pub fn finalize_session(
-    db: &Database,
-    id: &SessionId,
-    result: &SessionResult,
-) -> AppResult<()> {
+pub fn finalize_session(db: &Database, id: &SessionId, result: &SessionResult) -> AppResult<()> {
     db.with_connection(|conn| {
         conn.execute(
             "UPDATE sessions
@@ -155,7 +151,8 @@ pub fn delete_all_sessions(db: &Database) -> AppResult<u64> {
 // ── Row mapping ──────────────────────────────────────────────────────────
 
 /// Column order here is the contract `row_to_summary` reads by index.
-pub const SELECT_COLUMNS: &str = "SELECT id, started_at, ended_at, outcome, duration_ms, language, \
+pub const SELECT_COLUMNS: &str =
+    "SELECT id, started_at, ended_at, outcome, duration_ms, language, \
      engine_id, model_id, raw_text, final_text, word_count, app_bundle_id, delivery, error_code, \
      error_message FROM sessions";
 

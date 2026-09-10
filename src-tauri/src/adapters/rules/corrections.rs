@@ -18,8 +18,17 @@ pub const BACKTRACK_PHRASES: &[&str] = &[
 ];
 
 const CORRECTION_CUES: &[&str] = &[
-    "sorry", "no", "wait", "oh", "oops", "actually", "i mean", "i meant", "make that",
-    "scratch that", "my bad",
+    "sorry",
+    "no",
+    "wait",
+    "oh",
+    "oops",
+    "actually",
+    "i mean",
+    "i meant",
+    "make that",
+    "scratch that",
+    "my bad",
 ];
 
 const RESTART_PHRASES: &[&str] = &[
@@ -47,14 +56,20 @@ fn words_with_offsets(text: &str) -> Vec<Word<'_>> {
     for (i, ch) in text.char_indices() {
         if ch.is_whitespace() {
             if let Some(s) = start.take() {
-                out.push(Word { text: &text[s..i], start: s });
+                out.push(Word {
+                    text: &text[s..i],
+                    start: s,
+                });
             }
         } else if start.is_none() {
             start = Some(i);
         }
     }
     if let Some(s) = start {
-        out.push(Word { text: &text[s..], start: s });
+        out.push(Word {
+            text: &text[s..],
+            start: s,
+        });
     }
     out
 }
@@ -81,7 +96,9 @@ fn ends_sentence(word: &str) -> bool {
 }
 
 pub fn apply_spoken_corrections(text: &str, language: Option<&LanguageCode>) -> String {
-    let is_en = language.map(|l| l.as_str().starts_with("en")).unwrap_or(false);
+    let is_en = language
+        .map(|l| l.as_str().starts_with("en"))
+        .unwrap_or(false);
     if !is_en {
         return text.to_string();
     }
@@ -132,7 +149,9 @@ pub fn apply_backtracking_corrections(text: &str) -> Option<String> {
             // Backtrack cues must be delimited by punctuation, clause end, or document edges
             let is_valid_cue = if parts.len() == 1 && parts[0] == "undo" {
                 // "undo" must strictly be standalone
-                (prev_ends_clause && cue_ends_clause) || (start == 0 && cue_ends_clause) || (prev_ends_clause && is_at_end)
+                (prev_ends_clause && cue_ends_clause)
+                    || (start == 0 && cue_ends_clause)
+                    || (prev_ends_clause && is_at_end)
             } else {
                 cue_ends_clause || prev_ends_clause || is_at_end || start == 0
             };

@@ -14,7 +14,9 @@ pub mod catalog;
 pub mod download;
 pub mod store;
 
-pub use catalog::{descriptor_for, CatalogEntry, DEFAULT_MODEL_ID, FALLBACK_MODEL_ID, MODEL_CATALOG};
+pub use catalog::{
+    descriptor_for, CatalogEntry, DEFAULT_MODEL_ID, FALLBACK_MODEL_ID, MODEL_CATALOG,
+};
 pub use download::{download_resumable, hash_file};
 pub use store::HttpModelStore;
 
@@ -147,6 +149,9 @@ mod tests {
             eprintln!("skipped: the fallback model is installed on this machine");
             return;
         }
-        assert!(!store.verify(&fallback).await.expect("absence is not a failure"));
+        assert!(!store
+            .verify(&fallback)
+            .await
+            .expect("absence is not a failure"));
     }
 }

@@ -1040,6 +1040,7 @@ mod tests {
             "large-v3-turbo"
         );
         assert_eq!(strip_quantisation_suffix("base-english"), "base-english");
+        assert_eq!(strip_quantisation_suffix("small.en-tdrz"), "small.en-tdrz");
         assert_eq!(strip_quantisation_suffix("tiny"), "tiny");
     }
 }

@@ -47,9 +47,10 @@ impl std::fmt::Display for LanguageCode {
 pub enum LanguageHint {
     #[default]
     Auto,
-    Pinned { language: LanguageCode },
+    Pinned {
+        language: LanguageCode,
+    },
 }
-
 
 /**
  * SOURCE OF TRUTH KEYWORDS: TranscriptSegment

@@ -49,7 +49,11 @@ pub fn recover_orphans(db: &Database) {
     match services::sessions::find_orphans(db) {
         Ok(orphans) if orphans.is_empty() => {}
         Ok(orphans) => {
-            tracing::warn!(count = orphans.len(), audio_ready, "recovering interrupted sessions");
+            tracing::warn!(
+                count = orphans.len(),
+                audio_ready,
+                "recovering interrupted sessions"
+            );
             for orphan in orphans {
                 if let Err(err) = services::sessions::mark_orphaned(db, &orphan.id, now_ms()) {
                     tracing::error!(error = %err, "could not close an interrupted session");
@@ -61,7 +65,8 @@ pub fn recover_orphans(db: &Database) {
 }
 
 /// How often the retention sweep runs after the one at launch. Six hours.
-pub const RETENTION_SWEEP_INTERVAL: std::time::Duration = std::time::Duration::from_secs(6 * 60 * 60);
+pub const RETENTION_SWEEP_INTERVAL: std::time::Duration =
+    std::time::Duration::from_secs(6 * 60 * 60);
 
 /**
  * SOURCE OF TRUTH KEYWORDS: start_retention_sweep, retention_days, purge

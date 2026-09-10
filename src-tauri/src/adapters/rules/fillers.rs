@@ -4,13 +4,28 @@
  * WHERE: Consumed by adapters/rules/mod.rs and text.rs.
  */
 
-use crate::types::LanguageCode;
 use super::dictionary::replace_whole_words;
 use super::whitespace::normalise_whitespace;
+use crate::types::LanguageCode;
 
 const ENGLISH_FILLERS: &[&str] = &[
-    "um", "uh", "erm", "hmm", "mhm", "uhh", "umm", "er", "ah", "like", "you know", "i mean",
-    "sort of", "kind of", "basically", "literally", "actually",
+    "um",
+    "uh",
+    "erm",
+    "hmm",
+    "mhm",
+    "uhh",
+    "umm",
+    "er",
+    "ah",
+    "like",
+    "you know",
+    "i mean",
+    "sort of",
+    "kind of",
+    "basically",
+    "literally",
+    "actually",
 ];
 
 const SPANISH_FILLERS: &[&str] = &[
@@ -19,27 +34,71 @@ const SPANISH_FILLERS: &[&str] = &[
 ];
 
 const FRENCH_FILLERS: &[&str] = &[
-    "euh", "ben", "bah", "genre", "tu sais", "du coup", "en fait", "enfin", "voilà",
-    "c'est-à-dire", "écoute", "quoi",
+    "euh",
+    "ben",
+    "bah",
+    "genre",
+    "tu sais",
+    "du coup",
+    "en fait",
+    "enfin",
+    "voilà",
+    "c'est-à-dire",
+    "écoute",
+    "quoi",
 ];
 
 const GERMAN_FILLERS: &[&str] = &[
-    "äh", "ähm", "halt", "quasi", "sozusagen", "weißt du", "also", "na ja", "tja",
-    "eigentlich", "irgendwie",
+    "äh",
+    "ähm",
+    "halt",
+    "quasi",
+    "sozusagen",
+    "weißt du",
+    "also",
+    "na ja",
+    "tja",
+    "eigentlich",
+    "irgendwie",
 ];
 
 const ITALIAN_FILLERS: &[&str] = &[
-    "ehm", "ecco", "cioè", "tipo", "sai", "diciamo", "praticamente", "nel senso",
-    "allora", "guarda",
+    "ehm",
+    "ecco",
+    "cioè",
+    "tipo",
+    "sai",
+    "diciamo",
+    "praticamente",
+    "nel senso",
+    "allora",
+    "guarda",
 ];
 
 const PORTUGUESE_FILLERS: &[&str] = &[
-    "é", "né", "tipo", "tipo assim", "sabe", "então", "ou seja", "quer dizer",
-    "ahem", "humm", "pronto", "pá",
+    "é",
+    "né",
+    "tipo",
+    "tipo assim",
+    "sabe",
+    "então",
+    "ou seja",
+    "quer dizer",
+    "ahem",
+    "humm",
+    "pronto",
+    "pá",
 ];
 
 const JAPANESE_FILLERS: &[&str] = &[
-    "えーと", "あの", "その", "ええと", "まあ", "なんか", "というか", "ほら",
+    "えーと",
+    "あの",
+    "その",
+    "ええと",
+    "まあ",
+    "なんか",
+    "というか",
+    "ほら",
 ];
 
 const CHINESE_FILLERS: &[&str] = &[
@@ -47,35 +106,46 @@ const CHINESE_FILLERS: &[&str] = &[
 ];
 
 const RUSSIAN_FILLERS: &[&str] = &[
-    "э-э", "ну", "типа", "как бы", "значит", "короче", "в общем", "слушай", "понимаешь",
+    "э-э",
+    "ну",
+    "типа",
+    "как бы",
+    "значит",
+    "короче",
+    "в общем",
+    "слушай",
+    "понимаешь",
 ];
 
 const DUTCH_FILLERS: &[&str] = &[
-    "eh", "ehm", "nou", "zeg maar", "weet je", "eigenlijk", "gewoon", "dus",
+    "eh",
+    "ehm",
+    "nou",
+    "zeg maar",
+    "weet je",
+    "eigenlijk",
+    "gewoon",
+    "dus",
 ];
 
-const KOREAN_FILLERS: &[&str] = &[
-    "그", "저", "어", "음", "그니까", "있잖아", "뭐지",
-];
+const KOREAN_FILLERS: &[&str] = &["그", "저", "어", "음", "그니까", "있잖아", "뭐지"];
 
-const ARABIC_FILLERS: &[&str] = &[
-    "يعني", "أمم", "إيه", "طيب", "يعني زي", "فاهم",
-];
+const ARABIC_FILLERS: &[&str] = &["يعني", "أمم", "إيه", "طيب", "يعني زي", "فاهم"];
 
-const HINDI_FILLERS: &[&str] = &[
-    "मतलब", "यानी", "जैसे कि", "अरे", "अच्छा", "हाँ",
-];
+const HINDI_FILLERS: &[&str] = &["मतलब", "यानी", "जैसे कि", "अरे", "अच्छा", "हाँ"];
 
-const POLISH_FILLERS: &[&str] = &[
-    "no", "wiesz", "znaczy", "jakby", "w sumie", "yyy", "eee",
-];
+const POLISH_FILLERS: &[&str] = &["no", "wiesz", "znaczy", "jakby", "w sumie", "yyy", "eee"];
 
-const TURKISH_FILLERS: &[&str] = &[
-    "şey", "yani", "ııı", "falan", "mesela", "hani", "öhm",
-];
+const TURKISH_FILLERS: &[&str] = &["şey", "yani", "ııı", "falan", "mesela", "hani", "öhm"];
 
 const SWEDISH_FILLERS: &[&str] = &[
-    "eh", "öh", "liksom", "typ", "alltså", "vet du", "så att säga",
+    "eh",
+    "öh",
+    "liksom",
+    "typ",
+    "alltså",
+    "vet du",
+    "så att säga",
 ];
 
 pub fn fillers_for_language(language: Option<&LanguageCode>) -> Option<&'static [&'static str]> {

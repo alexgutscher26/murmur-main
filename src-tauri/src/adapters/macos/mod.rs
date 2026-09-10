@@ -12,8 +12,8 @@
 
 pub mod injector;
 pub mod modifier_tap;
-mod sound;
 pub mod permissions;
+mod sound;
 
 pub use injector::{MacosInjector, PasteTiming};
 pub use modifier_tap::{watch_modifier_tap, ModifierTap, TAPS_REQUIRED};
@@ -22,4 +22,3 @@ pub use sound::{play_feedback, FeedbackSound};
 
 pub type OsInjector = MacosInjector<MacosPermissions>;
 pub type OsPermissions = MacosPermissions;
-

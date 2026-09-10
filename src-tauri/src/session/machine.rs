@@ -52,7 +52,10 @@ pub enum SessionEvent {
     /// The countdown ran out. The recording is destroyed.
     CancelExpired,
     /// Elapsed-time update while capturing.
-    Tick { elapsed_ms: u64, remaining_ms: u64 },
+    Tick {
+        elapsed_ms: u64,
+        remaining_ms: u64,
+    },
     /// The trailing fragment decoded and the text was delivered.
 
     /// A background delivery failed. Surfaced only when nothing else is
@@ -137,9 +140,12 @@ impl std::fmt::Display for TransitionError {
 
 impl From<TransitionError> for AppError {
     fn from(err: TransitionError) -> Self {
-        AppError::new(ErrorCode::IllegalTransition, "That is not possible right now.")
-            .recoverable()
-            .with_detail(err)
+        AppError::new(
+            ErrorCode::IllegalTransition,
+            "That is not possible right now.",
+        )
+        .recoverable()
+        .with_detail(err)
     }
 }
 
@@ -282,10 +288,10 @@ impl SessionMachine {
                 (
                     SessionState::Idle,
                     vec![
-                            Effect::StopCapture,
-                            Effect::HandOffToDelivery { session_id },
-                            Effect::EmitState,
-                        ],
+                        Effect::StopCapture,
+                        Effect::HandOffToDelivery { session_id },
+                        Effect::EmitState,
+                    ],
                 )
             }
             /*
@@ -346,10 +352,10 @@ impl SessionMachine {
                 (
                     SessionState::Idle,
                     vec![
-                            Effect::StopCapture,
-                            Effect::HandOffToDelivery { session_id },
-                            Effect::EmitState,
-                        ],
+                        Effect::StopCapture,
+                        Effect::HandOffToDelivery { session_id },
+                        Effect::EmitState,
+                    ],
                 )
             }
 
@@ -380,11 +386,11 @@ impl SessionMachine {
                 (
                     SessionState::Idle,
                     vec![
-                            Effect::AbortCountdown,
-                            Effect::StopCapture,
-                            Effect::HandOffToDelivery { session_id },
-                            Effect::EmitState,
-                        ],
+                        Effect::AbortCountdown,
+                        Effect::StopCapture,
+                        Effect::HandOffToDelivery { session_id },
+                        Effect::EmitState,
+                    ],
                 )
             }
             (SessionState::CancelPending { .. }, SessionEvent::CancelExpired) => {
@@ -405,11 +411,11 @@ impl SessionMachine {
                 (
                     SessionState::Idle,
                     vec![
-                            Effect::AbortCountdown,
-                            Effect::StopCapture,
-                            Effect::HandOffToDelivery { session_id },
-                            Effect::EmitState,
-                        ],
+                        Effect::AbortCountdown,
+                        Effect::StopCapture,
+                        Effect::HandOffToDelivery { session_id },
+                        Effect::EmitState,
+                    ],
                 )
             }
 
@@ -442,16 +448,11 @@ impl SessionMachine {
             ),
 
             // ── Leaving a terminal state ─────────────────────────────────
-            (
-                SessionState::Failed { .. },
-                SessionEvent::Reset,
-            ) => {
+            (SessionState::Failed { .. }, SessionEvent::Reset) => {
                 self.session_id = None;
                 (SessionState::Idle, vec![Effect::EmitState])
             }
-            (SessionState::Idle, SessionEvent::Reset) => {
-                (SessionState::Idle, vec![])
-            }
+            (SessionState::Idle, SessionEvent::Reset) => (SessionState::Idle, vec![]),
 
             // ── Everything else is a disagreement, not a no-op ────────────
             (state, event) => {
@@ -718,7 +719,8 @@ mod tests {
     fn a_lost_device_delivers_what_was_captured_rather_than_failing() {
         let mut m = recording();
         let err = AppError::new(ErrorCode::AudioDeviceLost, "AirPods disconnected");
-        m.handle(SessionEvent::DeviceLost(err)).expect("device lost");
+        m.handle(SessionEvent::DeviceLost(err))
+            .expect("device lost");
 
         assert!(
             matches!(m.state(), SessionState::Idle),
@@ -855,7 +857,9 @@ mod tests {
             }
 
             let err = AppError::new(ErrorCode::AudioDeviceLost, "AirPods disconnected");
-            let transition = m.handle(SessionEvent::DeviceLost(err)).expect("device lost");
+            let transition = m
+                .handle(SessionEvent::DeviceLost(err))
+                .expect("device lost");
 
             assert!(
                 transition.effects.contains(&Effect::StopCapture),
@@ -932,7 +936,10 @@ mod tests {
             m.handle(failure()).is_err(),
             "a previous recording's failure must not take the screen mid-sentence"
         );
-        assert!(m.state().is_capturing(), "and must not disturb the recording");
+        assert!(
+            m.state().is_capturing(),
+            "and must not disturb the recording"
+        );
 
         // Once nothing is in progress, the same failure is worth showing.
         let mut idle = machine();
@@ -1017,7 +1024,8 @@ mod tests {
         .expect("failed");
         assert!(matches!(m.state(), SessionState::Failed { .. }));
 
-        m.handle(SessionEvent::Reset).expect("failed states are left");
+        m.handle(SessionEvent::Reset)
+            .expect("failed states are left");
         m.handle(SessionEvent::StartRequested)
             .expect("and the app records again");
 

@@ -97,7 +97,10 @@ impl AudioSource for ReplayAudioSource {
         std::thread::spawn(move || {
             // ~20ms at 16kHz, the size a real drain thread delivers.
             for block in samples.chunks(320) {
-                if sink.blocking_send(CaptureEvent::Samples(block.to_vec())).is_err() {
+                if sink
+                    .blocking_send(CaptureEvent::Samples(block.to_vec()))
+                    .is_err()
+                {
                     return;
                 }
             }
@@ -234,7 +237,10 @@ impl crate::ports::ModelStore for UnusedModelStore {
     async fn list(&self) -> AppResult<Vec<crate::ports::models::ModelStatus>> {
         Ok(vec![])
     }
-    async fn status(&self, id: &crate::types::ModelId) -> AppResult<crate::ports::models::ModelStatus> {
+    async fn status(
+        &self,
+        id: &crate::types::ModelId,
+    ) -> AppResult<crate::ports::models::ModelStatus> {
         Err(crate::error::AppError::not_found(id.as_str()))
     }
     async fn ensure(&self, _id: &crate::types::ModelId) -> AppResult<PathBuf> {
@@ -314,10 +320,14 @@ fn build_with_permissions(
 
 /// Drives one full session and returns the harness once it reaches a terminal
 /// state, so the test can inspect what actually happened.
-async fn run_session(harness: &Harness, event_rx: mpsc::Receiver<SessionEvent>, speak_for: Duration) {
+async fn run_session(
+    harness: &Harness,
+    event_rx: mpsc::Receiver<SessionEvent>,
+    speak_for: Duration,
+) {
     let (decode_tx, decode_rx) = mpsc::channel(16);
-    let worker = AsrWorker::spawn(Arc::clone(&harness.ctx.ports.engine), decode_tx)
-        .expect("ASR worker");
+    let worker =
+        AsrWorker::spawn(Arc::clone(&harness.ctx.ports.engine), decode_tx).expect("ASR worker");
 
     let actor = SessionActor::new(
         harness.ctx.clone(),
@@ -543,10 +553,12 @@ mod tests {
         );
 
         // The latency claim has to be measurable, or it is only an assertion.
-        let metrics = services::metrics::metrics_for_session(&harness.db, &session.id)
-            .expect("metrics");
+        let metrics =
+            services::metrics::metrics_for_session(&harness.db, &session.id).expect("metrics");
         assert!(
-            metrics.iter().any(|m| m.stage == crate::types::LatencyStage::TailDecode),
+            metrics
+                .iter()
+                .any(|m| m.stage == crate::types::LatencyStage::TailDecode),
             "the tail decode was not timed"
         );
 
@@ -621,15 +633,27 @@ mod tests {
         tokio::spawn(actor.run(rx));
 
         let session = &harness.ctx.session;
-        session.send(SessionEvent::StartRequested).await.expect("start");
+        session
+            .send(SessionEvent::StartRequested)
+            .await
+            .expect("start");
         tokio::time::sleep(Duration::from_millis(1200)).await;
 
-        session.send(SessionEvent::CancelArmed).await.expect("armed");
+        session
+            .send(SessionEvent::CancelArmed)
+            .await
+            .expect("armed");
         tokio::time::sleep(Duration::from_millis(300)).await;
-        session.send(SessionEvent::CancelAborted).await.expect("aborted");
+        session
+            .send(SessionEvent::CancelAborted)
+            .await
+            .expect("aborted");
 
         tokio::time::sleep(Duration::from_secs(2)).await;
-        session.send(SessionEvent::StopRequested).await.expect("stop");
+        session
+            .send(SessionEvent::StopRequested)
+            .await
+            .expect("stop");
 
         await_delivery(&harness).await;
 
@@ -673,18 +697,29 @@ mod tests {
         tokio::spawn(actor.run(rx));
 
         let session = &harness.ctx.session;
-        session.send(SessionEvent::StartRequested).await.expect("start");
+        session
+            .send(SessionEvent::StartRequested)
+            .await
+            .expect("start");
         tokio::time::sleep(Duration::from_millis(1500)).await;
 
         // A row exists while recording — that is the crash-recovery guarantee.
         assert_eq!(
-            services::sessions::list_sessions(&harness.db, 10, 0).expect("list").len(),
+            services::sessions::list_sessions(&harness.db, 10, 0)
+                .expect("list")
+                .len(),
             1,
             "the in-flight row must exist during recording"
         );
 
-        session.send(SessionEvent::CancelArmed).await.expect("armed");
-        session.send(SessionEvent::CancelExpired).await.expect("expired");
+        session
+            .send(SessionEvent::CancelArmed)
+            .await
+            .expect("armed");
+        session
+            .send(SessionEvent::CancelExpired)
+            .await
+            .expect("expired");
         tokio::time::sleep(Duration::from_millis(500)).await;
 
         assert!(
@@ -692,7 +727,9 @@ mod tests {
             "a cancelled recording must never be pasted"
         );
         assert_eq!(
-            services::sessions::list_sessions(&harness.db, 10, 0).expect("list").len(),
+            services::sessions::list_sessions(&harness.db, 10, 0)
+                .expect("list")
+                .len(),
             0,
             "escape means gone — no row, no tombstone"
         );
@@ -717,7 +754,9 @@ mod tests {
 
         let states = harness.events.states.lock().clone();
         assert!(
-            states.iter().any(|s| matches!(s, SessionState::Recording { .. })),
+            states
+                .iter()
+                .any(|s| matches!(s, SessionState::Recording { .. })),
             "the pill was never told it was recording"
         );
         assert!(
