@@ -4,18 +4,12 @@
  * WHERE: Consumed by registry/capabilities/mod.rs.
  */
 
-use super::helpers::{
-    advanced, choice, default_hotkey, dynamic_choice, metric, number, text, toggle,
-};
+use super::helpers::{advanced, choice, default_hotkey, dynamic_choice, metric, number, text, toggle};
 use crate::ports::permissions::OsPermission;
-use crate::registry::capability::{
-    Capability, CapabilityKey, HotkeyDef, NavDef, SettingDef, SettingSection,
-};
+use crate::registry::capability::{Capability, CapabilityKey, HotkeyDef, NavDef, SettingDef, SettingSection};
 use crate::registry::keys;
 use crate::types::settings::ChoiceSource;
-use crate::types::{
-    EngineFeature, HotkeyBinding, KeyModifier, LatencyStage, SettingKind, SettingValue,
-};
+use crate::types::{EngineFeature, HotkeyBinding, KeyModifier, LatencyStage, SettingKind, SettingValue};
 
 pub fn dictation_capability() -> Capability {
     Capability {

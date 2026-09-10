@@ -144,10 +144,8 @@ mod tests {
         delete_session(&db, &id)?;
 
         db.with_connection(|conn| {
-            let metrics_count: i64 =
-                conn.query_row("SELECT count(*) FROM session_metrics", [], |r| r.get(0))?;
-            let sessions_count: i64 =
-                conn.query_row("SELECT count(*) FROM sessions", [], |r| r.get(0))?;
+            let metrics_count: i64 = conn.query_row("SELECT count(*) FROM session_metrics", [], |r| r.get(0))?;
+            let sessions_count: i64 = conn.query_row("SELECT count(*) FROM sessions", [], |r| r.get(0))?;
             assert_eq!(metrics_count, 0);
             assert_eq!(sessions_count, 0);
             Ok(())

@@ -28,10 +28,8 @@ const LATENCY_WINDOW: i64 = 200;
 
 const GET: CommandSpec = CommandSpec::new("get_stats", CapabilityKey::Stats);
 const GET_REFERRAL: CommandSpec = CommandSpec::new("get_referral_status", CapabilityKey::Stats);
-const DISMISS_REFERRAL: CommandSpec =
-    CommandSpec::new("dismiss_referral_prompt", CapabilityKey::Stats);
-const CHECK_REENGAGEMENT: CommandSpec =
-    CommandSpec::new("check_reengagement", CapabilityKey::Stats);
+const DISMISS_REFERRAL: CommandSpec = CommandSpec::new("dismiss_referral_prompt", CapabilityKey::Stats);
+const CHECK_REENGAGEMENT: CommandSpec = CommandSpec::new("check_reengagement", CapabilityKey::Stats);
 
 use crate::registry::CapabilityKey;
 
@@ -111,8 +109,7 @@ pub async fn get_stats(state: State<'_, AppState>) -> Result<StatsSummary, AppEr
 
 fn read_baseline_wpm(db: &crate::db::Database) -> Result<f64, AppError> {
     let stored = settings::get_setting(db, keys::BASELINE_WPM)?;
-    let value =
-        stored.or_else(|| registry::setting_def(keys::BASELINE_WPM).map(|d| d.default.clone()));
+    let value = stored.or_else(|| registry::setting_def(keys::BASELINE_WPM).map(|d| d.default.clone()));
     Ok(match value {
         Some(SettingValue::Number(wpm)) if wpm > 0.0 => wpm,
         // The registry guarantees a numeric default, so this is unreachable in

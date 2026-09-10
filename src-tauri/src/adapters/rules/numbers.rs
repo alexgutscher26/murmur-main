@@ -12,9 +12,7 @@
 use crate::types::LanguageCode;
 
 fn is_english(language: Option<&LanguageCode>) -> bool {
-    language
-        .map(|l| l.as_str().starts_with("en"))
-        .unwrap_or(true)
+    language.map(|l| l.as_str().starts_with("en")).unwrap_or(true)
 }
 
 /// Normalizes spoken numbers, ordinals, and currencies in `text`.
@@ -202,10 +200,7 @@ fn normalize_cardinals(text: &str) -> String {
 
                 if w_clean == "and" {
                     // "and" is only allowed if preceded by a number word and followed by a number word
-                    if num_tokens.is_empty()
-                        || j + 1 >= words.len()
-                        || !is_number_word(words[j + 1])
-                    {
+                    if num_tokens.is_empty() || j + 1 >= words.len() || !is_number_word(words[j + 1]) {
                         break;
                     }
                     num_tokens.push("and");
@@ -231,7 +226,9 @@ fn normalize_cardinals(text: &str) -> String {
             }
 
             if let Some(parsed) = parse_number_tokens(&num_tokens) {
-                let is_compound = num_tokens.len() > 1 || parsed >= 10 || raw_word.contains('-');
+                let is_compound = num_tokens.len() > 1
+                    || parsed >= 10
+                    || raw_word.contains('-');
 
                 if is_compound {
                     let formatted = format_number_with_commas(parsed);
@@ -344,34 +341,26 @@ fn normalize_currency(text: &str) -> String {
                 .chars()
                 .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
                 .collect::<String>();
-            let next_clean = words[j]
-                .trim_end_matches([',', '.', '!', '?', ';', ':'])
-                .to_lowercase();
+            let next_clean = words[j].trim_end_matches([',', '.', '!', '?', ';', ':']).to_lowercase();
 
             if let Some((_, symbol)) = CURRENCIES.iter().find(|(name, _)| *name == next_clean) {
                 let num_tokens: Vec<&str> = number_words.iter().map(|s| s.as_str()).collect();
                 if let Some(parsed_amount) = parse_number_tokens(&num_tokens) {
                     let next_idx = j + 1;
 
-                    if punct.is_empty()
-                        && next_idx + 2 < words.len()
-                        && words[next_idx].to_lowercase() == "and"
-                    {
+                    if punct.is_empty() && next_idx + 2 < words.len() && words[next_idx].to_lowercase() == "and" {
                         let cents_word = words[next_idx + 1].to_lowercase();
                         let cents_unit = words[next_idx + 2].to_lowercase();
                         let cents_punct = words[next_idx + 2]
                             .chars()
                             .filter(|c| matches!(*c, ',' | '.' | '!' | '?' | ';' | ':'))
                             .collect::<String>();
-                        let clean_cents_unit =
-                            cents_unit.trim_end_matches([',', '.', '!', '?', ';', ':']);
+                        let clean_cents_unit = cents_unit.trim_end_matches([',', '.', '!', '?', ';', ':']);
 
                         if clean_cents_unit == "cents" || clean_cents_unit == "cent" {
                             if let Some(c_val) = parse_number_tokens(&[&cents_word]) {
                                 let formatted_main = format_number_with_commas(parsed_amount);
-                                result.push(format!(
-                                    "{symbol}{formatted_main}.{c_val:02}{cents_punct}"
-                                ));
+                                result.push(format!("{symbol}{formatted_main}.{c_val:02}{cents_punct}"));
                                 i = next_idx + 3;
                                 continue;
                             }
@@ -407,71 +396,29 @@ pub mod tests {
     #[test]
     fn normalizes_cardinal_compounds_and_large_numbers() {
         let lang = LanguageCode("en".into());
-        assert_eq!(
-            normalize_numbers("we need forty two items", Some(&lang)),
-            "we need 42 items"
-        );
-        assert_eq!(
-            normalize_numbers("cost is one thousand units", Some(&lang)),
-            "cost is 1,000 units"
-        );
-        assert_eq!(
-            normalize_numbers("about twenty five thousand people", Some(&lang)),
-            "about 25,000 people"
-        );
-        assert_eq!(
-            normalize_numbers(
-                "we made two million five hundred thousand calls",
-                Some(&lang)
-            ),
-            "we made 2,500,000 calls"
-        );
+        assert_eq!(normalize_numbers("we need forty two items", Some(&lang)), "we need 42 items");
+        assert_eq!(normalize_numbers("cost is one thousand units", Some(&lang)), "cost is 1,000 units");
+        assert_eq!(normalize_numbers("about twenty five thousand people", Some(&lang)), "about 25,000 people");
+        assert_eq!(normalize_numbers("we made two million five hundred thousand calls", Some(&lang)), "we made 2,500,000 calls");
     }
 
     #[test]
     fn normalizes_ordinals() {
         let lang = LanguageCode("en".into());
-        assert_eq!(
-            normalize_numbers("this is the third time", Some(&lang)),
-            "this is the 3rd time"
-        );
-        assert_eq!(
-            normalize_numbers("he finished twenty first in line", Some(&lang)),
-            "he finished 21st in line"
-        );
-        assert_eq!(
-            normalize_numbers("on the thirty second floor", Some(&lang)),
-            "on the 32nd floor"
-        );
+        assert_eq!(normalize_numbers("this is the third time", Some(&lang)), "this is the 3rd time");
+        assert_eq!(normalize_numbers("he finished twenty first in line", Some(&lang)), "he finished 21st in line");
+        assert_eq!(normalize_numbers("on the thirty second floor", Some(&lang)), "on the 32nd floor");
     }
 
     #[test]
     fn normalizes_currency_expressions() {
         let lang = LanguageCode("en".into());
-        assert_eq!(
-            normalize_numbers("that costs twenty dollars", Some(&lang)),
-            "that costs $20"
-        );
-        assert_eq!(
-            normalize_numbers("paid five hundred dollars for it", Some(&lang)),
-            "paid $500 for it"
-        );
-        assert_eq!(
-            normalize_numbers("it was fifty euros", Some(&lang)),
-            "it was €50"
-        );
-        assert_eq!(
-            normalize_numbers("costs ten pounds", Some(&lang)),
-            "costs £10"
-        );
+        assert_eq!(normalize_numbers("that costs twenty dollars", Some(&lang)), "that costs $20");
+        assert_eq!(normalize_numbers("paid five hundred dollars for it", Some(&lang)), "paid $500 for it");
+        assert_eq!(normalize_numbers("it was fifty euros", Some(&lang)), "it was €50");
+        assert_eq!(normalize_numbers("costs ten pounds", Some(&lang)), "costs £10");
         assert_eq!(normalize_numbers("only five bucks", Some(&lang)), "only $5");
-        assert_eq!(
-            normalize_numbers("keep fifty cents", Some(&lang)),
-            "keep 50¢"
-        );
-        assert_eq!(
-            normalize_numbers("total was twenty dollars and fifty cents.", Some(&lang)),
-            "total was $20.50."
-        );
+        assert_eq!(normalize_numbers("keep fifty cents", Some(&lang)), "keep 50¢");
+        assert_eq!(normalize_numbers("total was twenty dollars and fifty cents.", Some(&lang)), "total was $20.50.");
     }
 }

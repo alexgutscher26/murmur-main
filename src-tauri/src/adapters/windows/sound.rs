@@ -13,7 +13,9 @@
 use windows::core::{w, PCWSTR};
 use windows::Win32::Foundation::HMODULE;
 use windows::Win32::Media::Audio::{PlaySoundW, SND_ALIAS, SND_ASYNC, SND_NODEFAULT};
-use windows::Win32::UI::WindowsAndMessaging::{MB_ICONASTERISK, MB_ICONEXCLAMATION, MB_OK};
+use windows::Win32::UI::WindowsAndMessaging::{
+    MB_ICONASTERISK, MB_ICONEXCLAMATION, MB_OK,
+};
 
 #[link(name = "user32")]
 extern "system" {

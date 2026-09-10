@@ -52,7 +52,8 @@ impl Validate for SaveProfileInput {
     }
 }
 
-const SAVE: CommandSpec = CommandSpec::new("save_app_profile", CapabilityKey::Settings).exclusive();
+const SAVE: CommandSpec =
+    CommandSpec::new("save_app_profile", CapabilityKey::Settings).exclusive();
 
 #[tauri::command]
 #[specta::specta]

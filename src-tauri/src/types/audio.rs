@@ -95,6 +95,7 @@ pub enum CaptureMode {
     Instant,
 }
 
+
 /**
  * SOURCE OF TRUTH KEYWORDS: DeviceInfo
  * WHAT:  One selectable input device as Settings lists it.

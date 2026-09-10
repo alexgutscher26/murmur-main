@@ -151,9 +151,7 @@ fn collect(root: &Path, dir: &Path, out: &mut Vec<Source>) {
             .to_string_lossy()
             .replace('\\', "/");
 
-        if DECLARATION_SITES
-            .iter()
-            .any(|site| relative.starts_with(site))
+        if DECLARATION_SITES.iter().any(|site| relative.starts_with(site))
             || TEST_ONLY_FILES.contains(&relative.as_str())
         {
             continue;
@@ -283,11 +281,7 @@ fn key_consumption_site(sources: &[Source], constant: &str) -> Option<String> {
 }
 
 /// Resolves a setting to the file that acts on it, by either route.
-fn consumption_site(
-    sources: &[Source],
-    key: &str,
-    constants: &HashMap<String, String>,
-) -> Option<String> {
+fn consumption_site(sources: &[Source], key: &str, constants: &HashMap<String, String>) -> Option<String> {
     let constant = constants.get(key)?;
 
     if let Some(site) = key_consumption_site(sources, constant) {
@@ -423,10 +417,7 @@ mod tests {
     fn helper() {}
 }";
         let stripped = strip_test_module(sample);
-        assert!(
-            stripped.contains("pub mod ports;"),
-            "real code was discarded"
-        );
+        assert!(stripped.contains("pub mod ports;"), "real code was discarded");
         assert!(!stripped.contains("fn helper"), "the test module survived");
     }
 

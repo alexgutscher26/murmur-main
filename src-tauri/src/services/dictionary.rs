@@ -19,8 +19,7 @@ use crate::types::{DictionaryChangeLogEntry, DictionaryEntry, DictionaryId, Matc
 
 pub fn list_entries(db: &Database) -> AppResult<Vec<DictionaryEntry>> {
     db.with_connection(|conn| {
-        let mut stmt =
-            conn.prepare(&format!("{SELECT_COLUMNS} ORDER BY pattern COLLATE NOCASE"))?;
+        let mut stmt = conn.prepare(&format!("{SELECT_COLUMNS} ORDER BY pattern COLLATE NOCASE"))?;
         let rows = stmt.query_map([], row_to_entry)?;
         rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
     })
@@ -154,7 +153,10 @@ pub fn delete_entry(db: &Database, id: &DictionaryId) -> AppResult<()> {
     })
 }
 
-pub fn list_changelog(db: &Database, limit: i64) -> AppResult<Vec<DictionaryChangeLogEntry>> {
+pub fn list_changelog(
+    db: &Database,
+    limit: i64,
+) -> AppResult<Vec<DictionaryChangeLogEntry>> {
     db.with_connection(|conn| {
         let mut stmt = conn.prepare(
             "SELECT id, entry_id, action, pattern, replacement, match_kind, prev_replacement, prev_match_kind, timestamp
@@ -246,7 +248,8 @@ pub fn touch_entries(db: &Database, patterns: &[String], used_at: i64) -> AppRes
     db.with_connection_mut(|conn| {
         let tx = conn.transaction()?;
         {
-            let mut stmt = tx.prepare("UPDATE dictionary SET used_at = ?2 WHERE pattern = ?1")?;
+            let mut stmt =
+                tx.prepare("UPDATE dictionary SET used_at = ?2 WHERE pattern = ?1")?;
             for pattern in patterns {
                 stmt.execute(params![pattern, used_at])?;
             }

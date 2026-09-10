@@ -61,13 +61,7 @@ mod tests {
     #[test]
     fn permissions_default_to_granted_on_windows() {
         let provider = WindowsPermissions::new();
-        assert_eq!(
-            provider.check(OsPermission::Microphone),
-            PermissionState::Granted
-        );
-        assert_eq!(
-            provider.check(OsPermission::Accessibility),
-            PermissionState::Granted
-        );
+        assert_eq!(provider.check(OsPermission::Microphone), PermissionState::Granted);
+        assert_eq!(provider.check(OsPermission::Accessibility), PermissionState::Granted);
     }
 }

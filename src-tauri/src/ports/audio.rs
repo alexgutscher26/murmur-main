@@ -65,9 +65,6 @@ pub trait AudioSource: Send + Sync {
     /// Opens the device and begins delivering CaptureEvents to `sink`.
     /// Blocking, and expected to be fast — this sits on the hotkey path in
     /// OnDemand mode, which is why the measured device-open cost is a metric.
-    fn start(
-        &self,
-        config: &CaptureConfig,
-        sink: SampleSender,
-    ) -> AppResult<Box<dyn CaptureSession>>;
+    fn start(&self, config: &CaptureConfig, sink: SampleSender)
+        -> AppResult<Box<dyn CaptureSession>>;
 }

@@ -80,12 +80,7 @@ mod tests {
             .iter()
             .filter_map(|capability| capability.nav.as_ref())
             .filter(|nav| !keys.contains(&normalise_icon_name(&nav.icon)))
-            .map(|nav| {
-                format!(
-                    "{} (route \"{}\") declares icon \"{}\"",
-                    nav.label, nav.route, nav.icon
-                )
-            })
+            .map(|nav| format!("{} (route \"{}\") declares icon \"{}\"", nav.label, nav.route, nav.icon))
             .collect();
 
         assert!(

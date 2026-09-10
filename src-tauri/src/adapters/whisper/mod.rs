@@ -27,9 +27,9 @@ pub mod prompt;
 pub mod state_pool;
 
 pub use benchmark::{measure_realtime_factor, RealtimeMeasurement};
+pub use engine::{WhisperEngine, WHISPER_ENGINE_ID};
 pub use blocklist::{blocklist_for, BlockedPhrase, DropRule};
 pub use coreml::coreml_encoder_path;
-pub use engine::{WhisperEngine, WHISPER_ENGINE_ID};
 pub use hallucination::{is_digital_silence, is_hallucination, rms_dbfs};
 pub use params::{audio_ctx_for, DecodeProfile, FULL_AUDIO_CTX};
 pub use prompt::{fit_prompt, PROMPT_TOKEN_BUDGET};

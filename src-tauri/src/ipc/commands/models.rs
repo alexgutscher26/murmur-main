@@ -85,7 +85,8 @@ pub async fn get_model_status(
 
 /// Downloads if absent, verifies by hash, and returns the verified path.
 /// Progress arrives on the ModelDownloadProgress event, not from this call.
-const DOWNLOAD: CommandSpec = CommandSpec::new("download_model", CapabilityKey::Models).exclusive();
+const DOWNLOAD: CommandSpec =
+    CommandSpec::new("download_model", CapabilityKey::Models).exclusive();
 
 #[tauri::command]
 #[specta::specta]
@@ -114,7 +115,10 @@ const DELETE: CommandSpec = CommandSpec::new("delete_model", CapabilityKey::Mode
 
 #[tauri::command]
 #[specta::specta]
-pub async fn delete_model(state: State<'_, AppState>, input: ModelIdInput) -> Result<(), AppError> {
+pub async fn delete_model(
+    state: State<'_, AppState>,
+    input: ModelIdInput,
+) -> Result<(), AppError> {
     execute(&state, DELETE, input, |ctx, input| async move {
         ctx.ports().models.delete(&input.model_id).await
     })

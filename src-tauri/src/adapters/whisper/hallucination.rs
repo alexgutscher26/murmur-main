@@ -216,11 +216,7 @@ mod tests {
 
     #[test]
     fn punctuation_and_case_do_not_change_the_verdict() {
-        for spelling in [
-            "Thanks for watching!",
-            "thanks for watching",
-            "THANKS, FOR WATCHING.",
-        ] {
+        for spelling in ["Thanks for watching!", "thanks for watching", "THANKS, FOR WATCHING."] {
             assert!(
                 is_hallucination(spelling, Some("en"), 0.0, SPEAKING),
                 "{spelling} should be dropped"
@@ -279,18 +275,8 @@ mod tests {
 
     #[test]
     fn other_languages_drop_their_own_credits() {
-        assert!(is_hallucination(
-            "ご視聴ありがとうございました",
-            Some("ja"),
-            0.0,
-            SPEAKING
-        ));
-        assert!(is_hallucination(
-            "Gracias por ver el video.",
-            Some("es"),
-            0.0,
-            SPEAKING
-        ));
+        assert!(is_hallucination("ご視聴ありがとうございました", Some("ja"), 0.0, SPEAKING));
+        assert!(is_hallucination("Gracias por ver el video.", Some("es"), 0.0, SPEAKING));
         assert!(is_hallucination("感谢观看", Some("zh"), 0.0, SPEAKING));
     }
 }

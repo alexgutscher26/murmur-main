@@ -152,9 +152,7 @@ pub enum ModelState {
     /// the hotkey path.
     Optimizing,
     Ready,
-    Failed {
-        message: String,
-    },
+    Failed { message: String },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]

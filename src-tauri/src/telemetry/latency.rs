@@ -51,9 +51,7 @@ impl LatencyRecorder {
     }
 
     pub fn record(&self, stage: LatencyStage, duration_ms: f64) {
-        self.samples
-            .lock()
-            .push(MetricSample { stage, duration_ms });
+        self.samples.lock().push(MetricSample { stage, duration_ms });
     }
 
     /// Starts a timer that records itself when dropped.

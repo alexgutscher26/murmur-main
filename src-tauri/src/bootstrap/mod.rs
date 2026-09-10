@@ -35,9 +35,7 @@ use crate::registry;
 use crate::session::{SessionActor, SessionSettings};
 
 pub use hotkeys::{code_from_name, set_escape_registered};
-pub use windows::{
-    attach_rail, place_rail, DASHBOARD_WINDOW, ONBOARDING_WINDOW, PILL_WINDOW, SIDEBAR_WINDOW,
-};
+pub use windows::{attach_rail, place_rail, DASHBOARD_WINDOW, ONBOARDING_WINDOW, PILL_WINDOW, SIDEBAR_WINDOW};
 
 /**
  * SOURCE OF TRUTH KEYWORDS: setup
@@ -50,18 +48,21 @@ pub fn setup(app: &AppHandle) -> AppResult<()> {
         .resource_dir()
         .map(|dir| dir.join("resources").join("models"))
         .ok();
-    let resource_models_alt = app.path().resource_dir().map(|dir| dir.join("models")).ok();
-    let app_data_models = app.path().app_data_dir().map(|dir| dir.join("models")).ok();
+    let resource_models_alt = app
+        .path()
+        .resource_dir()
+        .map(|dir| dir.join("models"))
+        .ok();
+    let app_data_models = app
+        .path()
+        .app_data_dir()
+        .map(|dir| dir.join("models"))
+        .ok();
 
     let bundled_dir = [resource_models, resource_models_alt, app_data_models]
         .into_iter()
         .flatten()
-        .find(|p| {
-            p.is_dir()
-                && std::fs::read_dir(p)
-                    .map(|mut entries| entries.next().is_some())
-                    .unwrap_or(false)
-        })
+        .find(|p| p.is_dir() && std::fs::read_dir(p).map(|mut entries| entries.next().is_some()).unwrap_or(false))
         .or_else(|| {
             app.path()
                 .resource_dir()
@@ -124,9 +125,7 @@ pub fn setup(app: &AppHandle) -> AppResult<()> {
         .unwrap_or(false)
         || (cfg!(debug_assertions) && std::env::var("TAURI_UPDATER_FORCE").is_err())
     {
-        tracing::debug!(
-            "updater checks disabled in development / debug mode (TAURI_UPDATER_DISABLE)"
-        );
+        tracing::debug!("updater checks disabled in development / debug mode (TAURI_UPDATER_DISABLE)");
     } else {
         updates::start_update_checks(state.clone());
     }

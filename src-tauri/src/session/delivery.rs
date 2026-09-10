@@ -34,13 +34,15 @@ use tokio::sync::mpsc;
 use crate::error::AppError;
 use crate::ipc::context::SessionContext;
 use crate::pipeline::assembler::Assembler;
-use crate::ports::enhancer::EnhanceContext;
 use crate::ports::injector::InjectionRequest;
+use crate::ports::enhancer::EnhanceContext;
 use crate::services;
 use crate::session::machine::SessionEvent;
 use crate::session::settings_view::SessionSettings;
 use crate::telemetry::latency::{now_ms, LatencyRecorder};
-use crate::types::{DeliveryKind, LanguageCode, LatencyStage, SessionId, SessionOutcome};
+use crate::types::{
+    DeliveryKind, LanguageCode, LatencyStage, SessionId, SessionOutcome,
+};
 
 /**
  * SOURCE OF TRUTH KEYWORDS: PendingDelivery
@@ -428,7 +430,8 @@ fn persist(
 
     let samples = latency.take_samples();
     if !samples.is_empty() {
-        if let Err(err) = services::metrics::record_metrics(&ctx.db, session_id, &samples, now_ms())
+        if let Err(err) =
+            services::metrics::record_metrics(&ctx.db, session_id, &samples, now_ms())
         {
             tracing::warn!(error = %err, "could not record session metrics");
         }

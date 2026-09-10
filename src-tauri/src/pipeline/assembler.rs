@@ -65,8 +65,7 @@ impl Assembler {
             let position = self
                 .parts
                 .partition_point(|(start, _)| *start <= segment.start_ms);
-            self.parts
-                .insert(position, (segment.start_ms, text.to_string()));
+            self.parts.insert(position, (segment.start_ms, text.to_string()));
         }
     }
 
@@ -98,9 +97,7 @@ impl Assembler {
         let mut scrubbed = current.clone();
         let mut modified = false;
 
-        while let Some(next) =
-            crate::adapters::rules::corrections::apply_backtracking_corrections(&scrubbed)
-        {
+        while let Some(next) = crate::adapters::rules::corrections::apply_backtracking_corrections(&scrubbed) {
             if next == scrubbed {
                 break;
             }

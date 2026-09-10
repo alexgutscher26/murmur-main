@@ -17,8 +17,7 @@ pub fn normalise_punctuation(text: &str) -> String {
             '\u{201C}' | '\u{201D}' => out.push('"'),
             '\u{2013}' | '\u{2014}' => out.push('-'),
             ' ' => {
-                if matches!(chars.peek(), Some(&next) if matches!(next, ',' | '.' | '!' | '?' | ';' | ':'))
-                {
+                if matches!(chars.peek(), Some(&next) if matches!(next, ',' | '.' | '!' | '?' | ';' | ':')) {
                     continue;
                 }
                 out.push(' ');

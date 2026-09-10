@@ -50,106 +50,31 @@ pub struct LanguageOption {
  * WHERE: The source for language_options.
  */
 pub const WHISPER_LANGUAGES: &[(&str, &str)] = &[
-    ("en", "English"),
-    ("zh", "Chinese"),
-    ("de", "German"),
-    ("es", "Spanish"),
-    ("ru", "Russian"),
-    ("ko", "Korean"),
-    ("fr", "French"),
-    ("ja", "Japanese"),
-    ("pt", "Portuguese"),
-    ("tr", "Turkish"),
-    ("pl", "Polish"),
-    ("ca", "Catalan"),
-    ("nl", "Dutch"),
-    ("ar", "Arabic"),
-    ("sv", "Swedish"),
-    ("it", "Italian"),
-    ("id", "Indonesian"),
-    ("hi", "Hindi"),
-    ("fi", "Finnish"),
-    ("vi", "Vietnamese"),
-    ("he", "Hebrew"),
-    ("uk", "Ukrainian"),
-    ("el", "Greek"),
-    ("ms", "Malay"),
-    ("cs", "Czech"),
-    ("ro", "Romanian"),
-    ("da", "Danish"),
-    ("hu", "Hungarian"),
-    ("ta", "Tamil"),
-    ("no", "Norwegian"),
-    ("th", "Thai"),
-    ("ur", "Urdu"),
-    ("hr", "Croatian"),
-    ("bg", "Bulgarian"),
-    ("lt", "Lithuanian"),
-    ("la", "Latin"),
-    ("mi", "Maori"),
-    ("ml", "Malayalam"),
-    ("cy", "Welsh"),
-    ("sk", "Slovak"),
-    ("te", "Telugu"),
-    ("fa", "Persian"),
-    ("lv", "Latvian"),
-    ("bn", "Bengali"),
-    ("sr", "Serbian"),
-    ("az", "Azerbaijani"),
-    ("sl", "Slovenian"),
-    ("kn", "Kannada"),
-    ("et", "Estonian"),
-    ("mk", "Macedonian"),
-    ("br", "Breton"),
-    ("eu", "Basque"),
-    ("is", "Icelandic"),
-    ("hy", "Armenian"),
-    ("ne", "Nepali"),
-    ("mn", "Mongolian"),
-    ("bs", "Bosnian"),
-    ("kk", "Kazakh"),
-    ("sq", "Albanian"),
-    ("sw", "Swahili"),
-    ("gl", "Galician"),
-    ("mr", "Marathi"),
-    ("pa", "Punjabi"),
-    ("si", "Sinhala"),
-    ("km", "Khmer"),
-    ("sn", "Shona"),
-    ("yo", "Yoruba"),
-    ("so", "Somali"),
-    ("af", "Afrikaans"),
-    ("oc", "Occitan"),
-    ("ka", "Georgian"),
-    ("be", "Belarusian"),
-    ("tg", "Tajik"),
-    ("sd", "Sindhi"),
-    ("gu", "Gujarati"),
-    ("am", "Amharic"),
-    ("yi", "Yiddish"),
-    ("lo", "Lao"),
-    ("uz", "Uzbek"),
-    ("fo", "Faroese"),
-    ("ht", "Haitian Creole"),
-    ("ps", "Pashto"),
-    ("tk", "Turkmen"),
-    ("nn", "Nynorsk"),
-    ("mt", "Maltese"),
-    ("sa", "Sanskrit"),
-    ("lb", "Luxembourgish"),
-    ("my", "Burmese"),
-    ("bo", "Tibetan"),
-    ("tl", "Tagalog"),
-    ("mg", "Malagasy"),
-    ("as", "Assamese"),
-    ("tt", "Tatar"),
-    ("haw", "Hawaiian"),
-    ("ln", "Lingala"),
-    ("ha", "Hausa"),
-    ("ba", "Bashkir"),
-    ("jw", "Javanese"),
-    ("su", "Sundanese"),
-    ("yue", "Cantonese"),
+    ("en", "English"), ("zh", "Chinese"), ("de", "German"), ("es", "Spanish"),
+    ("ru", "Russian"), ("ko", "Korean"), ("fr", "French"), ("ja", "Japanese"),
+    ("pt", "Portuguese"), ("tr", "Turkish"), ("pl", "Polish"), ("ca", "Catalan"),
+    ("nl", "Dutch"), ("ar", "Arabic"), ("sv", "Swedish"), ("it", "Italian"),
+    ("id", "Indonesian"), ("hi", "Hindi"), ("fi", "Finnish"), ("vi", "Vietnamese"),
+    ("he", "Hebrew"), ("uk", "Ukrainian"), ("el", "Greek"), ("ms", "Malay"),
+    ("cs", "Czech"), ("ro", "Romanian"), ("da", "Danish"), ("hu", "Hungarian"),
+    ("ta", "Tamil"), ("no", "Norwegian"), ("th", "Thai"), ("ur", "Urdu"),
+    ("hr", "Croatian"), ("bg", "Bulgarian"), ("lt", "Lithuanian"), ("la", "Latin"),
+    ("mi", "Maori"), ("ml", "Malayalam"), ("cy", "Welsh"), ("sk", "Slovak"),
+    ("te", "Telugu"), ("fa", "Persian"), ("lv", "Latvian"), ("bn", "Bengali"),
+    ("sr", "Serbian"), ("az", "Azerbaijani"), ("sl", "Slovenian"), ("kn", "Kannada"),
+    ("et", "Estonian"), ("mk", "Macedonian"), ("br", "Breton"), ("eu", "Basque"),
+    ("is", "Icelandic"), ("hy", "Armenian"), ("ne", "Nepali"), ("mn", "Mongolian"),
+    ("bs", "Bosnian"), ("kk", "Kazakh"), ("sq", "Albanian"), ("sw", "Swahili"),
+    ("gl", "Galician"), ("mr", "Marathi"), ("pa", "Punjabi"), ("si", "Sinhala"),
+    ("km", "Khmer"), ("sn", "Shona"), ("yo", "Yoruba"), ("so", "Somali"),
+    ("af", "Afrikaans"), ("oc", "Occitan"), ("ka", "Georgian"), ("be", "Belarusian"),
+    ("tg", "Tajik"), ("sd", "Sindhi"), ("gu", "Gujarati"), ("am", "Amharic"),
+    ("yi", "Yiddish"), ("lo", "Lao"), ("uz", "Uzbek"), ("fo", "Faroese"),
+    ("ht", "Haitian Creole"), ("ps", "Pashto"), ("tk", "Turkmen"), ("nn", "Nynorsk"),
+    ("mt", "Maltese"), ("sa", "Sanskrit"), ("lb", "Luxembourgish"), ("my", "Burmese"),
+    ("bo", "Tibetan"), ("tl", "Tagalog"), ("mg", "Malagasy"), ("as", "Assamese"),
+    ("tt", "Tatar"), ("haw", "Hawaiian"), ("ln", "Lingala"), ("ha", "Hausa"),
+    ("ba", "Bashkir"), ("jw", "Javanese"), ("su", "Sundanese"), ("yue", "Cantonese"),
 ];
 
 /// English name for a code, falling back to the code itself.
@@ -203,9 +128,7 @@ mod tests {
     #[test]
     fn every_language_the_product_promises_is_present() {
         // docs/01 §4.1 M6 names these explicitly.
-        for code in [
-            "hi", "ar", "es", "fr", "it", "de", "pt", "ja", "zh", "ko", "ru",
-        ] {
+        for code in ["hi", "ar", "es", "fr", "it", "de", "pt", "ja", "zh", "ko", "ru"] {
             assert!(
                 WHISPER_LANGUAGES.iter().any(|(c, _)| *c == code),
                 "`{code}` is promised in the ideation doc but missing here"
@@ -226,20 +149,17 @@ mod tests {
         // The Parakeet case: fast, but no Hindi and no Arabic. The picker must
         // be able to say WHY, which means the option is present and flagged.
         let support = LanguageSupport::Set {
-            languages: vec![LanguageCode("en".into()), LanguageCode("fr".into())],
+            languages: vec![
+                LanguageCode("en".into()),
+                LanguageCode("fr".into()),
+            ],
         };
         let options = language_options(&support, false);
 
-        let hindi = options
-            .iter()
-            .find(|o| o.code == "hi")
-            .expect("hindi listed");
+        let hindi = options.iter().find(|o| o.code == "hi").expect("hindi listed");
         assert!(!hindi.supported, "hindi must be shown as unavailable");
 
-        let english = options
-            .iter()
-            .find(|o| o.code == "en")
-            .expect("english listed");
+        let english = options.iter().find(|o| o.code == "en").expect("english listed");
         assert!(english.supported);
     }
 

@@ -12,9 +12,7 @@ pub fn dictionary_capability() -> Capability {
     Capability {
         key: CapabilityKey::Dictionary,
         name: text("Dictionary"),
-        description: text(
-            "Names and jargon the model keeps getting wrong, and what they should be.",
-        ),
+        description: text("Names and jargon the model keeps getting wrong, and what they should be."),
         requires: vec![],
         // Prompting the engine with these terms is what fixes recognition
         // rather than patching the output, so the feature declares it.
