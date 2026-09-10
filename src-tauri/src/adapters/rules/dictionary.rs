@@ -62,31 +62,83 @@ pub fn replace_whole_words(
 
     let mut out = String::with_capacity(haystack.len());
     let mut cursor = 0usize;
+    let mut search_idx = 0usize;
 
-    while let Some(found) = subject[cursor..].find(&pattern) {
-        let start = cursor + found;
-        let end = start + pattern.len();
+    // Fast path for case_sensitive where byte offsets match 1:1
+    if case_sensitive {
+        while let Some(found) = subject[search_idx..].find(&pattern) {
+            let start = search_idx + found;
+            let end = start + pattern.len();
 
-        let before_ok = start == 0
-            || !subject[..start]
+            let before_ok = start == 0
+                || !subject[..start]
+                    .chars()
+                    .next_back()
+                    .map(|c| c.is_alphanumeric())
+                    .unwrap_or(false);
+            let after_ok = end >= subject.len()
+                || !subject[end..]
+                    .chars()
+                    .next()
+                    .map(|c| c.is_alphanumeric())
+                    .unwrap_or(false);
+
+            if before_ok && after_ok {
+                out.push_str(&haystack[cursor..start]);
+                out.push_str(replacement);
+                cursor = end;
+            } else {
+                out.push_str(&haystack[cursor..end]);
+                cursor = end;
+            }
+            search_idx = end;
+        }
+        out.push_str(&haystack[cursor..]);
+        return out;
+    }
+
+    // Mapping from subject byte offset to haystack byte offset for case-insensitive
+    let mut s_to_h = Vec::with_capacity(subject.len() + 1);
+    let mut h_idx = 0;
+    for c in haystack.chars() {
+        let c_len = c.len_utf8();
+        let s_len = c.to_lowercase().map(|c| c.len_utf8()).sum();
+        for _ in 0..s_len {
+            s_to_h.push(h_idx);
+        }
+        h_idx += c_len;
+    }
+    s_to_h.push(haystack.len());
+
+    while let Some(found) = subject[search_idx..].find(&pattern) {
+        let s_start = search_idx + found;
+        let s_end = s_start + pattern.len();
+
+        let h_start = s_to_h[s_start];
+        let h_end = s_to_h[s_end];
+
+        let before_ok = h_start == 0
+            || !haystack[..h_start]
                 .chars()
                 .next_back()
                 .map(|c| c.is_alphanumeric())
                 .unwrap_or(false);
-        let after_ok = end >= subject.len()
-            || !subject[end..]
+        let after_ok = h_end >= haystack.len()
+            || !haystack[h_end..]
                 .chars()
                 .next()
                 .map(|c| c.is_alphanumeric())
                 .unwrap_or(false);
 
         if before_ok && after_ok {
-            out.push_str(&haystack[cursor..start]);
+            out.push_str(&haystack[cursor..h_start]);
             out.push_str(replacement);
+            cursor = h_end;
         } else {
-            out.push_str(&haystack[cursor..end]);
+            out.push_str(&haystack[cursor..h_end]);
+            cursor = h_end;
         }
-        cursor = end;
+        search_idx = s_end;
     }
 
     out.push_str(&haystack[cursor..]);
