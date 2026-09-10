@@ -99,9 +99,7 @@ const KNOWN_UPWARD_IMPORTS: &[(&str, &str, &str)] = &[
 ];
 
 fn layer_of(module: &str) -> Option<usize> {
-    LAYER_ORDER
-        .iter()
-        .position(|layer| layer.contains(&module))
+    LAYER_ORDER.iter().position(|layer| layer.contains(&module))
 }
 
 /// Every `use crate::<module>` in every shipped source file, as
@@ -256,9 +254,7 @@ mod tests {
                 "`{file}` is excepted without a reason"
             );
             assert!(
-                actual
-                    .iter()
-                    .any(|(f, m)| f == file && m == module),
+                actual.iter().any(|(f, m)| f == file && m == module),
                 "`{file}` no longer imports crate::{module} — delete its line from \
                  KNOWN_UPWARD_IMPORTS"
             );

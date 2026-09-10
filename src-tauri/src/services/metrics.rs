@@ -70,14 +70,10 @@ pub fn record_metrics(
     })
 }
 
-pub fn metrics_for_session(
-    db: &Database,
-    session_id: &SessionId,
-) -> AppResult<Vec<MetricSample>> {
+pub fn metrics_for_session(db: &Database, session_id: &SessionId) -> AppResult<Vec<MetricSample>> {
     db.with_connection(|conn| {
-        let mut stmt = conn.prepare(
-            "SELECT stage, duration_ms FROM session_metrics WHERE session_id = ?1",
-        )?;
+        let mut stmt =
+            conn.prepare("SELECT stage, duration_ms FROM session_metrics WHERE session_id = ?1")?;
         let rows = stmt.query_map(params![session_id.as_str()], |row| {
             let stage: String = row.get(0)?;
             let duration_ms: f64 = row.get(1)?;
@@ -114,7 +110,8 @@ pub fn latency_summary(db: &Database, window: i64) -> AppResult<Vec<LatencySumma
                   ORDER BY recorded_at DESC
                   LIMIT ?2",
             )?;
-            let rows = stmt.query_map(params![stage.as_str(), window], |row| row.get::<_, f64>(0))?;
+            let rows =
+                stmt.query_map(params![stage.as_str(), window], |row| row.get::<_, f64>(0))?;
             rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
         })?;
 
@@ -216,8 +213,14 @@ mod tests {
             &db,
             &id,
             &[
-                MetricSample { stage: LatencyStage::TailDecode, duration_ms: 120.0 },
-                MetricSample { stage: LatencyStage::TotalFinalize, duration_ms: 240.0 },
+                MetricSample {
+                    stage: LatencyStage::TailDecode,
+                    duration_ms: 120.0,
+                },
+                MetricSample {
+                    stage: LatencyStage::TotalFinalize,
+                    duration_ms: 240.0,
+                },
             ],
             1000,
         )?;

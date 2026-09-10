@@ -55,8 +55,7 @@ impl Validate for SaveTextFileInput {
     }
 }
 
-const SAVE: CommandSpec =
-    CommandSpec::new("save_text_file", CapabilityKey::History).exclusive();
+const SAVE: CommandSpec = CommandSpec::new("save_text_file", CapabilityKey::History).exclusive();
 
 /**
  * WHAT:  Shows a save dialog and writes the text to whatever the user picks.

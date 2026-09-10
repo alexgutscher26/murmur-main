@@ -224,6 +224,7 @@ mod tests {
         assert_eq!(strip_quantisation("small-q5_1"), "small");
         // Unquantised names are untouched.
         assert_eq!(strip_quantisation("large-v3-turbo"), "large-v3-turbo");
+        assert_eq!(strip_quantisation("small.en-tdrz"), "small.en-tdrz");
         assert_eq!(strip_quantisation("small"), "small");
         // A trailing segment that merely looks similar must survive.
         assert_eq!(strip_quantisation("base-english"), "base-english");

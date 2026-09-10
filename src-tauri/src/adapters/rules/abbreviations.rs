@@ -192,7 +192,10 @@ pub fn expand_abbreviations(
     let mut current = text.to_string();
 
     for abbr in abbreviations {
-        if disabled.iter().any(|d| d.trim().eq_ignore_ascii_case(abbr.needle)) {
+        if disabled
+            .iter()
+            .any(|d| d.trim().eq_ignore_ascii_case(abbr.needle))
+        {
             continue;
         }
 
@@ -241,7 +244,8 @@ fn replace_abbreviation(haystack: &str, needle: &str, replacement: &str) -> Stri
             if is_upper {
                 let mut chars = effective_replacement.chars();
                 if let Some(first) = chars.next() {
-                    effective_replacement = first.to_uppercase().collect::<String>() + chars.as_str();
+                    effective_replacement =
+                        first.to_uppercase().collect::<String>() + chars.as_str();
                 }
             }
 
@@ -268,7 +272,11 @@ mod tests {
     fn expands_standard_english_abbreviations() {
         let lang = LanguageCode("en".into());
         assert_eq!(
-            expand_abbreviations("We like fruit, eg apples, and vegetables, ie carrots.", Some(&lang), &[]),
+            expand_abbreviations(
+                "We like fruit, eg apples, and vegetables, ie carrots.",
+                Some(&lang),
+                &[]
+            ),
             "We like fruit, e.g. apples, and vegetables, i.e. carrots."
         );
         assert_eq!(
@@ -329,7 +337,11 @@ mod tests {
         let lang = LanguageCode("en".into());
         let disabled = vec!["eg".to_string(), "vs".to_string()];
         assert_eq!(
-            expand_abbreviations("We like eg apples vs oranges, ie fruits.", Some(&lang), &disabled),
+            expand_abbreviations(
+                "We like eg apples vs oranges, ie fruits.",
+                Some(&lang),
+                &disabled
+            ),
             "We like eg apples vs oranges, i.e. fruits."
         );
     }

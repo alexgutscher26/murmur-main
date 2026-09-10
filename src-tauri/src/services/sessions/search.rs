@@ -14,7 +14,8 @@ use crate::types::SessionSummary;
 
 use super::crud::row_to_summary;
 
-pub const SELECT_DISTINCT_COLUMNS: &str = "SELECT DISTINCT id, started_at, ended_at, outcome, duration_ms, language, \
+pub const SELECT_DISTINCT_COLUMNS: &str =
+    "SELECT DISTINCT id, started_at, ended_at, outcome, duration_ms, language, \
      engine_id, model_id, raw_text, final_text, word_count, app_bundle_id, delivery, error_code, \
      error_message FROM sessions";
 

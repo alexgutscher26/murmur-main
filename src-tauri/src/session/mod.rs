@@ -17,5 +17,5 @@ mod e2e_tests;
 pub mod settings_view;
 
 pub use actor::SessionActor;
-pub use settings_view::SessionSettings;
 pub use machine::{Effect, SessionEvent, SessionMachine, Transition, TransitionError};
+pub use settings_view::SessionSettings;

@@ -344,8 +344,14 @@ mod tests {
     fn a_beep_or_a_click_never_opens_the_gate() {
         for (name, body) in [
             ("16ms click", beep(VAD_FRAME_SAMPLES, 1000.0, 0.6)),
-            ("200ms beep", beep(TARGET_SAMPLE_RATE as usize / 5, 1000.0, 0.3)),
-            ("500ms beep", beep(TARGET_SAMPLE_RATE as usize / 2, 1000.0, 0.3)),
+            (
+                "200ms beep",
+                beep(TARGET_SAMPLE_RATE as usize / 5, 1000.0, 0.3),
+            ),
+            (
+                "500ms beep",
+                beep(TARGET_SAMPLE_RATE as usize / 2, 1000.0, 0.3),
+            ),
         ] {
             let mut detector = SpeechDetector::new();
             detector.push(&in_a_quiet_room(body));
@@ -394,9 +400,10 @@ mod tests {
      */
     #[test]
     fn real_speech_clears_the_gate_by_a_wide_margin() {
-        let Some(samples) =
-            crate::testing::synthesise_speech("Testing one two three, this is real speech.", "vadgate")
-        else {
+        let Some(samples) = crate::testing::synthesise_speech(
+            "Testing one two three, this is real speech.",
+            "vadgate",
+        ) else {
             eprintln!("skipped: `say` is unavailable on this host");
             return;
         };
@@ -451,4 +458,3 @@ mod tests {
         let _ = detector.silence_ms();
     }
 }
-

@@ -86,7 +86,11 @@ impl SessionSettings {
         if let Some(bundle_id) = bundle_id {
             match services::profiles::get_profile(db, bundle_id) {
                 Ok(Some(profile)) => {
-                    tracing::debug!(bundle_id, overrides = profile.overrides.len(), "applying app profile");
+                    tracing::debug!(
+                        bundle_id,
+                        overrides = profile.overrides.len(),
+                        "applying app profile"
+                    );
                     stored.extend(profile.overrides);
                 }
                 Ok(None) => {}
@@ -130,8 +134,9 @@ impl SessionSettings {
                 .max(MIN_FINALIZE_TIMEOUT_MS as f64) as u64,
             auto_paste: read_bool(stored, keys::AUTO_PASTE).unwrap_or(true),
             restore_clipboard: read_bool(stored, keys::RESTORE_CLIPBOARD).unwrap_or(true),
-            paste_delay_ms: read_number(stored, keys::PASTE_DELAY_MS).unwrap_or(40.0).max(0.0)
-                as u64,
+            paste_delay_ms: read_number(stored, keys::PASTE_DELAY_MS)
+                .unwrap_or(40.0)
+                .max(0.0) as u64,
             clipboard_restore_delay_ms: read_number(stored, keys::CLIPBOARD_RESTORE_DELAY_MS)
                 .unwrap_or(150.0)
                 .max(0.0) as u64,
@@ -141,9 +146,11 @@ impl SessionSettings {
             expand_abbreviations: read_bool(stored, keys::EXPAND_ABBREVIATIONS).unwrap_or(true),
             disabled_abbreviations: read_string_list(stored, keys::DISABLED_ABBREVIATIONS),
             normalise_numbers: read_bool(stored, keys::NORMALISE_NUMBERS).unwrap_or(true),
-            normalise_urls_and_paths: read_bool(stored, keys::NORMALISE_URLS_AND_PATHS).unwrap_or(true),
+            normalise_urls_and_paths: read_bool(stored, keys::NORMALISE_URLS_AND_PATHS)
+                .unwrap_or(true),
             code_mode: read_bool(stored, keys::CODE_MODE).unwrap_or(false),
-            code_casing_style: read_choice(stored, keys::CODE_CASING_STYLE).unwrap_or_else(|| "camel".into()),
+            code_casing_style: read_choice(stored, keys::CODE_CASING_STYLE)
+                .unwrap_or_else(|| "camel".into()),
             normalise_punctuation: read_bool(stored, keys::NORMALISE_PUNCTUATION).unwrap_or(true),
             capitalise_sentences: read_bool(stored, keys::CAPITALISE_SENTENCES).unwrap_or(true),
             audio_feedback: read_bool(stored, keys::AUDIO_FEEDBACK).unwrap_or(true),
@@ -225,7 +232,10 @@ mod tests {
         let stored = empty();
         assert_eq!(read_bool(&stored, keys::AUTO_PASTE), Some(true));
         assert_eq!(read_bool(&stored, keys::STRIP_FILLERS), Some(false));
-        assert_eq!(read_number(&stored, keys::CANCEL_COUNTDOWN_MS), Some(3000.0));
+        assert_eq!(
+            read_number(&stored, keys::CANCEL_COUNTDOWN_MS),
+            Some(3000.0)
+        );
     }
 
     #[test]
@@ -264,7 +274,10 @@ mod tests {
         assert_eq!(defaults.clipboard_restore_delay_ms, 150);
 
         let mut stored = empty();
-        stored.insert(keys::PASTE_DELAY_MS.to_string(), SettingValue::Number(120.0));
+        stored.insert(
+            keys::PASTE_DELAY_MS.to_string(),
+            SettingValue::Number(120.0),
+        );
         stored.insert(
             keys::CLIPBOARD_RESTORE_DELAY_MS.to_string(),
             SettingValue::Number(400.0),
