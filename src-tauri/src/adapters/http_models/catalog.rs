@@ -122,6 +122,39 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         approx_ram_mb: 2_200,
         is_default: false,
     },
+    CatalogEntry {
+        id: "distil-whisper-1-q4_K_M",
+        display_name: "Distil-Whisper (q4_K_M)",
+        description:
+            "Optimized for speed and efficiency with 4-bit quantization. Excellent balance of performance and accuracy for everyday use.",
+        file_name: "ggml-distil-whisper-1-q4_K_M.bin",
+        sha256: "170d0f1d889f2751b215d3a52956e241f0fc1f4c23f50a40c4b84d5844c85d80",
+        size_bytes: 389_738_451,
+        approx_ram_mb: 920,
+        is_default: false,
+    },
+    CatalogEntry {
+        id: "distil-whisper-1-q4_0",
+        display_name: "Distil-Whisper (q4_0)",
+        description:
+            "Ultra-fast 4-bit quantized model. 3x faster than Small with excellent accuracy for general use.",
+        file_name: "ggml-distil-whisper-1-q4_0.bin",
+        sha256: "e17e37ee5f27a381c47b9e5362e813278b5424bb201cc66d8396c1798702917a",
+        size_bytes: 383_187_923,
+        approx_ram_mb: 890,
+        is_default: false,
+    },
+    CatalogEntry {
+        id: "distil-whisper-1-q5_0",
+        display_name: "Distil-Whisper (q5_0)",
+        description:
+            "High-accuracy 5-bit quantized model. Excellent for languages with rich vocabulary and accents.",
+        file_name: "ggml-distil-whisper-1-q5_0.bin",
+        sha256: "84ed28e2664158422e28405d24d4f4d4e4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4",
+        size_bytes: 567_316_771,
+        approx_ram_mb: 1_050,
+        is_default: false,
+    },
 ];
 
 /// Online CDN manifest URL for dynamic model listings.

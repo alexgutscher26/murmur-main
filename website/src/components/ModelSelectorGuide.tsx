@@ -77,6 +77,42 @@ const MODELS: ModelInfo[] = [
       "Near-unquantized 8-bit precision for zero-compromise multilingual translation and technical dictation.",
     recommendedFor: "Highest fidelity across subtle accents and multi-speaker audio",
   },
+  {
+    id: "distil-q4",
+    name: "Distil-Whisper (q4_K_M)",
+    badge: "Fast & Efficient",
+    size: "390 MB",
+    latency: "160 ms",
+    ramUsage: "920 MB",
+    accuracy: 97.9,
+    description:
+      "Distilled model for speed and efficiency. Excellent balance of performance and accuracy for everyday use.",
+    recommendedFor: "Everyday use, speed optimization, balanced performance",
+  },
+  {
+    id: "distil-q4-0",
+    name: "Distil-Whisper (q4_0)",
+    badge: "Ultra-Fast",
+    size: "383 MB",
+    latency: "140 ms",
+    ramUsage: "890 MB",
+    accuracy: 97.7,
+    description:
+      "Ultra-fast 4-bit quantized model. 3x faster than Small with excellent accuracy for general use.",
+    recommendedFor: "General use, speed optimization, balanced performance",
+  },
+  {
+    id: "distil-q5-0",
+    name: "Distil-Whisper (q5_0)",
+    badge: "High Accuracy",
+    size: "567 MB",
+    latency: "180 ms",
+    ramUsage: "1050 MB",
+    accuracy: 98.3,
+    description:
+      "High-accuracy 5-bit quantized model. Excellent for languages with rich vocabulary and accents.",
+    recommendedFor: "High accuracy, languages with rich vocabulary, balanced performance",
+  },
 ];
 
 export function ModelSelectorGuide() {
