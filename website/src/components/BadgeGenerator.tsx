@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 
 interface BadgeOption {
   id: string;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Layers, Terminal, MessageSquare, FileText, Mail, Check } from "lucide-react";
+import { Terminal, MessageSquare, FileText, Mail, Check } from "lucide-react";
 
 interface ContextApp {
   id: string;

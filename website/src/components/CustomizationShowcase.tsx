@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Wrench, Terminal, Database, Sparkles, Check, ArrowRight } from "lucide-react";
+import { Wrench, Terminal, Database, Sparkles } from "lucide-react";
 
 interface CustomFeature {
   id: string;

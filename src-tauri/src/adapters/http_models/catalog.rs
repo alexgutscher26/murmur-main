@@ -16,7 +16,7 @@
 
 use crate::types::{ModelDescriptor, ModelId};
 
-/// Every file below is resolved against this. whisper.cpp's own repository.
+/// Every file below without custom_url is resolved against this. whisper.cpp's own repository.
 pub const HF_BASE_URL: &str = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/";
 
 /// The default model the app installs on first run / onboarding for Starter users.
@@ -43,6 +43,7 @@ pub struct CatalogEntry {
     pub size_bytes: u64,
     pub approx_ram_mb: u64,
     pub is_default: bool,
+    pub custom_url: Option<&'static str>,
 }
 
 impl CatalogEntry {
@@ -51,7 +52,10 @@ impl CatalogEntry {
             id: ModelId(self.id.to_string()),
             display_name: self.display_name.to_string(),
             description: self.description.to_string(),
-            url: format!("{HF_BASE_URL}{}", self.file_name),
+            url: self
+                .custom_url
+                .map(|u| u.to_string())
+                .unwrap_or_else(|| format!("{HF_BASE_URL}{}", self.file_name)),
             sha256: self.sha256.to_string(),
             size_bytes: self.size_bytes,
             approx_ram_mb: self.approx_ram_mb,
@@ -71,6 +75,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 77691713,
         approx_ram_mb: 200,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "tiny.en",
@@ -81,6 +86,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 77704715,
         approx_ram_mb: 200,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "tiny-q5_1",
@@ -91,6 +97,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 32152673,
         approx_ram_mb: 100,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "tiny.en-q5_1",
@@ -101,6 +108,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 32166155,
         approx_ram_mb: 100,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "tiny-q8_0",
@@ -111,6 +119,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 43537433,
         approx_ram_mb: 150,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "base",
@@ -121,6 +130,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 147951465,
         approx_ram_mb: 300,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "base.en",
@@ -131,6 +141,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 147964211,
         approx_ram_mb: 300,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "base-q5_1",
@@ -141,6 +152,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 59707625,
         approx_ram_mb: 250,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "base.en-q5_1",
@@ -151,6 +163,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 59721011,
         approx_ram_mb: 150,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "base-q8_0",
@@ -161,6 +174,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 81768585,
         approx_ram_mb: 200,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "small",
@@ -171,6 +185,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 487601967,
         approx_ram_mb: 950,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "small.en",
@@ -181,16 +196,18 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 487614201,
         approx_ram_mb: 950,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "small.en-tdrz",
-        display_name: "Small (tdrz) (tdrz) (English)",
-        description: "Tiny diarization model for fast, low-memory transcription.",
+        display_name: "Small (tdrz) (English)",
+        description: "Tiny diarization model for fast, low-memory transcription with speaker turns.",
         file_name: "ggml-small.en-tdrz.bin",
-        sha256: "UNKNOWN_SHA256",
-        size_bytes: 487614201,
+        sha256: "ceac3ec06d1d98ef71aec665283564631055fd6129b79d8e1be4f9cc33cc54b4",
+        size_bytes: 487614184,
         approx_ram_mb: 950,
         is_default: false,
+        custom_url: Some("https://huggingface.co/akashmjn/tinydiarize-whisper.cpp/resolve/main/ggml-small.en-tdrz.bin"),
     },
     CatalogEntry {
         id: "small-q5_1",
@@ -201,6 +218,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 190085487,
         approx_ram_mb: 450,
         is_default: true,
+        custom_url: None,
     },
     CatalogEntry {
         id: "small.en-q5_1",
@@ -211,6 +229,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 190098681,
         approx_ram_mb: 400,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "small-q8_0",
@@ -221,6 +240,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 264464607,
         approx_ram_mb: 550,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "medium",
@@ -231,6 +251,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 1533763059,
         approx_ram_mb: 2200,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "medium.en",
@@ -241,6 +262,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 1533774781,
         approx_ram_mb: 2200,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "medium-q5_0",
@@ -251,6 +273,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 539212467,
         approx_ram_mb: 1000,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "medium.en-q5_0",
@@ -261,6 +284,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 539225533,
         approx_ram_mb: 950,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "medium-q8_0",
@@ -271,6 +295,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 823369779,
         approx_ram_mb: 1450,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "large-v1",
@@ -281,6 +306,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 3094623691,
         approx_ram_mb: 4450,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "large-v2",
@@ -291,6 +317,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 3094623691,
         approx_ram_mb: 4450,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "large-v2-q5_0",
@@ -301,6 +328,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 1080732091,
         approx_ram_mb: 1550,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "large-v2-q8_0",
@@ -311,6 +339,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 1656129691,
         approx_ram_mb: 2400,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "large-v3",
@@ -321,6 +350,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 3095033483,
         approx_ram_mb: 4450,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "large-v3-q5_0",
@@ -331,6 +361,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 1081140203,
         approx_ram_mb: 1550,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "large-v3-turbo",
@@ -341,6 +372,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 1624555275,
         approx_ram_mb: 2200,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "large-v3-turbo-q5_0",
@@ -351,6 +383,7 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 574041195,
         approx_ram_mb: 1100,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
         id: "large-v3-turbo-q8_0",
@@ -361,39 +394,55 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         size_bytes: 874188075,
         approx_ram_mb: 1600,
         is_default: false,
+        custom_url: None,
     },
     CatalogEntry {
-        id: "distil-whisper-1-q4_K_M",
-        display_name: "Distil-Whisper (q4_K_M)",
+        id: "distil-small.en",
+        display_name: "Distil-Whisper Small (English)",
         description:
-            "Optimized for speed and efficiency with 4-bit quantization. Excellent balance of performance and accuracy for everyday use.",
-        file_name: "ggml-distil-whisper-1-q4_K_M.bin",
-        sha256: "170d0f1d889f2751b215d3a52956e241f0fc1f4c23f50a40c4b84d5844c85d80",
-        size_bytes: 389_738_451,
-        approx_ram_mb: 920,
+            "Distilled English Small model. Up to 6x faster than standard Whisper Small with low memory footprint.",
+        file_name: "ggml-distil-small.en.bin",
+        sha256: "7691eb11167ab7aaf6b3e05d8266f2fd9ad89c550e433f86ac266ebdee6c970a",
+        size_bytes: 336191657,
+        approx_ram_mb: 450,
         is_default: false,
+        custom_url: Some("https://huggingface.co/distil-whisper/distil-small.en/resolve/main/ggml-distil-small.en.bin"),
     },
     CatalogEntry {
-        id: "distil-whisper-1-q4_0",
-        display_name: "Distil-Whisper (q4_0)",
+        id: "distil-medium.en",
+        display_name: "Distil-Whisper Medium (English)",
         description:
-            "Ultra-fast 4-bit quantized model. 3x faster than Small with excellent accuracy for general use.",
-        file_name: "ggml-distil-whisper-1-q4_0.bin",
-        sha256: "e17e37ee5f27a381c47b9e5362e813278b5424bb201cc66d8396c1798702917a",
-        size_bytes: 383_187_923,
-        approx_ram_mb: 890,
+            "Distilled English Medium model. Fast, low latency with exceptional technical English accuracy.",
+        file_name: "ggml-medium-32-2.en.bin",
+        sha256: "ad53ccb618188b210550e98cc32bf5a13188d86635e395bb11115ed275d6e7aa",
+        size_bytes: 794018180,
+        approx_ram_mb: 1000,
         is_default: false,
+        custom_url: Some("https://huggingface.co/distil-whisper/distil-medium.en/resolve/main/ggml-medium-32-2.en.bin"),
     },
     CatalogEntry {
-        id: "distil-whisper-1-q5_0",
-        display_name: "Distil-Whisper (q5_0)",
+        id: "distil-large-v2",
+        display_name: "Distil-Whisper Large v2 (English)",
         description:
-            "High-accuracy 5-bit quantized model. Excellent for languages with rich vocabulary and accents.",
-        file_name: "ggml-distil-whisper-1-q5_0.bin",
-        sha256: "84ed28e2664158422e28405d24d4f4d4e4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4",
-        size_bytes: 567_316_771,
-        approx_ram_mb: 1_050,
+            "Distilled Large v2 model. State of the art English accuracy with 5.8x speedup over standard Large v2.",
+        file_name: "ggml-large-32-2.en.bin",
+        sha256: "2ed2bbe6c4138b3757f292b0622981bdb3d02bcac57f77095670dac85fab3cd6",
+        size_bytes: 1519111363,
+        approx_ram_mb: 1800,
         is_default: false,
+        custom_url: Some("https://huggingface.co/distil-whisper/distil-large-v2/resolve/main/ggml-large-32-2.en.bin"),
+    },
+    CatalogEntry {
+        id: "distil-large-v3",
+        display_name: "Distil-Whisper Large v3 (English)",
+        description:
+            "Distilled Large v3 model. Peak accuracy, 6x faster inference than Large v3 with studio-grade punctuation.",
+        file_name: "ggml-distil-large-v3.bin",
+        sha256: "2883a11b90fb10ed592d826edeaee7d2929bf1ab985109fe9e1e7b4d2b69a298",
+        size_bytes: 1519521155,
+        approx_ram_mb: 1800,
+        is_default: false,
+        custom_url: Some("https://huggingface.co/distil-whisper/distil-large-v3-ggml/resolve/main/ggml-distil-large-v3.bin"),
     },
 ];
 

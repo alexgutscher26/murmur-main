@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sliders, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 interface ExamplePrompt {
   id: string;

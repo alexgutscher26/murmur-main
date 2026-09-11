@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Cpu, ShieldCheck, Zap, Sparkles } from "lucide-react";
+import { Cpu, ShieldCheck, Zap } from "lucide-react";
 
 const TAGLINE_WORDS = [
   "Your",

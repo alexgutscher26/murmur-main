@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Zap, Check, Gauge } from "lucide-react";
+import { Zap, Check } from "lucide-react";
 
 interface BenchmarkMetric {
   id: string;

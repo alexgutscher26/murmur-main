@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calculator, Clock, Calendar, DollarSign, Sparkles } from "lucide-react";
+import { Clock, Calendar, DollarSign } from "lucide-react";
 
 export function ProductivityCalculator() {
   const [dailyTypingHours, setDailyTypingHours] = useState<number>(3.5);

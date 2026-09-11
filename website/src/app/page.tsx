@@ -12,7 +12,6 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { ProductivityCalculator } from "@/components/ProductivityCalculator";
 import { ModelSelectorGuide } from "@/components/ModelSelectorGuide";
-import { Testimonials } from "@/components/Testimonials";
 import { DownloadSection } from "@/components/DownloadSection";
 import { FAQSection } from "@/components/FAQSection";
 import { Footer } from "@/components/Footer";

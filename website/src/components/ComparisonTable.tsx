@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, X, ShieldCheck } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 interface ComparisonRow {
   feature: string;

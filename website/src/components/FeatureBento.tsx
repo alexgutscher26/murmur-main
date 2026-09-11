@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck, Zap, Globe, Command, WifiOff, Sparkles, Sliders } from "lucide-react";
+import { ShieldCheck, Globe, Command, WifiOff, Sparkles, Sliders } from "lucide-react";
 
 const JOBS = [
   {

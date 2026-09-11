@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Mic, Copy, Check, Volume2, Cpu, Activity } from "lucide-react";
+import { Mic, Copy, Check, Volume2, Cpu } from "lucide-react";
 
 interface Scenario {
   id: string;

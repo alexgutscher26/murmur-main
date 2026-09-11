@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, ShieldCheck, Zap, Sparkles } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Zap } from "lucide-react";
 
 interface AppItem {
   name: string;
