@@ -31,8 +31,6 @@ use std::time::Duration;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{Device, SampleFormat, Stream, StreamConfig, SupportedStreamConfig};
 
-/// cpal 0.18 exposes a device's human name through `description()`, and a
-/// device that cannot describe itself is one that has just been unplugged.
 fn device_name(device: &Device) -> Option<String> {
     device.description().ok().map(|d| d.name().to_string())
 }
@@ -461,6 +459,105 @@ where
                     for (slot, sample) in buffer.iter_mut().zip(block) {
                         // u16 is offset-binary: midpoint is silence.
                         *slot = (f32::from(*sample) - 32_768.0) / 32_768.0;
+                    }
+                    on_samples(&buffer[..block.len()]);
+                }
+            },
+            on_error,
+            None,
+        ),
+        SampleFormat::I32 => device.build_input_stream(
+            *config,
+            move |data: &[i32], _| {
+                let mut buffer = [0.0_f32; CONVERT_CHUNK];
+                for block in data.chunks(CONVERT_CHUNK) {
+                    for (slot, sample) in buffer.iter_mut().zip(block) {
+                        *slot = (*sample as f64 / i32::MAX as f64) as f32;
+                    }
+                    on_samples(&buffer[..block.len()]);
+                }
+            },
+            on_error,
+            None,
+        ),
+        SampleFormat::I8 => device.build_input_stream(
+            *config,
+            move |data: &[i8], _| {
+                let mut buffer = [0.0_f32; CONVERT_CHUNK];
+                for block in data.chunks(CONVERT_CHUNK) {
+                    for (slot, sample) in buffer.iter_mut().zip(block) {
+                        *slot = f32::from(*sample) / f32::from(i8::MAX);
+                    }
+                    on_samples(&buffer[..block.len()]);
+                }
+            },
+            on_error,
+            None,
+        ),
+        SampleFormat::U8 => device.build_input_stream(
+            *config,
+            move |data: &[u8], _| {
+                let mut buffer = [0.0_f32; CONVERT_CHUNK];
+                for block in data.chunks(CONVERT_CHUNK) {
+                    for (slot, sample) in buffer.iter_mut().zip(block) {
+                        *slot = (f32::from(*sample) - 128.0) / 128.0;
+                    }
+                    on_samples(&buffer[..block.len()]);
+                }
+            },
+            on_error,
+            None,
+        ),
+        SampleFormat::F64 => device.build_input_stream(
+            *config,
+            move |data: &[f64], _| {
+                let mut buffer = [0.0_f32; CONVERT_CHUNK];
+                for block in data.chunks(CONVERT_CHUNK) {
+                    for (slot, sample) in buffer.iter_mut().zip(block) {
+                        *slot = *sample as f32;
+                    }
+                    on_samples(&buffer[..block.len()]);
+                }
+            },
+            on_error,
+            None,
+        ),
+        SampleFormat::I64 => device.build_input_stream(
+            *config,
+            move |data: &[i64], _| {
+                let mut buffer = [0.0_f32; CONVERT_CHUNK];
+                for block in data.chunks(CONVERT_CHUNK) {
+                    for (slot, sample) in buffer.iter_mut().zip(block) {
+                        *slot = (*sample as f64 / i64::MAX as f64) as f32;
+                    }
+                    on_samples(&buffer[..block.len()]);
+                }
+            },
+            on_error,
+            None,
+        ),
+        SampleFormat::U32 => device.build_input_stream(
+            *config,
+            move |data: &[u32], _| {
+                let mut buffer = [0.0_f32; CONVERT_CHUNK];
+                for block in data.chunks(CONVERT_CHUNK) {
+                    for (slot, sample) in buffer.iter_mut().zip(block) {
+                        *slot = ((*sample as f64 - 2_147_483_648.0) / 2_147_483_648.0) as f32;
+                    }
+                    on_samples(&buffer[..block.len()]);
+                }
+            },
+            on_error,
+            None,
+        ),
+        SampleFormat::U64 => device.build_input_stream(
+            *config,
+            move |data: &[u64], _| {
+                let mut buffer = [0.0_f32; CONVERT_CHUNK];
+                for block in data.chunks(CONVERT_CHUNK) {
+                    for (slot, sample) in buffer.iter_mut().zip(block) {
+                        *slot = ((*sample as f64 - 9_223_372_036_854_775_808.0)
+                            / 9_223_372_036_854_775_808.0) as f32;
                     }
                     on_samples(&buffer[..block.len()]);
                 }
