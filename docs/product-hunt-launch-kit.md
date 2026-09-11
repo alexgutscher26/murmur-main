@@ -13,7 +13,7 @@ This document is the operational package and submission asset kit for the offici
 | **Short Description**   | `HushWrite turns speech into clean, formatted text in any desktop app—running 100% locally on your GPU via whisper.cpp. No cloud audio uploads, no accounts, and sub-180ms latency. Dictate code, notes, and emails with complete privacy.` | **230 characters** (Strict Limit: 260 chars)      |
 | **Categories / Topics** | `Productivity`, `Open Source`, `Artificial Intelligence`, `Developer Tools`, `Privacy`                                                                                                                                                      | Primary tags on Product Hunt                      |
 | **Website URL**         | `https://HushWrite.app`                                                                                                                                                                                                                     | Canonical landing page                            |
-| **GitHub Repo**         | `https://github.com/webprodigies/HushWrite`                                                                                                                                                                                                 | Open Source (MIT)                                 |
+| **GitHub Repo**         | `https://github.com/alexgutscher26/HushWrite`                                                                                                                                                                                                 | Open Source (MIT)                                 |
 | **Pricing Type**        | `Free + Paid Options`                                                                                                                                                                                                                       | Free core tier + perpetual lifetime & pro options |
 | **Platforms Supported** | `macOS (Apple Silicon & Intel)`, `Windows 10/11`                                                                                                                                                                                            | Cross-platform desktop apps                       |
 
@@ -82,9 +82,8 @@ This document is the operational package and submission asset kit for the offici
 
 - **Maker Name:** Alex Gutscher
 - **Maker Title:** Founder & Systems Engineer at HushWrite
-- **Product Hunt Handle:** `@alexgutscher`
-- **Twitter / X:** `@webprodigies`
-- **GitHub:** `https://github.com/webprodigies/HushWrite`
+- **Twitter / X:** `@snackforcode`
+- **GitHub:** `https://github.com/alexgutscher26/HushWrite`
 - **Bio (Profile Text):**
   > _"Systems engineer obsessed with local-first software, latency optimization, and data sovereignty. Built HushWrite to prove that local AI on modern GPUs is faster, cheaper, and fundamentally more private than cloud streaming."_
 
@@ -118,7 +117,7 @@ HushWrite is **free and open source (MIT)**. You can download it today and use i
 
 For power users who want advanced model switching (Whisper Medium/Large) and custom workflow profiles, we are offering **25% off** our Core Lifetime perpetual license and Pro tier with coupon code **HUNTER25** for the next 72 hours!
 
-Grab the build at https://HushWrite.app or inspect our code at https://github.com/webprodigies/HushWrite.
+Grab the build at https://HushWrite.app or inspect our code at https://github.com/alexgutscher26/HushWrite.
 
 Turn off your Wi-Fi, hold ⌥ Space (or Alt+Space), and let us know your feedback below! I'll be in the comments all day answering questions about whisper.cpp FFI, DirectML compute shaders, and latency benchmarking. 🚀
 ```
@@ -129,7 +128,7 @@ Turn off your Wi-Fi, hold ⌥ Space (or Alt+Space), and let us know your feedbac
 
 - **12:01 AM PST:** Product listing published on Product Hunt. Verify links, screenshots, and GIF playback.
 - **12:05 AM PST:** Post Maker First-Comment with coupon code `HUNTER25`.
-- **12:15 AM PST:** Tweet launch thread on X from `@webprodigies` with video clip demo.
+- **12:15 AM PST:** Tweet launch thread on X from `@snackforcode` with video clip demo.
 - **1:00 AM – 8:00 AM PST:** Engage European & Asian community questions in PH comments.
 - **8:00 AM PST:** Share community posts on Reddit (`r/rust`, `r/selfhosted`, `r/MachineLearning`, `r/productivity`).
 - **12:00 PM PST:** Midday progress update: share benchmark numbers and reply to technical architecture queries.

@@ -39,7 +39,7 @@ Over the past year, voice dictation apps had a massive resurgence. However, virt
 
 I wanted something different: a lean, native desktop utility that runs 100% locally on the device's GPU, requires zero network connections, and feels as instantaneous as physical keystrokes.
 
-Today we're open-sourcing **HushWrite** (MIT License): https://github.com/webprodigies/HushWrite
+Today we're open-sourcing **HushWrite** (MIT License): https://github.com/alexgutscher26/HushWrite
 
 ### Architecture & Technical Details:
 
@@ -55,7 +55,7 @@ Today we're open-sourcing **HushWrite** (MIT License): https://github.com/webpro
 
 Bridging Rust and C++ across whisper.cpp's memory model was an adventure. Ensuring audio sample buffers remained aligned without heap reallocations during active beam search decoding required careful lifetime management and zero-copy slicing.
 
-The repo is fully open source (MIT): https://github.com/webprodigies/HushWrite
+The repo is fully open source (MIT): https://github.com/alexgutscher26/HushWrite
 
 I'd love to hear your feedback on the architecture, unsafe FFI boundaries, and audio buffer management! Happy to answer any questions about the Rust stack.
 ```
@@ -93,7 +93,7 @@ The prevailing industry assumption has been that massive cloud GPUs (H100/A100) 
    - Running quantized Q5_0 models drew under 1.1% battery per hour on Apple Silicon, whereas maintaining an active WebSocket upload socket consumed 2.8% battery per hour.
 
 We've packaged this engine into a free, open-source desktop app (HushWrite) and published the benchmark methodology and evaluation scripts on GitHub:
-https://github.com/webprodigies/HushWrite
+https://github.com/alexgutscher26/HushWrite
 
 Would love to discuss quantization thresholds, temperature fallbacks, and speculative decoding techniques for on-device ASR!
 ```
@@ -122,7 +122,7 @@ I built **HushWrite** to solve this: an open-source, air-gapped voice dictation 
 - **Unlimited & Free:** No 2,000-word weekly quotas or $15/month subscriptions. MIT licensed.
 
 Download DMGs/Installers or build from source:
-https://github.com/webprodigies/HushWrite
+https://github.com/alexgutscher26/HushWrite
 Website: https://HushWrite.app
 
 Check it out, disconnect your internet, and let me know how it runs on your setup!

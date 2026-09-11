@@ -235,25 +235,26 @@ export function Hero() {
           <span className="block text-[#737373] font-bold mt-1 sm:mt-2">Keep it private.</span>
         </h1>
 
-        {/* Subtitle with Inline Badges matching the screenshot */}
-        <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed font-normal">
-          Turn your voice into polished text in any app — processed 100% locally on your Windows PC
-          (with Mac Early Access for technical testers) through key guarantees like{" "}
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800 align-middle my-1">
-            <Eye className="w-3.5 h-3.5 text-neutral-500" />
-            <span>No uploaded audio</span>
-          </span>
-          {", "}
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800 align-middle my-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-neutral-500" />
-            <span>0 cloud transcripts</span>
-          </span>
-          {", and "}
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800 align-middle my-1">
-            <Lock className="w-3.5 h-3.5 text-neutral-500" />
-            <span>Zero data selling</span>
-          </span>
+        {/* Subtitle */}
+        <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed font-normal mb-5">
+          Turn your voice into polished, formatted text in any app — processed 100% locally on your device.
         </p>
+
+        {/* Trust Badges */}
+        <div className="flex flex-wrap items-center justify-center gap-2 max-w-xl mx-auto">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800">
+            <Eye className="w-3.5 h-3.5 text-neutral-500" />
+            <span>No audio uploads</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800">
+            <ShieldCheck className="w-3.5 h-3.5 text-neutral-500" />
+            <span>Zero cloud transcripts</span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800">
+            <Lock className="w-3.5 h-3.5 text-neutral-500" />
+            <span>100% offline & private</span>
+          </span>
+        </div>
       </div>
 
       {/* Two CTA Buttons */}

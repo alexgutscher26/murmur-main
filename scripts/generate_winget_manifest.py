@@ -10,7 +10,7 @@ Usage:
         --version 0.1.0 \
         --installer-url https://github.com/alexgutscher26/HushWrite/releases/download/v0.1.0/HushWrite_0.1.0_x64-setup.exe \
         --installer-sha256 <SHA256_HEX> \
-        --output-dir winget/manifests/w/WebProdigies/HushWrite/0.1.0
+        --output-dir winget/manifests/w/snackforcode/HushWrite/0.1.0
 """
 
 import argparse
@@ -20,7 +20,7 @@ import os
 def generate_manifests(version: str, installer_url: str, sha256: str, output_dir: str):
     os.makedirs(output_dir, exist_ok=True)
 
-    pkg_id = "WebProdigies.HushWrite"
+    pkg_id = "snackforcode.HushWrite"
 
     version_yaml = f"""# yaml-language-server: $schema=https://aka.ms/winget-manifest.version.1.6.0.schema.json
 
@@ -56,16 +56,16 @@ ManifestVersion: 1.6.0
 PackageIdentifier: {pkg_id}
 PackageVersion: {version}
 PackageLocale: en-US
-Publisher: WebProdigies
+Publisher: snackforcode
 PublisherUrl: https://HushWrite.app
-PublisherSupportUrl: https://github.com/webprodigies/HushWrite/issues
+PublisherSupportUrl: https://github.com/snackforcode/HushWrite/issues
 PrivacyUrl: https://HushWrite.app/privacy
-Author: WebProdigies
+Author: snackforcode
 PackageName: HushWrite
 PackageUrl: https://HushWrite.app
 License: MIT
-LicenseUrl: https://github.com/webprodigies/HushWrite/blob/main/LICENSE
-Copyright: Copyright (c) 2026 WebProdigies
+LicenseUrl: https://github.com/snackforcode/HushWrite/blob/main/LICENSE
+Copyright: Copyright (c) 2026 snackforcode
 ShortDescription: Private, local AI voice dictation that never leaves your computer.
 Description: |
   HushWrite is a private, local-first voice dictation application for macOS and Windows.
@@ -105,7 +105,7 @@ def main():
 
     args = parser.parse_args()
 
-    out_dir = args.output_dir or f"winget/manifests/w/WebProdigies/HushWrite/{args.version}"
+    out_dir = args.output_dir or f"winget/manifests/w/snackforcode/HushWrite/{args.version}"
     generate_manifests(args.version, args.installer_url, args.installer_sha256, out_dir)
 
 

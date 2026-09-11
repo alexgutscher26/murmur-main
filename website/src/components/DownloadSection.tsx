@@ -93,7 +93,7 @@ export function DownloadSection() {
   const cliCommands = [
     {
       platform: "Windows Winget",
-      command: "winget install WebProdigies.HushWrite",
+      command: "winget install snackforcode.HushWrite",
     },
     {
       platform: "Windows PowerShell",
@@ -105,7 +105,7 @@ export function DownloadSection() {
     },
     {
       platform: "Source / GitHub Clone",
-      command: "git clone https://github.com/webprodigies/HushWrite.git",
+      command: "git clone https://github.com/alexgutscher26/HushWrite.git",
     },
   ];
 
@@ -312,12 +312,12 @@ export function DownloadSection() {
                   Official Repository
                 </span>
                 <a
-                  href="https://github.com/webprodigies/HushWrite"
+                  href="https://github.com/alexgutscher26/HushWrite"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono text-xs font-bold text-neutral-950 hover:underline flex items-center gap-1"
                 >
-                  <span>webprodigies/HushWrite</span>
+                  <span>HushWrite</span>
                   <ExternalLink className="w-3 h-3 text-neutral-400" />
                 </a>
               </div>

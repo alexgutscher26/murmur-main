@@ -395,7 +395,7 @@
   - Build both `x86_64-pc-windows-msvc` and `aarch64-pc-windows-msvc` targets
   - Run `cargo clippy` and `cargo test` in the matrix before packaging
   - Upload artifacts to the GitHub release as `.exe`, `.msi`, and `.msix`
-- [x] [INFRA] Winget package — Official multi-YAML manifests (`WebProdigies.HushWrite`) under `winget/manifests/` and automated generator script (`scripts/generate_winget_manifest.py`) for `winget install HushWrite`.
+- [x] [INFRA] Winget package — Official multi-YAML manifests (`snackforcode.HushWrite`) under `winget/manifests/` and automated generator script (`scripts/generate_winget_manifest.py`) for `winget install HushWrite`.
 - [ ] [INFRA] Chocolatey package — Publish a Chocolatey package for enterprise environments.
   - Create `nuspec` manifest and install/uninstall PowerShell scripts
   - Submit to the Chocolatey Community Repository

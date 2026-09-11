@@ -418,7 +418,7 @@ Phase 2 is the risk concentration. If measured latency there misses the target, 
 
 1. **The updater private key has no passphrase, and it exists on exactly one machine.** `~/.HushWrite-updater.key`, chmod 600, gitignored. Its public half is compiled into every binary that ships, so after the first release the keypair can never be rotated for installs already in the wild — losing this file strands every existing installation on whatever version it has, permanently, with no recovery path. It belongs in a password manager, and adding a passphrase is free today and impossible later.
 
-2. **`plugins.updater.endpoints` is a guess.** It points at `github.com/webprodigies/HushWrite`, inferred rather than read, because the project has no git remote to read one from. If the real slug differs, the update check will silently find nothing — no error, no prompt, just an app that never updates and never says why. One value, and it has to be right before the first tag rather than after it.
+2. **`plugins.updater.endpoints` is a guess.** It points at `github.com/alexgutscher26/HushWrite`, inferred rather than read, because the project has no git remote to read one from. If the real slug differs, the update check will silently find nothing — no error, no prompt, just an app that never updates and never says why. One value, and it has to be right before the first tag rather than after it.
 
 Releases are published as **drafts**, so a broken build is never what every install auto-downloads.
 

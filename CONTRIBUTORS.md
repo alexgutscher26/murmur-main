@@ -8,10 +8,10 @@ HushWrite is a community-driven, local-first open source project built to protec
 
 ## Core Maintainers & Engineering
 
-| Contributor | Focus Areas | GitHub |
-| :--- | :--- | :--- |
+| Contributor                           | Focus Areas                                                      | GitHub                                               |
+| :------------------------------------ | :--------------------------------------------------------------- | :--------------------------------------------------- |
 | **Alex Gutscher** (`@alexgutscher26`) | Project Lead, Tauri v2 Architecture, DirectML / CUDA Integration | [@alexgutscher26](https://github.com/alexgutscher26) |
-| **WebProdigies** (`@webprodigies`) | Core Engine, Speech Pipelines, Website & Landing Experience | [@webprodigies](https://github.com/webprodigies) |
+| **snackforcode** (`@snackforcode`)    | Core Engine, Speech Pipelines, Website & Landing Experience      | [@snackforcode](https://github.com/snackforcode)     |
 
 ---
 
@@ -37,6 +37,7 @@ Alphabetical list of contributors across code, models, UI, and documentation:
 ## Becoming a Contributor
 
 We welcome contributions of all kinds!
+
 - **Code & Core Engine**: Implement features or fixes following our hexagonal architecture and SOT headers.
 - **Acoustic & LLM Models**: Help benchmark new GGUF quantizations or ONNX FastConformer models.
 - **Custom Vocabulary Packs**: Share domain dictionaries for medical, legal, coding, and creative writing.

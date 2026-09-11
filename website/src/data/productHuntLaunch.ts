@@ -69,8 +69,8 @@ export const PRODUCT_HUNT_LAUNCH: ProductHuntListing = {
     bio: "Systems engineer obsessed with local-first software, latency optimization, and data sovereignty. Built HushWrite to prove that local AI on modern GPUs is faster, cheaper, and fundamentally more private than cloud streaming.",
     avatarUrl: "https://HushWrite.app/128x128@2x.png",
     socialLinks: {
-      x: "https://x.com/webprodigies",
-      github: "https://github.com/webprodigies/HushWrite",
+      x: "https://x.com/alexgutscher26",
+      github: "https://github.com/alexgutscher26/HushWrite",
     },
   },
   screenshots: [

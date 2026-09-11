@@ -208,7 +208,7 @@ export default function DevelopersPage() {
               <span className="text-xs text-neutral-400 font-normal">Windows & Mac</span>
             </Link>
             <a
-              href="https://github.com/webprodigies/HushWrite"
+              href="https://github.com/alexgutscher26/HushWrite"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-50 border border-neutral-200/90 shadow-sm text-sm font-semibold text-neutral-800 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"

@@ -17,7 +17,7 @@ use std::path::{Path, PathBuf};
 use crate::error::{AppError, AppResult, ErrorCode};
 
 /// Matches the bundle identifier so the app's data sits where macOS expects it.
-pub const APP_DIR_NAME: &str = "com.webprodigies.HushWrite";
+pub const APP_DIR_NAME: &str = "com.snackforcode.HushWrite";
 
 /**
  * SOURCE OF TRUTH KEYWORDS: AppPaths

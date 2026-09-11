@@ -115,7 +115,7 @@ flowchart LR
 #### Option A: Windows Package Manager (WinGet)
 
 ```powershell
-winget install WebProdigies.HushWrite
+winget install snackforcode.HushWrite
 ```
 
 #### Option B: Standalone Installer
