@@ -142,14 +142,14 @@ export function SwitcherModal({ isOpen, onClose, defaultPlan = "lifetime" }: Swi
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-950">Pro Lifetime</span>
+                    <span className="text-xs font-bold text-neutral-950">Founding Beta</span>
                     <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                      Save $20
+                      Save $10
                     </span>
                   </div>
                   <div className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-lg font-bold font-mono text-emerald-700">$69</span>
-                    <span className="text-xs text-neutral-400 line-through font-mono">$89</span>
+                    <span className="text-lg font-bold font-mono text-emerald-700">$39</span>
+                    <span className="text-xs text-neutral-400 line-through font-mono">$49</span>
                     <span className="text-[10px] text-neutral-500">one-time</span>
                   </div>
                 </button>
@@ -242,7 +242,7 @@ export function SwitcherModal({ isOpen, onClose, defaultPlan = "lifetime" }: Swi
               ) : (
                 <>
                   <span>
-                    Claim Switcher Deal & Checkout ({plan === "lifetime" ? "$69" : "$29"})
+                    Claim Switcher Deal & Checkout ({plan === "lifetime" ? "$39" : "$29"})
                   </span>
                   <ArrowRight className="size-4" />
                 </>

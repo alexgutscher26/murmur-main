@@ -27,15 +27,15 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
   const normalizedDiscount = discountCode?.trim().toUpperCase();
 
   if (tier === "pro_lifetime") {
-    const originalAmountCents = 8900; // $89.00
+    const originalAmountCents = 4900; // $49.00 Founding Beta
 
     if (normalizedDiscount === "SWITCHER-40") {
       return {
         tier,
-        name: "HushWrite Pro Lifetime (Switcher Guarantee)",
-        amountCents: 6900, // $69.00 ($20 off)
+        name: "HushWrite Founding Beta (Switcher Guarantee)",
+        amountCents: 3900, // $39.00 ($10 off)
         currency: "usd",
-        discountApplied: "Switcher Guarantee ($20 Off Lifetime)",
+        discountApplied: "Switcher Guarantee ($10 Off Founding Beta)",
         originalAmountCents,
       };
     }
@@ -45,9 +45,9 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
         tier,
         name:
           normalizedDiscount === "STUDENT-50"
-            ? "HushWrite Pro Lifetime (Student & Academic Grant)"
-            : "HushWrite Pro Lifetime (Open Source Maintainer Grant)",
-        amountCents: 4400, // $44.00 (50% off)
+            ? "HushWrite Founding Beta (Student & Academic Grant)"
+            : "HushWrite Founding Beta (Open Source Maintainer Grant)",
+        amountCents: 2400, // $24.00 (~50% off)
         currency: "usd",
         discountApplied: "Academic / OSS 50% Grant",
         originalAmountCents,
@@ -57,8 +57,8 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
     if (normalizedDiscount?.startsWith("HushWrite-") || normalizedDiscount?.startsWith("REF-")) {
       return {
         tier,
-        name: "HushWrite Pro Lifetime (Referral Bonus)",
-        amountCents: 7900, // $79.00 ($10 off)
+        name: "HushWrite Founding Beta (Referral Bonus)",
+        amountCents: 3900, // $39.00 ($10 off)
         currency: "usd",
         discountApplied: `Friend Referral Bonus ($10 Off with ${normalizedDiscount})`,
         originalAmountCents,
@@ -67,8 +67,8 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
 
     return {
       tier,
-      name: "HushWrite Pro Lifetime License",
-      amountCents: 8900,
+      name: "HushWrite Founding Beta License",
+      amountCents: 4900,
       currency: "usd",
       originalAmountCents,
     };
@@ -150,7 +150,7 @@ export function generateLicenseKey(tier: PlanTierKey, discountCode?: string | nu
   } else if (discount === "OSS-50") {
     prefix = "OSS";
   } else if (tier === "pro_lifetime") {
-    prefix = "LIFETIME";
+    prefix = "FOUNDING";
   }
 
   return `${prefix}-${chunk(4)}-${chunk(4)}-${chunk(4)}`;

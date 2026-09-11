@@ -184,14 +184,14 @@ export function StudentGrantModal({
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-neutral-950">Pro Lifetime</span>
+                    <span className="text-xs font-bold text-neutral-950">Founding Beta</span>
                     <span className="text-[10px] font-mono font-semibold px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-800">
                       50% OFF
                     </span>
                   </div>
                   <div className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-lg font-bold font-mono text-purple-700">$44</span>
-                    <span className="text-xs text-neutral-400 line-through font-mono">$89</span>
+                    <span className="text-lg font-bold font-mono text-purple-700">$24</span>
+                    <span className="text-xs text-neutral-400 line-through font-mono">$49</span>
                     <span className="text-[10px] text-neutral-500">once</span>
                   </div>
                 </button>
@@ -388,7 +388,7 @@ export function StudentGrantModal({
                 <span>Redirecting to Checkout...</span>
               ) : (
                 <>
-                  <span>Claim 50% Grant & Checkout ({plan === "lifetime" ? "$44" : "$24/yr"})</span>
+                  <span>Claim 50% Grant & Checkout ({plan === "lifetime" ? "$24" : "$24/yr"})</span>
                   <ArrowRight className="size-4" />
                 </>
               )}

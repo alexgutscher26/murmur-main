@@ -69,14 +69,19 @@ const COMMUNITY_PACKS = [
 
 const PRICING_FAQS = [
   {
-    question: "What is the difference between Free and Pro?",
+    question: "What is included in Founding Beta ($49 one-time)?",
     answer:
-      "Free gives you unlimited local dictation using the lightweight Whisper Base model with standard punctuation. Pro unlocks Whisper Large v3 Turbo & Medium models, per-app style adaptation (Slack vs code vs email), custom vocabulary & client jargon, and automatic filler word stripping.",
+      "Founding Beta ($49 one-time) gives you permanent lifetime access to all HushWrite features on up to 2 personal devices. It includes immediate Windows Store & direct installer access now, Mac Early Access for technical testers, and guarantees the official signed & notarized Mac release as soon as it is available.",
   },
   {
-    question: "How does Pro Lifetime vs Pro Annual work?",
+    question: "What is the difference between Free and Founding Beta?",
     answer:
-      "Pro Lifetime ($89 one-time) lets you own the software forever on up to 2 personal devices with 1 full year of continuous updates included. After year 1, your version remains yours to use offline indefinitely with zero subscriptions. Pro Annual ($49/year) is for users who prefer continuous ongoing model upgrades, driver tuning, and priority support as a low annual expense.",
+      "Free gives you unlimited local dictation using the lightweight Whisper Base model with standard punctuation. Founding Beta unlocks Whisper Large v3 Turbo & Medium models, per-app style adaptation (Slack vs code vs email), custom vocabulary & client jargon, and automatic filler word stripping.",
+  },
+  {
+    question: "What is the status of the macOS release?",
+    answer:
+      "HushWrite is fully released and optimized for Windows 10/11 today. The macOS version is currently in Early Access for technical testers who can run test binaries or build from source. Founding Beta supporters are guaranteed full access to the official, signed, and notarized macOS release at no extra charge the moment it is available.",
   },
   {
     question: "Does HushWrite ever send my audio or text to the cloud?",
@@ -86,12 +91,12 @@ const PRICING_FAQS = [
   {
     question: "How does the Switcher Discount work?",
     answer:
-      "If you currently pay for Wispr Flow, Superwhisper, or Dragon, you can claim 40% off Pro Annual or $20 off Pro Lifetime by emailing proof of an active receipt or account screenshot.",
+      "If you currently pay for Wispr Flow, Superwhisper, or Dragon, you can claim $10 off Founding Beta (pay only $39 one-time) or 40% off Pro Annual by emailing proof of an active receipt or account screenshot.",
   },
   {
     question: "Do you offer Student and Open Source Maintainer pricing?",
     answer:
-      "Yes! Students, educators, and verified open-source maintainers receive a 50% discount ($44 for Pro Lifetime or $24/yr for Pro Annual). Simply reach out with your student ID or GitHub profile.",
+      "Yes! Students, educators, and verified open-source maintainers receive a 50% discount ($24 for Founding Beta or $24/yr for Pro Annual). Simply reach out with your student ID or GitHub profile.",
   },
   {
     question: "How do Team licenses work?",
@@ -145,10 +150,10 @@ function PricingContent() {
 
   const proPrice = refCode
     ? proBilling === "lifetime"
-      ? "$79"
+      ? "$39"
       : "$39"
     : proBilling === "lifetime"
-      ? "$89"
+      ? "$49"
       : "$49";
 
   const proPeriod = refCode
@@ -161,10 +166,10 @@ function PricingContent() {
 
   const proSubtext = refCode
     ? proBilling === "lifetime"
-      ? "Friend referral applied ($10 off reg. $89) · Own forever"
+      ? "Friend referral applied ($10 off reg. $49) · Own forever"
       : "Friend referral applied ($10 off reg. $49) · Continuous updates"
     : proBilling === "lifetime"
-      ? "Pay once · Own forever · 1 yr updates included"
+      ? "Pay once · Own forever · Windows Store + Mac Early Access"
       : "Equivalent to $4.08/mo · Continuous updates";
 
   const tiers: PricingTier[] = [
@@ -180,9 +185,9 @@ function PricingContent() {
       features: [
         "100% on-device Whisper Base model",
         "Sub-200ms instantaneous transcription",
-        "Universal hotkey (⌥Space / Alt+Space)",
+        "Universal hotkey (Alt+Space / ⌥Space)",
         "Standard punctuation & raw text insertion",
-        "macOS (Metal) & Windows (DirectML) native",
+        "Windows (DirectML) native & Mac early access",
         "Audio and transcripts never leave RAM",
       ],
       ctaText: "Download Free Forever",
@@ -191,30 +196,32 @@ function PricingContent() {
     },
     {
       id: "pro",
-      name: "Pro",
+      name: proBilling === "lifetime" ? "Founding Beta" : "Pro Annual",
       badge: refCode
         ? "Referral Gift Applied"
         : proBilling === "lifetime"
-          ? "Perpetual · Best Value"
+          ? "Founding Beta · Best Value"
           : "Most Flexible",
       price: proPrice,
       period: proPeriod,
       subtext: proSubtext,
       description:
-        "For professionals who write daily and want peak accuracy, custom jargon, and context awareness.",
+        "Includes Windows Store access now, Mac Early Access for technical testers, and a signed/notarized Mac release as soon as it is available.",
       features: [
         "Everything in Free, plus:",
+        "Windows Store access & direct installer (.exe / .msi / winget)",
+        "Mac Early Access for technical testers",
+        "Signed & notarized Mac release as soon as available",
         "Whisper Large v3 Turbo & Medium models",
         "Per-app writing styles (Slack, Mail, Code, Docs)",
         "Custom dictionary for technical terms & client names",
         "Automatic filler word removal (strips ums/ahs)",
+        "Valid on 2 personal devices (Windows & macOS)",
         "Works 100% offline & air-gap verified",
-        "Valid on 2 personal devices (macOS & Windows)",
-        "Continuous performance tuning & model drops",
       ],
       ctaText:
         proBilling === "lifetime"
-          ? `Get Pro Lifetime (${proPrice})`
+          ? `Get Founding Beta (${proPrice} one-time)`
           : `Start Pro Annual (${proPrice}/yr)`,
       ctaHref: "/#download",
       isPrimary: true,
@@ -293,17 +300,16 @@ function PricingContent() {
                   </span>
                 </div>
                 <h2 className="text-sm sm:text-base font-bold text-emerald-950">
-                  $10 Off Any Pro Tier + Developer Prompt Pack Included
+                  $10 Off Founding Beta + Developer Prompt Pack Included
                 </h2>
                 <p className="text-xs text-emerald-800/90 mt-0.5">
-                  Your invite bonus is active. Select Lifetime ($79) or Annual ($39/yr) below to
-                  check out.
+                  Your invite bonus is active. Select Founding Beta ($39 one-time) below to check out.
                 </p>
               </div>
             </div>
             <div className="text-right shrink-0">
               <span className="inline-block px-3 py-1 rounded-xl bg-emerald-600 text-white text-xs font-mono font-bold shadow-xs">
-                {proBilling === "lifetime" ? "$79 Lifetime" : "$39 / Year"}
+                {proBilling === "lifetime" ? "$39 Founding Beta" : "$39 / Year"}
               </span>
             </div>
           </div>
@@ -327,10 +333,10 @@ function PricingContent() {
             <div className="flex items-center gap-3 shrink-0">
               <div className="text-right">
                 <span className="block text-[11px] font-mono text-neutral-400 line-through">
-                  $89 / $49
+                  $49 reg.
                 </span>
                 <span className="block text-sm font-bold font-mono text-emerald-700">
-                  Save up to 40%
+                  $39 one-time
                 </span>
               </div>
               <button
@@ -350,9 +356,9 @@ function PricingContent() {
                 1
               </span>
               <div>
-                <span className="font-semibold text-neutral-900 block">40% Off Annual Pass</span>
+                <span className="font-semibold text-neutral-900 block">$10 Off Founding Beta</span>
                 <span className="text-[11px] text-neutral-500">
-                  Pay only $29 for your entire first year (reg. $49).
+                  Pay only $39 once (reg. $49) and own your license forever.
                 </span>
               </div>
             </div>
@@ -361,9 +367,9 @@ function PricingContent() {
                 2
               </span>
               <div>
-                <span className="font-semibold text-neutral-900 block">$20 Off Pro Lifetime</span>
+                <span className="font-semibold text-neutral-900 block">40% Off Annual Pass</span>
                 <span className="text-[11px] text-neutral-500">
-                  Pay $69 once instead of $89 and own it forever.
+                  Pay only $29 for your entire first year if choosing subscription.
                 </span>
               </div>
             </div>
@@ -374,7 +380,7 @@ function PricingContent() {
               <div>
                 <span className="font-semibold text-neutral-900 block">Frictionless Switch</span>
                 <span className="text-[11px] text-neutral-500">
-                  Fast email verification with receipt or active screenshot.
+                  Instant activation with receipt or active subscription screenshot.
                 </span>
               </div>
             </div>
@@ -391,9 +397,9 @@ function PricingContent() {
                 : "text-neutral-600 hover:text-neutral-950"
             }`}
           >
-            <span>Lifetime License ($89)</span>
+            <span>Founding Beta ($49)</span>
             <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-semibold">
-              Pay Once
+              Pay Once · Own Forever
             </span>
           </button>
 
@@ -502,7 +508,7 @@ function PricingContent() {
               </h2>
               <p className="mt-2 text-sm text-neutral-600 max-w-xl">
                 We support researchers, students, and open-source creators who push the boundaries
-                of knowledge and open software. Enjoy a flat 50% discount on any Pro license.
+                of knowledge and open software. Enjoy a flat 50% discount on Founding Beta or Pro Annual.
               </p>
             </div>
 
@@ -512,10 +518,10 @@ function PricingContent() {
               </span>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold font-mono text-emerald-700">50% OFF</span>
-                <span className="text-xs text-neutral-600 font-sans">Pro Lifetime & Annual</span>
+                <span className="text-xs text-neutral-600 font-sans">Founding Beta & Annual</span>
               </div>
               <span className="text-[11px] font-mono text-neutral-400">
-                Lifetime: $44 · Annual: $24/yr
+                Founding Beta: $24 · Annual: $24/yr
               </span>
             </div>
           </div>
@@ -542,7 +548,7 @@ function PricingContent() {
                 <ul className="text-xs text-neutral-700 space-y-1.5 mb-4">
                   <li className="flex items-center gap-2">
                     <span className="text-emerald-600 font-bold">✓</span>
-                    <span>$44 Pro Lifetime (normally $89)</span>
+                    <span>$24 Founding Beta (normally $49)</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-emerald-600 font-bold">✓</span>
@@ -586,7 +592,7 @@ function PricingContent() {
                 <ul className="text-xs text-neutral-700 space-y-1.5 mb-4">
                   <li className="flex items-center gap-2">
                     <span className="text-purple-600 font-bold">✓</span>
-                    <span>$44 Pro Lifetime or $24/yr Annual</span>
+                    <span>$24 Founding Beta or $24/yr Annual</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <span className="text-purple-600 font-bold">✓</span>

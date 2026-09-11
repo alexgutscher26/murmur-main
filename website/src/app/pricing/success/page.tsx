@@ -50,7 +50,7 @@ function SuccessContent() {
   };
 
   const isLifetime = planParam === "pro_lifetime";
-  const planTitle = isLifetime ? "Pro Lifetime Perpetual License" : "Pro Annual Pass";
+  const planTitle = isLifetime ? "Founding Beta Perpetual License" : "Pro Annual Pass";
 
   return (
     <div className="relative pt-32 pb-20 px-4 max-w-4xl mx-auto text-center">
