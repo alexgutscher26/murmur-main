@@ -40,10 +40,10 @@ interface ReleaseEntry {
 
 const RELEASES: ReleaseEntry[] = [
   {
-    version: "v0.1.0",
-    date: "August 2026",
-    badge: "Current Release",
-    title: "Local Speech AI, Pro Tiers & Desktop UX Overhaul",
+    version: "v1.0.0",
+    date: "September 2026",
+    badge: "Stable Release",
+    title: "HushWrite 1.0.0 — Production Ready On-Device Voice AI",
     highlights: [
       {
         icon: <Cpu className="size-4 text-text-primary" />,

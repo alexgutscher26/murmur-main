@@ -743,7 +743,7 @@ function GeneralTabContent({
             </p>
           </div>
           <span className="inline-flex items-center rounded-md bg-stone-100 dark:bg-stone-800 px-2 py-0.5 text-[11px] font-mono text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
-            v0.1.0 · MIT License
+            v1.0.0 · MIT License
           </span>
         </div>
 
