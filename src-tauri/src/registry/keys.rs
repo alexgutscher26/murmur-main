@@ -27,6 +27,10 @@ pub const AUDIO_FEEDBACK: &str = "dictation.audio_feedback";
 pub const TRANSCRIPTION_MODEL: &str = "transcription.model";
 pub const LANGUAGE: &str = "transcription.language";
 pub const FINALIZE_TIMEOUT_MS: &str = "transcription.finalize_timeout_ms";
+pub const TRANSCRIPTION_AUTO_ESCALATE: &str = "transcription.auto_escalate";
+pub const TRANSCRIPTION_ESCALATE_MODEL: &str = "transcription.escalate_model";
+pub const TRANSCRIPTION_CONFIDENCE_THRESHOLD: &str = "transcription.confidence_threshold";
+pub const TRANSCRIPTION_APP_AWARE_ESCALATE: &str = "transcription.app_aware_escalate";
 
 // ── Output ───────────────────────────────────────────────────────────────
 pub const AUTO_PASTE: &str = "output.auto_paste";

@@ -414,3 +414,21 @@ export function canUseMultiDeviceSync(tier: PlanTier): boolean {
 export function canUseTeamDictionarySync(tier: PlanTier): boolean {
   return tier === "team";
 }
+
+/** Whether the user can enable Adaptive Model Auto-Switching */
+export function canUseAdaptiveEscalation(_tier: PlanTier): boolean {
+  return true;
+}
+
+/** Whether a specific target model requires a Pro or Team license */
+export function isProModel(modelId: string): boolean {
+  const proModelIds = [
+    "large-v3-turbo",
+    "large-v3",
+    "medium",
+    "medium-q5_0",
+    "qwen-2.5-1.5b-instruct",
+    "phi-3.5-mini-instruct",
+  ];
+  return proModelIds.some((id) => modelId.toLowerCase().includes(id));
+}

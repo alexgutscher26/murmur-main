@@ -186,12 +186,12 @@ mod tests {
     use crate::types::LanguageCode;
 
     fn segment(text: &str, start_ms: u64, end_ms: u64) -> TranscriptSegment {
-        TranscriptSegment {
-            text: text.into(),
+        TranscriptSegment::simple(
+            text.into(),
             start_ms,
             end_ms,
-            language: Some(LanguageCode("en".into())),
-        }
+            Some(LanguageCode("en".into())),
+        )
     }
 
     #[test]

@@ -359,6 +359,7 @@ impl TranscriptionEngine for WhisperEngine {
             };
 
             let no_speech = segment.no_speech_probability();
+            let confidence = Some((1.0 - no_speech).clamp(0.0, 1.0));
             if is_hallucination(
                 &text,
                 detected.as_ref().map(LanguageCode::as_str),
@@ -377,6 +378,8 @@ impl TranscriptionEngine for WhisperEngine {
                 start_ms: absolute_ms(chunk, segment.start_timestamp()),
                 end_ms: absolute_ms(chunk, segment.end_timestamp()),
                 language: detected.clone(),
+                confidence,
+                escalated: false,
             });
         }
 

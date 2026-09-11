@@ -65,6 +65,23 @@ pub struct TranscriptSegment {
     #[specta(type = TsNumber)]
     pub end_ms: u64,
     pub language: Option<LanguageCode>,
+    #[serde(default)]
+    pub confidence: Option<f32>,
+    #[serde(default)]
+    pub escalated: bool,
+}
+
+impl TranscriptSegment {
+    pub fn simple(text: String, start_ms: u64, end_ms: u64, language: Option<LanguageCode>) -> Self {
+        Self {
+            text,
+            start_ms,
+            end_ms,
+            language,
+            confidence: None,
+            escalated: false,
+        }
+    }
 }
 
 /**
@@ -81,4 +98,6 @@ pub struct Transcript {
     pub final_text: String,
     pub language: Option<LanguageCode>,
     pub word_count: u32,
+    #[serde(default)]
+    pub escalated: bool,
 }

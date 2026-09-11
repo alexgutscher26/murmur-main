@@ -113,9 +113,12 @@ export function toControlSetting(
   }
 
   const isFillerGated = def.key === "enhance.strip_fillers" && tier && !canUseFillerStripper(tier);
-  const label = isFillerGated ? `${def.label} (PRO)` : def.label;
+  const isEscalateGated = def.key === "transcription.escalate_model" && tier === "starter";
+  const label = isFillerGated || isEscalateGated ? `${def.label} (PRO)` : def.label;
   const description = isFillerGated
     ? `${def.description} (Pro capability: automatically strips verbal hesitations and filler words).`
+    : isEscalateGated
+    ? `${def.description} (Pro tier: unlocks large-v3-turbo and medium-q5_0 for high-capacity escalation).`
     : [def.description, ...notes].join(" ");
 
   const base = {

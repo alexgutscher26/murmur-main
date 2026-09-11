@@ -183,6 +183,30 @@ async fn deliver(ctx: &SessionContext, pending: PendingDelivery) {
         code_casing_style: settings.code_casing_style,
     };
 
+    if settings.auto_escalate {
+        let policy = crate::pipeline::adaptive::AdaptiveEscalationPolicy::new(
+            settings.auto_escalate,
+            settings.confidence_threshold,
+            settings.app_aware_escalate,
+            settings.escalate_model.clone(),
+            true,
+        );
+        let decision = policy.evaluate(
+            None,
+            started_at.map(|t| t.elapsed().as_millis() as u64).unwrap_or(0),
+            -30.0,
+            peak_amplitude,
+            None,
+        );
+        if decision.should_escalate {
+            tracing::info!(
+                reason = %decision.reason,
+                target_model = %decision.target_model,
+                "adaptive model auto-escalation evaluated for session"
+            );
+        }
+    }
+
     let final_text = {
         let _timer = latency.stage_timer(LatencyStage::Enhance);
         ctx.ports

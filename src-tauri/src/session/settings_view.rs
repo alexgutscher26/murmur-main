@@ -56,6 +56,10 @@ pub struct SessionSettings {
     pub normalise_punctuation: bool,
     pub capitalise_sentences: bool,
     pub audio_feedback: bool,
+    pub auto_escalate: bool,
+    pub escalate_model: String,
+    pub confidence_threshold: f32,
+    pub app_aware_escalate: bool,
 }
 
 impl SessionSettings {
@@ -154,6 +158,13 @@ impl SessionSettings {
             normalise_punctuation: read_bool(stored, keys::NORMALISE_PUNCTUATION).unwrap_or(true),
             capitalise_sentences: read_bool(stored, keys::CAPITALISE_SENTENCES).unwrap_or(true),
             audio_feedback: read_bool(stored, keys::AUDIO_FEEDBACK).unwrap_or(true),
+            auto_escalate: read_bool(stored, keys::TRANSCRIPTION_AUTO_ESCALATE).unwrap_or(false),
+            escalate_model: read_choice(stored, keys::TRANSCRIPTION_ESCALATE_MODEL)
+                .unwrap_or_else(|| "large-v3-turbo".to_string()),
+            confidence_threshold: read_number(stored, keys::TRANSCRIPTION_CONFIDENCE_THRESHOLD)
+                .unwrap_or(0.70) as f32,
+            app_aware_escalate: read_bool(stored, keys::TRANSCRIPTION_APP_AWARE_ESCALATE)
+                .unwrap_or(true),
         }
     }
 }

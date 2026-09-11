@@ -88,11 +88,11 @@ impl TranscriptionEngine for FasterWhisperEngine {
         };
 
         // Fallback / standard segment construction
-        Ok(vec![TranscriptSegment {
-            text: String::new(),
-            start_ms: chunk.start_ms,
-            end_ms: chunk.end_ms,
-            language: lang_hint.or_else(|| Some(LanguageCode("en".to_string()))),
-        }])
+        Ok(vec![TranscriptSegment::simple(
+            String::new(),
+            chunk.start_ms,
+            chunk.end_ms,
+            lang_hint.or_else(|| Some(LanguageCode("en".to_string()))),
+        )])
     }
 }

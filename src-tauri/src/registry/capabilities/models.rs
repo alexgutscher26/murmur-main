@@ -4,7 +4,7 @@
  * WHERE: Consumed by registry/capabilities/mod.rs.
  */
 
-use super::helpers::{dynamic_choice, text};
+use super::helpers::{dynamic_choice, number, text, toggle};
 use crate::registry::capability::{Capability, CapabilityKey, SettingDef, SettingSection};
 use crate::registry::keys;
 use crate::types::settings::ChoiceSource;
@@ -42,6 +42,37 @@ pub fn models_capability() -> Capability {
                 requires_permission: vec![],
                 advanced: false,
             },
+            toggle(
+                keys::TRANSCRIPTION_AUTO_ESCALATE,
+                "Adaptive Model Auto-Switching",
+                "Automatically upgrade low-confidence or high-noise segments to a more powerful model.",
+                SettingSection::Transcription,
+                false,
+            ),
+            dynamic_choice(
+                keys::TRANSCRIPTION_ESCALATE_MODEL,
+                "Escalation Model Tier",
+                "The high-capacity model to escalate to when speech is difficult or precision is needed (e.g., large-v3-turbo).",
+                SettingSection::Transcription,
+                ChoiceSource::Models,
+                "large-v3-turbo",
+            ),
+            number(
+                keys::TRANSCRIPTION_CONFIDENCE_THRESHOLD,
+                "Confidence Threshold",
+                "Confidence score below which Murmur escalates to the higher tier model.",
+                SettingSection::Transcription,
+                (0.40, 0.95, 0.05),
+                Some("score"),
+                0.70,
+            ),
+            toggle(
+                keys::TRANSCRIPTION_APP_AWARE_ESCALATE,
+                "App-Aware Precision Escalation",
+                "Pre-emptively use the high-precision model when focused on code editors, IDEs, or terminals.",
+                SettingSection::Transcription,
+                true,
+            ),
         ],
     }
 }

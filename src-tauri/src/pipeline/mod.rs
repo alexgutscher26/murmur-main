@@ -9,6 +9,7 @@
  * WHERE: Driven by session/actor.rs.
  */
 
+pub mod adaptive;
 pub mod assembler;
 pub mod chunker;
 pub mod vad;

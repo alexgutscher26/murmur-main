@@ -315,12 +315,12 @@ mod tests {
             _request: &TranscribeRequest,
         ) -> AppResult<Vec<TranscriptSegment>> {
             std::thread::sleep(self.delay);
-            Ok(vec![TranscriptSegment {
-                text: format!("chunk at {}", chunk.start_ms),
-                start_ms: chunk.start_ms,
-                end_ms: chunk.end_ms,
-                language: None,
-            }])
+            Ok(vec![TranscriptSegment::simple(
+                format!("chunk at {}", chunk.start_ms),
+                chunk.start_ms,
+                chunk.end_ms,
+                None,
+            )])
         }
     }
 
