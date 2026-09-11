@@ -35,7 +35,7 @@ pub fn init_tracing(logs_dir: &std::path::Path) -> TracingGuard {
     // Default to info for our own crate and warn for everything else, so a
     // dependency cannot flood the log. RUST_LOG overrides it during debugging.
     let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("warn,HushWrite_lib=info"));
+        .unwrap_or_else(|_| EnvFilter::new("warn,hush_write_lib=info,HushWrite_lib=info"));
 
     let file_layer = fmt::layer()
         .with_writer(writer)
