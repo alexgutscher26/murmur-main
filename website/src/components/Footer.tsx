@@ -304,9 +304,22 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500">
-          <p>
-            © {new Date().getFullYear()} HushWrite. Zero telemetry, 100% on-device data sovereignty.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <p>
+              © {new Date().getFullYear()} HushWrite. Zero telemetry, 100% on-device data sovereignty.
+            </p>
+            <a
+              href="https://HushWrite.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center hover:opacity-85 transition-opacity"
+            >
+              <img
+                src="https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white"
+                alt="Dictated with HushWrite"
+              />
+            </a>
+          </div>
 
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-2 bg-white border border-neutral-200/80 px-3 py-1 rounded-full shadow-sm">

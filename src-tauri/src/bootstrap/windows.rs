@@ -420,7 +420,7 @@ pub fn keep_rail_centred(app: &AppHandle) {
 pub fn rail_size_points() -> (f64, f64) {
     use crate::tray::design_token;
 
-    let nav_items = 6.0;
+    let nav_items = 7.0;
 
     let padding = design_token("--rail-padding");
     let height = 2.0 * padding

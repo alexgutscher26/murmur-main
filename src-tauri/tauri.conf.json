@@ -31,7 +31,7 @@
         "label": "sidebar",
         "url": "sidebar.html",
         "width": 56,
-        "height": 340,
+        "height": 380,
         "resizable": false,
         "visible": false,
         "transparent": true,

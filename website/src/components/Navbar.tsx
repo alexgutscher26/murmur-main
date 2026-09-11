@@ -159,12 +159,12 @@ export function Navbar() {
                   Download free for Mac & Windows
                 </Link>
                 <a
-                  href="https://github.com/webprodigies/HushWrite"
+                  href="https://github.com/alexgutscher26/HushWrite"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full text-center text-sm font-semibold text-neutral-800 hover:text-neutral-950 bg-white hover:bg-neutral-50 border border-neutral-200/90 py-3 px-4 rounded-xl shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
                 >
-                  Star on GitHub (4.8k)
+                  Star on GitHub
                 </a>
               </motion.div>
             </div>

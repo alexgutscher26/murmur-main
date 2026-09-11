@@ -35,7 +35,7 @@
 
 import { cn } from "@/lib/utils";
 import { Mark } from "@/components/global";
-import { Mic, Gauge, BookOpen, Gift, Settings, HelpCircle } from "lucide-react";
+import { Mic, Gauge, BookOpen, Gift, Settings, HelpCircle, CreditCard } from "lucide-react";
 
 export interface SidebarWindowProps {
   activeRoute: string;
@@ -73,6 +73,12 @@ export function SidebarWindow({ activeRoute, onSelect }: SidebarWindowProps) {
   ];
 
   const bottomItems: SidebarItem[] = [
+    {
+      id: "billing",
+      label: "Plan & Billing",
+      icon: CreditCard,
+      route: "billing",
+    },
     {
       id: "invite",
       label: "Invite & Earn Pro",
