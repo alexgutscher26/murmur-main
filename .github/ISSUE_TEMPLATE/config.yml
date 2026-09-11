@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discord Community & Beta Feedback
+    url: https://discord.gg/HushWrite
+    about: Join the community to discuss features, get help, or share custom voice packs.
+  - name: 📖 Documentation & Architecture Notes
+    url: https://github.com/alexgutscher26/HushWrite/tree/main/docs
+    about: Read in-depth implementation notes, SOT guidelines, and latency budgets.

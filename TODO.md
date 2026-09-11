@@ -666,9 +666,9 @@
 - [ ] [COMMUNITY] Public feature roadmap — A public GitHub project board or `ROADMAP.md` showing the current quarter's planned features, in-progress items, and the next quarter's backlog, updated monthly.
 - [ ] [COMMUNITY] User feedback widget — A subtle in-app thumbs-up/thumbs-down feedback button visible after each session (never during) that stores the rating locally and batches it for optional opt-in submission.
 - [ ] [COMMUNITY] Open beta program — A public beta channel where users can opt in to pre-release builds, with a dedicated `#beta-feedback` Discord channel and a structured feedback form linked from each beta release.
-- [ ] [COMMUNITY] Contributor recognition — A `CONTRIBUTORS.md` file automatically updated by CI after each merged PR, listing contributors alphabetically with their contributions. Linked from the README and the About page in the dashboard.
-- [ ] [DX] GitHub issue templates — Structured templates for Bug Report, Feature Request, and Security Vulnerability with required fields (reproduction steps, expected vs. actual behavior, system info, HushWrite version).
-- [ ] [DX] GitHub PR template — A PR checklist template requiring: description of change, testing done, screenshots (for UI changes), and confirmation that SOT headers are present in new files.
+- [x] [COMMUNITY] Contributor recognition — A `CONTRIBUTORS.md` file automatically updated by CI after each merged PR, listing contributors alphabetically with their contributions. Linked from the README and the About page in the dashboard.
+- [x] [DX] GitHub issue templates — Structured templates for Bug Report, Feature Request, and Security Vulnerability with required fields (reproduction steps, expected vs. actual behavior, system info, HushWrite version).
+- [x] [DX] GitHub PR template — A PR checklist template requiring: description of change, testing done, screenshots (for UI changes), and confirmation that SOT headers are present in new files.
 
 ---
 

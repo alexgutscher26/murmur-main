@@ -732,6 +732,55 @@ function GeneralTabContent({
       <div className="rounded-2xl border border-stone-200/80 bg-white dark:border-stone-800/80 dark:bg-stone-900/40 p-5 shadow-xs">
         <SettingsBackup />
       </div>
+
+      {/* About & Community Recognition Card */}
+      <div className="rounded-2xl border border-stone-200/80 bg-white dark:border-stone-800/80 dark:bg-stone-900/40 p-5 shadow-xs space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-stone-900 dark:text-white">About HushWrite</h3>
+            <p className="text-xs text-stone-500 dark:text-stone-400">
+              High-performance, zero-cloud speech-to-text engineered in Rust and Tauri v2.
+            </p>
+          </div>
+          <span className="inline-flex items-center rounded-md bg-stone-100 dark:bg-stone-800 px-2 py-0.5 text-[11px] font-mono text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700">
+            v0.1.0 · MIT License
+          </span>
+        </div>
+
+        <div className="pt-2 border-t border-stone-100 dark:border-stone-800/80 flex items-center justify-between gap-4 text-xs text-stone-600 dark:text-stone-400 flex-wrap">
+          <div className="flex items-center gap-4">
+            <a
+              href="https://github.com/alexgutscher26/HushWrite"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-stone-900 dark:hover:text-white transition-colors underline underline-offset-2"
+            >
+              GitHub Repository
+            </a>
+            <span>·</span>
+            <a
+              href="https://github.com/alexgutscher26/HushWrite/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-stone-900 dark:hover:text-white transition-colors underline underline-offset-2"
+            >
+              Issue Tracker
+            </a>
+            <span>·</span>
+            <a
+              href="https://github.com/alexgutscher26/HushWrite/blob/main/CONTRIBUTORS.md"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-stone-900 dark:hover:text-white transition-colors underline underline-offset-2"
+            >
+              Contributors & Community
+            </a>
+          </div>
+          <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
+            <ShieldCheck className="size-3.5" /> 100% On-Device & Zero Egress
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

@@ -12,7 +12,7 @@ _Local inference with sub-300ms latency, native system injection, and strict dat
 [![React 19](https://img.shields.io/badge/ui-React%2019%20%2B%20Tailwind%20v4-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
 [![100% Local](https://img.shields.io/badge/voice-100%25%20Local%20%2F%20Zero%20Egress-10B981?style=flat-square&logo=shield&logoColor=white)](PRIVACY.md)
 
-[Overview](#overview) • [Key Features](#key-features) • [Comparison](#comparison) • [Architecture](#architecture) • [Installation](#installation) • [Developer Guide](#developer-guide) • [Security & Privacy](#security--privacy) • [Documentation](#documentation) • [License](#license)
+[Overview](#overview) • [Key Features](#key-features) • [Comparison](#comparison) • [Architecture](#architecture) • [Installation](#installation) • [Developer Guide](#developer-guide) • [Security & Privacy](#security--privacy) • [Contributors](#community--contributors) • [Documentation](#documentation) • [License](#license)
 
 </div>
 
@@ -227,6 +227,16 @@ Generated packages will be located in `src-tauri/target/release/bundle/`:
 For detailed information regarding our data boundaries, threat model, and vulnerability disclosure policies, see:
 - [Security Policy](SECURITY.md)
 - [Privacy Architecture](PRIVACY.md)
+
+---
+
+## Community & Contributors
+
+HushWrite thrives on community contributions from developers, clinicians, lawyers, writers, and language model enthusiasts worldwide.
+
+- Read our list of maintainers and contributors in [**`CONTRIBUTORS.md`**](CONTRIBUTORS.md).
+- To contribute code, report bugs, or share voice packs, check out [**`CONTRIBUTING.md`**](CONTRIBUTING.md) and our [GitHub Issue Templates](.github/ISSUE_TEMPLATE).
+- Join our [Discord Community](https://discord.gg/HushWrite) for live discussions and beta testing.
 
 ---
 

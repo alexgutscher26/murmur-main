@@ -1,0 +1,118 @@
+name: 🐛 Bug Report
+description: Report reproducible bugs, crashes, audio glitches, or unexpected behavior.
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve HushWrite! Please fill in the details below to help us reproduce and resolve the issue quickly.
+
+  - type: input
+    id: version
+    attributes:
+      label: HushWrite Version
+      description: What version of HushWrite are you running? (Check Settings > General or app title bar).
+      placeholder: "e.g., v0.1.0 (build 2026.09.11)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: Select your host operating system.
+      options:
+        - Windows 11 (x64)
+        - Windows 11 (ARM64)
+        - Windows 10 (x64)
+        - macOS Sequoia (Apple Silicon)
+        - macOS Sonoma (Apple Silicon)
+        - macOS Ventura (Apple Silicon / Intel)
+        - Linux (Custom build)
+    validations:
+      required: true
+
+  - type: input
+    id: hardware
+    attributes:
+      label: Hardware / GPU Acceleration
+      description: What CPU and GPU does your machine have?
+      placeholder: "e.g., AMD Ryzen 7 7840HS, NVIDIA RTX 4060 (DirectML) / M3 Max (Metal)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: active_model
+    attributes:
+      label: Active ASR & LLM Model
+      description: Which speech model and enhancement settings are active?
+      options:
+        - "small-q5_1 (Default Whisper Small)"
+        - "large-v3-turbo-q5_0 (Whisper Large Turbo)"
+        - "base-q5_1 (Whisper Base)"
+        - "parakeet-tdt-0.6b-v2 (NVIDIA Parakeet ONNX Fast Tier)"
+        - "parakeet-tdt_ctc-110m (Parakeet Fast Tier)"
+        - "qwen2.5-1.5b-instruct (Local GGUF LLM)"
+        - "phi-3.5-mini-instruct (Local GGUF LLM)"
+        - "Other (Specify in description)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: air_gap
+    attributes:
+      label: Air-Gap Isolation Mode Status
+      description: Is Air-Gap mode currently enabled?
+      options:
+        - "Disabled (Default local operation)"
+        - "Enabled (Hardware socket isolation active)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction_steps
+    attributes:
+      label: Steps to Reproduce
+      description: Explain how we can reproduce the problem step by step.
+      placeholder: |
+        1. Press `Alt+Space` or `⌥ Space` in VS Code.
+        2. Speak: "Test sentence one two three."
+        3. Release hotkey.
+        4. Observe behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: "Text should be injected into the active caret with proper capitalization and punctuation."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened? (Include error messages or unexpected output).
+      placeholder: "Overlay pill stayed in processing state or error surface appeared."
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs & Output
+      description: Paste relevant logs from `C:\Users\<user>\AppData\Roaming\HushWrite\logs` or terminal output.
+      render: shell
+
+  - type: checkboxes
+    id: validations
+    attributes:
+      label: Verification & Privacy Checklist
+      options:
+        - label: I have verified that no sensitive or confidential personal information is in the logs or description above.
+          required: true
+        - label: I have searched existing GitHub issues to confirm this bug has not already been reported.
+          required: true

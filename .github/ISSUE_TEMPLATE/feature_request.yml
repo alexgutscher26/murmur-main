@@ -1,0 +1,67 @@
+name: 💡 Feature Request
+description: Propose new capabilities, model integrations, hardware acceleration, or UX improvements.
+labels: ["enhancement", "discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping shape the future of HushWrite! Please explain the problem you want to solve and your proposed solution.
+
+  - type: input
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A clear, 1-sentence description of the requested feature.
+      placeholder: "e.g., Support Whisper-Med specialized medical dictionary auto-switching"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Which area of HushWrite does this request relate to?
+      options:
+        - "Speech Recognition & ASR Engines (Whisper, Parakeet, FastConformer)"
+        - "Smart Cleanup & Local LLM (GGUF, ChatML, Voice Transforms)"
+        - "Audio Pipeline & Capture (VAD, Noise Suppression, Ring Buffer)"
+        - "Operating System Integration & Input Injection (DirectML, Metal, Windows/macOS)"
+        - "UI & Overlay HUD (Pill, Waveform, Theme, Notch)"
+        - "Settings, Profiles & Custom Dictionaries"
+        - "Air-Gap, Privacy & Enterprise Packaging"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement / User Need
+      description: What limitation or workflow obstacle are you encountering?
+      placeholder: "I am often writing medical SOAP notes in clinical software where specific Latin pharmaceutical terms are missed by general models..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution / Ideal Workflow
+      description: How should the feature work from the user's perspective?
+      placeholder: "Add a Medical vocabulary pack in settings with 500+ generic drug name phonetic biases..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any workarounds or existing tools?
+      placeholder: "Manually adding individual terms one by one into the Custom Dictionary..."
+
+  - type: checkboxes
+    id: privacy_gate
+    attributes:
+      label: Privacy & Architecture Confirmation
+      options:
+        - label: This proposed feature respects HushWrite's zero-cloud-telemetry, 100% on-device architecture.
+          required: true
