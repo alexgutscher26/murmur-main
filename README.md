@@ -62,15 +62,15 @@ The application requires no user accounts, has no recurring subscriptions, impos
 
 ## Comparison
 
-| Dimension | HushWrite | Cloud Solutions (e.g. Wispr Flow) | Proprietary Local Tools |
-| :--- | :--- | :--- | :--- |
-| **Privacy Architecture** | **100% Local / Zero Egress** | Remote WebSocket audio streaming | Closed-source binary |
-| **Platform Support** | **macOS & Windows** | Web / Limited Desktop | Mostly macOS only |
-| **Inference Latency** | **Streaming (`p50 < 300ms`)** | Network-dependent (~1.5s - 3.0s) | Post-speech batch (~1.0s - 4.0s) |
-| **Licensing** | **Open Source (MIT)** | Monthly subscription ($10 - $20/mo) | Commercial paid license |
-| **Usage Limits** | **Unlimited** | Tiered quotas and word caps | Tiered feature gates |
-| **Clipboard Preservation**| **Automated restoration** | Overwrites clipboard | Inconsistent |
-| **Extensibility** | **Rust + Tauri v2 + React 19** | Closed SaaS | Proprietary architecture |
+| Dimension                  | HushWrite                      | Cloud Solutions (e.g. Wispr Flow)   | Proprietary Local Tools          |
+| :------------------------- | :----------------------------- | :---------------------------------- | :------------------------------- |
+| **Privacy Architecture**   | **100% Local / Zero Egress**   | Remote WebSocket audio streaming    | Closed-source binary             |
+| **Platform Support**       | **macOS & Windows**            | Web / Limited Desktop               | Mostly macOS only                |
+| **Inference Latency**      | **Streaming (`p50 < 300ms`)**  | Network-dependent (~1.5s - 3.0s)    | Post-speech batch (~1.0s - 4.0s) |
+| **Licensing**              | **Open Source (MIT)**          | Monthly subscription ($10 - $20/mo) | Commercial paid license          |
+| **Usage Limits**           | **Unlimited**                  | Tiered quotas and word caps         | Tiered feature gates             |
+| **Clipboard Preservation** | **Automated restoration**      | Overwrites clipboard                | Inconsistent                     |
+| **Extensibility**          | **Rust + Tauri v2 + React 19** | Closed SaaS                         | Proprietary architecture         |
 
 ---
 
@@ -212,6 +212,7 @@ bun run tauri:build
 ```
 
 Generated packages will be located in `src-tauri/target/release/bundle/`:
+
 - **macOS**: `.app` and `.dmg`
 - **Windows**: `.msi` and `.exe`
 
@@ -219,12 +220,13 @@ Generated packages will be located in `src-tauri/target/release/bundle/`:
 
 ## Security & Privacy
 
-| Permission | Purpose | Failure Mode if Denied |
-| :--- | :--- | :--- |
-| **Microphone** | Audio capture during dictation. | Dictation cannot operate (Required). |
+| Permission        | Purpose                                          | Failure Mode if Denied                                    |
+| :---------------- | :----------------------------------------------- | :-------------------------------------------------------- |
+| **Microphone**    | Audio capture during dictation.                  | Dictation cannot operate (Required).                      |
 | **Accessibility** | Direct caret text injection via simulated paste. | Transcribed text is copied to clipboard for manual paste. |
 
 For detailed information regarding our data boundaries, threat model, and vulnerability disclosure policies, see:
+
 - [Security Policy](SECURITY.md)
 - [Privacy Architecture](PRIVACY.md)
 
@@ -236,7 +238,7 @@ HushWrite thrives on community contributions from developers, clinicians, lawyer
 
 - Read our list of maintainers and contributors in [**`CONTRIBUTORS.md`**](CONTRIBUTORS.md).
 - To contribute code, report bugs, or share voice packs, check out [**`CONTRIBUTING.md`**](CONTRIBUTING.md) and our [GitHub Issue Templates](.github/ISSUE_TEMPLATE).
-- Join our [Discord Community](https://discord.gg/HushWrite) for live discussions and beta testing.
+- Join our [Discord Community](https://discord.gg/s95VtQv33m) for live discussions and beta testing.
 
 ---
 

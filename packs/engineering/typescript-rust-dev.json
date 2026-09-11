@@ -1,0 +1,40 @@
+{
+  "$schema": "../schema.json",
+  "name": "TypeScript & Rust Engineering Pack",
+  "author": "alexgutscher26",
+  "version": "1.0.0",
+  "category": "Developer",
+  "description": "Comprehensive phonetic biasing for modern web and systems engineering: TypeScript, React 19, Rust, Tauri v2, DirectML, and conventional commit macros.",
+  "vocabulary": [
+    { "term": "TypeScript", "phonetic": "type script", "bias_weight": 1.4 },
+    { "term": "JavaScript", "phonetic": "java script", "bias_weight": 1.2 },
+    { "term": "Rust", "phonetic": "rust", "bias_weight": 1.3 },
+    { "term": "Tauri", "phonetic": "tow ree", "bias_weight": 1.5 },
+    { "term": "DirectML", "phonetic": "direct m l", "bias_weight": 1.5 },
+    { "term": "WebRTC", "phonetic": "web r t c", "bias_weight": 1.4 },
+    { "term": "Tokio", "phonetic": "toe key oh", "bias_weight": 1.4 },
+    { "term": "Cargo.toml", "phonetic": "cargo dot tom mel", "bias_weight": 1.5 },
+    { "term": "package.json", "phonetic": "package dot jason", "bias_weight": 1.5 },
+    { "term": "Supabase", "phonetic": "soop uh base", "bias_weight": 1.3 },
+    { "term": "PostgreSQL", "phonetic": "post gres q l", "bias_weight": 1.4 },
+    { "term": "FastConformer", "phonetic": "fast conformer", "bias_weight": 1.5 },
+    { "term": "Parakeet", "phonetic": "pair uh keet", "bias_weight": 1.4 },
+    { "term": "whisper.cpp", "phonetic": "whisper dot c p p", "bias_weight": 1.5 },
+    { "term": "llama-cpp-2", "phonetic": "llama c p p two", "bias_weight": 1.5 },
+    { "term": "TailwindCSS", "phonetic": "tailwind c s s", "bias_weight": 1.3 },
+    { "term": "Next.js", "phonetic": "next j s", "bias_weight": 1.3 }
+  ],
+  "abbreviations": {
+    "pr": "PR",
+    "ci": "CI/CD",
+    "dto": "DTO",
+    "orm": "ORM",
+    "ast": "AST",
+    "ipc": "IPC"
+  },
+  "voice_snippets": {
+    "insert pr checklist": "### ✅ Pull Request Checklist\n- [ ] Code follows formatting & linting rules\n- [ ] Unit & integration tests passing (`cargo test` / `bun test`)\n- [ ] Documentation updated\n- [ ] Zero sensitive secrets or debug logs",
+    "insert bug report template": "### 🐛 Bug Description\n- **Expected:** \n- **Actual:** \n- **Steps to Reproduce:**\n  1. \n  2. "
+  },
+  "system_prompt_addon": "Format code identifiers in backticks and maintain camelCase or snake_case as spoken."
+}

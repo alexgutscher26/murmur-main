@@ -1,0 +1,26 @@
+{
+  "$schema": "../schema.json",
+  "name": "Creative Story & Manuscript Drafting",
+  "author": "alexgutscher26",
+  "version": "1.0.0",
+  "category": "Creative",
+  "description": "Voice pack tailored for fiction writers, novelists, essayists, and screenwriters with dialogue punctuation and scene structuring macros.",
+  "vocabulary": [
+    { "term": "denouement", "phonetic": "day noo mon", "bias_weight": 1.4 },
+    { "term": "juxtaposition", "phonetic": "jux tuh puh zish un", "bias_weight": 1.3 },
+    { "term": "bildungsroman", "phonetic": "bil dungs roh mahn", "bias_weight": 1.5 },
+    { "term": "verisimilitude", "phonetic": "vair uh sih mil uh tood", "bias_weight": 1.4 },
+    { "term": "in medias res", "phonetic": "in mee dee uhs rayz", "bias_weight": 1.4 }
+  ],
+  "abbreviations": {
+    "pov": "POV",
+    "wip": "WIP",
+    "mc": "main character"
+  },
+  "voice_snippets": {
+    "insert scene break": "\n\n* * *\n\n",
+    "insert chapter header": "\n\n## Chapter \n\n",
+    "insert character arc notes": "### 👤 Character Profile\n- **Name:** \n- **Motivation:** \n- **Internal Conflict:** \n- **Key Relationships:** "
+  },
+  "system_prompt_addon": "Preserve natural prose rhythms, emphasize vivid dialogue pacing, and format scene transitions cleanly."
+}

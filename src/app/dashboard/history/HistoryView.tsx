@@ -30,6 +30,7 @@ import type { DictationMode } from "@/lib/dictation-mode";
 import { NoTranscriptionsYet } from "../_components/NoTranscriptionsYet";
 import { ExportAction } from "./_components/ExportAction";
 import { HistoryRow } from "./_components/HistoryRow";
+import { SessionFeedback } from "./_components/SessionFeedback";
 import { SessionPlaybackModal } from "./_components/SessionPlaybackModal";
 import { useHistory } from "./use-history";
 
@@ -220,6 +221,7 @@ export function HistoryView({ hotkey, mode }: HistoryViewProps) {
         renderRowActions={({ item }) =>
           selecting ? null : (
             <span className="flex items-center gap-1">
+              <SessionFeedback session={item} className="mr-0.5" />
               <button
                 type="button"
                 aria-label="Play session transcript"

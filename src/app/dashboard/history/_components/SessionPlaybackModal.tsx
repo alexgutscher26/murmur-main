@@ -14,6 +14,7 @@ import { FastForward, Pause, Play, RotateCcw, Volume2, VolumeX, X } from "lucide
 import { formatCompactDuration, formatRelativeTime } from "@/lib/format";
 import { GlassPanel } from "@/components/global";
 import type { SessionSummary } from "@/lib/bindings";
+import { SessionFeedback } from "./SessionFeedback";
 
 export interface SessionPlaybackModalProps {
   session: SessionSummary;
@@ -304,23 +305,30 @@ export function SessionPlaybackModal({ session, onClose }: SessionPlaybackModalP
             </button>
           </div>
 
-          {/* Speed Selector */}
-          <div className="flex items-center gap-1">
-            <span className="text-caption text-text-tertiary mr-1">Speed:</span>
-            {PLAYBACK_RATES.map((rate) => (
-              <button
-                key={rate}
-                type="button"
-                onClick={() => setPlaybackRate(rate)}
-                className={`rounded px-1.5 py-0.5 font-mono text-caption transition-colors ${
-                  playbackRate === rate
-                    ? "bg-text-primary text-opaque-elevated font-medium"
-                    : "text-text-secondary hover:bg-sunken-strong hover:text-text-primary"
-                }`}
-              >
-                {rate}x
-              </button>
-            ))}
+          {/* Feedback & Speed */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <span className="text-caption text-text-tertiary mr-1">Rating:</span>
+              <SessionFeedback session={session} />
+            </div>
+            <div className="h-3 w-px bg-hairline" />
+            <div className="flex items-center gap-1">
+              <span className="text-caption text-text-tertiary mr-1">Speed:</span>
+              {PLAYBACK_RATES.map((rate) => (
+                <button
+                  key={rate}
+                  type="button"
+                  onClick={() => setPlaybackRate(rate)}
+                  className={`rounded px-1.5 py-0.5 font-mono text-caption transition-colors ${
+                    playbackRate === rate
+                      ? "bg-text-primary text-opaque-elevated font-medium"
+                      : "text-text-secondary hover:bg-sunken-strong hover:text-text-primary"
+                  }`}
+                >
+                  {rate}x
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </GlassPanel>

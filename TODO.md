@@ -661,11 +661,11 @@
 
 ## Community & Ecosystem
 
-- [ ] [COMMUNITY] Discord server — A public Discord community for HushWrite users and contributors with channels for `#announcements`, `#feature-requests`, `#bug-reports`, `#showcase` (share your voice packs), and `#dev` (contributor discussion).
-- [ ] [COMMUNITY] Community voice pack directory — A GitHub repository (`HushWrite-community/packs`) where contributors can PR their domain-specific voice packs (medical, legal, coding, creative writing) following a schema and review process.
-- [ ] [COMMUNITY] Public feature roadmap — A public GitHub project board or `ROADMAP.md` showing the current quarter's planned features, in-progress items, and the next quarter's backlog, updated monthly.
-- [ ] [COMMUNITY] User feedback widget — A subtle in-app thumbs-up/thumbs-down feedback button visible after each session (never during) that stores the rating locally and batches it for optional opt-in submission.
-- [ ] [COMMUNITY] Open beta program — A public beta channel where users can opt in to pre-release builds, with a dedicated `#beta-feedback` Discord channel and a structured feedback form linked from each beta release.
+- [x] [COMMUNITY] Discord server — A public Discord community blueprint and setup guide (`docs/DISCORD_SETUP.md`) for HushWrite users and contributors with channels for `#announcements`, `#feature-requests`, `#bug-reports`, `#showcase-and-packs`, and `#dev-general`.
+- [x] [COMMUNITY] Community voice pack directory — A GitHub repository (`packs/`) where contributors can PR their domain-specific voice packs (medical, legal, coding, creative writing) following a schema (`packs/schema.json`) and review process (`packs/README.md`).
+- [x] [COMMUNITY] Public feature roadmap — A public `ROADMAP.md` showing the current quarter's planned features, in-progress items, and the next quarter's backlog, updated quarterly with strict zero-cloud promises.
+- [x] [COMMUNITY] User feedback widget — A subtle in-app thumbs-up/thumbs-down feedback button visible in session history and playback (`SessionFeedback.tsx`) that stores ratings locally and allows quick vocabulary additions without cloud telemetry.
+- [x] [COMMUNITY] Open beta program — A public beta channel guide (`docs/OPEN_BETA.md`) where users can opt in to pre-release builds, with a dedicated `#beta-feedback` Discord channel and structured release cadence.
 - [x] [COMMUNITY] Contributor recognition — A `CONTRIBUTORS.md` file automatically updated by CI after each merged PR, listing contributors alphabetically with their contributions. Linked from the README and the About page in the dashboard.
 - [x] [DX] GitHub issue templates — Structured templates for Bug Report, Feature Request, and Security Vulnerability with required fields (reproduction steps, expected vs. actual behavior, system info, HushWrite version).
 - [x] [DX] GitHub PR template — A PR checklist template requiring: description of change, testing done, screenshots (for UI changes), and confirmation that SOT headers are present in new files.

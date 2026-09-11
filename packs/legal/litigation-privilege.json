@@ -1,0 +1,32 @@
+{
+  "$schema": "../schema.json",
+  "name": "Litigation & Legal Privilege Pack",
+  "author": "alexgutscher26",
+  "version": "1.0.0",
+  "category": "Legal",
+  "description": "Vocabulary biasing for legal practitioners: Latin maxims, confidentiality headers, statutory citations, and discovery templates.",
+  "vocabulary": [
+    { "term": "res judicata", "phonetic": "rez joo dih kah tah", "bias_weight": 1.5 },
+    { "term": "habeas corpus", "phonetic": "hay bee us core pus", "bias_weight": 1.5 },
+    { "term": "pro hac vice", "phonetic": "pro hawk vee chay", "bias_weight": 1.4 },
+    { "term": "prima facie", "phonetic": "pry muh fay sha", "bias_weight": 1.4 },
+    { "term": "inter alia", "phonetic": "in ter ah lee uh", "bias_weight": 1.3 },
+    { "term": "affidavit", "phonetic": "aff uh day vit", "bias_weight": 1.2 },
+    { "term": "subpoena duces tecum", "phonetic": "suh pee nuh doo sez tay kum", "bias_weight": 1.5 },
+    { "term": "deposition", "phonetic": "deh puh zish un", "bias_weight": 1.2 },
+    { "term": "indemnification", "phonetic": "in dem nuh fih kay shun", "bias_weight": 1.3 },
+    { "term": "force majeure", "phonetic": "force mah jure", "bias_weight": 1.4 }
+  ],
+  "abbreviations": {
+    "usc": "U.S.C.",
+    "cfr": "C.F.R.",
+    "f3d": "F.3d",
+    "edny": "E.D.N.Y.",
+    "sdny": "S.D.N.Y."
+  },
+  "voice_snippets": {
+    "insert privileged header": "CONFIDENTIAL ATTORNEY-CLIENT PRIVILEGED & WORK PRODUCT DOCUMENT — DO NOT DISCLOSE",
+    "insert discovery demand": "Pursuant to Rule 34 of the Federal Rules of Civil Procedure, Plaintiff hereby requests that Defendant produce the following documents..."
+  },
+  "system_prompt_addon": "Capitalize statutory defined terms and format Latin legal maxims in italics where appropriate."
+}

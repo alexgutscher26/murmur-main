@@ -1,0 +1,78 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HushWriteVoicePack",
+  "description": "Schema definition for HushWrite community domain voice packs.",
+  "type": "object",
+  "required": ["name", "author", "version", "category", "description", "vocabulary"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The human-readable name of the voice pack."
+    },
+    "author": {
+      "type": "string",
+      "description": "GitHub handle or name of the pack author."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic versioning (e.g. 1.0.0)."
+    },
+    "category": {
+      "type": "string",
+      "enum": ["Developer", "Legal", "Healthcare", "Creative", "Operations", "Finance", "General"],
+      "description": "Domain category."
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed explanation of the vocabulary, macros, and formatting included."
+    },
+    "vocabulary": {
+      "type": "array",
+      "description": "List of domain terms with phonetic spellings and biasing weights.",
+      "items": {
+        "type": "object",
+        "required": ["term"],
+        "properties": {
+          "term": {
+            "type": "string",
+            "description": "The exact written output term (e.g. 'TypeScript' or 'SOAP note')."
+          },
+          "phonetic": {
+            "type": "string",
+            "description": "Phonetic or colloquial spoken pronunciation."
+          },
+          "bias_weight": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 3.0,
+            "default": 1.0,
+            "description": "Initial prompt biasing weight (1.0 = normal, 1.5 = high priority)."
+          },
+          "case_sensitive": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    },
+    "abbreviations": {
+      "type": "object",
+      "description": "Spoken abbreviations and their expanded forms.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "voice_snippets": {
+      "type": "object",
+      "description": "Spoken voice macros expanding to structured multi-line templates.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "system_prompt_addon": {
+      "type": "string",
+      "description": "Optional instructions injected into the local LLM cleanup pass."
+    }
+  }
+}
