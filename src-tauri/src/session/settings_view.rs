@@ -60,6 +60,12 @@ pub struct SessionSettings {
     pub escalate_model: String,
     pub confidence_threshold: f32,
     pub app_aware_escalate: bool,
+    pub llm_cleanup_enabled: bool,
+    pub llm_model: String,
+    pub llm_auto_quantization: bool,
+    pub voice_transforms_enabled: bool,
+    pub custom_system_prompt: String,
+    pub voice_transform_trigger: String,
 }
 
 impl SessionSettings {
@@ -165,6 +171,13 @@ impl SessionSettings {
                 .unwrap_or(0.70) as f32,
             app_aware_escalate: read_bool(stored, keys::TRANSCRIPTION_APP_AWARE_ESCALATE)
                 .unwrap_or(true),
+            llm_cleanup_enabled: read_bool(stored, keys::LLM_CLEANUP_ENABLED).unwrap_or(false),
+            llm_model: read_choice(stored, keys::LLM_MODEL).unwrap_or_else(|| "auto".to_string()),
+            llm_auto_quantization: read_bool(stored, keys::LLM_AUTO_QUANTIZATION).unwrap_or(true),
+            voice_transforms_enabled: read_bool(stored, keys::VOICE_TRANSFORMS_ENABLED).unwrap_or(true),
+            custom_system_prompt: read_string(stored, keys::CUSTOM_SYSTEM_PROMPT).unwrap_or_default(),
+            voice_transform_trigger: read_string(stored, keys::VOICE_TRANSFORM_TRIGGER)
+                .unwrap_or_else(|| "Hey HushWrite".to_string()),
         }
     }
 }
@@ -218,6 +231,13 @@ fn read_number(stored: &Stored, key: &str) -> Option<f64> {
 fn read_choice(stored: &Stored, key: &str) -> Option<String> {
     match effective_setting(stored, key)? {
         SettingValue::Choice(value) | SettingValue::Text(value) => Some(value),
+        _ => None,
+    }
+}
+
+fn read_string(stored: &Stored, key: &str) -> Option<String> {
+    match effective_setting(stored, key)? {
+        SettingValue::Text(value) | SettingValue::Choice(value) => Some(value),
         _ => None,
     }
 }

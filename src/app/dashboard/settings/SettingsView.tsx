@@ -59,6 +59,7 @@ import { AbbreviationManager } from "./_components/AbbreviationManager";
 import { AppProfiles } from "./_components/AppProfiles";
 import { SettingsBackup } from "./_components/SettingsBackup";
 import { OverlaySection } from "./_components/OverlaySection";
+import { VoiceTransformPreview } from "./_components/VoiceTransformPreview";
 import { WpmCalibrationWizard } from "../_components/WpmCalibrationWizard";
 import { toControlSetting, type DynamicOptions } from "./to-setting-def";
 import { navigateTo } from "../use-hash-route";
@@ -988,8 +989,11 @@ function OutputTabContent({
   const advanced = defs.filter((def) => def.advanced);
 
   return (
-    <div className="rounded-2xl border border-stone-200/80 bg-white dark:border-stone-800/80 dark:bg-stone-900/40 p-5 shadow-xs divide-y divide-stone-100 dark:divide-stone-800/60">
-      {plain.map((def) => (
+    <div className="space-y-6">
+      <VoiceTransformPreview />
+
+      <div className="rounded-2xl border border-stone-200/80 bg-white dark:border-stone-800/80 dark:bg-stone-900/40 p-5 shadow-xs divide-y divide-stone-100 dark:divide-stone-800/60">
+        {plain.map((def) => (
         <SettingControl
           key={def.key}
           className="py-3 first:pt-0 last:pb-0"
@@ -1039,6 +1043,7 @@ function OutputTabContent({
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }

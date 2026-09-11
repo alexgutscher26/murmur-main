@@ -4,7 +4,7 @@
  * WHERE: Consumed by registry/capabilities/mod.rs.
  */
 
-use super::helpers::{dynamic_choice, number, text, toggle};
+use super::helpers::{choice, dynamic_choice, number, text, toggle};
 use crate::registry::capability::{Capability, CapabilityKey, SettingDef, SettingSection};
 use crate::registry::keys;
 use crate::types::settings::ChoiceSource;
@@ -21,6 +21,18 @@ pub fn models_capability() -> Capability {
         hotkey: None,
         metrics: vec![],
         settings: vec![
+            choice(
+                keys::TRANSCRIPTION_ENGINE,
+                "Speech Recognition Engine",
+                "Choose between standard Whisper, ultra-fast NVIDIA Parakeet (sub-50ms), or intelligent Dual-Engine auto-switching.",
+                SettingSection::Transcription,
+                &[
+                    ("auto", "Dual Engine (Auto Fast-Tier)", "Sub-50ms Parakeet for English, 99-language Whisper for multilingual."),
+                    ("whisper", "Whisper ASR", "Full 99-language coverage with Whisper.cpp models."),
+                    ("parakeet", "NVIDIA Parakeet (Fast Tier)", "DirectML-accelerated non-autoregressive streaming dictation for English."),
+                ],
+                "auto",
+            ),
             dynamic_choice(
                 keys::TRANSCRIPTION_MODEL,
                 "Model",

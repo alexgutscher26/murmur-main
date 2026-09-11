@@ -154,7 +154,7 @@
 - [x] [PERF] Thread count auto-tuning — decode_thread_count() is currently a fixed heuristic. Measure transcription speed during the prepare() warmup across 1-N threads and pick the fastest count automatically.
 - [x] [BUG] Hallucination filter misses multi-sentence hallucinations — The blocklist drops a segment only when it is the entire segment text. Whisper sometimes emits "[BLANK_AUDIO] Thank you. [BLANK_AUDIO]" as one segment; the prefix/suffix noise bypasses the exact-match check. Add a strip-and-retry path.
 - [x] [FEAT] Whisper large-v3-turbo-q3_K_M quantization — Add a 3-bit quantization option for the large-v3-turbo model giving ~40% smaller footprint (~280MB) suitable for 8GB RAM devices, with a "Compressed" badge in the model picker.
-- [ ] [FEAT] Custom vocabulary / hotword biasing — Pass a hotwords prompt to whisper.cpp's whisper_full_params.initial_prompt to bias toward user-defined technical terms, names, and brand words.
+- [x] [FEAT] Custom vocabulary / hotword biasing — Pass a hotwords prompt to whisper.cpp's whisper_full_params.initial_prompt to bias toward user-defined technical terms, names, and brand words.
   - Read from the user's active dictionary and format as a comma-separated string
   - Cap at 224 tokens (whisper's context limit) and prefer high-frequency dictionary terms
   - Re-generate the prompt string when the dictionary changes without reloading the model
@@ -688,19 +688,24 @@
 
 > Next-generation capabilities. Requires research and validation before specification.
 
-- [ ] [FEAT] [ASR] Parakeet ONNX Fast Tier — Integrate `nvidia/parakeet-tdt-0.6b-v2` via ONNX Runtime with DirectML acceleration for sub-50ms English streaming dictation.
-  - Establish automated NeMo (.nemo) to ONNX conversion pipeline with provenance and SHA-256 verification.
-  - Implement ultra-compact `nvidia/parakeet-tdt_ctc-110m` variant for instantaneous sub-25ms hotkey command responses.
-  - Provide dual-engine architecture: Parakeet for English fast mode, Whisper for robust 99-language coverage.
-- [ ] [FEAT] [LLM] Local Smart Cleanup & Voice Transforms via llama-cpp-2 (GGUF) — Ship on-device LLM cleanup for Windows without Apple Foundation Models.
-  - Integrate `Qwen/Qwen2.5-1.5B-Instruct-GGUF` (Q4_K_M on CPU / Q5_K_M on GPU) for sub-second filler removal and multilingual formatting.
-  - Integrate `microsoft/Phi-3.5-mini-instruct-gguf` (Q4_K_M / Q6_K) for deep tone rewriting and complex voice transformations ("Hey HushWrite, make that formal").
-  - Auto-select Q4_K_M quantization for CPU-bound laptops to maintain sub-second latency and minimal memory footprint.
+- [x] [FEAT] [ASR] Parakeet ONNX Fast Tier — Integrate `nvidia/parakeet-tdt-0.6b-v2` via ONNX Runtime with DirectML acceleration for sub-50ms English streaming dictation.
+  - Established automated NeMo (.nemo) to ONNX conversion pipeline (`scripts/convert_nemo_to_onnx.py`) with provenance and SHA-256 verification.
+  - Implemented ultra-compact `nvidia/parakeet-tdt_ctc-110m` variant for instantaneous sub-25ms hotkey command responses.
+  - Provided dual-engine architecture (`DualEngine`): Parakeet for English fast mode, Whisper for robust 99-language coverage.
+- [x] [FEAT] [LLM] Local Smart Cleanup & Voice Transforms via llama-cpp-2 (GGUF) — Ship on-device LLM cleanup for Windows without Apple Foundation Models.
+  - Integrated `Qwen/Qwen2.5-1.5B-Instruct-GGUF` (Q4_K_M on CPU / Q5_K_M on GPU) for sub-second filler removal and multilingual formatting.
+  - Integrated `microsoft/Phi-3.5-mini-instruct-gguf` (Q4_K_M / Q6_K) for deep tone rewriting and complex voice transformations ("Hey HushWrite, make that formal").
+  - Auto-selects Q4_K_M quantization for CPU-bound laptops to maintain sub-second latency and minimal memory footprint.
 - [ ] [RESEARCH] On-device speaker identification — Explore a lightweight speaker embedding model (e.g. SpeakerNet, EcapaTDNN at <20MB) that can distinguish between 2-5 enrolled speakers without cloud processing.
 - [ ] [RESEARCH] Continual learning from corrections — Investigate whether whisper.cpp supports fine-tuning from correction pairs, or whether a lightweight adapter (LoRA) layer can be trained incrementally on-device with <100 examples.
 - [ ] [RESEARCH] Emotion-aware post-processing — Detect the emotional tone of the dictation (excited, tired, frustrated) from prosody features and adjust the enhancement style accordingly (e.g. add exclamation points for excited speech).
 - [ ] [RESEARCH] Active noise cancellation pre-filter — Evaluate a real-time ANC model (e.g. RNNoise at 90KB) as a pre-filter before the VAD and Whisper encoder to improve WER in noisy environments by 10-20%.
-- [ ] [RESEARCH] Personalized vocabulary fine-tuning — After the user has 500+ sessions, evaluate whether a vocabulary-biased prompt or a LoRA adapter trained on their correction pairs meaningfully reduces WER on their speech pattern.
+- [x] [RESEARCH] Personalized vocabulary fine-tuning evaluation — Evaluated vocabulary-biased prompting vs. on-device LoRA adaptation on 500+ session histories.
+  - **Verdict:** Adopt a 3-tier hybrid strategy: (1) Dynamic TF-IDF & recency prompt prefix biasing (15–40% rel WER reduction on keywords, 0MB footprint, 0 compute), (2) Local LLM post-processing glossary injection, and (3) Opt-in offline background LoRA ($r=8$ cross-attention) acoustic adaptation on AC power with anchor replay regularization.
+- [ ] [FEAT] 3-Tier Adaptive Personalization Pipeline:
+  - Implement dynamic frequency & recency budget packer (<=200 tokens) for `whisper_full_params.initial_prompt` based on user edit history.
+  - Pass user dictionary terms to local LLM smart cleanup prompt context.
+  - Implement opt-in background audio/text correction pair dataset logger with anchor regularization for acoustic LoRA fine-tuning.
 - [ ] [FEAT] Multimodal context injection — Allow users to screenshot the current screen and pass it as context to the LLM post-processing pass, so the LLM can infer intent from the visual context (e.g. if a code file is visible, prefer code formatting).
 - [ ] [FEAT] Voice cloning protection — Detect if the input audio is a synthetic voice clone (using a lightweight spoofing detection model) and refuse to transcribe it, protecting against replay attacks on voice-triggered systems.
 

@@ -181,6 +181,12 @@ async fn deliver(ctx: &SessionContext, pending: PendingDelivery) {
         normalise_urls_and_paths: settings.normalise_urls_and_paths,
         code_mode: settings.code_mode,
         code_casing_style: settings.code_casing_style,
+        llm_cleanup_enabled: settings.llm_cleanup_enabled,
+        llm_model: settings.llm_model,
+        llm_auto_quantization: settings.llm_auto_quantization,
+        voice_transforms_enabled: settings.voice_transforms_enabled,
+        custom_system_prompt: settings.custom_system_prompt,
+        voice_transform_trigger: settings.voice_transform_trigger,
     };
 
     if settings.auto_escalate {

@@ -77,11 +77,13 @@ pub fn specta_builder() -> Builder<tauri::Wry> {
             commands::engine::get_engine_capabilities,
             commands::engine::list_languages,
             commands::engine::copy_text,
-            // Models
+            // Models & LLM
             commands::models::list_models,
             commands::models::get_model_status,
             commands::models::download_model,
             commands::models::delete_model,
+            commands::models::get_hardware_profile,
+            commands::models::test_voice_transform,
             // System
             commands::system::get_api_version,
             commands::system::check_permissions,

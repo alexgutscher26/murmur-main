@@ -25,6 +25,7 @@ import { formatBytes, formatEta, formatRate } from "@/lib/format";
 import { ErrorSurface, ProgressBar, Skeleton, ProFeatureModal } from "@/components/global";
 import { usePlan, canUseTurboModel } from "@/lib/plan";
 import { useSettings } from "../../use-settings";
+import { cn } from "@/lib/utils";
 
 const STATE_LABEL: Readonly<Record<ModelState["kind"], string>> = {
   NOT_DOWNLOADED: "Not downloaded",
@@ -46,6 +47,7 @@ export function ModelManager() {
   const [progress, setProgress] = useState<Readonly<Record<string, DownloadProgress>>>({});
   const [liveStates, setLiveStates] = useState<Readonly<Record<string, ModelState>>>({});
   const [downloadingIds, setDownloadingIds] = useState<ReadonlySet<string>>(new Set());
+  const [categoryFilter, setCategoryFilter] = useState<"all" | "speech" | "parakeet" | "llm">("all");
   const [proModalOpen, setProModalOpen] = useState(false);
   const [gatedModelName, setGatedModelName] = useState("Whisper Large v3 Turbo");
   const [downloadError, setDownloadError] = useState<AppError | null>(null);
@@ -176,6 +178,19 @@ export function ModelManager() {
     return <ErrorSurface error={models.error} onRetry={models.reload} size="compact" />;
   }
 
+  const activeLlmModelId = (settings.data?.["enhance.llm_model"]?.value as string) || "auto";
+
+  const filteredModels = (models.data ?? []).filter((report) => {
+    const isParakeet = report.descriptor.id.includes("parakeet");
+    const isLlm = report.descriptor.id.includes("qwen") || report.descriptor.id.includes("phi");
+    const isWhisper = !isParakeet && !isLlm;
+
+    if (categoryFilter === "speech") return isWhisper;
+    if (categoryFilter === "parakeet") return isParakeet;
+    if (categoryFilter === "llm") return isLlm;
+    return true;
+  });
+
   return (
     <>
       {isAirGapActive && (
@@ -210,20 +225,78 @@ export function ModelManager() {
         </div>
       ) : null}
 
+      {/* Model Category Filters */}
+      <div className="mb-4 flex items-center gap-1.5 p-1 rounded-xl bg-stone-100 dark:bg-stone-800/60 border border-stone-200/60 dark:border-stone-700/60 w-fit flex-wrap">
+        <button
+          type="button"
+          onClick={() => setCategoryFilter("all")}
+          className={cn(
+            "px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+            categoryFilter === "all"
+              ? "bg-white text-stone-900 shadow-xs dark:bg-stone-700 dark:text-white"
+              : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200",
+          )}
+        >
+          All Models
+        </button>
+        <button
+          type="button"
+          onClick={() => setCategoryFilter("speech")}
+          className={cn(
+            "px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+            categoryFilter === "speech"
+              ? "bg-white text-stone-900 shadow-xs dark:bg-stone-700 dark:text-white"
+              : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200",
+          )}
+        >
+          Whisper (99 Languages)
+        </button>
+        <button
+          type="button"
+          onClick={() => setCategoryFilter("parakeet")}
+          className={cn(
+            "px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+            categoryFilter === "parakeet"
+              ? "bg-white text-stone-900 shadow-xs dark:bg-stone-700 dark:text-white"
+              : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200",
+          )}
+        >
+          Parakeet (Fast Tier &lt;50ms)
+        </button>
+        <button
+          type="button"
+          onClick={() => setCategoryFilter("llm")}
+          className={cn(
+            "px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer",
+            categoryFilter === "llm"
+              ? "bg-white text-stone-900 shadow-xs dark:bg-stone-700 dark:text-white"
+              : "text-stone-500 hover:text-stone-800 dark:text-stone-400 dark:hover:text-stone-200",
+          )}
+        >
+          Smart Cleanup & Transforms (LLM)
+        </button>
+      </div>
+
       <ul className="hairline rounded-card bg-surface px-4">
-        {(models.data ?? []).map((report) => {
+        {filteredModels.map((report) => {
           const model: ModelReport = {
             ...report,
             state: liveStates[report.descriptor.id] ?? report.state,
           };
+          const isParakeet = model.descriptor.id.includes("parakeet");
+          const isLlm =
+            model.descriptor.id.includes("qwen") || model.descriptor.id.includes("phi");
           const isProModel =
             model.descriptor.id.includes("turbo") ||
             model.descriptor.id.includes("large") ||
-            model.descriptor.id.includes("medium");
-          const isCompressed = model.descriptor.id.includes("q3_");
+            model.descriptor.id.includes("medium") ||
+            model.descriptor.id.includes("q6_k");
+          const isCompressed = model.descriptor.id.includes("q3_") || model.descriptor.id.includes("q4_k_m");
           const isUnlocked = canUseTurboModel(tier);
           const isLocked = isProModel && !isUnlocked;
-          const isActive = model.descriptor.id === activeModelId;
+          const isActive = isLlm
+            ? model.descriptor.id === activeLlmModelId
+            : model.descriptor.id === activeModelId;
           const isDownloading = downloadingIds.has(model.descriptor.id);
           const isAnyDownloading = downloadingIds.size > 0;
 
@@ -241,6 +314,8 @@ export function ModelManager() {
                 isUnlocked={isUnlocked}
                 isActive={isActive}
                 isDownloading={isDownloading}
+                isLlm={isLlm}
+                isParakeet={isParakeet}
               />
               <ModelAction
                 model={model}
@@ -280,6 +355,8 @@ function ModelSummary({
   isUnlocked,
   isActive,
   isDownloading,
+  isLlm,
+  isParakeet,
 }: {
   model: ModelReport;
   progress: DownloadProgress | undefined;
@@ -289,6 +366,8 @@ function ModelSummary({
   isUnlocked: boolean;
   isActive: boolean;
   isDownloading?: boolean;
+  isLlm?: boolean;
+  isParakeet?: boolean;
 }) {
   const { descriptor, state } = model;
   const isStateDownloading = state.kind === "DOWNLOADING";
@@ -305,6 +384,21 @@ function ModelSummary({
         <p className="text-sm font-medium text-stone-900 dark:text-white">
           {descriptor.display_name}
         </p>
+        {isParakeet && (
+          <>
+            <span className="inline-flex items-center rounded-md bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300 border border-amber-500/30">
+              DirectML / ONNX
+            </span>
+            <span className="inline-flex items-center rounded-md bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-sky-600 dark:text-sky-400 border border-sky-500/20">
+              {descriptor.id.includes("110m") ? "<25ms Latency" : "<50ms Streaming"}
+            </span>
+          </>
+        )}
+        {isLlm && (
+          <span className="inline-flex items-center rounded-md bg-purple-500/15 px-2 py-0.5 text-[11px] font-semibold text-purple-700 dark:text-purple-300 border border-purple-500/30">
+            LLM (GGUF)
+          </span>
+        )}
         {isActive && (
           <span className="inline-flex items-center gap-1 rounded-md bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
             <Check className="size-3" />

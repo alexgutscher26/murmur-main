@@ -65,6 +65,8 @@ export const commands = {
 	getModelStatus: (input: ModelIdInput) => typedError<ModelReport, AppError>(__TAURI_INVOKE("get_model_status", { input })),
 	downloadModel: (input: ModelIdInput) => typedError<string, AppError>(__TAURI_INVOKE("download_model", { input })),
 	deleteModel: (input: ModelIdInput) => typedError<null, AppError>(__TAURI_INVOKE("delete_model", { input })),
+	getHardwareProfile: () => typedError<HardwareProfile, AppError>(__TAURI_INVOKE("get_hardware_profile")),
+	testVoiceTransform: (input: TestVoiceTransformInput) => typedError<string, AppError>(__TAURI_INVOKE("test_voice_transform", { input })),
 	getApiVersion: () => typedError<ApiVersionInfo, AppError>(__TAURI_INVOKE("get_api_version")),
 	checkPermissions: () => typedError<PermissionReport[], AppError>(__TAURI_INVOKE("check_permissions")),
 	requestPermission: (input: PermissionInput) => typedError<PermissionState, AppError>(__TAURI_INVOKE("request_permission", { input })),
@@ -444,6 +446,16 @@ export type ExportHistoryInput = {
 	format: ExportFormat,
 };
 
+export type HardwareProfile = {
+	cpu_cores: number,
+	has_dedicated_gpu: boolean,
+	gpu_name: string | null,
+	recommended_quantization: QuantizationTier,
+	is_battery_or_laptop: boolean,
+	recommended_cleanup_model: string,
+	recommended_transform_model: string,
+};
+
 /**
  * 
  *  * SOURCE OF TRUTH KEYWORDS: HotkeyBinding, KeyModifier
@@ -780,6 +792,8 @@ export type PurgeHistoryInput = {
 	retention_days: number,
 };
 
+export type QuantizationTier = "Q4_K_M" | "Q5_K_M" | "Q6_K";
+
 /**
  * 
  *  * SOURCE OF TRUTH KEYWORDS: RecordingMode
@@ -1054,6 +1068,11 @@ export type StatsSummary = {
 	activity: ActivityDay[],
 	languages: LanguageCount[],
 	latency: LatencySummary[],
+};
+
+export type TestVoiceTransformInput = {
+	text: string,
+	instruction: string | null,
 };
 
 /**

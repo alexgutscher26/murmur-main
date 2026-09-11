@@ -24,6 +24,7 @@ pub const INPUT_DEVICE: &str = "dictation.input_device";
 pub const AUDIO_FEEDBACK: &str = "dictation.audio_feedback";
 
 // ── Transcription ────────────────────────────────────────────────────────
+pub const TRANSCRIPTION_ENGINE: &str = "transcription.engine";
 pub const TRANSCRIPTION_MODEL: &str = "transcription.model";
 pub const LANGUAGE: &str = "transcription.language";
 pub const FINALIZE_TIMEOUT_MS: &str = "transcription.finalize_timeout_ms";
@@ -50,6 +51,12 @@ pub const NORMALISE_NUMBERS: &str = "enhance.normalise_numbers";
 pub const NORMALISE_URLS_AND_PATHS: &str = "enhance.normalise_urls_and_paths";
 pub const CODE_MODE: &str = "enhance.code_mode";
 pub const CODE_CASING_STYLE: &str = "enhance.code_casing_style";
+pub const LLM_CLEANUP_ENABLED: &str = "enhance.llm_cleanup_enabled";
+pub const LLM_MODEL: &str = "enhance.llm_model";
+pub const LLM_AUTO_QUANTIZATION: &str = "enhance.llm_auto_quantization";
+pub const VOICE_TRANSFORMS_ENABLED: &str = "enhance.voice_transforms_enabled";
+pub const CUSTOM_SYSTEM_PROMPT: &str = "enhance.custom_system_prompt";
+pub const VOICE_TRANSFORM_TRIGGER: &str = "enhance.voice_transform_trigger";
 
 // ── Privacy ──────────────────────────────────────────────────────────────
 pub const RETENTION_DAYS: &str = "privacy.retention_days";

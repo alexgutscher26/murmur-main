@@ -101,10 +101,13 @@ pub async fn download_model(
             ));
         }
         let path = ctx.ports().models.ensure(&input.model_id).await?;
-        let engine = ctx.ports().engine.clone();
-        tokio::task::spawn_blocking(move || engine.prepare())
-            .await
-            .map_err(|e| AppError::internal(e.to_string()))??;
+        let is_llm = input.model_id.as_str().contains("qwen") || input.model_id.as_str().contains("phi");
+        if !is_llm {
+            let engine = ctx.ports().engine.clone();
+            tokio::task::spawn_blocking(move || engine.prepare())
+                .await
+                .map_err(|e| AppError::internal(e.to_string()))??;
+        }
         Ok(path.to_string_lossy().into_owned())
     })
     .await
@@ -120,3 +123,53 @@ pub async fn delete_model(state: State<'_, AppState>, input: ModelIdInput) -> Re
     })
     .await
 }
+
+const HARDWARE: CommandSpec = CommandSpec::new("get_hardware_profile", CapabilityKey::Models);
+
+#[tauri::command]
+#[specta::specta]
+pub async fn get_hardware_profile(
+    state: State<'_, AppState>,
+) -> Result<crate::adapters::llm::HardwareProfile, AppError> {
+    execute(&state, HARDWARE, (), |_ctx, ()| async move {
+        Ok(crate::adapters::llm::HardwareDetector::detect())
+    })
+    .await
+}
+
+#[derive(Debug, serde::Deserialize, specta::Type)]
+pub struct TestVoiceTransformInput {
+    pub text: String,
+    pub instruction: Option<String>,
+}
+
+impl Validate for TestVoiceTransformInput {
+    fn validate(&self) -> Result<(), String> {
+        if self.text.trim().is_empty() {
+            return Err("Text is required for transformation preview.".into());
+        }
+        Ok(())
+    }
+}
+
+const TRANSFORM_TEST: CommandSpec = CommandSpec::new("test_voice_transform", CapabilityKey::Settings);
+
+#[tauri::command]
+#[specta::specta]
+pub async fn test_voice_transform(
+    state: State<'_, AppState>,
+    input: TestVoiceTransformInput,
+) -> Result<String, AppError> {
+    execute(&state, TRANSFORM_TEST, input, |ctx, input| async move {
+        let enhance_ctx = crate::ports::enhancer::EnhanceContext {
+            llm_cleanup_enabled: true,
+            voice_transforms_enabled: true,
+            strip_fillers: true,
+            custom_system_prompt: input.instruction.unwrap_or_default(),
+            ..Default::default()
+        };
+        ctx.ports().enhancer.enhance(&input.text, &enhance_ctx)
+    })
+    .await
+}
+

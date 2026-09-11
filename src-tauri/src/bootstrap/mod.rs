@@ -25,7 +25,6 @@ use tauri::{AppHandle, Manager};
 use crate::adapters;
 use crate::adapters::cpal::CpalAudioSource;
 use crate::adapters::os::{OsInjector, OsPermissions};
-use crate::adapters::rules::RuleEnhancer;
 use crate::config::AppPaths;
 use crate::db::Database;
 use crate::error::{AppError, AppResult};
@@ -167,7 +166,7 @@ fn build_ports(app: &AppHandle, paths: &AppPaths) -> AppResult<Ports> {
     Ok(Ports {
         engine,
         audio: Arc::new(CpalAudioSource::new()),
-        enhancer: Arc::new(RuleEnhancer::new()),
+        enhancer: Arc::new(adapters::llm::LlmTextEnhancer::new()),
         injector: Arc::new(OsInjector::new(OsPermissions::new())),
         models,
         permissions: Arc::new(OsPermissions::new()),

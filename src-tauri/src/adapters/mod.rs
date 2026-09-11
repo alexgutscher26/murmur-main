@@ -26,6 +26,8 @@ pub mod cpal;
 pub mod events;
 pub mod faster_whisper;
 pub mod http_models;
+pub mod llm;
+pub mod parakeet;
 pub mod rules;
 pub mod whisper;
 
@@ -42,6 +44,8 @@ pub use windows as os;
 pub use events::TauriEventSink;
 pub use faster_whisper::{FasterWhisperEngine, FASTER_WHISPER_ENGINE_ID};
 pub use http_models::HttpModelStore;
+pub use llm::LlmTextEnhancer;
+pub use parakeet::{DualEngine, ParakeetEngine, DUAL_ENGINE_ID, PARAKEET_ENGINE_ID};
 pub use whisper::{WhisperEngine, WHISPER_ENGINE_ID};
 
 /// The engine used unless a setting says otherwise.
@@ -54,6 +58,8 @@ pub fn available_engines() -> Vec<EngineId> {
     vec![
         default_engine_id(),
         EngineId(FASTER_WHISPER_ENGINE_ID.to_string()),
+        EngineId(PARAKEET_ENGINE_ID.to_string()),
+        EngineId(DUAL_ENGINE_ID.to_string()),
     ]
 }
 
@@ -73,6 +79,12 @@ pub fn build_engine(id: &EngineId, model_path: PathBuf) -> AppResult<Arc<dyn Tra
     match id.as_str() {
         WHISPER_ENGINE_ID => Ok(Arc::new(WhisperEngine::new(model_path))),
         FASTER_WHISPER_ENGINE_ID => Ok(Arc::new(FasterWhisperEngine::new(model_path))),
+        PARAKEET_ENGINE_ID => Ok(Arc::new(ParakeetEngine::new(model_path))),
+        DUAL_ENGINE_ID => {
+            let parakeet = Arc::new(ParakeetEngine::new(model_path.clone()));
+            let whisper = Arc::new(WhisperEngine::new(model_path));
+            Ok(Arc::new(DualEngine::new(parakeet, whisper)))
+        }
         other => Err(AppError::new(
             ErrorCode::EngineNotReady,
             "That transcription engine is not available in this version of HushWrite.",
@@ -112,9 +124,9 @@ mod tests {
 
     #[test]
     fn an_unknown_engine_is_refused_rather_than_defaulted() {
-        let built = build_engine(&EngineId("parakeet".into()), PathBuf::from("/tmp/x.bin"));
+        let built = build_engine(&EngineId("unknown_engine".into()), PathBuf::from("/tmp/x.bin"));
         match built {
-            Ok(_) => panic!("this build has no parakeet"),
+            Ok(_) => panic!("this build has no unknown_engine"),
             Err(err) => assert_eq!(err.code, ErrorCode::EngineNotReady),
         }
     }

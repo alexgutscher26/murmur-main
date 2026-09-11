@@ -164,6 +164,7 @@ mod tests {
             normalise_urls_and_paths: true,
             code_mode: false,
             code_casing_style: "camel".into(),
+            ..Default::default()
         }
     }
 
@@ -225,6 +226,7 @@ mod tests {
             normalise_urls_and_paths: false,
             code_mode: false,
             code_casing_style: "camel".into(),
+            ..Default::default()
         };
 
         let raw = "um hello comma world";

@@ -50,6 +50,12 @@ pub struct EnhanceContext {
     pub normalise_urls_and_paths: bool,
     pub code_mode: bool,
     pub code_casing_style: String,
+    pub llm_cleanup_enabled: bool,
+    pub llm_model: String,
+    pub llm_auto_quantization: bool,
+    pub voice_transforms_enabled: bool,
+    pub custom_system_prompt: String,
+    pub voice_transform_trigger: String,
 }
 
 pub trait TextEnhancer: Send + Sync {
