@@ -222,6 +222,14 @@ export function Hero() {
 
       {/* Two-Tier Headline matching the screenshot */}
       <div className="relative text-center max-w-4xl px-4 mx-auto mb-6 z-10">
+        {/* Platform Status Badge */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.06)] mb-6">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-xs font-semibold text-neutral-800">
+            Available on Windows 10 & 11 · Mac Early Access for Technical Testers
+          </span>
+        </div>
+
         <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-bold tracking-[-0.035em] text-neutral-950 mb-6 leading-[1.06]">
           Speak naturally.
           <span className="block text-[#737373] font-bold mt-1 sm:mt-2">Keep it private.</span>
@@ -229,8 +237,8 @@ export function Hero() {
 
         {/* Subtitle with Inline Badges matching the screenshot */}
         <p className="text-base sm:text-lg text-neutral-600 max-w-2xl mx-auto leading-relaxed font-normal">
-          Turn your voice into polished text in any app — processed locally on your PC or Mac
-          through key guarantees like{" "}
+          Turn your voice into polished text in any app — processed 100% locally on your Windows PC
+          (with Mac Early Access for technical testers) through key guarantees like{" "}
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-neutral-200/90 shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-xs sm:text-sm font-medium text-neutral-800 align-middle my-1">
             <Eye className="w-3.5 h-3.5 text-neutral-500" />
             <span>No uploaded audio</span>
@@ -251,13 +259,6 @@ export function Hero() {
       {/* Two CTA Buttons matching the screenshot */}
       <div className="relative flex flex-col sm:flex-row items-center gap-3.5 mb-14 z-10">
         <a
-          href="mailto:sales@HushWrite.app?subject=HushWrite%20Enterprise%20and%20Team%20Inquiry"
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-50 border border-neutral-200/90 shadow-sm text-sm font-semibold text-neutral-800 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
-        >
-          <Mail className="w-4 h-4 text-neutral-500" />
-          <span>Talk to Sales</span>
-        </a>
-        <a
           href="/downloads/HushWrite_0.1.0_x64-setup.exe"
           download="HushWrite_0.1.0_x64-setup.exe"
           onClick={handleHeroDownload}
@@ -271,12 +272,19 @@ export function Hero() {
           ) : (
             <>
               <Download className="w-4 h-4 text-emerald-400" />
-              <span>Download Free (.exe)</span>
+              <span>Download for Windows (.exe)</span>
               <span className="text-xs text-neutral-400 font-normal">
-                Windows 64-bit
+                Windows 10/11 64-bit
               </span>
             </>
           )}
+        </a>
+        <a
+          href="#download"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-neutral-50 border border-neutral-200/90 shadow-sm text-sm font-semibold text-neutral-800 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
+        >
+          <Terminal className="w-4 h-4 text-neutral-500" />
+          <span>Mac Early Access (Technical)</span>
         </a>
       </div>
 

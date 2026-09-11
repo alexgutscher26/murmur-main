@@ -221,8 +221,9 @@ export function Footer() {
             </div>
 
             <p className="text-sm text-neutral-600 leading-relaxed max-w-sm">
-              Local speech-to-text for macOS and Windows. Free forever, open source, and your audio
-              never leaves your device. Built with Rust, Tauri 2, and whisper.cpp.
+              Local speech-to-text for Windows (with Mac Early Access for technical testers). Free
+              forever, open source, and your audio never leaves your device. Built with Rust, Tauri 2,
+              and whisper.cpp.
             </p>
 
             <ul className="flex flex-wrap items-center gap-2">

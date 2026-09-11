@@ -53,7 +53,7 @@ const FAQS: FAQItem[] = [
   {
     question: "Which operating systems and hardware are supported?",
     answer:
-      "HushWrite is natively built for macOS 13+ (Apple Silicon M1/M2/M3/M4 with Metal acceleration and Intel x86_64) and Windows 10/11 64-bit (with DirectX 12 / DirectML and CUDA GPU acceleration). Linux support is tracked on our GitHub roadmap.",
+      "HushWrite is fully released and optimized for Windows 10/11 64-bit with native DirectX 12 / DirectML and CUDA GPU acceleration. The macOS version is currently available in Early Access for technical testers (running experimental builds or building from source via git). A signed and Apple-notarized Mac release is in progress and included for all Founding Beta supporters as soon as it is available.",
   },
 ];
 

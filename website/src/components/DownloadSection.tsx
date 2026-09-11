@@ -93,87 +93,27 @@ export function DownloadSection() {
           </p>
         </div>
 
-        {/* Primary Download Platform Cards */}
+        {/* Primary Download Platform Cards: Windows Primary, macOS Early Access */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {/* macOS Card */}
-          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-neutral-200/90 flex flex-col justify-between shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)] relative overflow-hidden">
-            {detectedOs === "mac" && (
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-            )}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Laptop className="w-5 h-5 text-neutral-900" />
-                  <h3 className="text-xl font-bold text-neutral-950">macOS</h3>
-                </div>
-                {detectedOs === "mac" && (
-                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-bold">
-                    Detected Device
-                  </span>
-                )}
-              </div>
-              <span className="text-xs font-mono text-neutral-500 block mb-3">
-                macOS 13.0 or later (Apple Silicon & Intel)
-              </span>
-              <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mb-6">
-                Native Metal GPU acceleration on Apple Silicon (M1, M2, M3, M4) and Intel Macs. Runs
-                quietly in your menu bar.
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2.5">
-              <button
-                type="button"
-                onClick={() =>
-                  setDownloadToast({
-                    title: "macOS Notarization",
-                    desc: "macOS builds are in automated Apple notarization. In the meantime, you can build from source via git or download the Windows installer.",
-                  })
-                }
-                className="flex-1 text-center text-xs sm:text-sm font-semibold text-white bg-[#141416] hover:bg-neutral-800 py-3.5 px-4 rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Download className="w-4 h-4 text-neutral-400" />
-                <span>Apple Silicon (.dmg)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  setDownloadToast({
-                    title: "macOS Notarization",
-                    desc: "macOS builds are in automated Apple notarization. In the meantime, you can build from source via git or download the Windows installer.",
-                  })
-                }
-                className="flex-1 text-center text-xs sm:text-sm font-semibold text-neutral-800 hover:bg-neutral-50 bg-white border border-neutral-200/90 py-3.5 px-4 rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Download className="w-4 h-4 text-neutral-500" />
-                <span>Intel Mac (.dmg)</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Windows Card */}
-          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-neutral-200/90 flex flex-col justify-between shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)] relative overflow-hidden">
-            {detectedOs === "windows" && (
-              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
-            )}
+          {/* Windows Card - Primary Release */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-white border-2 border-neutral-900 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)] flex flex-col justify-between relative overflow-hidden ring-4 ring-neutral-900/5">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Laptop className="w-5 h-5 text-neutral-900" />
                   <h3 className="text-xl font-bold text-neutral-950">Windows</h3>
                 </div>
-                {detectedOs === "windows" && (
-                  <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-bold">
-                    Detected Device
-                  </span>
-                )}
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-bold">
+                  Primary Release · Stable
+                </span>
               </div>
               <span className="text-xs font-mono text-neutral-500 block mb-3">
-                Windows 10 & 11 (64-bit)
+                Windows 10 & 11 (64-bit) · Store, .exe, MSI & Winget
               </span>
               <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mb-6">
                 Native DirectML & CUDA acceleration for NVIDIA, AMD, and Intel GPUs. Operates
-                seamlessly in your system tray.
+                instantaneously from your system tray with sub-180ms latency.
               </p>
             </div>
 
@@ -195,6 +135,53 @@ export function DownloadSection() {
               >
                 <Download className="w-4 h-4 text-neutral-500" />
                 <span>MSI Package (.msi)</span>
+              </a>
+            </div>
+          </div>
+
+          {/* macOS Card - Early Access for Technical Testers */}
+          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-neutral-200/90 flex flex-col justify-between shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)] relative overflow-hidden">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Laptop className="w-5 h-5 text-neutral-900" />
+                  <h3 className="text-xl font-bold text-neutral-950">macOS</h3>
+                </div>
+                <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80 font-bold">
+                  Early Access · Technical Testers
+                </span>
+              </div>
+              <span className="text-xs font-mono text-neutral-500 block mb-3">
+                macOS 13.0+ (Apple Silicon Metal & Intel)
+              </span>
+              <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mb-6">
+                Available now for developers & technical testers via experimental builds or source.
+                The official signed and Apple-notarized Mac release is in progress and included in Founding Beta.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              <button
+                type="button"
+                onClick={() =>
+                  setDownloadToast({
+                    title: "Mac Early Access",
+                    desc: "macOS builds are in active Apple notarization. For technical testing, build from source via git clone or download experimental test binaries.",
+                  })
+                }
+                className="flex-1 text-center text-xs sm:text-sm font-semibold text-white bg-[#141416] hover:bg-neutral-800 py-3.5 px-4 rounded-xl transition-all shadow-md hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Download className="w-4 h-4 text-amber-400" />
+                <span>Mac Test Build (.dmg)</span>
+              </button>
+              <a
+                href="https://github.com/webprodigies/HushWrite"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 text-center text-xs sm:text-sm font-semibold text-neutral-800 hover:bg-neutral-50 bg-white border border-neutral-200/90 py-3.5 px-4 rounded-xl transition-all shadow-sm hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Terminal className="w-4 h-4 text-neutral-500" />
+                <span>Build from Source</span>
               </a>
             </div>
           </div>

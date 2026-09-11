@@ -156,27 +156,28 @@ export function BillingView() {
     },
     {
       id: "pro",
-      name: "Pro",
-      badge: proBilling === "lifetime" ? "Perpetual · Best Value" : "Most Flexible",
-      price: proBilling === "lifetime" ? "$89" : "$49",
+      name: proBilling === "lifetime" ? "Founding Beta" : "Pro Annual",
+      badge: proBilling === "lifetime" ? "Founding Beta · Best Value" : "Most Flexible",
+      price: proBilling === "lifetime" ? "$49" : "$49",
       period: proBilling === "lifetime" ? "one-time" : "/ year",
       subtext:
         proBilling === "lifetime"
-          ? "Pay once · Own forever · 1 yr updates included"
+          ? "Pay once · Own forever · Windows Store + Mac Early Access"
           : "Equivalent to $4.08/mo · Continuous updates",
       description:
-        "For professionals who write daily and want peak accuracy, custom jargon, and context awareness.",
+        "Includes Windows Store access now, Mac Early Access for technical testers, and a signed/notarized Mac release as soon as it is available.",
       features: [
         { name: "Everything included in Free", included: true },
+        { name: "Windows Store & direct installer (.exe / .msi / winget)", included: true },
+        { name: "Mac Early Access for technical testers", included: true },
+        { name: "Signed & notarized Mac release as soon as available", included: true },
         { name: "Whisper Large v3 Turbo & Medium models", included: true },
         { name: "Smart Context Engine (VS Code, Slack, Notion, Mail)", included: true },
         { name: "Custom dictionary for technical terms & client names", included: true },
         { name: "Automatic filler word stripper (removes ums/ahs)", included: true },
         { name: "Works 100% offline & air-gap verified", included: true },
-        { name: "Valid on 2 personal devices (macOS & Windows)", included: true },
-        { name: "Continuous performance tuning & model drops", included: true },
-        { name: "Voice snippets and text expansions", included: true },
-        { name: "Spoken editing commands & punctuation macros", included: true },
+        { name: "Valid on 2 personal devices (Windows & macOS)", included: true },
+        { name: "Voice snippets, text expansions & macros", included: true },
       ],
     },
     {
@@ -285,7 +286,7 @@ export function BillingView() {
               </span>
             </div>
             <p className="text-caption text-text-secondary">
-              Get 40% off Pro Annual ($29/yr) or $20 off Pro Lifetime ($69) with proof of
+              Get $10 off Founding Beta ($39) or 40% off Pro Annual ($29/yr) with proof of
               subscription. Zero cloud compute taxes.
             </p>
           </div>
@@ -313,7 +314,7 @@ export function BillingView() {
               </span>
             </div>
             <p className="text-caption text-text-secondary">
-              Get 50% off Pro Lifetime ($44) or Annual ($24/yr) with a .edu email or public GitHub
+              Get 50% off Founding Beta ($24) or Annual ($24/yr) with a .edu email or public GitHub
               repository.
             </p>
           </div>
@@ -388,7 +389,7 @@ export function BillingView() {
         <form onSubmit={handleActivate} className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
-            placeholder="PRO-XXXX-XXXX, LIFETIME-XXXX, or STUDENT-XXXX"
+            placeholder="FOUNDING-XXXX, PRO-XXXX-XXXX, or STUDENT-XXXX"
             value={inputKey}
             onChange={(e) => setInputKey(e.target.value)}
             className="hairline h-9 flex-1 rounded-input bg-sunken px-3 font-mono text-body text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-1 focus:ring-text-primary"
@@ -407,7 +408,7 @@ export function BillingView() {
         )}
         {keyError && (
           <p className="text-caption font-mono text-danger mt-2">
-            ✕ Invalid key format. Enter a valid HushWrite Pro, Team, Student, or Switcher key.
+            ✕ Invalid key format. Enter a valid HushWrite Founding Beta, Pro, Team, Student, or Switcher key.
           </p>
         )}
 
@@ -419,7 +420,7 @@ export function BillingView() {
                 <span className="text-caption font-mono font-semibold text-text-primary">
                   {licenseKey}
                 </span>
-                {licenseKey.startsWith("LIFETIME-") || subscriptionStatus === "lifetime" ? (
+                {licenseKey.startsWith("LIFETIME-") || licenseKey.startsWith("FOUNDING-") || subscriptionStatus === "lifetime" ? (
                   <span className="rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-2 py-0.2 text-[10px] font-mono font-semibold flex items-center gap-1">
                     <Sparkles className="size-2.5" />
                     <span>Perpetual · Never Expires</span>
@@ -453,7 +454,7 @@ export function BillingView() {
                 <span>{syncing ? "Checking..." : "Check Status"}</span>
               </button>
 
-              {!licenseKey.startsWith("LIFETIME-") && (
+              {!licenseKey.startsWith("LIFETIME-") && !licenseKey.startsWith("FOUNDING-") && (
                 <button
                   type="button"
                   onClick={handleManageSubscription}
@@ -488,7 +489,7 @@ export function BillingView() {
                 : "text-text-secondary hover:text-text-primary"
             }`}
           >
-            Lifetime License ($89)
+            Founding Beta ($49)
           </button>
           <button
             type="button"
@@ -582,7 +583,9 @@ export function BillingView() {
                       onClick={() => handleOpenLink("https://HushWrite.app/pricing")}
                       className="w-full text-center text-caption font-semibold py-2 rounded-input bg-text-primary text-opaque-elevated transition-opacity hover:opacity-90 shadow-xs"
                     >
-                      Buy Pro License ({proBilling === "lifetime" ? "$89" : "$49/yr"}) ↗
+                      {proBilling === "lifetime"
+                        ? "Get Founding Beta ($49 one-time) ↗"
+                        : "Start Pro Annual ($49/yr) ↗"}
                     </button>
                     {!isTrial && (
                       <button
