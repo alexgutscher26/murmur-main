@@ -298,7 +298,7 @@ fn normalize_ordinals(text: &str) -> String {
     sorted_ordinals.sort_by_key(|(spoken, _)| std::cmp::Reverse(spoken.len()));
 
     for (spoken, replacement) in sorted_ordinals {
-        out = super::dictionary::replace_whole_words(&out, spoken, replacement, false);
+        out = super::dictionary::replace_whole_words(&out, spoken, replacement, false, false);
     }
     out
 }

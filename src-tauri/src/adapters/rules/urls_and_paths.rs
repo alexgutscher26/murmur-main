@@ -87,15 +87,15 @@ fn format_spoken_urls(text: &str) -> String {
     // Protocols
     // Protocols
     out =
-        super::dictionary::replace_whole_words(&out, "https colon slash slash", "https://", false);
-    out = super::dictionary::replace_whole_words(&out, "http colon slash slash", "http://", false);
-    out = super::dictionary::replace_whole_words(&out, "colon slash slash", "://", false);
-    out = super::dictionary::replace_whole_words(&out, "https : / /", "https://", false);
-    out = super::dictionary::replace_whole_words(&out, "http : / /", "http://", false);
+        super::dictionary::replace_whole_words(&out, "https colon slash slash", "https://", false, false);
+    out = super::dictionary::replace_whole_words(&out, "http colon slash slash", "http://", false, false);
+    out = super::dictionary::replace_whole_words(&out, "colon slash slash", "://", false, false);
+    out = super::dictionary::replace_whole_words(&out, "https : / /", "https://", false, false);
+    out = super::dictionary::replace_whole_words(&out, "http : / /", "http://", false, false);
 
     // "www dot"
-    out = super::dictionary::replace_whole_words(&out, "www dot", "www.", false);
-    out = super::dictionary::replace_whole_words(&out, "www . ", "www.", false);
+    out = super::dictionary::replace_whole_words(&out, "www dot", "www.", false, false);
+    out = super::dictionary::replace_whole_words(&out, "www . ", "www.", false, false);
 
     // Collapse trailing space after protocols and www.
     out = out.replace("https:// ", "https://");

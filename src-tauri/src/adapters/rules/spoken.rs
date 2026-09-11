@@ -60,7 +60,7 @@ pub fn expand_spoken_commands(text: &str, language: Option<&LanguageCode>) -> St
 
     let mut out = text.to_string();
     for (phrase, replacement) in commands {
-        out = replace_whole_words(&out, phrase, replacement, false);
+        out = replace_whole_words(&out, phrase, replacement, false, false);
     }
     out
 }
@@ -699,259 +699,234 @@ fn build_tagged_path(words: &[&str]) -> String {
 
 pub fn format_markdown_mode(text: &str) -> String {
     let mut out = text.to_string();
-    out = replace_whole_words(&out, "heading level 1", "\n# ", false);
-    out = replace_whole_words(&out, "heading level 2", "\n## ", false);
-    out = replace_whole_words(&out, "heading level 3", "\n### ", false);
-    out = replace_whole_words(&out, "header 1", "\n# ", false);
-    out = replace_whole_words(&out, "header 2", "\n## ", false);
-    out = replace_whole_words(&out, "header 3", "\n### ", false);
-    out = replace_whole_words(&out, "bullet point", "\n- ", false);
-    out = replace_whole_words(&out, "dash point", "\n- ", false);
-    out = replace_whole_words(&out, "todo item", "\n- [ ] ", false);
-    out = replace_whole_words(&out, "checklist item", "\n- [ ] ", false);
-    out = replace_whole_words(&out, "insert bug template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false);
-    out = replace_whole_words(&out, "bug report template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false);
-    out = replace_whole_words(&out, "bug template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false);
+    out = replace_whole_words(&out, "heading level 1", "\n# ", false, false);
+    out = replace_whole_words(&out, "heading level 2", "\n## ", false, false);
+    out = replace_whole_words(&out, "heading level 3", "\n### ", false, false);
+    out = replace_whole_words(&out, "header 1", "\n# ", false, false);
+    out = replace_whole_words(&out, "header 2", "\n## ", false, false);
+    out = replace_whole_words(&out, "header 3", "\n### ", false, false);
+    out = replace_whole_words(&out, "bullet point", "\n- ", false, false);
+    out = replace_whole_words(&out, "dash point", "\n- ", false, false);
+    out = replace_whole_words(&out, "todo item", "\n- [ ] ", false, false);
+    out = replace_whole_words(&out, "checklist item", "\n- [ ] ", false, false);
+    out = replace_whole_words(&out, "insert bug template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false, false);
+    out = replace_whole_words(&out, "bug report template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false, false);
+    out = replace_whole_words(&out, "bug template", "\n### 🐛 Bug Report\n**Description:**\n\n**Steps to Reproduce:**\n1. \n2. \n3. \n\n**Expected Behavior:**\n\n**Actual Behavior:**\n\n**Environment:**\n- OS:\n- Version:\n", false, false);
 
     out = replace_whole_words(
         &out,
         "insert status update",
         "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "standup update",
         "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "daily standup",
         "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "status update",
         "\n### 📋 Status Update\n**Yesterday:**\n- \n\n**Today:**\n- \n\n**Blockers:**\n- None\n",
-        false,
-    );
+        false, false);
 
-    out = replace_whole_words(&out, "insert pull request template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
-    out = replace_whole_words(&out, "pull request template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
-    out = replace_whole_words(&out, "insert pr template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
-    out = replace_whole_words(&out, "pr template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false);
+    out = replace_whole_words(&out, "insert pull request template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false, false);
+    out = replace_whole_words(&out, "pull request template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false, false);
+    out = replace_whole_words(&out, "insert pr template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false, false);
+    out = replace_whole_words(&out, "pr template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false, false);
 
-    out = replace_whole_words(&out, "pr checklist", "\n### ✅ PR Checklist\n- [ ] Code follows style conventions\n- [ ] Unit & integration tests pass\n- [ ] Documentation updated\n- [ ] No sensitive credentials or debug logs\n", false);
-    out = replace_whole_words(&out, "pull request checklist", "\n### ✅ PR Checklist\n- [ ] Code follows style conventions\n- [ ] Unit & integration tests pass\n- [ ] Documentation updated\n- [ ] No sensitive credentials or debug logs\n", false);
+    out = replace_whole_words(&out, "pr checklist", "\n### ✅ PR Checklist\n- [ ] Code follows style conventions\n- [ ] Unit & integration tests pass\n- [ ] Documentation updated\n- [ ] No sensitive credentials or debug logs\n", false, false);
+    out = replace_whole_words(&out, "pull request checklist", "\n### ✅ PR Checklist\n- [ ] Code follows style conventions\n- [ ] Unit & integration tests pass\n- [ ] Documentation updated\n- [ ] No sensitive credentials or debug logs\n", false, false);
 
-    out = replace_whole_words(&out, "environment setup", "\n### 🛠️ Environment Setup\n1. Clone repository\n2. Copy `.env.example` to `.env`\n3. Run `bun install` / `pnpm install`\n4. Start dev server: `bun run dev`\n", false);
-    out = replace_whole_words(&out, "env setup", "\n### 🛠️ Environment Setup\n1. Clone repository\n2. Copy `.env.example` to `.env`\n3. Run `bun install` / `pnpm install`\n4. Start dev server: `bun run dev`\n", false);
+    out = replace_whole_words(&out, "environment setup", "\n### 🛠️ Environment Setup\n1. Clone repository\n2. Copy `.env.example` to `.env`\n3. Run `bun install` / `pnpm install`\n4. Start dev server: `bun run dev`\n", false, false);
+    out = replace_whole_words(&out, "env setup", "\n### 🛠️ Environment Setup\n1. Clone repository\n2. Copy `.env.example` to `.env`\n3. Run `bun install` / `pnpm install`\n4. Start dev server: `bun run dev`\n", false, false);
 
-    out = replace_whole_words(&out, "internal api docs", "\n### 🔌 API Specification\n**Endpoint:** `METHOD /api/v1/resource`\n**Headers:** `Authorization: Bearer <token>`\n**Request Body:**\n```json\n{\n  \n}\n```\n**Response (200 OK):**\n```json\n{\n  \n}\n```\n", false);
-    out = replace_whole_words(&out, "api documentation template", "\n### 🔌 API Specification\n**Endpoint:** `METHOD /api/v1/resource`\n**Headers:** `Authorization: Bearer <token>`\n**Request Body:**\n```json\n{\n  \n}\n```\n**Response (200 OK):**\n```json\n{\n  \n}\n```\n", false);
+    out = replace_whole_words(&out, "internal api docs", "\n### 🔌 API Specification\n**Endpoint:** `METHOD /api/v1/resource`\n**Headers:** `Authorization: Bearer <token>`\n**Request Body:**\n```json\n{\n  \n}\n```\n**Response (200 OK):**\n```json\n{\n  \n}\n```\n", false, false);
+    out = replace_whole_words(&out, "api documentation template", "\n### 🔌 API Specification\n**Endpoint:** `METHOD /api/v1/resource`\n**Headers:** `Authorization: Bearer <token>`\n**Request Body:**\n```json\n{\n  \n}\n```\n**Response (200 OK):**\n```json\n{\n  \n}\n```\n", false, false);
 
-    out = replace_whole_words(&out, "naming conventions", "\n### 🏷️ Codebase Naming Conventions\n- **Variables & Functions:** `camelCase`\n- **Classes, Types & Interfaces:** `PascalCase`\n- **Constants & Enums:** `SCREAMING_SNAKE_CASE`\n- **Files & Components:** `kebab-case` or `PascalCase.tsx`\n- **Database Columns:** `snake_case`\n", false);
-    out = replace_whole_words(&out, "naming convention", "\n### 🏷️ Codebase Naming Conventions\n- **Variables & Functions:** `camelCase`\n- **Classes, Types & Interfaces:** `PascalCase`\n- **Constants & Enums:** `SCREAMING_SNAKE_CASE`\n- **Files & Components:** `kebab-case` or `PascalCase.tsx`\n- **Database Columns:** `snake_case`\n", false);
+    out = replace_whole_words(&out, "naming conventions", "\n### 🏷️ Codebase Naming Conventions\n- **Variables & Functions:** `camelCase`\n- **Classes, Types & Interfaces:** `PascalCase`\n- **Constants & Enums:** `SCREAMING_SNAKE_CASE`\n- **Files & Components:** `kebab-case` or `PascalCase.tsx`\n- **Database Columns:** `snake_case`\n", false, false);
+    out = replace_whole_words(&out, "naming convention", "\n### 🏷️ Codebase Naming Conventions\n- **Variables & Functions:** `camelCase`\n- **Classes, Types & Interfaces:** `PascalCase`\n- **Constants & Enums:** `SCREAMING_SNAKE_CASE`\n- **Files & Components:** `kebab-case` or `PascalCase.tsx`\n- **Database Columns:** `snake_case`\n", false, false);
 
-    out = replace_whole_words(&out, "onboarding instructions", "\n### 🚀 Developer Onboarding Checklist\n- [ ] Request repository access & permissions\n- [ ] Configure local dev environment & secrets\n- [ ] Review architecture guidelines & standards\n- [ ] Submit first starter PR\n", false);
-    out = replace_whole_words(&out, "developer onboarding", "\n### 🚀 Developer Onboarding Checklist\n- [ ] Request repository access & permissions\n- [ ] Configure local dev environment & secrets\n- [ ] Review architecture guidelines & standards\n- [ ] Submit first starter PR\n", false);
+    out = replace_whole_words(&out, "onboarding instructions", "\n### 🚀 Developer Onboarding Checklist\n- [ ] Request repository access & permissions\n- [ ] Configure local dev environment & secrets\n- [ ] Review architecture guidelines & standards\n- [ ] Submit first starter PR\n", false, false);
+    out = replace_whole_words(&out, "developer onboarding", "\n### 🚀 Developer Onboarding Checklist\n- [ ] Request repository access & permissions\n- [ ] Configure local dev environment & secrets\n- [ ] Review architecture guidelines & standards\n- [ ] Submit first starter PR\n", false, false);
 
     out = replace_whole_words(
         &out,
         "calendar link",
         "\nYou can book a quick technical discussion with me here: calendly.com\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "book a call",
         "\nYou can book a quick technical discussion with me here: calendly.com\n",
-        false,
-    );
+        false, false);
 
-    out = replace_whole_words(&out, "youtube script template", "\n### 🎬 YouTube Video Script\n**Title Idea:** \n**Hook (0:00 - 0:30):**\n\n**Intro & Value Proposition:**\n\n**Main Points:**\n1. \n2. \n3. \n\n**Sponsor / Mid-roll CTA:**\n\n**Conclusion & Next Video CTA:**\n", false);
-    out = replace_whole_words(&out, "video script template", "\n### 🎬 YouTube Video Script\n**Title Idea:** \n**Hook (0:00 - 0:30):**\n\n**Intro & Value Proposition:**\n\n**Main Points:**\n1. \n2. \n3. \n\n**Sponsor / Mid-roll CTA:**\n\n**Conclusion & Next Video CTA:**\n", false);
-    out = replace_whole_words(&out, "youtube script", "\n### 🎬 YouTube Video Script\n**Title Idea:** \n**Hook (0:00 - 0:30):**\n\n**Intro & Value Proposition:**\n\n**Main Points:**\n1. \n2. \n3. \n\n**Sponsor / Mid-roll CTA:**\n\n**Conclusion & Next Video CTA:**\n", false);
+    out = replace_whole_words(&out, "youtube script template", "\n### 🎬 YouTube Video Script\n**Title Idea:** \n**Hook (0:00 - 0:30):**\n\n**Intro & Value Proposition:**\n\n**Main Points:**\n1. \n2. \n3. \n\n**Sponsor / Mid-roll CTA:**\n\n**Conclusion & Next Video CTA:**\n", false, false);
+    out = replace_whole_words(&out, "video script template", "\n### 🎬 YouTube Video Script\n**Title Idea:** \n**Hook (0:00 - 0:30):**\n\n**Intro & Value Proposition:**\n\n**Main Points:**\n1. \n2. \n3. \n\n**Sponsor / Mid-roll CTA:**\n\n**Conclusion & Next Video CTA:**\n", false, false);
+    out = replace_whole_words(&out, "youtube script", "\n### 🎬 YouTube Video Script\n**Title Idea:** \n**Hook (0:00 - 0:30):**\n\n**Intro & Value Proposition:**\n\n**Main Points:**\n1. \n2. \n3. \n\n**Sponsor / Mid-roll CTA:**\n\n**Conclusion & Next Video CTA:**\n", false, false);
 
-    out = replace_whole_words(&out, "content hook template", "\n### 🪝 Content Hook Framework\n**1. Curiosity Gap / Pattern Interrupt:**\n\n**2. Stakes & Problem Statement:**\n\n**3. Promise & Payoff:**\n", false);
-    out = replace_whole_words(&out, "video hook template", "\n### 🪝 Content Hook Framework\n**1. Curiosity Gap / Pattern Interrupt:**\n\n**2. Stakes & Problem Statement:**\n\n**3. Promise & Payoff:**\n", false);
-    out = replace_whole_words(&out, "viral hook template", "\n### 🪝 Content Hook Framework\n**1. Curiosity Gap / Pattern Interrupt:**\n\n**2. Stakes & Problem Statement:**\n\n**3. Promise & Payoff:**\n", false);
+    out = replace_whole_words(&out, "content hook template", "\n### 🪝 Content Hook Framework\n**1. Curiosity Gap / Pattern Interrupt:**\n\n**2. Stakes & Problem Statement:**\n\n**3. Promise & Payoff:**\n", false, false);
+    out = replace_whole_words(&out, "video hook template", "\n### 🪝 Content Hook Framework\n**1. Curiosity Gap / Pattern Interrupt:**\n\n**2. Stakes & Problem Statement:**\n\n**3. Promise & Payoff:**\n", false, false);
+    out = replace_whole_words(&out, "viral hook template", "\n### 🪝 Content Hook Framework\n**1. Curiosity Gap / Pattern Interrupt:**\n\n**2. Stakes & Problem Statement:**\n\n**3. Promise & Payoff:**\n", false, false);
 
-    out = replace_whole_words(&out, "newsletter template", "\n### 💌 Newsletter Draft\n**Subject Line Options:**\n1. \n2. \n\n**Preview Text:**\n\n**Core Essay:**\n\n**Key Takeaways:**\n- \n\n**Recommended Links:**\n- \n", false);
-    out = replace_whole_words(&out, "substack template", "\n### 💌 Newsletter Draft\n**Subject Line Options:**\n1. \n2. \n\n**Preview Text:**\n\n**Core Essay:**\n\n**Key Takeaways:**\n- \n\n**Recommended Links:**\n- \n", false);
-    out = replace_whole_words(&out, "substack draft", "\n### 💌 Newsletter Draft\n**Subject Line Options:**\n1. \n2. \n\n**Preview Text:**\n\n**Core Essay:**\n\n**Key Takeaways:**\n- \n\n**Recommended Links:**\n- \n", false);
+    out = replace_whole_words(&out, "newsletter template", "\n### 💌 Newsletter Draft\n**Subject Line Options:**\n1. \n2. \n\n**Preview Text:**\n\n**Core Essay:**\n\n**Key Takeaways:**\n- \n\n**Recommended Links:**\n- \n", false, false);
+    out = replace_whole_words(&out, "substack template", "\n### 💌 Newsletter Draft\n**Subject Line Options:**\n1. \n2. \n\n**Preview Text:**\n\n**Core Essay:**\n\n**Key Takeaways:**\n- \n\n**Recommended Links:**\n- \n", false, false);
+    out = replace_whole_words(&out, "substack draft", "\n### 💌 Newsletter Draft\n**Subject Line Options:**\n1. \n2. \n\n**Preview Text:**\n\n**Core Essay:**\n\n**Key Takeaways:**\n- \n\n**Recommended Links:**\n- \n", false, false);
 
-    out = replace_whole_words(&out, "social caption template", "\n### 📱 Social Caption\n**Hook Line:**\n\n**Body / Story:**\n\n**Call to Action:**\n👉 \n\n**Hashtags:**\n# \n", false);
-    out = replace_whole_words(&out, "instagram caption template", "\n### 📱 Social Caption\n**Hook Line:**\n\n**Body / Story:**\n\n**Call to Action:**\n👉 \n\n**Hashtags:**\n# \n", false);
-    out = replace_whole_words(&out, "tiktok caption template", "\n### 📱 Social Caption\n**Hook Line:**\n\n**Body / Story:**\n\n**Call to Action:**\n👉 \n\n**Hashtags:**\n# \n", false);
+    out = replace_whole_words(&out, "social caption template", "\n### 📱 Social Caption\n**Hook Line:**\n\n**Body / Story:**\n\n**Call to Action:**\n👉 \n\n**Hashtags:**\n# \n", false, false);
+    out = replace_whole_words(&out, "instagram caption template", "\n### 📱 Social Caption\n**Hook Line:**\n\n**Body / Story:**\n\n**Call to Action:**\n👉 \n\n**Hashtags:**\n# \n", false, false);
+    out = replace_whole_words(&out, "tiktok caption template", "\n### 📱 Social Caption\n**Hook Line:**\n\n**Body / Story:**\n\n**Call to Action:**\n👉 \n\n**Hashtags:**\n# \n", false, false);
 
-    out = replace_whole_words(&out, "linkedin post template", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false);
-    out = replace_whole_words(&out, "linkedin post", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false);
-    out = replace_whole_words(&out, "linkedin update", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false);
-    out = replace_whole_words(&out, "linkedin thought leadership", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false);
+    out = replace_whole_words(&out, "linkedin post template", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false, false);
+    out = replace_whole_words(&out, "linkedin post", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false, false);
+    out = replace_whole_words(&out, "linkedin update", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false, false);
+    out = replace_whole_words(&out, "linkedin thought leadership", "\n### 💼 LinkedIn Post\n**Hook:**\n\n**The Problem / Insight:**\n\n**Key Lessons / Framework:**\n• \n• \n• \n\n**Takeaway & Question:**\n👉 \n\n**Hashtags:**\n#Tech #Productivity #Engineering\n", false, false);
 
-    out = replace_whole_words(&out, "linkedin carousel template", "\n### 📑 LinkedIn Carousel Outline\n**Slide 1 (Cover Hook):**\n\n**Slide 2 (The Hidden Mistake):**\n\n**Slide 3 (The Shift):**\n\n**Slide 4 (Step-by-Step System):**\n• Step 1:\n• Step 2:\n• Step 3:\n\n**Slide 5 (Summary & Repost CTA):**\n", false);
-    out = replace_whole_words(&out, "linkedin carousel", "\n### 📑 LinkedIn Carousel Outline\n**Slide 1 (Cover Hook):**\n\n**Slide 2 (The Hidden Mistake):**\n\n**Slide 3 (The Shift):**\n\n**Slide 4 (Step-by-Step System):**\n• Step 1:\n• Step 2:\n• Step 3:\n\n**Slide 5 (Summary & Repost CTA):**\n", false);
-    out = replace_whole_words(&out, "carousel outline template", "\n### 📑 LinkedIn Carousel Outline\n**Slide 1 (Cover Hook):**\n\n**Slide 2 (The Hidden Mistake):**\n\n**Slide 3 (The Shift):**\n\n**Slide 4 (Step-by-Step System):**\n• Step 1:\n• Step 2:\n• Step 3:\n\n**Slide 5 (Summary & Repost CTA):**\n", false);
+    out = replace_whole_words(&out, "linkedin carousel template", "\n### 📑 LinkedIn Carousel Outline\n**Slide 1 (Cover Hook):**\n\n**Slide 2 (The Hidden Mistake):**\n\n**Slide 3 (The Shift):**\n\n**Slide 4 (Step-by-Step System):**\n• Step 1:\n• Step 2:\n• Step 3:\n\n**Slide 5 (Summary & Repost CTA):**\n", false, false);
+    out = replace_whole_words(&out, "linkedin carousel", "\n### 📑 LinkedIn Carousel Outline\n**Slide 1 (Cover Hook):**\n\n**Slide 2 (The Hidden Mistake):**\n\n**Slide 3 (The Shift):**\n\n**Slide 4 (Step-by-Step System):**\n• Step 1:\n• Step 2:\n• Step 3:\n\n**Slide 5 (Summary & Repost CTA):**\n", false, false);
+    out = replace_whole_words(&out, "carousel outline template", "\n### 📑 LinkedIn Carousel Outline\n**Slide 1 (Cover Hook):**\n\n**Slide 2 (The Hidden Mistake):**\n\n**Slide 3 (The Shift):**\n\n**Slide 4 (Step-by-Step System):**\n• Step 1:\n• Step 2:\n• Step 3:\n\n**Slide 5 (Summary & Repost CTA):**\n", false, false);
 
-    out = replace_whole_words(&out, "linkedin hook template", "\n### 🪝 LinkedIn Hook\n**Contrarian Opening:**\n\n**Data / Real-World Proof:**\n\n**Core Thesis:**\n", false);
-    out = replace_whole_words(&out, "thought leadership hook", "\n### 🪝 LinkedIn Hook\n**Contrarian Opening:**\n\n**Data / Real-World Proof:**\n\n**Core Thesis:**\n", false);
+    out = replace_whole_words(&out, "linkedin hook template", "\n### 🪝 LinkedIn Hook\n**Contrarian Opening:**\n\n**Data / Real-World Proof:**\n\n**Core Thesis:**\n", false, false);
+    out = replace_whole_words(&out, "thought leadership hook", "\n### 🪝 LinkedIn Hook\n**Contrarian Opening:**\n\n**Data / Real-World Proof:**\n\n**Core Thesis:**\n", false, false);
 
-    out = replace_whole_words(&out, "x thread template", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
-    out = replace_whole_words(&out, "twitter thread template", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
-    out = replace_whole_words(&out, "x thread", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
-    out = replace_whole_words(&out, "twitter thread", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false);
+    out = replace_whole_words(&out, "x thread template", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false, false);
+    out = replace_whole_words(&out, "twitter thread template", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false, false);
+    out = replace_whole_words(&out, "x thread", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false, false);
+    out = replace_whole_words(&out, "twitter thread", "\n### 🧵 X (Twitter) Thread\n**1/ 🧵 [Hook & Big Promise]:**\n\n**2/ [The Context & Pain]:**\n\n**3/ [The Solution / Core Breakthrough]:**\n\n**4/ [Detailed Breakdown]:**\n• \n• \n• \n\n**5/ [Conclusion & Bookmark CTA]:**\nIf you found this valuable:\n1. Follow for more insights\n2. Repost the first post to share with others\n", false, false);
 
     out = replace_whole_words(
         &out,
         "x post template",
         "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "twitter post template",
         "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "tweet template",
         "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "x post",
         "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "single tweet",
         "\n### 🐦 X (Twitter) Post\n**Hook:**\n\n**Insight:**\n\n**CTA / Question:**\n",
-        false,
-    );
+        false, false);
 
-    out = replace_whole_words(&out, "podcast outline template", "\n### 🎙️ Podcast Episode Outline\n**Episode Title:** \n**Guest:** \n**Core Theme:** \n\n**Discussion Questions:**\n- \n- \n- \n\n**Key Timestamps:**\n- 00:00 Intro\n- \n\n**Links Mentioned:**\n- \n", false);
-    out = replace_whole_words(&out, "podcast show notes", "\n### 🎙️ Podcast Episode Outline\n**Episode Title:** \n**Guest:** \n**Core Theme:** \n\n**Discussion Questions:**\n- \n- \n- \n\n**Key Timestamps:**\n- 00:00 Intro\n- \n\n**Links Mentioned:**\n- \n", false);
+    out = replace_whole_words(&out, "podcast outline template", "\n### 🎙️ Podcast Episode Outline\n**Episode Title:** \n**Guest:** \n**Core Theme:** \n\n**Discussion Questions:**\n- \n- \n- \n\n**Key Timestamps:**\n- 00:00 Intro\n- \n\n**Links Mentioned:**\n- \n", false, false);
+    out = replace_whole_words(&out, "podcast show notes", "\n### 🎙️ Podcast Episode Outline\n**Episode Title:** \n**Guest:** \n**Core Theme:** \n\n**Discussion Questions:**\n- \n- \n- \n\n**Key Timestamps:**\n- 00:00 Intro\n- \n\n**Links Mentioned:**\n- \n", false, false);
 
-    out = replace_whole_words(&out, "sponsor read template", "\n### 📢 Sponsor Read (60s)\n**Organic Transition:**\n\n**Product Problem & Solution:**\n\n**Personal Experience:**\n\n**Offer & Discount Code:**\n\n**Call to Action URL:**\n", false);
-    out = replace_whole_words(&out, "ad read template", "\n### 📢 Sponsor Read (60s)\n**Organic Transition:**\n\n**Product Problem & Solution:**\n\n**Personal Experience:**\n\n**Offer & Discount Code:**\n\n**Call to Action URL:**\n", false);
+    out = replace_whole_words(&out, "sponsor read template", "\n### 📢 Sponsor Read (60s)\n**Organic Transition:**\n\n**Product Problem & Solution:**\n\n**Personal Experience:**\n\n**Offer & Discount Code:**\n\n**Call to Action URL:**\n", false, false);
+    out = replace_whole_words(&out, "ad read template", "\n### 📢 Sponsor Read (60s)\n**Organic Transition:**\n\n**Product Problem & Solution:**\n\n**Personal Experience:**\n\n**Offer & Discount Code:**\n\n**Call to Action URL:**\n", false, false);
 
-    out = replace_whole_words(&out, "insert meeting notes", "\n### 📝 Meeting Notes\n**Date:** \n**Attendees:** \n**Objective:** \n\n**Key Discussion Points:**\n- \n\n**Action Items:**\n- [ ] \n", false);
-    out = replace_whole_words(&out, "meeting notes template", "\n### 📝 Meeting Notes\n**Date:** \n**Attendees:** \n**Objective:** \n\n**Key Discussion Points:**\n- \n\n**Action Items:**\n- [ ] \n", false);
-    out = replace_whole_words(&out, "meeting notes", "\n### 📝 Meeting Notes\n**Date:** \n**Attendees:** \n**Objective:** \n\n**Key Discussion Points:**\n- \n\n**Action Items:**\n- [ ] \n", false);
+    out = replace_whole_words(&out, "insert meeting notes", "\n### 📝 Meeting Notes\n**Date:** \n**Attendees:** \n**Objective:** \n\n**Key Discussion Points:**\n- \n\n**Action Items:**\n- [ ] \n", false, false);
+    out = replace_whole_words(&out, "meeting notes template", "\n### 📝 Meeting Notes\n**Date:** \n**Attendees:** \n**Objective:** \n\n**Key Discussion Points:**\n- \n\n**Action Items:**\n- [ ] \n", false, false);
+    out = replace_whole_words(&out, "meeting notes", "\n### 📝 Meeting Notes\n**Date:** \n**Attendees:** \n**Objective:** \n\n**Key Discussion Points:**\n- \n\n**Action Items:**\n- [ ] \n", false, false);
 
-    out = replace_whole_words(&out, "feature spec template", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false);
-    out = replace_whole_words(&out, "rfc template", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false);
-    out = replace_whole_words(&out, "feature spec", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false);
+    out = replace_whole_words(&out, "feature spec template", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false, false);
+    out = replace_whole_words(&out, "rfc template", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false, false);
+    out = replace_whole_words(&out, "feature spec", "\n### 💡 Feature Specification\n**Overview:** \n\n**Problem Statement:** \n\n**Proposed Solution:** \n\n**Acceptance Criteria:**\n- [ ] \n", false, false);
 
     out = replace_whole_words(
         &out,
         "release notes template",
         "\n### 📦 Release Notes\n**Added:**\n- \n\n**Fixed:**\n- \n\n**Changed:**\n- \n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "changelog template",
         "\n### 📦 Release Notes\n**Added:**\n- \n\n**Fixed:**\n- \n\n**Changed:**\n- \n",
-        false,
-    );
+        false, false);
 
     out = replace_whole_words(
         &out,
         "todo list template",
         "\n### 🎯 Action Items\n- [ ] \n- [ ] \n- [ ] \n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "task checklist",
         "\n### 🎯 Action Items\n- [ ] \n- [ ] \n- [ ] \n",
-        false,
-    );
+        false, false);
 
-    out = replace_whole_words(&out, "insert badge template", "\n[![Made with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)\n", false);
-    out = replace_whole_words(&out, "made with HushWrite badge", "\n[![Made with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)\n", false);
-    out = replace_whole_words(&out, "badge template", "\n[![Made with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)\n", false);
+    out = replace_whole_words(&out, "insert badge template", "\n[![Made with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)\n", false, false);
+    out = replace_whole_words(&out, "made with HushWrite badge", "\n[![Made with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)\n", false, false);
+    out = replace_whole_words(&out, "badge template", "\n[![Made with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://HushWrite.app)\n", false, false);
     out = replace_whole_words(
         &out,
         "dictated with HushWrite",
         "\n_Dictated privately on-device with [HushWrite](https://HushWrite.app)_\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "made with local dictation",
         "\n_Dictated privately on-device with [HushWrite](https://HushWrite.app)_\n",
-        false,
-    );
+        false, false);
 
-    out = replace_whole_words(&out, "issue title", "\n# Issue:", false);
+    out = replace_whole_words(&out, "issue title", "\n# Issue:", false, false);
     out = replace_whole_words(
         &out,
         "steps to reproduce",
         "\n### Steps to Reproduce:\n1. ",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "reproduction steps",
         "\n### Steps to Reproduce:\n1. ",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "expected behavior",
         "\n### Expected Behavior\n",
-        false,
-    );
-    out = replace_whole_words(&out, "actual behavior", "\n### Actual Behavior\n", false);
+        false, false);
+    out = replace_whole_words(&out, "actual behavior", "\n### Actual Behavior\n", false, false);
     out = replace_whole_words(
         &out,
         "acceptance criteria",
         "\n### Acceptance Criteria:\n- [ ] ",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "pull request description",
         "\n## Description\n\n## Changes\n- ",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "pr description",
         "\n## Description\n\n## Changes\n- ",
-        false,
-    );
-    out = replace_whole_words(&out, "pr summary", "\n## Summary\n\n", false);
+        false, false);
+    out = replace_whole_words(&out, "pr summary", "\n## Summary\n\n", false, false);
 
-    out = replace_whole_words(&out, "code block python", "\n```python\n\n```\n", false);
-    out = replace_whole_words(&out, "code block rust", "\n```rust\n\n```\n", false);
+    out = replace_whole_words(&out, "code block python", "\n```python\n\n```\n", false, false);
+    out = replace_whole_words(&out, "code block rust", "\n```rust\n\n```\n", false, false);
     out = replace_whole_words(
         &out,
         "code block typescript",
         "\n```typescript\n\n```\n",
-        false,
-    );
+        false, false);
     out = replace_whole_words(
         &out,
         "code block javascript",
         "\n```javascript\n\n```\n",
-        false,
-    );
-    out = replace_whole_words(&out, "code block json", "\n```json\n\n```\n", false);
-    out = replace_whole_words(&out, "code block sql", "\n```sql\n\n```\n", false);
-    out = replace_whole_words(&out, "code block bash", "\n```bash\n\n```\n", false);
-    out = replace_whole_words(&out, "code block shell", "\n```bash\n\n```\n", false);
-    out = replace_whole_words(&out, "code block html", "\n```html\n\n```\n", false);
-    out = replace_whole_words(&out, "code block css", "\n```css\n\n```\n", false);
-    out = replace_whole_words(&out, "code block", "\n```\n\n```\n", false);
+        false, false);
+    out = replace_whole_words(&out, "code block json", "\n```json\n\n```\n", false, false);
+    out = replace_whole_words(&out, "code block sql", "\n```sql\n\n```\n", false, false);
+    out = replace_whole_words(&out, "code block bash", "\n```bash\n\n```\n", false, false);
+    out = replace_whole_words(&out, "code block shell", "\n```bash\n\n```\n", false, false);
+    out = replace_whole_words(&out, "code block html", "\n```html\n\n```\n", false, false);
+    out = replace_whole_words(&out, "code block css", "\n```css\n\n```\n", false, false);
+    out = replace_whole_words(&out, "code block", "\n```\n\n```\n", false, false);
     out
 }
 
@@ -1120,7 +1095,7 @@ pub const COMMON_NAMED_ENTITIES: &[(&str, &str)] = &[
 pub fn normalize_named_entities(text: &str) -> String {
     let mut out = text.to_string();
     for (lower, canonical) in COMMON_NAMED_ENTITIES {
-        out = replace_whole_words(&out, lower, canonical, false);
+        out = replace_whole_words(&out, lower, canonical, false, false);
     }
     out
 }

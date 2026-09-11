@@ -200,7 +200,7 @@ pub fn strip_fillers(text: &str, language: Option<&LanguageCode>) -> String {
         if cjk {
             out = out.replace(filler, "");
         } else {
-            out = replace_whole_words(&out, filler, "", false);
+            out = replace_whole_words(&out, filler, "", false, true);
         }
     }
     normalise_whitespace(&out)
