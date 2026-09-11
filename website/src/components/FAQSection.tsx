@@ -41,19 +41,24 @@ const FAQS: FAQItem[] = [
       "Yes. Once your chosen Whisper model weights are downloaded, HushWrite operates completely offline in air-gapped environments with no internet access required.",
   },
   {
-    question: "What system permissions are required?",
+    question: "Why does the early-access macOS build require security approval?",
     answer:
-      "HushWrite requires microphone access for audio recording and accessibility permissions on macOS (or UI Automation on Windows) to paste text into your active target window.",
+      "Because macOS early-access test builds are currently unsigned and undergoing Apple notarization, macOS Gatekeeper will display a standard warning prompt upon first launch. You can approve it in 2 seconds: either right-click HushWrite.app in Applications and select 'Open', or go to System Settings > Privacy & Security and click 'Open Anyway'. An official signed and Apple-notarized Mac release is planned and included in Founding Beta as soon as it is available.",
   },
   {
-    question: "Which languages are supported?",
+    question: "What macOS permissions are expected and why?",
     answer:
-      "HushWrite supports all 99 languages included in OpenAI Whisper models, with automatic language identification enabled by default.",
+      "HushWrite requests 3 specific permissions: (1) Microphone Access to capture raw speech into temporary local RAM for whisper.cpp processing; (2) Accessibility Permissions to type formatted text directly at your cursor position in your active application; and (3) Input Monitoring / Global Keyboard to detect your push-to-talk hotkey (⌥ Space) when HushWrite is in the background.",
+  },
+  {
+    question: "What network access does HushWrite make?",
+    answer:
+      "HushWrite requires zero account creation, has zero telemetry by default, and sends zero audio or transcripts across the network. The only optional network calls are (1) downloading initial open-source Whisper GGML model files from official Hugging Face / GitHub mirrors, and (2) optional read-only version checks against GitHub Releases API (which can be disabled in Settings).",
   },
   {
     question: "Which operating systems and hardware are supported?",
     answer:
-      "HushWrite is fully released and optimized for Windows 10/11 64-bit with native DirectX 12 / DirectML and CUDA GPU acceleration. The macOS version is currently available in Early Access for technical testers (running experimental builds or building from source via git). A signed and Apple-notarized Mac release is in progress and included for all Founding Beta supporters as soon as it is available.",
+      "HushWrite is fully released and optimized for Windows 10 & 11 (64-bit) with native DirectX 12 / DirectML and CUDA acceleration. The macOS version (Apple Silicon M1/M2/M3/M4 & Intel) is currently available in Early Access for technical testers via unsigned beta builds or source code. Signed and notarized Mac releases are in active development.",
   },
 ];
 

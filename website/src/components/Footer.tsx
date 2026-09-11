@@ -62,6 +62,11 @@ const RESOURCES_LINKS: FooterLink[] = [
   { href: "/privacy", label: "Privacy Promise", accent: true },
   { href: "/pricing", label: "Pricing & Lifetime" },
   { href: "/#download", label: "Download App" },
+  {
+    href: "mailto:support@hushwrite.app",
+    label: "Support Contact",
+    external: true,
+  },
 ];
 
 const ECOSYSTEM_LINKS: FooterLink[] = [
@@ -72,8 +77,15 @@ const ECOSYSTEM_LINKS: FooterLink[] = [
     icon: true,
   },
   {
-    href: "/downloads/HushWrite_0.1.0_x64-setup.exe",
-    label: "Download Windows (.exe)",
+    href: "https://github.com/webprodigies/HushWrite/releases",
+    label: "Official Releases & SHA256",
+    external: true,
+    badge: "v0.1.0",
+  },
+  {
+    href: "https://apps.microsoft.com/search?query=HushWrite",
+    label: "Microsoft Store (Windows)",
+    external: true,
   },
   {
     href: "https://github.com/ggerganov/whisper.cpp",
@@ -83,11 +95,6 @@ const ECOSYSTEM_LINKS: FooterLink[] = [
   {
     href: "https://github.com/webprodigies/HushWrite/blob/main/LICENSE",
     label: "Open Source (MIT)",
-    external: true,
-  },
-  {
-    href: "https://github.com/alexgutscher26/HushWrite-main/blob/main/PRIVACY.md",
-    label: "Air-Gapped Policy (PRIVACY.md)",
     external: true,
   },
 ];
