@@ -101,6 +101,8 @@ const KNOWN_UNREACHABLE: &[(&str, &str)] = &[
     ("dictation.secondary_hotkey", "Not implemented yet"),
     ("ui.pill_opacity", "Not implemented yet"),
     ("ui.pill_compact", "Not implemented yet"),
+    ("ui.accent_color", "Consumed by frontend overlay webview"),
+    ("ui.confetti_effect", "Consumed by frontend overlay webview"),
     ("privacy.encryption_at_rest", "Not implemented yet"),
     ("privacy.purge_on_lock", "Not implemented yet"),
     ("privacy.incognito_mode", "Not implemented yet"),

@@ -134,6 +134,7 @@ pub fn run() {
                 // this is logged rather than fatal.
                 tracing::error!(error = %err, "could not install the menu bar item");
             }
+            tray::sync_tray_visibility(&handle);
 
             Ok(())
         })

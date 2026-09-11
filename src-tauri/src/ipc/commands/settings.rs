@@ -119,6 +119,7 @@ pub async fn set_setting(
  * WHERE: Called after every successful settings write.
  */
 fn announce(app: &tauri::AppHandle, key: Option<String>) {
+    crate::tray::sync_tray_visibility(app);
     if let Err(err) = (crate::ipc::events::SettingsChanged { key }).emit(app) {
         tracing::warn!(error = %err, "could not announce a settings change");
     }

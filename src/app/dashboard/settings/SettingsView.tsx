@@ -42,6 +42,7 @@ import { ModelManager } from "./_components/ModelManager";
 import { AbbreviationManager } from "./_components/AbbreviationManager";
 import { AppProfiles } from "./_components/AppProfiles";
 import { SettingsBackup } from "./_components/SettingsBackup";
+import { OverlaySection } from "./_components/OverlaySection";
 import { WpmCalibrationWizard } from "../_components/WpmCalibrationWizard";
 import { toControlSetting, type DynamicOptions } from "./to-setting-def";
 import { navigateTo } from "../use-hash-route";
@@ -50,6 +51,7 @@ import { usePlan, canUseFillerStripper, type PlanTier } from "@/lib/plan";
 /** Presentation order and wording */
 const SECTION_ORDER: readonly SettingSection[] = [
   "RECORDING",
+  "OVERLAY",
   "TRANSCRIPTION",
   "OUTPUT",
   "PRIVACY",
@@ -58,6 +60,7 @@ const SECTION_ORDER: readonly SettingSection[] = [
 
 const SECTION_LABEL: Readonly<Record<SettingSection, string>> = {
   RECORDING: "Recording",
+  OVERLAY: "Overlay & Indicator",
   TRANSCRIPTION: "Transcription",
   OUTPUT: "Output",
   VOCABULARY: "Vocabulary",
@@ -331,9 +334,10 @@ export function SettingsView({ registry, section }: SettingsViewProps) {
 }
 
 /** Panels that are not settings but belong inside a section. */
-type SectionPanel = "MODELS_PANEL" | "PRIVACY_PANEL";
+type SectionPanel = "MODELS_PANEL" | "PRIVACY_PANEL" | "OVERLAY_PANEL";
 
 const EXTRAS: Partial<Record<SettingSection, SectionPanel>> = {
+  OVERLAY: "OVERLAY_PANEL",
   TRANSCRIPTION: "MODELS_PANEL",
   PRIVACY: "PRIVACY_PANEL",
 };
@@ -437,36 +441,42 @@ function SettingsSection({
         </div>
       )}
 
-      {plain.map((def) => (
-        <div key={def.key}>
-          <SettingControl
-            className="hairline-b last:border-b-0"
-            setting={toControlSetting(
-              def,
-              values?.[def.key],
-              dynamic,
-              engine,
-              permissions,
-              (value) => onWrite(def.key, value),
-              tier,
-            )}
-          />
-          {def.key === "enhance.expand_abbreviations" &&
-            (values?.[def.key]?.type !== "BOOL" || values[def.key].value !== false) && (
-              <div className="py-2.5">
-                <AbbreviationManager
-                  languageCode={
-                    values?.["transcription.language"]?.type === "CHOICE"
-                      ? values["transcription.language"].value
-                      : undefined
-                  }
-                  disabledValue={values?.["enhance.disabled_abbreviations"]}
-                  onUpdateDisabled={(val) => onWrite("enhance.disabled_abbreviations", val)}
-                />
-              </div>
-            )}
+      {extra === "OVERLAY_PANEL" ? (
+        <div data-section="overlay">
+          <OverlaySection values={values} onWrite={onWrite} />
         </div>
-      ))}
+      ) : (
+        plain.map((def) => (
+          <div key={def.key}>
+            <SettingControl
+              className="hairline-b last:border-b-0"
+              setting={toControlSetting(
+                def,
+                values?.[def.key],
+                dynamic,
+                engine,
+                permissions,
+                (value) => onWrite(def.key, value),
+                tier,
+              )}
+            />
+            {def.key === "enhance.expand_abbreviations" &&
+              (values?.[def.key]?.type !== "BOOL" || values[def.key].value !== false) && (
+                <div className="py-2.5">
+                  <AbbreviationManager
+                    languageCode={
+                      values?.["transcription.language"]?.type === "CHOICE"
+                        ? values["transcription.language"].value
+                        : undefined
+                    }
+                    disabledValue={values?.["enhance.disabled_abbreviations"]}
+                    onUpdateDisabled={(val) => onWrite("enhance.disabled_abbreviations", val)}
+                  />
+                </div>
+              )}
+          </div>
+        ))
+      )}
 
       {hasBaselineWpm ? (
         <>

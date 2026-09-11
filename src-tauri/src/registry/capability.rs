@@ -84,6 +84,7 @@ pub enum SettingSection {
     Vocabulary,
     Privacy,
     General,
+    Overlay,
 }
 
 /**

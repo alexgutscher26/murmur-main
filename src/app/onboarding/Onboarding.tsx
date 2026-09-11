@@ -49,6 +49,7 @@ import { HotkeyStep } from "./_components/HotkeyStep";
 import { TourStep } from "./_components/TourStep";
 import { InviteStep } from "./_components/InviteStep";
 import { TutorialStep } from "./_components/TutorialStep";
+import { OverlayStep } from "./_components/OverlayStep";
 
 /** Declared by the Onboarding capability in the registry. Named here because
  *  "which setting means first run is over" is a contract between the two
@@ -82,6 +83,7 @@ export function Onboarding() {
 
   // Adaptive re-entry: state initialized or restored from saved registry settings
   const [toured, setToured] = useState(false);
+  const [overlayChosen, setOverlayChosen] = useState(false);
   const [tutorialDone, setTutorialDone] = useState(false);
   const [tested, setTested] = useState(false);
   const [invited, setInvited] = useState(false);
@@ -92,10 +94,13 @@ export function Onboarding() {
     if (savedStepIndex >= 1) {
       setToured(true);
     }
-    if (savedTutorialComplete || savedStepIndex >= 4) {
+    if (savedStepIndex >= 4) {
+      setOverlayChosen(true);
+    }
+    if (savedTutorialComplete || savedStepIndex >= 5) {
       setTutorialDone(true);
     }
-    if (savedStepIndex >= 5) {
+    if (savedStepIndex >= 6) {
       setTested(true);
       setInvited(true);
     }
@@ -129,12 +134,17 @@ export function Onboarding() {
     (registry.data?.capabilities ?? []).map((capability) => capability.hotkey?.default ?? null),
   );
 
+  const handleOverlayDone = useCallback(() => {
+    setOverlayChosen(true);
+    persistStep(4);
+  }, [persistStep]);
+
   const handleTutorialDone = useCallback(() => {
     setTutorialDone(true);
     void unwrapCommand(() =>
       commands.setSetting({ key: TUTORIAL_COMPLETE_KEY, value: { type: "BOOL", value: true } }),
     );
-    persistStep(4);
+    persistStep(5);
   }, [persistStep]);
 
   const finish = useCallback(() => {
@@ -145,7 +155,7 @@ export function Onboarding() {
         setFinishError(result.error);
         return;
       }
-      persistStep(5);
+      persistStep(6);
       void getCurrentWindow().close();
     });
   }, [persistStep]);
@@ -201,6 +211,13 @@ export function Onboarding() {
             }}
           />
         </StepShell>
+      ) : !overlayChosen ? (
+        <StepShell
+          title="Choose your overlay style"
+          description="Pick how HushWrite looks on screen during dictation. You can change this anytime in Settings."
+        >
+          <OverlayStep onDone={handleOverlayDone} />
+        </StepShell>
       ) : !tutorialDone ? (
         <StepShell
           title="Guided Practice"
@@ -227,7 +244,7 @@ export function Onboarding() {
                 type="button"
                 onClick={() => {
                   setInvited(true);
-                  persistStep(5);
+                  persistStep(6);
                 }}
                 className="h-[var(--control-height)] rounded-input bg-text-primary px-4 text-body font-medium text-opaque-elevated transition-opacity hover:opacity-90"
               >
@@ -238,7 +255,7 @@ export function Onboarding() {
                 type="button"
                 onClick={() => {
                   setInvited(true);
-                  persistStep(5);
+                  persistStep(6);
                 }}
                 className="h-[var(--control-height)] rounded-input px-3 text-caption text-text-secondary transition-colors hover:text-text-primary cursor-pointer"
               >
@@ -252,7 +269,7 @@ export function Onboarding() {
             mode={mode}
             onDelivered={() => {
               setTested(true);
-              persistStep(4);
+              persistStep(5);
             }}
           />
         </StepShell>

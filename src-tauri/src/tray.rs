@@ -285,10 +285,45 @@ struct PillPlacement {
 
 static PILL_PLACEMENT: std::sync::Mutex<Option<PillPlacement>> = std::sync::Mutex::new(None);
 
+pub fn sync_tray_visibility(app: &AppHandle) {
+    let visible = if let Some(state) = app.try_state::<crate::ipc::AppState>() {
+        crate::services::settings::get_setting(&state.db, crate::registry::keys::SHOW_TRAY_ICON)
+            .ok()
+            .flatten()
+            .map(|v| matches!(v, crate::types::SettingValue::Bool(true)))
+            .unwrap_or(true)
+    } else {
+        true
+    };
+
+    if let Some(tray) = app.tray_by_id("HushWrite") {
+        let _ = tray.set_visible(visible);
+    }
+}
+
 pub fn set_pill_visible(app: &AppHandle, visible: bool) {
     let Some(window) = app.get_webview_window(PILL_WINDOW) else {
         return;
     };
+
+    let style = if let Some(state) = app.try_state::<crate::ipc::AppState>() {
+        crate::services::settings::get_setting(&state.db, crate::registry::keys::OVERLAY_STYLE)
+            .ok()
+            .flatten()
+            .and_then(|v| match v {
+                crate::types::SettingValue::Choice(s) => Some(s),
+                _ => None,
+            })
+            .unwrap_or_else(|| "floating_pill".to_string())
+    } else {
+        "floating_pill".to_string()
+    };
+
+    if style == "none" {
+        PILL_SHOWN.store(false, Ordering::SeqCst);
+        let _ = window.hide();
+        return;
+    }
 
     if visible {
         PILL_SHOWN.store(true, Ordering::SeqCst);
@@ -645,6 +680,32 @@ pub fn fit_pill_to_state(app: &AppHandle, state: &crate::types::SessionState) {
         return;
     }
 
+    let (style, anchor) = if let Some(app_state) = app.try_state::<crate::ipc::AppState>() {
+        let s = crate::services::settings::get_setting(&app_state.db, crate::registry::keys::OVERLAY_STYLE)
+            .ok()
+            .flatten()
+            .and_then(|v| match v {
+                crate::types::SettingValue::Choice(s) => Some(s),
+                _ => None,
+            })
+            .unwrap_or_else(|| "floating_pill".to_string());
+        let a = crate::services::settings::get_setting(&app_state.db, crate::registry::keys::PILL_ANCHOR)
+            .ok()
+            .flatten()
+            .and_then(|v| match v {
+                crate::types::SettingValue::Choice(s) => Some(s),
+                _ => None,
+            })
+            .unwrap_or_else(|| "bottom_center".to_string());
+        (s, a)
+    } else {
+        ("floating_pill".to_string(), "bottom_center".to_string())
+    };
+
+    if style == "none" {
+        return;
+    }
+
     if let Ok(mut last) = LAST_LIVE_STATE.lock() {
         *last = Some(state.clone());
     }
@@ -667,62 +728,84 @@ pub fn fit_pill_to_state(app: &AppHandle, state: &crate::types::SessionState) {
         return;
     };
 
-    // One size for every capture state, so nothing resizes while the user is
-    // talking. Failure is the only state that changes the window, because it is
-    // the only one carrying a sentence rather than an indicator.
-    let points = match state {
-        SessionState::Failed { .. } => (PILL.width_failed, PILL.height_failed),
+    let points = match (style.as_str(), state) {
+        ("notch", SessionState::Failed { .. }) => (PILL.width_failed, 46.0),
+        ("notch", _) => (280.0, 38.0),
+        ("notch_slim_band", _) => (240.0, 10.0),
+        ("notch_drop_pill", SessionState::Failed { .. }) => (PILL.width_failed, PILL.height_failed),
+        ("notch_drop_pill", _) => (260.0, 42.0),
+        (_, SessionState::Failed { .. }) => (PILL.width_failed, PILL.height_failed),
         _ => (PILL.width, PILL.height),
     };
 
-    apply_pill_frame(&window, placement, points);
+    apply_pill_frame(&window, placement, points, &style, &anchor);
 }
 
 /**
  * SOURCE OF TRUTH KEYWORDS: pill_frame_on, cross_display_arithmetic
  * WHAT:  Where the pill sits on a given display, and how big it is there, in
  *        that display's physical pixels.
- * WHY:   Pure, because the bug it fixes was pure arithmetic — a size measured
- *        in one display's pixels used to centre against another display's
- *        width — and arithmetic can be tested, whereas a second monitor cannot
- *        be attached to a test runner. Everything touching a window handle
- *        stays in the caller.
- *
- *        Note what it does NOT take: the window. Nothing here can be derived
- *        from where the pill currently is, which is what stops a second
- *        opinion forming.
- * WHERE: The only place the frame is computed; exercised directly by the tests.
  */
 fn pill_frame_on(
     monitor_position: (i32, i32),
     monitor_size: (u32, u32),
     scale: f64,
     pill_points: (f64, f64),
+    style: &str,
+    anchor: &str,
 ) -> ((i32, i32), (u32, u32)) {
     let width = (pill_points.0 * scale).round() as i32;
     let height = (pill_points.1 * scale).round() as i32;
     let inset = (PILL_BOTTOM_INSET_PT * scale).round() as i32;
 
-    let default_x = monitor_position.0 + (monitor_size.0 as i32 - width) / 2;
-    let default_y = monitor_position.1 + monitor_size.1 as i32 - height - inset;
+    let (x, y) = match style {
+        "notch" | "notch_slim_band" => {
+            let cx = monitor_position.0 + (monitor_size.0 as i32 - width) / 2;
+            let cy = monitor_position.1;
+            (cx, cy)
+        }
+        "notch_drop_pill" => {
+            let cx = monitor_position.0 + (monitor_size.0 as i32 - width) / 2;
+            let cy = monitor_position.1 + (12.0 * scale).round() as i32;
+            (cx, cy)
+        }
+        _ => {
+            let left_x = monitor_position.0 + inset;
+            let center_x = monitor_position.0 + (monitor_size.0 as i32 - width) / 2;
+            let right_x = monitor_position.0 + monitor_size.0 as i32 - width - inset;
 
-    ((default_x, default_y), (width as u32, height as u32))
+            let top_y = monitor_position.1 + inset;
+            let middle_y = monitor_position.1 + (monitor_size.1 as i32 - height) / 2;
+            let bottom_y = monitor_position.1 + monitor_size.1 as i32 - height - inset;
+
+            match anchor {
+                "top_left" => (left_x, top_y),
+                "top_center" => (center_x, top_y),
+                "top_right" => (right_x, top_y),
+                "center_left" => (left_x, middle_y),
+                "center" => (center_x, middle_y),
+                "center_right" => (right_x, middle_y),
+                "bottom_left" => (left_x, bottom_y),
+                "bottom_right" => (right_x, bottom_y),
+                _ => (center_x, bottom_y),
+            }
+        }
+    };
+
+    ((x, y), (width as u32, height as u32))
 }
 
 /**
  * SOURCE OF TRUTH KEYWORDS: apply_pill_frame, move_size_move
- * WHAT:  Puts the pill at an absolute frame on a specific display.
- * WHY:   Move, size, then move again, and each step is load-bearing. A
- *        PhysicalSize means device pixels on whatever display the window
- *        currently occupies, so sizing before the move applies the target
- *        display's pixel count to the old display's pixels. And resizing pins
- *        the top-left and grows down and right, so the size change shifts the
- *        centre by half the delta — re-asserting the position is cheaper and
- *        far more obvious than compensating for it.
- * WHERE: The single writer of the pill's frame.
  */
-fn apply_pill_frame(window: &tauri::WebviewWindow, placement: PillPlacement, points: (f64, f64)) {
-    let ((x, y), (w, h)) = pill_frame_on(placement.origin, placement.size, placement.scale, points);
+fn apply_pill_frame(
+    window: &tauri::WebviewWindow,
+    placement: PillPlacement,
+    points: (f64, f64),
+    style: &str,
+    anchor: &str,
+) {
+    let ((x, y), (w, h)) = pill_frame_on(placement.origin, placement.size, placement.scale, points, style, anchor);
     let position = tauri::PhysicalPosition::new(x, y);
     let size = tauri::PhysicalSize::new(w, h);
 
@@ -746,34 +829,6 @@ fn menu_error(err: tauri::Error) -> AppError {
 mod tests {
     use super::*;
 
-    /**
-     * SOURCE OF TRUTH KEYWORDS: pill_tokens_parse
-     * WHAT:  Every dimension the window needs is actually found in tokens.css.
-     * WHY:   `from_tokens` panics on a missing token, which is the right
-     *        behaviour and also the reason this test exists: without it the
-     *        first person to learn that a token had been renamed would be the
-     *        user, at launch, via a crash. Reading them here means a rename
-     *        fails the build instead.
-     *
-     *        It deliberately does NOT assert specific numbers. The pill's size
-     *        belongs to whoever is designing it, and a test that pins it to
-     *        176px is a test that makes a redesign fail for no reason — which
-     *        is exactly what the previous version of this test did, within an
-     *        hour of being written.
-     */
-    /**
-     * SOURCE OF TRUTH KEYWORDS: cross_display_regression
-     * WHAT:  The pill lands centred on any display, whatever its scale.
-     * WHY:   The bug, in the form it actually took. The old code centred using
-     *        the window's CURRENT physical size, so moving a 200pt pill from a
-     *        2x laptop display to a 1x external one centred a 400px-wide object
-     *        against a screen measured in 1x pixels — putting it far left. It
-     *        looked correct on the second press because the window had moved by
-     *        then and reported the new display's pixels.
-     *
-     *        The assertion is that BOTH displays give a centred result from a
-     *        cold start, which is the property the second press was faking.
-     */
     #[test]
     fn the_pill_centres_on_every_display_regardless_of_scale() {
         let pill = (200.0, 44.0);
@@ -783,7 +838,7 @@ mod tests {
             ("external 1x, to the right", (3456, 0), (2560, 1440), 1.0),
             ("external 1.5x, above", (0, -1600), (2560, 1600), 1.5),
         ] {
-            let ((x, y), (w, h)) = pill_frame_on(origin, size, scale, pill);
+            let ((x, y), (w, h)) = pill_frame_on(origin, size, scale, pill, "floating_pill", "bottom_center");
 
             let left_gap = x - origin.0;
             let right_gap = (origin.0 + size.0 as i32) - (x + w as i32);
@@ -819,7 +874,7 @@ mod tests {
         let pill = (200.0, 44.0);
         let external = ((3456, 0), (2560u32, 1440u32), 1.0);
 
-        let ((x, _), (w, _)) = pill_frame_on(external.0, external.1, external.2, pill);
+        let ((x, _), (w, _)) = pill_frame_on(external.0, external.1, external.2, pill, "floating_pill", "bottom_center");
 
         // What the old code effectively did: centre using the 2x display's
         // pixel width. Kept here as the counter-example so the difference is

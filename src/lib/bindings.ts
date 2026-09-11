@@ -1003,7 +1003,7 @@ export type SettingKind = { kind: "TOGGLE" } | { kind: "TEXT"; placeholder: stri
  *  * WHERE: On every SettingDef; used by the Settings view to build its sections.
  *  
  */
-export type SettingSection = "RECORDING" | "TRANSCRIPTION" | "OUTPUT" | "VOCABULARY" | "PRIVACY" | "GENERAL";
+export type SettingSection = "RECORDING" | "TRANSCRIPTION" | "OUTPUT" | "VOCABULARY" | "PRIVACY" | "GENERAL" | "OVERLAY";
 
 /**
  * 

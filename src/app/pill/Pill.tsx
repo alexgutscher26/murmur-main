@@ -13,10 +13,12 @@ import { useTauriEvent } from "@/lib/use-event";
 import { unwrapCommand, useCommand } from "@/lib/ipc";
 import { glyphsForBinding } from "@/lib/hotkey";
 import { readDurationMs } from "@/lib/motion";
+import { getAccentConfig, type AccentColorId, type OverlayStyleId } from "@/lib/accent";
 import { cn } from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
 import { CountdownLine } from "@/components/global";
 import { PillWaveform } from "./_components/PillWaveform";
+import { PillConfetti } from "./_components/PillConfetti";
 
 /** Every state that puts something on screen. IDLE is the window's business. */
 type VisibleState = Exclude<SessionState, { kind: "IDLE" }>;
@@ -29,6 +31,7 @@ export function Pill() {
   const [refilling, setRefilling] = useState(false);
   const [partialText, setPartialText] = useState<string | null>(null);
   const [backtrackNotice, setBacktrackNotice] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
   const previousKind = useRef<VisibleState["kind"] | null>(null);
   const backtrackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -55,6 +58,20 @@ export function Pill() {
     settings.data?.["ui.pill_compact"]?.type === "BOOL" &&
     settings.data["ui.pill_compact"].value === true;
 
+  const overlayStyle = (settings.data?.["ui.overlay_style"]?.type === "CHOICE"
+    ? settings.data["ui.overlay_style"].value
+    : "floating_pill") as OverlayStyleId;
+
+  const accentColor = (settings.data?.["ui.accent_color"]?.type === "CHOICE"
+    ? settings.data["ui.accent_color"].value
+    : "monochrome") as AccentColorId;
+
+  const confettiEnabled =
+    settings.data?.["ui.confetti_effect"]?.type !== "BOOL" ||
+    settings.data["ui.confetti_effect"].value !== false;
+
+  const accent = useMemo(() => getAccentConfig(accentColor), [accentColor]);
+
   const isMac =
     typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform || "");
 
@@ -78,7 +95,14 @@ export function Pill() {
   }, []);
 
   useTauriEvent(events.sessionStateChanged, ({ state }) => {
-    setLive(state.kind !== "IDLE");
+    const wasLive = live;
+    const isNowLive = state.kind !== "IDLE";
+    setLive(isNowLive);
+
+    if (wasLive && !isNowLive && confettiEnabled && overlayStyle !== "none") {
+      setShowConfetti(true);
+    }
+
     if (state.kind === "ARMING" || state.kind === "IDLE") {
       setPartialText(null);
       setBacktrackNotice(null);
@@ -121,7 +145,7 @@ export function Pill() {
     void unwrapCommand(commands.resumeRecording);
   }, []);
 
-  if (!shown) return null;
+  if (overlayStyle === "none" || !shown) return null;
 
   const failed = shown.kind === "FAILED";
   const showLine = shown.kind === "CANCEL_PENDING" || refilling;
@@ -135,15 +159,66 @@ export function Pill() {
     return "";
   })();
 
+  // ── Style 3: Slim Notch Band ──────────────────────────────────────────
+  if (overlayStyle === "notch_slim_band") {
+    return (
+      <div
+        role="status"
+        aria-live="polite"
+        style={{ opacity: pillOpacity }}
+        className="relative flex h-full w-full select-none cursor-default items-center justify-center overflow-hidden rounded-b-lg bg-[#18181b]/95 dark:bg-[#161618]/95 border-b border-x shadow-md backdrop-blur-2xl px-2"
+      >
+        <span className="sr-only">{announcement}</span>
+        <div
+          className="h-[3px] w-full rounded-full transition-all duration-150 animate-pulse"
+          style={{
+            backgroundColor: accent.primary,
+            boxShadow: `0 0 10px ${accent.glow}`,
+          }}
+        />
+        <PillConfetti
+          active={showConfetti}
+          accentId={accentColor}
+          onComplete={() => setShowConfetti(false)}
+        />
+      </div>
+    );
+  }
+
+  // ── Common Accent Styles ──────────────────────────────────────────────
+  const dynamicBorder = accentColor === "monochrome" ? "border-white/15" : "";
+  const dynamicGlow =
+    accentColor === "monochrome"
+      ? "shadow-[0_12px_36px_rgba(0,0,0,0.65),inset_0_0.5px_0_rgba(255,255,255,0.2)]"
+      : `shadow-[0_12px_36px_rgba(0,0,0,0.65),0_0_20px_${accent.bgGlow},inset_0_0.5px_0_rgba(255,255,255,0.2)]`;
+
+  // ── Container Rounding & Border by Style ──────────────────────────────
+  const styleClasses = (() => {
+    switch (overlayStyle) {
+      case "notch":
+        return "rounded-b-[20px] border-b border-x border-t-0 pt-1 pb-1.5 px-3.5";
+      case "notch_drop_pill":
+        return "rounded-full border px-3.5 mt-1";
+      case "floating_pill":
+      default:
+        return "rounded-full border px-3.5";
+    }
+  })();
+
   return (
     <div
       role="status"
       aria-live="polite"
-      style={{ opacity: pillOpacity }}
+      style={{
+        opacity: pillOpacity,
+        borderColor: accentColor !== "monochrome" ? accent.border : undefined,
+      }}
       className={cn(
-        "relative flex h-full w-full select-none cursor-default items-center justify-between px-3.5",
-        "bg-[#18181b]/95 dark:bg-[#161618]/95 text-white rounded-full border border-white/15",
-        "shadow-[0_12px_36px_rgba(0,0,0,0.65),inset_0_0.5px_0_rgba(255,255,255,0.2)]",
+        "relative flex h-full w-full select-none cursor-default items-center justify-between",
+        "bg-[#18181b]/95 dark:bg-[#161618]/95 text-white",
+        dynamicBorder,
+        dynamicGlow,
+        styleClasses,
         "backdrop-blur-2xl transition-all duration-150 overflow-hidden",
         isCompactActive ? "justify-center px-2" : "gap-2.5",
       )}
@@ -152,8 +227,15 @@ export function Pill() {
         {announcement}
       </span>
 
-      {/* Left side: 5-bar dynamic white audio visualizer */}
-      <PillWaveform />
+      {/* Celebratory Confetti Burst */}
+      <PillConfetti
+        active={showConfetti}
+        accentId={accentColor}
+        onComplete={() => setShowConfetti(false)}
+      />
+
+      {/* Left side: Dynamic audio visualizer with accent color */}
+      <PillWaveform accentId={accentColor} />
 
       {/* Center: status, live speech snippet, or countdown */}
       {isCompactActive ? null : (
@@ -165,13 +247,20 @@ export function Pill() {
             partialText={partialText}
             backtrackNotice={backtrackNotice}
             onKeepRecording={handleKeepRecording}
+            accentPrimary={accentColor !== "monochrome" ? accent.primary : undefined}
           />
         </div>
       )}
 
       {/* Right side: Keycap badge */}
       {isCompactActive || failed ? null : (
-        <div className="shrink-0 flex items-center justify-center rounded-[6px] bg-white/[0.12] border border-white/20 px-2 py-0.5 text-[11px] font-mono font-medium text-white/95 shadow-xs">
+        <div
+          style={{
+            borderColor: accentColor !== "monochrome" ? accent.border : undefined,
+            color: accentColor !== "monochrome" ? accent.secondary : undefined,
+          }}
+          className="shrink-0 flex items-center justify-center rounded-[6px] bg-white/[0.12] border border-white/20 px-2 py-0.5 text-[11px] font-mono font-medium text-white/95 shadow-xs"
+        >
           {hotkeyLabel}
         </div>
       )}
@@ -192,6 +281,7 @@ function PillBody({
   partialText,
   backtrackNotice,
   onKeepRecording,
+  accentPrimary,
 }: {
   state: VisibleState;
   showLine: boolean;
@@ -199,6 +289,7 @@ function PillBody({
   partialText: string | null;
   backtrackNotice: string | null;
   onKeepRecording: () => void;
+  accentPrimary?: string;
 }) {
   if (showLine) {
     const remainingMs = state.kind === "CANCEL_PENDING" ? state.remaining_ms : 0;
@@ -244,7 +335,10 @@ function PillBody({
       }
       if (partialText) {
         return (
-          <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-white/90 select-none animate-in fade-in duration-150">
+          <span
+            style={{ color: accentPrimary }}
+            className="min-w-0 flex-1 truncate text-[13px] font-medium text-white/90 select-none animate-in fade-in duration-150"
+          >
             {getTrailingSnippet(partialText)}
           </span>
         );
