@@ -1,5 +1,5 @@
 /*!
- * SOURCE OF TRUTH KEYWORDS: run, HushWrite_lib, module_tree, ActivationPolicy
+ * SOURCE OF TRUTH KEYWORDS: run, hush_write_lib, module_tree, ActivationPolicy
  * WHAT:  Crate root. Declares the layer modules and starts the Tauri app.
  * WHY:   Wiring only, no logic — the layering the whole codebase depends on is
  *        only legible if the root stays a table of contents. Module order here

@@ -5,12 +5,12 @@
  *        library crate, which is what lets the whole application — including
  *        the session actor and the full pipeline — be exercised by tests. A
  *        binary with logic in it is a binary whose logic cannot be tested.
- * WHERE: The only caller of HushWrite_lib::run.
+ * WHERE: The only caller of hush_write_lib::run.
  */
 
 // Prevents an additional console window on Windows in release. DO NOT REMOVE.
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    HushWrite_lib::run()
+    hush_write_lib::run()
 }
