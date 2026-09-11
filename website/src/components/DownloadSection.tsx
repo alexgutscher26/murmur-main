@@ -202,7 +202,7 @@ export function DownloadSection() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Laptop className="w-5 h-5 text-neutral-900" />
-                  <h3 className="text-xl font-bold text-neutral-950">Murmur for macOS</h3>
+                  <h3 className="text-xl font-bold text-neutral-950">HushWrite for macOS</h3>
                 </div>
                 <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80 font-bold">
                   Early Access · Technical Testers

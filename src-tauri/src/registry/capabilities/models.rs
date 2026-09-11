@@ -60,7 +60,7 @@ pub fn models_capability() -> Capability {
             number(
                 keys::TRANSCRIPTION_CONFIDENCE_THRESHOLD,
                 "Confidence Threshold",
-                "Confidence score below which Murmur escalates to the higher tier model.",
+                "Confidence score below which HushWrite escalates to the higher tier model.",
                 SettingSection::Transcription,
                 (0.40, 0.95, 0.05),
                 Some("score"),
