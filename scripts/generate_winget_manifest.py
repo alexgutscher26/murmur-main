@@ -8,7 +8,7 @@ for submission to the microsoft/winget-pkgs community repository.
 Usage:
     python scripts/generate_winget_manifest.py \
         --version 0.1.0 \
-        --installer-url https://github.com/webprodigies/HushWrite/releases/download/v0.1.0/HushWrite_0.1.0_x64-setup.exe \
+        --installer-url https://github.com/alexgutscher26/HushWrite/releases/download/v0.1.0/HushWrite_0.1.0_x64-setup.exe \
         --installer-sha256 <SHA256_HEX> \
         --output-dir winget/manifests/w/WebProdigies/HushWrite/0.1.0
 """
@@ -79,7 +79,7 @@ Tags:
   - whisper
   - local-ai
   - privacy
-ReleaseNotesUrl: https://github.com/webprodigies/HushWrite/releases/tag/v{version}
+ReleaseNotesUrl: https://github.com/alexgutscher26/HushWrite/releases/tag/v{version}
 ManifestType: defaultLocale
 ManifestVersion: 1.6.0
 """

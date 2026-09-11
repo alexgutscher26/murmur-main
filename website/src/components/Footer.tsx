@@ -71,13 +71,13 @@ const RESOURCES_LINKS: FooterLink[] = [
 
 const ECOSYSTEM_LINKS: FooterLink[] = [
   {
-    href: "https://github.com/webprodigies/HushWrite",
+    href: "https://github.com/alexgutscher26/HushWrite",
     label: "GitHub Repository",
     external: true,
     icon: true,
   },
   {
-    href: "https://github.com/webprodigies/HushWrite/releases",
+    href: "https://github.com/alexgutscher26/HushWrite/releases",
     label: "Official Releases & SHA256",
     external: true,
     badge: "v0.1.0",
@@ -93,7 +93,7 @@ const ECOSYSTEM_LINKS: FooterLink[] = [
     external: true,
   },
   {
-    href: "https://github.com/webprodigies/HushWrite/blob/main/LICENSE",
+    href: "https://github.com/alexgutscher26/HushWrite/blob/main/LICENSE",
     label: "Open Source (MIT)",
     external: true,
   },

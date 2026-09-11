@@ -202,18 +202,23 @@ export function DownloadSection() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Laptop className="w-5 h-5 text-neutral-900" />
-                  <h3 className="text-xl font-bold text-neutral-950">macOS</h3>
+                  <h3 className="text-xl font-bold text-neutral-950">Murmur for macOS</h3>
                 </div>
                 <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80 font-bold">
                   Early Access · Technical Testers
                 </span>
               </div>
-              <span className="text-xs font-mono text-neutral-500 block mb-3">
-                macOS 13.0+ (Apple Silicon Metal & Intel)
+              <span className="text-xs font-mono text-neutral-500 block mb-2">
+                Mac Early Access is available for Apple Silicon and Intel Macs.
               </span>
-              <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mb-6">
-                Available for developers & technical testers via experimental builds or source.
-                The signed and Apple-notarized Mac release is in progress and included in Founding Beta.
+              <p className="text-neutral-600 text-xs sm:text-sm leading-relaxed mb-4">
+                The current build is distributed through our official GitHub Releases and requires a
+                one-time macOS approval because it is not yet signed and notarized. We are funding
+                Apple Developer signing from early customer revenue.
+              </p>
+              <p className="text-neutral-500 text-xs leading-relaxed mb-6 italic">
+                If you prefer a frictionless installation, use the Windows Microsoft Store version
+                today or join the Mac waitlist for the signed release.
               </p>
             </div>
 
@@ -242,21 +247,24 @@ export function DownloadSection() {
               </div>
 
               {/* Mandatory Security Approval Notice Under Mac Buttons */}
-              <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 text-left">
-                <div className="flex items-start gap-2">
+              <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-left">
+                <div className="flex items-start gap-2.5">
                   <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                   <div className="text-xs text-amber-900 leading-relaxed">
                     <p className="font-semibold text-amber-950">
                       Requires one-time macOS security approval. Signed/notarized release is planned.
                     </p>
+                    <p className="text-[11px] text-amber-800/90 mt-1">
+                      We are funding Apple Developer signing from early customer revenue.
+                    </p>
                     <button
                       onClick={() => setShowMacInstructions(!showMacInstructions)}
-                      className="text-amber-800 hover:text-amber-950 underline font-medium mt-1 inline-flex items-center gap-1"
+                      className="text-amber-800 hover:text-amber-950 underline font-medium mt-1.5 inline-flex items-center gap-1"
                     >
                       {showMacInstructions ? "Hide approval steps" : "View quick 2-step approval guide"}
                     </button>
                     {showMacInstructions && (
-                      <div className="mt-2.5 p-2.5 bg-white/90 rounded-lg border border-amber-200 text-[11px] text-neutral-700 space-y-1.5 font-sans">
+                      <div className="mt-2.5 p-2.5 bg-white/95 rounded-lg border border-amber-200 text-[11px] text-neutral-700 space-y-1.5 font-sans">
                         <p><strong>Method 1:</strong> Right-click <code>HushWrite.app</code> in your Applications folder → click <strong>Open</strong> → click <strong>Open</strong> in the prompt.</p>
                         <p><strong>Method 2:</strong> Go to <strong>System Settings → Privacy & Security</strong> → scroll down and click <strong>&ldquo;Open Anyway&rdquo;</strong>.</p>
                       </div>
@@ -286,7 +294,7 @@ export function DownloadSection() {
 
             <div className="flex items-center gap-2 shrink-0">
               <a
-                href="https://github.com/webprodigies/HushWrite/releases"
+                href="https://github.com/alexgutscher26/HushWrite/releases"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white text-xs font-semibold transition-all shadow-sm"
@@ -328,7 +336,7 @@ export function DownloadSection() {
                 </span>
               </div>
               <a
-                href="https://github.com/webprodigies/HushWrite/releases/tag/v0.1.0"
+                href="https://github.com/alexgutscher26/HushWrite/releases/tag/v0.1.0"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[11px] text-neutral-600 hover:text-neutral-950 underline mt-3 inline-block"

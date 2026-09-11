@@ -78,7 +78,7 @@ def update_manifest(manifest_path: str, platform: str, from_version: str, target
 
     if platform not in manifest["platforms"]:
         manifest["platforms"][platform] = {
-            "url": f"https://github.com/webprodigies/HushWrite/releases/download/v{target_version}/HushWrite_{target_version}_{platform}.zip",
+            "url": f"https://github.com/alexgutscher26/HushWrite/releases/download/v{target_version}/HushWrite_{target_version}_{platform}.zip",
             "signature": None,
             "patches": []
         }
@@ -109,7 +109,7 @@ def main():
     parser.add_argument("--platform", default="windows-x86_64", help="Platform key (windows-x86_64 or darwin-aarch64)")
     parser.add_argument("--output", required=True, help="Output .patch file path")
     parser.add_argument("--manifest", default="dist/latest.json", help="Path to latest.json to update")
-    parser.add_argument("--patch-base-url", default="https://github.com/webprodigies/HushWrite/releases/download", help="Base URL for release downloads")
+    parser.add_argument("--patch-base-url", default="https://github.com/alexgutscher26/HushWrite/releases/download", help="Base URL for release downloads")
 
     args = parser.parse_args()
 
