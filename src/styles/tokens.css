@@ -66,10 +66,10 @@
   --noise-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 
   /* ── Geometry (docs/04 §4) ────────────────────────────────────────── */
-  --radius-pill: 18px;
-  --pill-width: 176px;
+  --radius-pill: 20px;
+  --pill-width: 248px;
   --pill-width-compact: 140px;
-  --pill-height: 36px;
+  --pill-height: 40px;
   --pill-width-failed: 320px;
   --pill-height-failed: 48px;
   --pill-exit-duration-ms: 180ms;
@@ -159,9 +159,9 @@
   --pill-exit-duration-ms: 160;
   --pill-exit-travel: 8;
 
-  --pill-width: 176px;
+  --pill-width: 248px;
   --pill-width-compact: 48px;
-  --pill-height: 36px;
+  --pill-height: 40px;
   --pill-width-failed: 260px;
   --pill-height-failed: 52px;
 

@@ -13,14 +13,9 @@ import {
   Cpu,
   ShieldCheck,
   Zap,
-  Sparkles,
   Copy,
   Check,
-  CheckCircle2,
   FileCode2,
-  Lock,
-  ArrowRight,
-  Eye,
   Download,
 } from "lucide-react";
 

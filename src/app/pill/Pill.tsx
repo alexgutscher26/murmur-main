@@ -1,92 +1,30 @@
 /**
  * SOURCE OF TRUTH KEYWORDS: Pill, PillBody, SessionState, sessionStateChanged,
- *   VisibleState, PillTone, pill-width, pill-width-failed, window-is-the-pill
- * WHAT:  The overlay. Renders the current SessionState and nothing else — dot,
- *        waveform or countdown ring, the elapsed timer, or a failure sentence.
- * WHY:   THE WINDOW IS THE PILL. The NSPanel is sized to the pill's tokens and
- *        its vibrancy carries --radius-pill, so every pixel of the window is
- *        painted glass in the pill's shape and there is no slack to hide a
- *        mistake in. Three rules follow, and breaking any one of them puts the
- *        grey rectangle back on screen:
- *
- *        1. THE PILL FILLS THE WINDOW. It never animates its own width and
- *           never transforms itself. A CSS morph would race a native window
- *           resize that is not frame-locked to it, and every frame where the
- *           two disagree is bare glass beside the pill. Motion that moves the
- *           pill AS AN OBJECT — arriving, resizing, leaving — belongs to the
- *           window, in Rust. Motion INSIDE the pill belongs here.
- *        2. IDLE NEVER BLANKS THE VIEW. Rust hides the window on IDLE, and the
- *           same transition also reaches this webview over IPC. Those two do
- *           not land on the same frame, so a view that cleared on IDLE would
- *           leave an empty glass capsule on screen until the native hide caught
- *           up — a grey blob flashing at the end of every single dictation.
- *           The view therefore renders the last state that had something to say
- *           and lets the window take it away. `live` is tracked separately so
- *           the elapsed timer still STOPS on IDLE; only the pixels persist.
- *        3. THE SWITCH IS EXHAUSTIVE, with a `never` assertion rather than a
- *           default. A new variant in the Rust enum has to become a compile
- *           error here, not a silently blank pill.
- *
- *        It holds no domain state: get_session_state is called ONCE for first
- *        paint and every frame after that comes from session-state-changed, so
- *        there is no second copy of the truth and nothing to poll (CLAUDE.md §7).
- * WHERE: Mounted by src/entries/pill.tsx into the NSPanel window. Sizes come
- *        from tokens.css, which src-tauri/src/tray.rs reads and asserts against
- *        its own constants. Draws with the global Waveform and CountdownRing.
+ *   VisibleState, PillTone, pill-width, window-is-the-pill
+ * WHAT:  The overlay pill. Renders the 5-bar dynamic white audio visualizer,
+ *        "Listening — hold" status or partial transcript, and the active hotkey badge.
+ * WHERE: Mounted by src/entries/pill.tsx into the NSPanel window.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { commands, events, type SessionState } from "@/lib/bindings";
 import { isTransientFailure } from "@/lib/errors";
 import { useTauriEvent } from "@/lib/use-event";
 import { unwrapCommand, useCommand } from "@/lib/ipc";
-import { formatClock } from "@/lib/format";
+import { glyphsForBinding } from "@/lib/hotkey";
 import { readDurationMs } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { RotateCcw } from "lucide-react";
-import { CountdownLine, GlassPanel } from "@/components/global";
-import { MicIndicator } from "./_components/MicIndicator";
-import type { PillTone } from "./_components/StateDot";
+import { CountdownLine } from "@/components/global";
 import { PillWaveform } from "./_components/PillWaveform";
-import { useElapsed } from "./use-elapsed";
 
 /** Every state that puts something on screen. IDLE is the window's business. */
 type VisibleState = Exclude<SessionState, { kind: "IDLE" }>;
 
-/**
- * WHAT:  The surface tint per state.
- * WHY:   Only failure tints now. docs/04 §7 used to say the pill TURNS its
- *        state colour, and with an ember accent that meant a wash for cancel
- *        and for delivery too. There is no accent hue any more, so a neutral
- *        "tint" would be a wash the same colour as the pill — a layer that
- *        costs a paint and communicates nothing. What separates the states is
- *        FORM: a moving waveform, a draining line, a sentence. Hue was
- *        decorating a distinction that form had already made, which is exactly
- *        why removing it costs nothing.
- *
- *        Failure keeps its wash because that is the one state where losing the
- *        distinction is a safety problem rather than a style one. Still the
- *        soft variant: at full strength over vibrancy this is a red box, and
- *        the pill is an indicator, not an alert. Always rendered and
- *        transparent at rest, so the colour morphs on a state change instead
- *        of a tinted layer popping into existence (docs/04 §6).
- */
-const TONE_TINT: Readonly<Record<PillTone, string>> = {
-  ink: "bg-transparent",
-  danger: "bg-danger-soft",
-};
-
-function toneFor(state: VisibleState): PillTone {
-  // "Not yet" is not a fault: a red pill on a first-ever keypress says the app
-  // is broken when it is seven seconds old (docs/04 §2).
-  if (state.kind !== "FAILED") return "ink";
-  return isTransientFailure(state.code) ? "ink" : "danger";
-}
-
 export function Pill() {
-  /** The last state worth drawing. Never cleared — see rule 2 above. */
+  /** The last state worth drawing. Never cleared — persists until window hides. */
   const [shown, setShown] = useState<VisibleState | null>({ kind: "ARMING" });
-  /** Whether a session is actually running, which is a different question. */
+  /** Whether a session is actually running. */
   const [live, setLive] = useState(false);
   const [refilling, setRefilling] = useState(false);
   const [partialText, setPartialText] = useState<string | null>(null);
@@ -103,7 +41,7 @@ export function Pill() {
     };
   }, []);
 
-  // Settings for opacity
+  // Settings
   const settings = useCommand(commands.getSettings, []);
   useTauriEvent(events.settingsChanged, () => settings.reload());
 
@@ -116,6 +54,18 @@ export function Pill() {
   const isCompact =
     settings.data?.["ui.pill_compact"]?.type === "BOOL" &&
     settings.data["ui.pill_compact"].value === true;
+
+  const isMac =
+    typeof navigator !== "undefined" && /Mac|iPod|iPhone|iPad/.test(navigator.platform || "");
+
+  const hotkeySetting = settings.data?.["dictation.hotkey"];
+  const hotkeyLabel = useMemo(() => {
+    if (hotkeySetting && hotkeySetting.type === "HOTKEY" && hotkeySetting.value) {
+      const glyphs = glyphsForBinding(hotkeySetting.value);
+      if (glyphs.length > 0) return glyphs.join("");
+    }
+    return isMac ? "fn" : "Alt";
+  }, [hotkeySetting, isMac]);
 
   // First paint only. Every subsequent state arrives on the event.
   useEffect(() => {
@@ -154,8 +104,6 @@ export function Pill() {
     }, 2200);
   });
 
-  // A second Escape: hold the ring on screen while it springs back to full,
-  // or the gesture that saved the recording has no feedback at all.
   const kind = shown?.kind ?? null;
   useEffect(() => {
     const previous = previousKind.current;
@@ -169,13 +117,6 @@ export function Pill() {
     return () => window.clearTimeout(handle);
   }, [kind]);
 
-  // Ticks only while a session is live; keeps its pixels after it is not.
-  const elapsedMs = useElapsed(
-    live && (shown?.kind === "RECORDING" || shown?.kind === "CANCEL_PENDING")
-      ? shown.elapsed_ms
-      : null,
-  );
-
   const handleKeepRecording = useCallback(() => {
     void unwrapCommand(commands.resumeRecording);
   }, []);
@@ -188,35 +129,35 @@ export function Pill() {
 
   const announcement = (() => {
     if (!live) return "Dictation idle";
-    if (shown.kind === "ARMING" || shown.kind === "RECORDING") return "Dictation recording started";
+    if (shown.kind === "ARMING" || shown.kind === "RECORDING") return "Dictation listening";
     if (shown.kind === "CANCEL_PENDING") return "Cancelling dictation";
     if (shown.kind === "FAILED") return `Dictation error: ${shown.message}`;
     return "";
   })();
 
   return (
-    <GlassPanel
-      material="pill"
-      radius="pill"
+    <div
       role="status"
       aria-live="polite"
       style={{ opacity: pillOpacity }}
       className={cn(
-        "flex h-full w-full select-none cursor-default items-center px-3",
-        isCompactActive ? "justify-center px-2" : "gap-2",
+        "relative flex h-full w-full select-none cursor-default items-center justify-between px-3.5",
+        "bg-[#18181b]/95 dark:bg-[#161618]/95 text-white rounded-full border border-white/15",
+        "shadow-[0_12px_36px_rgba(0,0,0,0.65),inset_0_0.5px_0_rgba(255,255,255,0.2)]",
+        "backdrop-blur-2xl transition-all duration-150 overflow-hidden",
+        isCompactActive ? "justify-center px-2" : "gap-2.5",
       )}
     >
       <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {announcement}
       </span>
-      <span
-        aria-hidden="true"
-        className={cn("absolute inset-0 -z-10 transition-colors", TONE_TINT[toneFor(shown)])}
-      />
-      <MicIndicator tone={toneFor(shown)} recording={shown.kind === "RECORDING"} />
 
+      {/* Left side: 5-bar dynamic white audio visualizer */}
+      <PillWaveform />
+
+      {/* Center: status, live speech snippet, or countdown */}
       {isCompactActive ? null : (
-        <>
+        <div className="flex-1 min-w-0 flex items-center justify-start pl-1">
           <PillBody
             state={shown}
             showLine={showLine}
@@ -225,39 +166,25 @@ export function Pill() {
             backtrackNotice={backtrackNotice}
             onKeepRecording={handleKeepRecording}
           />
-
-          {failed ? null : (
-            <span className="w-[var(--pill-timer-width)] shrink-0 text-right text-label tabular-nums text-text-secondary">
-              {formatClock(elapsedMs)}
-            </span>
-          )}
-        </>
+        </div>
       )}
-    </GlassPanel>
+
+      {/* Right side: Keycap badge */}
+      {isCompactActive || failed ? null : (
+        <div className="shrink-0 flex items-center justify-center rounded-[6px] bg-white/[0.12] border border-white/20 px-2 py-0.5 text-[11px] font-mono font-medium text-white/95 shadow-xs">
+          {hotkeyLabel}
+        </div>
+      )}
+    </div>
   );
 }
 
-function getTrailingSnippet(text: string, maxWords = 5): string {
+function getTrailingSnippet(text: string, maxWords = 4): string {
   const words = text.trim().split(/\s+/);
   if (words.length <= maxWords) return text;
   return `…${words.slice(-maxWords).join(" ")}`;
 }
 
-/**
- * WHAT:  The middle slot — waveform, partial transcript preview, countdown line with keep action, or the failure sentence.
- * WHY:   Split out so the switch stays exhaustive over VisibleState["kind"]:
- *        a new variant in the Rust enum becomes a TypeScript error here rather
- *        than a silently blank pill.
- *
- *        ARMING deliberately draws EXACTLY what RECORDING draws. It is normally
- *        under 100ms, and a distinct "Listening…" label for a tenth of a second
- *        is not information, it is a flicker — the pill would appear, flash a
- *        word, and reshape itself before the eye resolved any of it. Drawing
- *        the recording layout with a resting waveform and an unpulsed dot means
- *        the pill arrives already in its working shape and simply comes alive
- *        as sound reaches it, which is the whole feel the app is after. If
- *        arming genuinely stalls, the device error surfaces as FAILED.
- */
 function PillBody({
   state,
   showLine,
@@ -279,20 +206,20 @@ function PillBody({
 
     return (
       <div className="flex min-w-0 flex-1 items-center gap-2">
-        <span className="shrink-0 text-caption text-text-secondary tabular-nums">
+        <span className="shrink-0 text-[11px] text-neutral-300 tabular-nums">
           {refilling ? "Resuming…" : `Cancelling in ${secondsLeft}…`}
         </span>
         <CountdownLine
           className="min-w-0 flex-1"
           remainingMs={remainingMs}
           state={refilling ? "refilling" : "draining"}
-          label={`Cancelling in ${secondsLeft} seconds — press Escape or click Keep to stay recording`}
+          label={`Cancelling in ${secondsLeft} seconds`}
         />
         <button
           type="button"
           onClick={onKeepRecording}
           aria-label="Keep recording"
-          className="shrink-0 cursor-pointer rounded-pill bg-sunken px-2 py-0.5 text-caption font-medium text-text-primary transition-colors hover:bg-sunken-strong active:scale-95"
+          className="shrink-0 cursor-pointer rounded-full bg-white/10 hover:bg-white/20 px-2 py-0.5 text-[11px] font-medium text-white transition-colors"
         >
           Keep
         </button>
@@ -302,15 +229,14 @@ function PillBody({
 
   switch (state.kind) {
     case "ARMING":
-      return <PillWaveform className="min-w-0 flex-1 justify-center text-text-primary" />;
     case "RECORDING":
       if (backtrackNotice) {
         return (
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 animate-in fade-in zoom-in-95 duration-200">
-            <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-500">
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 animate-in fade-in duration-150">
+            <span className="flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-amber-400">
               <RotateCcw className="h-2 w-2" />
             </span>
-            <span className="truncate text-caption font-medium text-amber-600 dark:text-amber-400">
+            <span className="truncate text-[12px] font-medium text-amber-400">
               {backtrackNotice}
             </span>
           </div>
@@ -318,32 +244,30 @@ function PillBody({
       }
       if (partialText) {
         return (
-          <span className="min-w-0 flex-1 truncate text-label text-text-primary/90 select-none animate-in fade-in duration-200">
+          <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-white/90 select-none animate-in fade-in duration-150">
             {getTrailingSnippet(partialText)}
           </span>
         );
       }
-      return <PillWaveform className="min-w-0 flex-1 justify-center text-text-primary" />;
+      return (
+        <span className="min-w-0 flex-1 truncate text-[13px] font-normal text-neutral-200 tracking-[-0.01em] whitespace-nowrap">
+          Listening — hold
+        </span>
+      );
     case "CANCEL_PENDING":
-      // Unreachable while showLine covers it; kept so the switch is total.
       return <span className="flex-1" />;
     case "FAILED":
-      // Tone follows the code, so "still starting up" does not read as a fault.
-      // Two lines, not one and an ellipsis: the whole point of this state is
-      // that he finds out why nothing arrived, and a truncated sentence is a
-      // failure that failed twice.
       return (
         <span
           className={cn(
-            "min-w-0 flex-1 text-label text-pretty",
-            isTransientFailure(state.code) ? "text-text-secondary" : "text-danger",
+            "min-w-0 flex-1 text-[12px] truncate",
+            isTransientFailure(state.code) ? "text-neutral-400" : "text-red-400 font-medium",
           )}
         >
           {state.message}
         </span>
       );
     default: {
-      // A new SessionState variant lands here as a compile error naming it.
       const unreachable: never = state;
       return unreachable;
     }

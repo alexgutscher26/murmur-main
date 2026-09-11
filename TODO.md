@@ -688,6 +688,14 @@
 
 > Next-generation capabilities. Requires research and validation before specification.
 
+- [ ] [FEAT] [ASR] Parakeet ONNX Fast Tier — Integrate `nvidia/parakeet-tdt-0.6b-v2` via ONNX Runtime with DirectML acceleration for sub-50ms English streaming dictation.
+  - Establish automated NeMo (.nemo) to ONNX conversion pipeline with provenance and SHA-256 verification.
+  - Implement ultra-compact `nvidia/parakeet-tdt_ctc-110m` variant for instantaneous sub-25ms hotkey command responses.
+  - Provide dual-engine architecture: Parakeet for English fast mode, Whisper for robust 99-language coverage.
+- [ ] [FEAT] [LLM] Local Smart Cleanup & Voice Transforms via llama-cpp-2 (GGUF) — Ship on-device LLM cleanup for Windows without Apple Foundation Models.
+  - Integrate `Qwen/Qwen2.5-1.5B-Instruct-GGUF` (Q4_K_M on CPU / Q5_K_M on GPU) for sub-second filler removal and multilingual formatting.
+  - Integrate `microsoft/Phi-3.5-mini-instruct-gguf` (Q4_K_M / Q6_K) for deep tone rewriting and complex voice transformations ("Hey HushWrite, make that formal").
+  - Auto-select Q4_K_M quantization for CPU-bound laptops to maintain sub-second latency and minimal memory footprint.
 - [ ] [RESEARCH] On-device speaker identification — Explore a lightweight speaker embedding model (e.g. SpeakerNet, EcapaTDNN at <20MB) that can distinguish between 2-5 enrolled speakers without cloud processing.
 - [ ] [RESEARCH] Continual learning from corrections — Investigate whether whisper.cpp supports fine-tuning from correction pairs, or whether a lightweight adapter (LoRA) layer can be trained incrementally on-device with <100 examples.
 - [ ] [RESEARCH] Emotion-aware post-processing — Detect the emotional tone of the dictation (excited, tired, frustrated) from prosody features and adjust the enhancement style accordingly (e.g. add exclamation points for excited speech).
@@ -698,6 +706,4 @@
 
 ---
 
-_Last updated: 2026-09-04. Items without dates are open-ended backlog._
-
-its not removeing filer words
+_Last updated: September 2026._

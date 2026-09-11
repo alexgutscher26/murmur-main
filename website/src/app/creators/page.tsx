@@ -8,7 +8,6 @@ import { Footer } from "@/components/Footer";
 import { Mark } from "@/components/Mark";
 import {
   Mic,
-  Video,
   Brain,
   MessageSquare,
   ShieldCheck,
@@ -17,10 +16,7 @@ import {
   Copy,
   Check,
   Download,
-  Sparkles,
   ArrowRight,
-  FileText,
-  Lock,
   Share2,
 } from "lucide-react";
 

@@ -8,6 +8,8 @@
  * WHERE: Entered from main.rs.
  */
 
+#![allow(non_snake_case)]
+
 // ── Infrastructure ───────────────────────────────────────────────────────
 pub mod config;
 pub mod db;
