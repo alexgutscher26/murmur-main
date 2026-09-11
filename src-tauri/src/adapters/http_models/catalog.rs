@@ -450,8 +450,8 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         description:
             "Compact on-device LLM cleanup via llama-cpp-2 (GGUF). Provides sub-second filler cleanup, punctuation enhancement, and 99-language formatting on CPU.",
         file_name: "qwen2.5-1.5b-instruct-q4_k_m.gguf",
-        sha256: "8eef58e9ad369b2d82bb774efae2406d4e28daef590e8784d85287f4614ff7bc",
-        size_bytes: 986064896,
+        sha256: "6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e",
+        size_bytes: 1117320736,
         approx_ram_mb: 1200,
         is_default: false,
         custom_url: Some("https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf"),
@@ -462,8 +462,8 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         description:
             "High-fidelity 5-bit quantized LLM cleanup. Optimal for GPU and high-core desktop workstations.",
         file_name: "qwen2.5-1.5b-instruct-q5_k_m.gguf",
-        sha256: "847be5c0ee8749e7bdfb77ebcce609c1585ebca808b8b0826978430b05bfe3f9",
-        size_bytes: 1121853440,
+        sha256: "b46661073c18e5b56a41fa320975f866a00def1ff08feef4718e013258896f8c",
+        size_bytes: 1285494304,
         approx_ram_mb: 1400,
         is_default: false,
         custom_url: Some("https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q5_k_m.gguf"),
@@ -474,11 +474,11 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         description:
             "High-reasoning small language model tailored for complex voice transformations ('Hey HushWrite, make that formal') and deep tone rewriting on CPU.",
         file_name: "Phi-3.5-mini-instruct-Q4_K_M.gguf",
-        sha256: "ea69e96e053f3e098be9037c8e547285648f57dc6beea194f454f0a20e36b856",
-        size_bytes: 2392473600,
+        sha256: "e4165e3a71af97f1b4820da61079826d8752a2088e313af0c7d346796c38eff5",
+        size_bytes: 2393232672,
         approx_ram_mb: 2400,
         is_default: false,
-        custom_url: Some("https://huggingface.co/microsoft/Phi-3.5-mini-instruct-gguf/resolve/main/Phi-3.5-mini-instruct-Q4_K_M.gguf"),
+        custom_url: Some("https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF/resolve/main/Phi-3.5-mini-instruct-Q4_K_M.gguf"),
     },
     CatalogEntry {
         id: "phi-3.5-mini-instruct-q6_k",
@@ -486,11 +486,11 @@ pub const MODEL_CATALOG: &[CatalogEntry] = &[
         description:
             "6-bit high-precision weights for conversational voice rewriting, executive document synthesis, and tone adjustments on GPU.",
         file_name: "Phi-3.5-mini-instruct-Q6_K.gguf",
-        sha256: "bfa6e5b4c102b4d89617d52a233b664d4ad64d70b7ce1b20ae295aa1f09e075d",
-        size_bytes: 3144000000,
+        sha256: "cc4f0d756eb82447035314dbd247809a564189c20583e1d6fb926f9b6e1eb890",
+        size_bytes: 3135853344,
         approx_ram_mb: 3400,
         is_default: false,
-        custom_url: Some("https://huggingface.co/microsoft/Phi-3.5-mini-instruct-gguf/resolve/main/Phi-3.5-mini-instruct-Q6_K.gguf"),
+        custom_url: Some("https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF/resolve/main/Phi-3.5-mini-instruct-Q6_K.gguf"),
     },
     CatalogEntry {
         id: "parakeet-tdt-0.6b-v2",
