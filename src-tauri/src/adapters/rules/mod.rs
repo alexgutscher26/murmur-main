@@ -302,10 +302,15 @@ mod tests {
         let started = std::time::Instant::now();
         let _ = enhancer.enhance(&raw, &context()).expect("enhance");
         let elapsed = started.elapsed();
+        let budget = if cfg!(debug_assertions) {
+            std::time::Duration::from_millis(250)
+        } else {
+            std::time::Duration::from_millis(20)
+        };
 
         assert!(
-            elapsed < std::time::Duration::from_millis(20),
-            "enhancement took {elapsed:?} on a long transcript"
+            elapsed < budget,
+            "enhancement took {elapsed:?} on a long transcript (budget: {budget:?})"
         );
     }
 }

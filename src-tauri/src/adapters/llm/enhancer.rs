@@ -165,7 +165,7 @@ impl LlmTextEnhancer {
             }
             VoiceTransformIntent::BulletedList => {
                 let sentences: Vec<&str> = text
-                    .split(|c| c == '.' || c == ';' || c == '\n')
+                    .split(['.', ';', '\n'])
                     .map(|s| s.trim())
                     .filter(|s| !s.is_empty())
                     .collect();

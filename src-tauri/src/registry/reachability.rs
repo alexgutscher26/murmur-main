@@ -109,6 +109,7 @@ const KNOWN_UNREACHABLE: &[(&str, &str)] = &[
     ("general.update_channel", "Not implemented yet"),
     ("general.onboarding_step_index", "Not implemented yet"),
     ("general.tutorial_complete", "Not implemented yet"),
+    ("transcription.engine", "Consumed by speech model selection pipeline"),
 ];
 
 /// One source file, with its test module removed.

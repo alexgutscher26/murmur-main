@@ -161,7 +161,7 @@ impl AudioPreprocessor {
 
             // Power spectrum via DFT
             let mut power_spectrum = vec![0.0f32; n_freqs];
-            for k in 0..n_freqs {
+            for (k, slot) in power_spectrum.iter_mut().enumerate().take(n_freqs) {
                 let mut real = 0.0f32;
                 let mut imag = 0.0f32;
                 for (n, &val) in frame_buf.iter().enumerate() {
@@ -169,19 +169,19 @@ impl AudioPreprocessor {
                     real += val * angle.cos();
                     imag -= val * angle.sin();
                 }
-                power_spectrum[k] = real * real + imag * imag;
+                *slot = real * real + imag * imag;
             }
 
             // Mel filterbank dot product and log compression
             let mut mel_frame = vec![0.0f32; self.config.n_mels];
-            for m in 0..self.config.n_mels {
+            for (m, mel_slot) in mel_frame.iter_mut().enumerate().take(self.config.n_mels) {
                 let filter_offset = m * n_freqs;
                 let mut mel_energy = 0.0f32;
-                for k in 0..n_freqs {
-                    mel_energy += power_spectrum[k] * self.mel_filters[filter_offset + k];
+                for (k, &pow) in power_spectrum.iter().enumerate().take(n_freqs) {
+                    mel_energy += pow * self.mel_filters[filter_offset + k];
                 }
                 // Log compression with small epsilon clamp to prevent -inf
-                mel_frame[m] = (mel_energy.max(1e-5)).ln();
+                *mel_slot = (mel_energy.max(1e-5)).ln();
             }
 
             features.push(mel_frame);

@@ -80,7 +80,7 @@ impl VoiceTransformParser {
                 trimmed
             };
 
-            let clean_start = without_wake.trim_start_matches(|c: char| c == ',' || c == ':' || c == ' ' || c == '-');
+            let clean_start = without_wake.trim_start_matches([',', ':', ' ', '-']);
             if let Some((intent, remainder)) = Self::extract_intent_from_prefix(clean_start) {
                 return ParsedVoiceTransform {
                     base_text: remainder.to_string(),
@@ -103,9 +103,9 @@ impl VoiceTransformParser {
                 after
             };
 
-            let clean_instr = instruction.trim_start_matches(|c: char| c == ',' || c == ':' || c == ' ' || c == '-');
+            let clean_instr = instruction.trim_start_matches([',', ':', ' ', '-']);
             let intent = Self::classify_instruction(clean_instr);
-            let clean_base = before.trim().trim_end_matches(|c: char| c == ',' || c == '.' || c == ';');
+            let clean_base = before.trim().trim_end_matches([',', '.', ';']);
 
             return ParsedVoiceTransform {
                 base_text: clean_base.to_string(),
@@ -163,7 +163,7 @@ impl VoiceTransformParser {
             "summarize as bullets", "format as email", "turn this into an email"
         ] {
             if lower.starts_with(cmd_pattern) {
-                let remainder = text[cmd_pattern.len()..].trim_start_matches(|c: char| c == ':' || c == ',' || c == ' ');
+                let remainder = text[cmd_pattern.len()..].trim_start_matches([':', ',', ' ']);
                 let intent = Self::classify_instruction(cmd_pattern);
                 return Some((intent, remainder));
             }
@@ -197,7 +197,7 @@ impl VoiceTransformParser {
         for (pattern, intent) in trailing_patterns {
             if let Some(pos) = lower.rfind(pattern) {
                 if pos > 0 && (lower.as_bytes()[pos - 1] == b' ' || lower.as_bytes()[pos - 1] == b',') {
-                    let base = text[..pos].trim().trim_end_matches(|c: char| c == ',' || c == '.');
+                    let base = text[..pos].trim().trim_end_matches([',', '.']);
                     if !base.is_empty() {
                         return Some((base.to_string(), intent.clone()));
                     }
