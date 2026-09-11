@@ -18,9 +18,9 @@ pub fn apply_dictionary(text: &str, entries: &[DictionaryEntry]) -> String {
     let mut out = normalize_named_entities(text);
     for entry in entries.iter().filter(|e| e.enabled) {
         out = match entry.match_kind {
-            MatchKind::Word => replace_whole_words(&out, &entry.pattern, &entry.replacement, false),
+            MatchKind::Word => replace_whole_words(&out, &entry.pattern, &entry.replacement, false, false),
             MatchKind::WordCaseSensitive => {
-                replace_whole_words(&out, &entry.pattern, &entry.replacement, true)
+                replace_whole_words(&out, &entry.pattern, &entry.replacement, true, false)
             }
             MatchKind::Substring => out.replace(&entry.pattern, &entry.replacement),
         };
@@ -44,6 +44,7 @@ pub fn replace_whole_words(
     needle: &str,
     replacement: &str,
     case_sensitive: bool,
+    strip_trailing_punct: bool,
 ) -> String {
     if needle.is_empty() {
         return haystack.to_string();
@@ -84,9 +85,21 @@ pub fn replace_whole_words(
                     .unwrap_or(false);
 
             if before_ok && after_ok {
+                let mut adj_end = end;
+                if strip_trailing_punct {
+                    while adj_end < haystack.len() {
+                        let next_char = haystack[adj_end..].chars().next().unwrap();
+                        if next_char.is_ascii_punctuation() && next_char != '\'' && next_char != '-' {
+                            adj_end += next_char.len_utf8();
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
                 out.push_str(&haystack[cursor..start]);
                 out.push_str(replacement);
-                cursor = end;
+                cursor = adj_end;
             } else {
                 out.push_str(&haystack[cursor..end]);
                 cursor = end;
@@ -131,9 +144,23 @@ pub fn replace_whole_words(
                 .unwrap_or(false);
 
         if before_ok && after_ok {
-            out.push_str(&haystack[cursor..h_start]);
+            let adj_h_start = h_start;
+            let mut adj_h_end = h_end;
+
+            if strip_trailing_punct {
+                while adj_h_end < haystack.len() {
+                    let next_char = haystack[adj_h_end..].chars().next().unwrap();
+                    if next_char.is_ascii_punctuation() && next_char != '\'' && next_char != '-' {
+                        adj_h_end += next_char.len_utf8();
+                    } else {
+                        break;
+                    }
+                }
+            }
+
+            out.push_str(&haystack[cursor..adj_h_start]);
             out.push_str(replacement);
-            cursor = h_end;
+            cursor = adj_h_end;
         } else {
             out.push_str(&haystack[cursor..h_end]);
             cursor = h_end;

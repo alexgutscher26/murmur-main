@@ -88,6 +88,15 @@ mod tests {
     }
 
     #[test]
+    fn fillers_remove_trailing_punctuation() {
+        let out = strip_fillers("um, so I was like, thinking.", Some(&english()));
+        assert_eq!(out, "so I was thinking.");
+
+        let out2 = strip_fillers("You know, I was actually... going there.", Some(&english()));
+        assert_eq!(out2, "I was going there.");
+    }
+
+    #[test]
     fn filler_removal_does_not_touch_words_that_contain_a_filler() {
         // "like" is a filler; "likely" is not.
         let out = strip_fillers("that is likely umbrella weather", Some(&english()));
