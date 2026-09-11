@@ -239,14 +239,14 @@ export const MODELS: ModelInfo[] = [
     ramUsage: "550 MB",
     accuracy: 98.2,
     description:
-      "NVIDIA's official Parakeet TDT 0.6B v2 architecture running via ONNX Runtime. The gold standard English fast tier converged on by leading Windows dictation engines for real-time streaming.",
+      "NVIDIA's official Parakeet TDT 0.6B v2 architecture running via ONNX Runtime & DirectML. The gold standard English fast tier for sub-50ms real-time streaming dictation.",
     recommendedFor: "High-speed English dictation, live streaming transcription, ultra-low latency voice typing",
-    quantization: "ONNX Runtime / INT8",
+    quantization: "ONNX Runtime / DirectML",
     languages: "English Only",
     fileName: "parakeet-tdt-0.6b-v2.onnx",
     repo: "nvidia/parakeet-tdt-0.6b-v2",
     engine: "ONNX Runtime",
-    availability: "Engine Roadmap",
+    availability: "Available Now",
     popular: true,
   },
   {
@@ -260,14 +260,14 @@ export const MODELS: ModelInfo[] = [
     ramUsage: "180 MB",
     accuracy: 94.8,
     description:
-      "Ultra-compact 110M parameter hybrid CTC-TDT model. Sacrifices minor edge-case precision for blazing sub-25ms response, ideal for short voice triggers and quick commands.",
+      "Ultra-compact 110M parameter hybrid CTC-TDT model. Blazing sub-25ms response, ideal for instantaneous hotkey voice triggers and fast coding commands.",
     recommendedFor: "Instant hotkey voice shortcuts, low-spec CPU devices, rapid single-phrase entry",
-    quantization: "ONNX Runtime / INT8",
+    quantization: "ONNX Runtime / DirectML",
     languages: "English Only",
     fileName: "parakeet-tdt_ctc-110m.onnx",
     repo: "nvidia/parakeet-tdt_ctc-110m",
     engine: "ONNX Runtime",
-    availability: "Engine Roadmap",
+    availability: "Available Now",
   },
   {
     id: "qwen2.5-1.5b-instruct",
@@ -287,7 +287,7 @@ export const MODELS: ModelInfo[] = [
     fileName: "qwen2.5-1.5b-instruct-q4_k_m.gguf",
     repo: "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
     engine: "llama-cpp-2 (GGUF)",
-    availability: "Cleanup Backend",
+    availability: "Available Now",
     popular: true,
   },
   {
@@ -308,7 +308,7 @@ export const MODELS: ModelInfo[] = [
     fileName: "Phi-3.5-mini-instruct-Q4_K_M.gguf",
     repo: "microsoft/Phi-3.5-mini-instruct-gguf",
     engine: "llama-cpp-2 (GGUF)",
-    availability: "Cleanup Backend",
+    availability: "Available Now",
     popular: true,
   },
 ];
