@@ -77,7 +77,7 @@ const ECOSYSTEM_LINKS: FooterLink[] = [
     icon: true,
   },
   {
-    href: "https://github.com/alexgutscher26/HushWrite/releases",
+    href: "https://github.com/alexgutscher26/HushWrite/tags",
     label: "Official Releases & SHA256",
     external: true,
     badge: "v0.1.0",

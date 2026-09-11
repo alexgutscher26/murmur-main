@@ -1,106 +1,114 @@
 <div align="center">
 
-# 🎙️ HushWrite
+# HushWrite
 
-**Instant, 100% private, local speech-to-text for macOS & Windows.**  
-_Press a hotkey, speak naturally, release — your words are transcribed and pasted before you can look up._
+**High-performance, zero-cloud speech-to-text for macOS and Windows.**  
+_Local inference with sub-300ms latency, native system injection, and strict data sovereignty._
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey?style=flat-square)](https://github.com/alexgutscher26/HushWrite)
 [![Tauri v2](https://img.shields.io/badge/built%20with-Tauri%20v2-24C8DB?style=flat-square&logo=tauri&logoColor=white)](https://tauri.app)
 [![Rust](https://img.shields.io/badge/core-Rust-DEA584?style=flat-square&logo=rust&logoColor=white)](https://www.rust-lang.org)
 [![React 19](https://img.shields.io/badge/ui-React%2019%20%2B%20Tailwind%20v4-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev)
-[![100% Local](https://img.shields.io/badge/voice-100%25%20Local%20%2F%20Zero%20Egress-10B981?style=flat-square&logo=shield&logoColor=white)](docs/badges.md)
-[![Dictated with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](docs/badges.md)
+[![100% Local](https://img.shields.io/badge/voice-100%25%20Local%20%2F%20Zero%20Egress-10B981?style=flat-square&logo=shield&logoColor=white)](PRIVACY.md)
 
-[Features](#-key-features) • [Why HushWrite?](#-why-HushWrite) • [Architecture](#-architecture) • [Installation](#-installation--downloads) • [Developer Guide](#-developer-guide) • [Community Badges](#-community-badges) • [License](#-license)
+[Overview](#overview) • [Key Features](#key-features) • [Comparison](#comparison) • [Architecture](#architecture) • [Installation](#installation) • [Developer Guide](#developer-guide) • [Security & Privacy](#security--privacy) • [Documentation](#documentation) • [License](#license)
 
 </div>
 
 ---
 
-## ⚡ What is HushWrite?
+## Overview
 
-**HushWrite** is an open-source, local-first dictation tool built for speed, privacy, and seamless workflow integration. Unlike cloud speech-to-text tools that record audio, stream it across the internet, and make you wait seconds for a response, HushWrite processes speech directly on your hardware using optimized `whisper.cpp` models.
+**HushWrite** is an open-source, local-first speech-to-text application engineered for high-throughput transcription, low latency, and complete user privacy. Unlike cloud-dependent dictation services that stream audio over external networks, HushWrite executes speech recognition entirely on local hardware using quantized, hardware-accelerated `whisper.cpp` engines.
 
-No accounts, no monthly cloud subscriptions, no word limits, and **zero audio ever leaves your machine**.
-
----
-
-## ✨ Key Features
-
-- ⚡ **Flat, Real-Time Latency (`p50 < 300ms`)**  
-  Transcribes continuously while you speak instead of waiting for you to finish. Finishing a 5-minute stream of thought is just as instantaneous as a 5-second sentence.
-- ⌨️ **Global Hotkeys & Mouse Triggers**  
-  Trigger anywhere with `⌥ Space` (macOS) or `Alt+Space` (Windows). Supports hold-to-talk, toggle mode, secondary keyboard shortcuts, and auxiliary mouse buttons (Middle Click, Mouse 4 / 5). Double-tap initiates rapid priority dictation.
-- 💊 **Minimal Floating Pill Overlay**  
-  A sleek, non-intrusive obsidian glass pill displays real-time audio waveforms, volume levels, and streaming transcription without ever stealing window focus or blocking clicks.
-- 📋 **Direct Synthetic Paste & Clipboard Restoration**  
-  Injects transcribed text directly into whichever application has focus (VS Code, Cursor, Obsidian, Slack, Terminal, browser) and automatically restores your prior clipboard content.
-- 🛑 **Graceful Escape & Cancel**  
-  Hit `Escape` or `Option/Alt+Escape` to cancel with an interactive 3-second countdown. Pressing `Escape` again instantly resumes the recording without losing audio.
-- 🌐 **99 Languages & Auto-Detection**  
-  Transcribe in nearly any language supported by OpenAI Whisper, automatically detected or pinned to your preferred dialect.
-- 📖 **Custom Vocabulary & Biasing**  
-  Train HushWrite on technical jargon, programming identifiers, unusual names, and domain-specific acronyms to both bias recognition and normalize output.
-- 🎛️ **Per-App Overrides & Profiles**  
-  Customize dictation hotkeys, vocabulary, and formatting profiles tailored specifically for code editors, chat clients, or document editors.
-- 🔍 **Searchable SQLite History & Honest Telemetry**  
-  Every dictation is indexed locally in SQLite. Easily search previous thoughts, monitor word counts, and review real achieved latency metrics (`p50` / `p95`).
-- 🚀 **Hardware Acceleration**  
-  Native Apple Silicon Metal & Core ML on macOS; DirectML (DirectX 12), CUDA, and Vulkan on Windows.
+The application requires no user accounts, has no recurring subscriptions, imposes no usage caps, and enforces a strict zero-egress data boundary.
 
 ---
 
-## 📊 Why HushWrite? (Comparison)
+## Key Features
 
-| Feature                     |            HushWrite             | Cloud Dictation (Wispr Flow, etc.) |     MacWhisper / Superwhisper      |
-| :-------------------------- | :------------------------------: | :--------------------------------: | :--------------------------------: |
-| **Privacy / Audio Egress**  | **100% On-Device (Zero Egress)** |      Audio sent to cloud APIs      | Often on-device, but closed-source |
-| **Cross-Platform**          |       **macOS & Windows**        |       Web / Limited desktop        |         Mostly macOS only          |
-| **Inference Latency**       |  **Streaming (`p50 < 300ms`)**   |     Network lag (~1.5s – 3.0s)     | Post-speech batch decode (~1s–5s)  |
-| **Price**                   |   **Free & Open Source (MIT)**   |         $10 – $20 / month          | $30+ paid license or subscription  |
-| **Audio / Word Limits**     |          **Unlimited**           |    Tiered quotas / monthly caps    |            Model-gated             |
-| **Clipboard Restoration**   |       **Yes (Preserved)**        |     Often overwrites clipboard     |            Inconsistent            |
-| **Extensible Architecture** |  **Tauri v2 + Rust + React 19**  |            Closed SaaS             |     Proprietary closed binary      |
+- **Low-Latency Streaming Inference (`p50 < 300ms`)**  
+  Processes audio streams concurrently using chunked VAD (Voice Activity Detection) and incremental decoding, delivering instantaneous text delivery upon releasing the hotkey.
+
+- **Global Shortcuts and Peripheral Triggers**  
+  Triggerable across any application via configurable shortcuts (`⌥ Space` on macOS, `Alt+Space` on Windows). Supports hold-to-talk, toggle modes, secondary bindings, and auxiliary mouse buttons (Middle Click, Mouse 4 / 5).
+
+- **Non-Intrusive Floating Pill Overlay**  
+  Displays real-time audio waveforms, decibel levels, and live partial transcriptions via an obsidian glass overlay window that never steals system focus or disrupts mouse interaction.
+
+- **Synthetic Keystroke Injection & Clipboard Preservation**  
+  Injects transcribed text directly at the active caret in any target application (IDEs, terminals, word processors, chat clients) and automatically restores pre-existing clipboard contents.
+
+- **Interactive Cancellation and Resume**  
+  Abort recordings instantly with `Escape` or `Option/Alt+Escape` with a visual countdown indicator. Pressing the cancel trigger again restores the session without dropping audio buffers.
+
+- **Multilingual Support & Automatic Language Detection**  
+  Transcribe across 99 languages supported by Whisper models, with automatic language identification or manual dialect locking.
+
+- **Custom Vocabulary Biasing & Text Normalization**  
+  Define domain-specific terminology, code identifiers, acronyms, and phonetic substitutions to guide acoustic model decoding and normalize generated text.
+
+- **Application-Specific Profiles**  
+  Configure distinct formatting rules, hotkeys, and vocabulary biases tailored to specific target applications (e.g., Markdown rules for Obsidian, code-casing rules for VS Code).
+
+- **Local SQLite History & Performance Observability**  
+  All session metadata, latency metrics (`p50` / `p95`), and word counts are indexed locally in SQLite for rapid full-text search. Includes a one-click Incognito mode.
+
+- **Hardware Acceleration**  
+  Native Apple Silicon Metal acceleration on macOS; DirectML (DirectX 12), CUDA, and Vulkan backends on Windows.
 
 ---
 
-## 🏗️ Architecture
+## Comparison
 
-HushWrite combines a high-performance, low-latency Rust audio pipeline with a modern Tauri v2 desktop container.
+| Dimension | HushWrite | Cloud Solutions (e.g. Wispr Flow) | Proprietary Local Tools |
+| :--- | :--- | :--- | :--- |
+| **Privacy Architecture** | **100% Local / Zero Egress** | Remote WebSocket audio streaming | Closed-source binary |
+| **Platform Support** | **macOS & Windows** | Web / Limited Desktop | Mostly macOS only |
+| **Inference Latency** | **Streaming (`p50 < 300ms`)** | Network-dependent (~1.5s - 3.0s) | Post-speech batch (~1.0s - 4.0s) |
+| **Licensing** | **Open Source (MIT)** | Monthly subscription ($10 - $20/mo) | Commercial paid license |
+| **Usage Limits** | **Unlimited** | Tiered quotas and word caps | Tiered feature gates |
+| **Clipboard Preservation**| **Automated restoration** | Overwrites clipboard | Inconsistent |
+| **Extensibility** | **Rust + Tauri v2 + React 19** | Closed SaaS | Proprietary architecture |
+
+---
+
+## Architecture
+
+HushWrite pairs a high-throughput, lock-free Rust audio pipeline with a sandboxed Tauri v2 desktop shell:
 
 ```mermaid
 flowchart LR
     subgraph AudioPipeline ["Hardware Audio Pipeline (Rust)"]
-        Mic[Microphone Input] --> cpal[cpal Stream]
+        Mic[Microphone Input] --> cpal[cpal Audio Capture]
         cpal --> rubato[rubato 16kHz Resampler]
-        rubato --> ringbuf[ringbuf SPSC RingBuffer]
-        ringbuf --> VAD[earshot WebRTC VAD]
+        rubato --> ringbuf[SPSC Ring Buffer]
+        ringbuf --> VAD[WebRTC VAD Engine]
         VAD --> Whisper[whisper-rs / whisper.cpp]
     end
 
-    subgraph CoreEngine ["HushWrite Core & Registry"]
-        Whisper --> Factory[IPC Command Factory]
-        Factory --> DB[(SQLite Local History)]
-        Factory --> SystemPaste[Synthetic Paste + Clipboard Restore]
+    subgraph CoreEngine ["HushWrite Core Engine"]
+        Whisper --> Factory[Command Factory & Pipeline]
+        Factory --> DB[(Local SQLite History)]
+        Factory --> SystemPaste[Synthetic Paste & Clipboard Manager]
     end
 
     subgraph UI ["Tauri v2 Frontend"]
         Factory -. Typed Events .-> Pill[Floating Pill Window]
-        Factory -. Specta Bindings .-> Dashboard[Dashboard & Settings UI]
+        Factory -. Specta RPC .-> Dashboard[Settings & Management UI]
     end
 ```
 
-### Core Architecture Highlights
+### Architectural Principles
 
-1. **The Registry (`src-tauri/src/registry/`)**: Single source of truth defining every capability, setting, hotkey, permission, and metric.
-2. **The Command Factory (`src-tauri/src/ipc/factory.rs`)**: Single entry point for all IPC commands, enforcing validation schemas, permission preflights, reentrancy guards, error mapping, and tracing.
-3. **Type-Safe IPC (`tauri-specta`)**: Rust types automatically generate `src/lib/bindings.ts` on test/build. No manual DTO sync or hand-written TypeScript IPC wrappers.
+1. **Centralized Registry (`src-tauri/src/registry/`)**: Single source of truth declaring all capabilities, user settings, hotkey triggers, permissions, and telemetry metrics.
+2. **Command Factory (`src-tauri/src/ipc/factory.rs`)**: Unified gateway for all IPC interactions, handling schema validation, permission checks, reentrancy guards, tracing, and structured error propagation.
+3. **Type-Safe Specta Bindings**: Rust definitions automatically generate TypeScript contracts (`src/lib/bindings.ts`), eliminating manual IPC type synchronization.
 
 ---
 
-## 📦 Installation & Downloads
+## Installation
 
 ### Windows
 
@@ -112,179 +120,129 @@ winget install WebProdigies.HushWrite
 
 #### Option B: Standalone Installer
 
-Download the latest `.msi` or `.exe` installer from [GitHub Releases](https://github.com/alexgutscher26/HushWrite/releases).
+Download the latest `.msi` or `.exe` installer from [GitHub Releases](https://github.com/alexgutscher26/HushWrite/tags).
 
 ---
 
 ### macOS
 
-1. Download the latest Universal `.dmg` from [GitHub Releases](https://github.com/alexgutscher26/HushWrite/releases).
-2. Open the `.dmg` and drag **HushWrite** into your `/Applications` folder.
-3. Grant **Microphone** and **Accessibility** permissions on initial launch.
+1. Download the latest Universal `.dmg` from [GitHub Releases](https://github.com/alexgutscher26/HushWrite/tags).
+2. Open the `.dmg` and drag **HushWrite** to `/Applications`.
+3. Grant **Microphone** and **Accessibility** permissions on first launch.
 
 ---
 
-## 🛠️ Developer Guide
+## Developer Guide
 
-### System Requirements
+### Prerequisites
 
-- **macOS**: macOS 13 (Ventura) or later (Apple Silicon M-series or Intel x86_64).
+- **macOS**: macOS 13 (Ventura) or later (Apple Silicon or Intel x86_64).
 - **Windows**: Windows 10/11 (64-bit).
 - **Tooling**:
   - [Rust](https://rustup.rs/) (stable toolchain)
-  - [Node.js](https://nodejs.org/) (v18+) or [Bun](https://bun.sh/)
+  - [Node.js](https://nodejs.org/) (v20+) or [Bun](https://bun.sh/)
   - [pnpm](https://pnpm.io/) or `bun`
-  - C++ build tools (Xcode Command Line Tools on macOS, Visual Studio C++ Build Tools on Windows)
-- ~200MB – 600MB disk space for local GGML Whisper weights (`small-q5_1` default).
+  - C++ Build Tools (Xcode Command Line Tools on macOS, Visual Studio C++ Build Tools on Windows)
 
 ---
 
-### Running in Development
-
-Clone the repository and install dependencies:
+### Development Setup
 
 ```bash
+# Clone the repository
 git clone https://github.com/alexgutscher26/HushWrite.git
 cd HushWrite
 
-# Install frontend dependencies
-pnpm install   # or: bun install
+# Install dependencies
+bun install   # or: pnpm install
 
-# Start the Tauri development desktop app
-pnpm tauri dev # or: bun run tauri dev
+# Start the desktop application in development mode
+bun run tauri dev # or: pnpm tauri dev
 ```
-
-> **First Launch Setup:** HushWrite opens a guided onboarding window to request microphone access, download your preferred starting Whisper model, and test your global hotkey. Afterwards, HushWrite minimizes to your system tray / menu bar.
 
 ---
 
-### Windows Performance Optimization
+### Windows Performance Configuration
 
-In debug builds on Windows, raw unoptimized C++ compilation of Whisper dependencies can cause high inference latencies. HushWrite's `src-tauri/Cargo.toml` overrides dependencies in dev profile:
+To maintain real-time decoding performance during development on Windows, C++ dependencies are compiled with level-3 optimization in `src-tauri/Cargo.toml`:
 
 ```toml
 [profile.dev.package."*"]
 opt-level = 3
 ```
 
-This ensures `whisper-rs-sys` and `rubato` run with native optimizations even during `tauri dev`, maintaining a real-time factor `< 0.3x`.
-
 ---
 
-### Source-of-Truth Navigation (`pnpm sot`)
+### Source-of-Truth Navigation (`sot`)
 
-HushWrite enforces strict `SOURCE OF TRUTH KEYWORDS` headers across the codebase. You can search symbols and architecture components instantly without scanning the entire file tree:
+HushWrite utilizes a header-based indexing system for rapid code navigation:
 
 ```bash
-# Find files owning a specific symbol or concept
-pnpm sot SessionState
+# Search files associated with a specific symbol or concept
+bun run sot SessionState
 
-# Display file headers and architectural context
-pnpm sot:show AudioChunk
+# Print header blocks and architectural context
+bun run sot:show AudioChunk
 
-# Validate that all project files adhere to SOT conventions
-pnpm sot:validate
+# Validate repository adherence to SOT conventions
+bun run sot:validate
 ```
 
 ---
 
-### Testing & Typecheck
+### Testing and Verification
 
 ```bash
-# Run Rust tests and regenerate TypeScript bindings via tauri-specta
+# Run Rust unit and integration tests
 cargo test --manifest-path src-tauri/Cargo.toml
 
-# Typecheck TypeScript and React components
-pnpm typecheck
+# Run TypeScript typechecks
+bun run typecheck
+
+# Validate Rust code formatting and lints
+cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets -- -D warnings
 ```
 
 ---
 
-### Building for Production
+### Production Build
 
 ```bash
-pnpm tauri build
+bun run tauri:build
 ```
 
-The resulting binaries will be placed in `src-tauri/target/release/bundle/`:
-
+Generated packages will be located in `src-tauri/target/release/bundle/`:
 - **macOS**: `.app` and `.dmg`
 - **Windows**: `.msi` and `.exe`
 
-#### Signing Updater Archives (Optional)
+---
 
-To sign release updater archives with your private key:
+## Security & Privacy
 
-```bash
-TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.HushWrite-updater.key)" \
-TAURI_SIGNING_PRIVATE_KEY_PASSWORD="" \
-  pnpm tauri build
-```
+| Permission | Purpose | Failure Mode if Denied |
+| :--- | :--- | :--- |
+| **Microphone** | Audio capture during dictation. | Dictation cannot operate (Required). |
+| **Accessibility** | Direct caret text injection via simulated paste. | Transcribed text is copied to clipboard for manual paste. |
+
+For detailed information regarding our data boundaries, threat model, and vulnerability disclosure policies, see:
+- [Security Policy](SECURITY.md)
+- [Privacy Architecture](PRIVACY.md)
 
 ---
 
-## 🔒 Permissions & Privacy Model
+## Documentation
 
-| Permission        | Why It's Needed                                                 | Fallback if Denied                                                 |
-| :---------------- | :-------------------------------------------------------------- | :----------------------------------------------------------------- |
-| **Microphone**    | Audio capture during dictation.                                 | Dictation cannot operate. (Required)                               |
-| **Accessibility** | Simulates `⌘V` / `Ctrl+V` to paste text into the active window. | Text is cleanly copied to the system clipboard for manual pasting. |
-
-> [!NOTE]  
-> **macOS Code Signing & Accessibility:**  
-> macOS binds Accessibility permissions to the app's bundle identifier _and_ its cryptographic signature. In development, ad-hoc signatures change on rebuild, causing macOS to occasionally require re-granting Accessibility. This does not occur in distributed release builds. Refer to `docs/03 §3.4` for details on configuring a local development certificate.
-
-### Zero Network Egress Guarantee
-
-HushWrite does **not** collect telemetry, user recordings, or text snippets. The only optional network interactions are:
-
-1. One-time GGML model download during onboarding or when switching models in Settings.
-2. Optional automated check for app updates via GitHub Releases.  
-   Both can be audited, monitored, or disabled entirely.
+- [`docs/00-START-HERE.md`](docs/00-START-HERE.md) — Architectural overview and onboarding.
+- [`docs/01-IDEATION.md`](docs/01-IDEATION.md) — Product specifications and functional requirements.
+- [`docs/02-TECHNICAL-PLAN.md`](docs/02-TECHNICAL-PLAN.md) — Low-level engineering design and latency budgets.
+- [`docs/03-IMPLEMENTATION-NOTES.md`](docs/03-IMPLEMENTATION-NOTES.md) — Audio thread safety, Whisper configuration, and platform notes.
+- [`docs/04-DESIGN-SYSTEM.md`](docs/04-DESIGN-SYSTEM.md) — Design tokens, typography, colors, and motion guidelines.
+- [`docs/05-PROJECT-STRUCTURE.md`](docs/05-PROJECT-STRUCTURE.md) — Directory conventions and module structure.
+- [`docs/06-CONVENTIONS-AND-GREP.md`](docs/06-CONVENTIONS-AND-GREP.md) — SOT header standards and search rules.
+- [`CLAUDE.md`](CLAUDE.md) — Core engineering rules and development invariants.
 
 ---
 
-## 🏷️ Community Badges
+## License
 
-Showcase your local, private AI dictation workflow in your open-source projects, pull requests, and documentation.
-
-### Shields.io Markdown Badges
-
-```markdown
-<!-- Flat Square Badge -->
-
-[![Dictated with HushWrite](https://img.shields.io/badge/dictated%20with-HushWrite-5865F2?style=flat-square&logo=soundcharts&logoColor=white)](https://github.com/alexgutscher26/HushWrite)
-
-<!-- 100% Local Privacy Badge -->
-
-[![100% Local Dictation](https://img.shields.io/badge/voice-100%25%20Local-10B981?style=flat-square&logo=shield&logoColor=white)](https://github.com/alexgutscher26/HushWrite)
-```
-
-### Pull Request & Issue Footer
-
-```markdown
----
-
-_Dictated privately on-device with [HushWrite](https://github.com/alexgutscher26/HushWrite)_
-```
-
-_(For full badge options, HTML embeds, and voice-triggered templates, see [`docs/badges.md`](docs/badges.md).)_
-
----
-
-## 📚 Documentation Index
-
-- [`docs/00-START-HERE.md`](docs/00-START-HERE.md) — Onboarding and architectural orientation.
-- [`docs/01-IDEATION.md`](docs/01-IDEATION.md) — Product requirements, feature breakdown, and scope.
-- [`docs/02-TECHNICAL-PLAN.md`](docs/02-TECHNICAL-PLAN.md) — Technology stack, system design, and latency budgets.
-- [`docs/03-IMPLEMENTATION-NOTES.md`](docs/03-IMPLEMENTATION-NOTES.md) — Audio thread safety, Whisper configuration, and platform quirks.
-- [`docs/04-DESIGN-SYSTEM.md`](docs/04-DESIGN-SYSTEM.md) — Design tokens, color palette, glass materials, and motion specs.
-- [`docs/05-PROJECT-STRUCTURE.md`](docs/05-PROJECT-STRUCTURE.md) — Directory layout and structural conventions.
-- [`docs/06-CONVENTIONS-AND-GREP.md`](docs/06-CONVENTIONS-AND-GREP.md) — SOT header system and rapid navigation guidelines.
-- [`CLAUDE.md`](CLAUDE.md) — Codebase engineering rules and invariants.
-
----
-
-## 📄 License
-
-HushWrite is distributed under the [MIT License](LICENSE).
+HushWrite is open-source software licensed under the [MIT License](LICENSE).

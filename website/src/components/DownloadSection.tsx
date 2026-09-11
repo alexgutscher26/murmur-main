@@ -294,12 +294,12 @@ export function DownloadSection() {
 
             <div className="flex items-center gap-2 shrink-0">
               <a
-                href="https://github.com/alexgutscher26/HushWrite/releases"
+                href="https://github.com/alexgutscher26/HushWrite/tags"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#141416] hover:bg-neutral-800 text-white text-xs font-semibold transition-all shadow-sm"
               >
-                <span>Official GitHub Releases</span>
+                <span>Official GitHub Releases & Tags</span>
                 <ExternalLink className="w-3.5 h-3.5 text-neutral-400" />
               </a>
             </div>

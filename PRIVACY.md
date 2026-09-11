@@ -1,95 +1,98 @@
-# HushWrite Privacy Architecture & Data Boundary
+# Privacy Architecture and Data Boundary
 
-HushWrite is built on a **local-first, zero-cloud architecture**. Your voice, your transcripts, and your personal data never leave your computer. We turn "trust me" into **"verify me"**.
-
----
-
-## 🔒 1. The Local Data Boundary Ledger
-
-| Data Type                         | Storage Location                         | Outbound Network Egress                     | Retention & Erasure Policy                                           |
-| :-------------------------------- | :--------------------------------------- | :------------------------------------------ | :------------------------------------------------------------------- |
-| **Microphone Audio**              | Temporary System Memory (RAM)            | **0 Bytes (Never)**                         | Purged immediately from RAM once transcription finishes              |
-| **Transcripts & Pasted Text**     | Local SQLite (`sessions.db`) or RAM-only | **0 Bytes (Never)**                         | User-controlled retention (0 days, 7 days, 30 days, or instant wipe) |
-| **Custom Dictionary**             | Local SQLite (`dictionary` table)        | **0 Bytes (Never)**                         | Fully editable & erasable on demand                                  |
-| **Window Context (App Title/ID)** | Ephemeral memory buffer                  | **0 Bytes (Never)**                         | Discarded after formatting rule evaluation                           |
-| **User Account & Identity**       | None (Zero accounts or logins required)  | **0 Bytes (No auth service)**               | N/A — 100% anonymous & local                                         |
-| **Telemetry & Crash Reports**     | None (Zero tracking SDKs)                | **0 Bytes (Never)**                         | N/A — No analytics beacons exist                                     |
-| **AI Model Weights**              | Local Disk Storage (`~/.HushWrite/models`)  | **1-time download from HuggingFace/GitHub** | Fully offline permanent storage                                      |
-| **App Update Checks**             | None                                     | **GitHub Releases API (Query only)**        | Can be toggled OFF in Settings                                       |
+HushWrite is engineered with a strict local-first, zero-cloud architecture. Audio processing, speech recognition, and text delivery execute entirely on local hardware. No user accounts, cloud servers, telemetry trackers, or external analytics endpoints are involved in dictation.
 
 ---
 
-## 🛡️ 2. Data Flow Architecture
+## 1. Local Data Boundary Ledger
+
+The following ledger details how every class of data is processed, stored, and retained:
+
+| Data Category | Storage Location | Network Transmission | Retention and Lifecycle |
+| :--- | :--- | :--- | :--- |
+| **Microphone Audio** | Ephemeral System RAM | Zero bytes transmitted | Cleared from volatile RAM immediately upon transcription completion or cancellation |
+| **Transcripts and Generated Text** | Local SQLite (`sessions.db`) or RAM-only | Zero bytes transmitted | Configurable retention (disabled/incognito, 7 days, 30 days, or manual deletion) |
+| **Custom Vocabulary & Dictionary** | Local SQLite (`dictionary` table) | Zero bytes transmitted | Fully editable and erasable on demand by the user |
+| **Window Context (App Title/ID)** | Ephemeral memory buffer | Zero bytes transmitted | Evaluated in-memory for per-app formatting rules and immediately discarded |
+| **User Identity & Account Data** | None | Zero bytes transmitted | No accounts, logins, emails, or identity registration required |
+| **Telemetry & Crash Analytics** | None | Zero bytes transmitted | No analytics beacons, trackers, or crash reporting SDKs exist in the binary |
+| **AI Model Weights** | Local disk storage (`~/.HushWrite/models`) | One-time initial download | Downloaded once from verified upstream mirrors (Hugging Face / GitHub); operated offline thereafter |
+| **Software Update Verification** | None | Read-only HTTPS query | Optional read-only check against GitHub Releases API; can be disabled entirely in Settings |
+
+---
+
+## 2. Audio and Inference Lifecycle Architecture
 
 ```text
-[ Microphone Audio Stream ]
-            │
-            ▼ (Volatile RAM Buffer — zero disk writes)
-[ Local whisper.cpp Engine ] (Metal / DirectML / CUDA hardware acceleration)
-            │
-            ▼ (Raw Decoded Tokens)
-[ Local Context Rules & Bias Engine ] (Regex formatting, filler removal, phonetic dictionary)
-            │
-            ▼ (Formatted Text)
-[ Native OS Window Injection ] (Directly typed/pasted into active cursor)
-            │
-            ├──► Audio buffer immediately freed from RAM
-            └──► Optional: Persist transcript to local SQLite (disabled in Incognito)
++-------------------------+
+| Microphone Audio Stream |
++-------------------------+
+             |
+             v (Volatile RAM ringbuffer - zero disk writes)
++-------------------------+
+| Local whisper.cpp Core  | (Metal / DirectML / CUDA / AVX2 hardware acceleration)
++-------------------------+
+             |
+             v (Decoded tokens in-memory)
++-------------------------+
+| Local Context Engine    | (Vocabulary biasing, phonetic corrections, punctuation rules)
++-------------------------+
+             |
+             v (Formatted text string)
++-------------------------+
+| OS Cursor Injection     | (Synthetic paste directly into active application window)
++-------------------------+
+             |
+             +---> Audio ringbuffer immediately cleared from volatile memory
+             +---> Optional: Persist transcript text to local SQLite database (disabled in Incognito)
 ```
 
 ---
 
-## 🌐 3. Explicit Outbound Network Request Disclosure
+## 3. Explicit Network Request Disclosure
 
-HushWrite makes **only two optional network requests**:
+HushWrite initiates outbound network communication only in two specific scenarios:
 
-1. **Model Weight Download:** When you download a model (e.g., `whisper-base-q5_0.bin`), HushWrite fetches the model directly from HuggingFace or official GitHub release assets. Once downloaded, it never connects again.
-2. **Version Check:** If enabled in Settings, HushWrite checks `api.github.com/repos/alexgutscher26/HushWrite/releases/latest` to notify you if an update is available.
+1. **Model Weight Download**: When selecting or downloading a new speech model (e.g., `whisper-small-q5_1.bin`), HushWrite retrieves the model file directly from official Hugging Face or GitHub release repositories. Once written to local storage, no further connection is made.
+2. **Version Update Checks**: When enabled in user preferences, HushWrite performs a read-only `GET` query against `api.github.com/repos/alexgutscher26/HushWrite/releases/latest` to check if a new version has been published.
 
-**Zero other network requests exist in the codebase.** If you block HushWrite in your firewall, all dictation, formatting, and history features continue operating with 100% functionality.
+Blocking HushWrite in a firewall or running it on an air-gapped system does not disable or degrade any core dictation, formatting, or history functionality.
 
 ---
 
-## 🧪 4. Reproducible Verification Recipes
+## 4. Regulatory and Compliance Alignment
 
-You can independently audit HushWrite using standard packet capture and network monitoring utilities:
+Because HushWrite does not collect, process, or transmit personal data to external servers, it provides structural compliance for sensitive enterprise workflows:
 
-### A. macOS (Little Snitch / LuLu)
+- **GDPR (General Data Protection Regulation)**: Compliant with Article 25 (Data protection by design and by default). Since personal data is neither processed by a third party nor transmitted off-device, no international data transfer agreements or cloud processor agreements are required.
+- **HIPAA (Health Insurance Portability and Accountability Act)**: Protected Health Information (PHI) spoken during clinical documentation remains entirely within the local machine's memory and local disk. No Business Associate Agreement (BAA) with a cloud vendor is necessary.
+- **Legal Privilege and Confidential Drafts**: Attorneys, researchers, and developers can dictate privileged or proprietary materials without risk of third-party model retraining, cloud data interception, or subpoena vulnerability.
 
-1. Install [LuLu](https://objective-see.org/products/lulu.html) or [Little Snitch](https://www.obdev.at/products/littlesnitch/).
-2. Launch HushWrite and dictate a 5-minute paragraph.
-3. Observe the rule monitor: **0 connection attempts** are initiated during dictation or text delivery.
+---
 
-### B. Windows (Wireshark / Pktmon)
+## 5. Independent Verification Procedures
 
-1. Run Windows Packet Monitor:
+HushWrite's privacy boundary can be audited independently using standard packet capture and network monitoring tools:
+
+### macOS Network Verification (Little Snitch / LuLu)
+1. Launch an application firewall (such as LuLu or Little Snitch).
+2. Open HushWrite and perform continuous dictation sessions across multiple target applications.
+3. Observe process activity: zero network connection attempts are initiated during audio capture, inference, or text injection.
+
+### Windows Network Verification (Packet Monitor / Wireshark)
+1. Open PowerShell with Administrator privileges and start a packet trace:
    ```powershell
    pktmon filter add -n HushWrite
    pktmon start --etw
    ```
-2. Dictate continuously across multiple applications.
-3. Stop the trace and inspect the output:
+2. Dictate paragraphs into various desktop editors.
+3. Stop the capture and inspect the generated trace:
    ```powershell
    pktmon stop
    pktmon pcapng pktmon.etl -o HushWrite_audit.pcapng
    ```
-4. Verify that zero audio or HTTP packets were emitted.
+4. Verify in Wireshark that no outbound TCP/UDP packets were dispatched by the `HushWrite.exe` process.
 
-### C. Linux / Cross-Platform (NetHogs)
-
-1. Run `sudo nethogs` and isolate the HushWrite process PID.
-2. Observe bandwidth during active transcription: `0.000 KB/s SENT` / `0.000 KB/s RECV`.
-
----
-
-## ⚔️ 5. The Competitive Trust Wedge: HushWrite vs. Cloud Dictation
-
-| Privacy Dimension      | HushWrite (Local-First)                                | Cloud Dictation (e.g. Wispr Flow, Cloud APIs)         |
-| :--------------------- | :-------------------------------------------------- | :---------------------------------------------------- |
-| **Trust Model**        | **Verifiable Architecture** (0 bytes leave machine) | Policy-based ("We promise not to train on your data") |
-| **Network Egress**     | 0 bytes audio / 0 bytes text                        | Continuous WebSocket audio stream                     |
-| **Account Required**   | **No (Works out of the box)**                       | Yes (Mandatory email/Google auth)                     |
-| **Offline Support**    | **100% offline ready (Air-gap mode)**               | Fails completely without internet                     |
-| **Transcript Storage** | Local SQLite on device (or Incognito)               | Remote cloud server storage                           |
-| **Telemetry**          | **Zero trackers / Zero beacons**                    | Analytics SDKs & product event tracking               |
-| **Auditability**       | Open-source binary & reproducible network recipe    | Closed cloud infrastructure                           |
+### Linux Network Verification (NetHogs / tcpdump)
+1. Run `sudo nethogs` and filter by the application process ID.
+2. Verify that network transmission metrics remain at `0.000 KB/s SENT` and `0.000 KB/s RECV` throughout active transcription.
