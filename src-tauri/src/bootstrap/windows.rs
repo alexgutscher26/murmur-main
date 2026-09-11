@@ -350,40 +350,62 @@ pub fn attach_rail(app: &AppHandle) {
         tracing::info!("rail attached to the dashboard");
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "windows")]
+    {
+        use windows::Win32::Foundation::HWND;
+        use windows::Win32::UI::WindowsAndMessaging::{SetWindowLongPtrW, GWLP_HWNDPARENT};
+
+        let (Some(rail), Some(dashboard)) = (
+            app.get_webview_window(SIDEBAR_WINDOW),
+            app.get_webview_window(DASHBOARD_WINDOW),
+        ) else {
+            return;
+        };
+
+        if let (Ok(rail_hwnd), Ok(dash_hwnd)) = (rail.hwnd(), dashboard.hwnd()) {
+            unsafe {
+                let _ = SetWindowLongPtrW(
+                    HWND(rail_hwnd.0 as _),
+                    GWLP_HWNDPARENT,
+                    dash_hwnd.0 as isize,
+                );
+            }
+            tracing::info!("rail owned by dashboard window on windows");
+        }
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
     let _ = app;
 }
 
 /**
  * SOURCE OF TRUTH KEYWORDS: keep_rail_centred, resize
- * WHAT:  Re-centres the rail when the dashboard changes height.
+ * WHAT:  Re-centres and re-places the rail when the dashboard moves or changes height.
  * WHERE: Registered once by setup.
  */
 pub fn keep_rail_centred(app: &AppHandle) {
-    use std::sync::Mutex;
-    static LAST_SIZE: Mutex<Option<(u32, u32)>> = Mutex::new(None);
-
     let handle = app.clone();
     if let Some(dashboard) = app.get_webview_window(DASHBOARD_WINDOW) {
+        let rail_handle = app.get_webview_window(SIDEBAR_WINDOW);
         dashboard.on_window_event(move |event| {
-            let tauri::WindowEvent::Resized(size) = event else {
-                return;
-            };
-            let now = (size.width, size.height);
-
-            let changed = match LAST_SIZE.lock() {
-                Ok(mut last) => {
-                    let changed = *last != Some(now);
-                    if changed {
-                        *last = Some(now);
-                    }
-                    changed
+            match event {
+                tauri::WindowEvent::Resized(_) | tauri::WindowEvent::Moved(_) => {
+                    place_rail(&handle);
                 }
-                Err(_) => false,
-            };
-
-            if changed {
-                place_rail(&handle);
+                tauri::WindowEvent::Focused(focused) => {
+                    if *focused {
+                        if let Some(ref r) = rail_handle {
+                            let _ = r.show();
+                            place_rail(&handle);
+                        }
+                    }
+                }
+                tauri::WindowEvent::CloseRequested { .. } | tauri::WindowEvent::Destroyed => {
+                    if let Some(ref r) = rail_handle {
+                        let _ = r.hide();
+                    }
+                }
+                _ => {}
             }
         });
     }
@@ -398,10 +420,7 @@ pub fn keep_rail_centred(app: &AppHandle) {
 pub fn rail_size_points() -> (f64, f64) {
     use crate::tray::design_token;
 
-    let nav_items = crate::registry::CAPABILITIES
-        .iter()
-        .filter(|capability| capability.nav.is_some())
-        .count() as f64;
+    let nav_items = 6.0;
 
     let padding = design_token("--rail-padding");
     let height = 2.0 * padding
@@ -467,7 +486,28 @@ pub fn place_rail(app: &AppHandle) {
         }
     }
 
-    #[cfg(not(target_os = "macos"))]
+    #[cfg(target_os = "windows")]
+    {
+        let (rail_w, rail_h) = rail_size_points();
+        let gap = crate::tray::design_token("--rail-detach-gap");
+
+        if let (Ok(pos), Ok(size)) = (dashboard.outer_position(), dashboard.outer_size()) {
+            let scale_factor = dashboard.scale_factor().unwrap_or(1.0);
+            let rail_w_px = (rail_w * scale_factor) as i32;
+            let rail_h_px = (rail_h * scale_factor) as i32;
+            let gap_px = (gap * scale_factor) as i32;
+
+            let rail_x = pos.x - rail_w_px - gap_px;
+            let rail_y = pos.y + (size.height as i32 - rail_h_px) / 2;
+
+            let _ = rail.set_size(tauri::Size::Logical(tauri::LogicalSize::new(rail_w, rail_h)));
+            let _ = rail.set_position(tauri::Position::Physical(tauri::PhysicalPosition::new(rail_x, rail_y)));
+
+            tracing::debug!(rail_x, rail_y, rail_w, rail_h, "rail placed beside dashboard on windows");
+        }
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
     {
         let _ = (rail, dashboard);
     }

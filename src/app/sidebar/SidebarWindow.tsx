@@ -34,46 +34,144 @@
  */
 
 import { cn } from "@/lib/utils";
-import { iconFor } from "@/lib/icons";
 import { Mark } from "@/components/global";
-import type { NavDef } from "@/lib/bindings";
+import { Mic, Gauge, BookOpen, Gift, Settings, HelpCircle } from "lucide-react";
 
 export interface SidebarWindowProps {
-  items: readonly NavDef[];
   activeRoute: string;
   onSelect: (route: string) => void;
 }
 
-export function SidebarWindow({ items, activeRoute, onSelect }: SidebarWindowProps) {
-  return (
-    <nav
-      aria-label="Sections"
-      className="flex h-full w-full flex-col items-center gap-[var(--rail-item-gap)] p-[var(--rail-padding)]"
-    >
-      <Mark label="HushWrite" className="mb-[var(--rail-mark-gap)] shrink-0" />
+interface SidebarItem {
+  id: string;
+  label: string;
+  icon: typeof Mic;
+  route: string;
+  isSpecial?: boolean;
+}
 
-      {items.map((item) => {
-        const Icon = iconFor(item.icon);
-        const isActive = item.route === activeRoute;
-        return (
-          <button
-            key={item.route}
-            type="button"
-            onClick={() => onSelect(item.route)}
-            title={item.label}
-            aria-label={item.label}
-            aria-current={isActive ? "page" : undefined}
-            className={cn(
-              "flex size-[var(--rail-item-size)] shrink-0 items-center justify-center rounded-input transition-colors",
-              isActive
-                ? "bg-sunken-strong text-text-primary"
-                : "text-text-secondary hover:bg-sunken hover:text-text-primary",
-            )}
-          >
-            <Icon className="size-4 shrink-0" aria-hidden="true" />
-          </button>
-        );
-      })}
-    </nav>
+export function SidebarWindow({ activeRoute, onSelect }: SidebarWindowProps) {
+  const topItems: SidebarItem[] = [
+    {
+      id: "dictation",
+      label: "Dictation",
+      icon: Mic,
+      route: "dictation",
+    },
+    {
+      id: "insights",
+      label: "Insights",
+      icon: Gauge,
+      route: "insights",
+    },
+    {
+      id: "dictionary",
+      label: "Dictionary",
+      icon: BookOpen,
+      route: "dictionary",
+    },
+  ];
+
+  const bottomItems: SidebarItem[] = [
+    {
+      id: "invite",
+      label: "Invite & Earn Pro",
+      icon: Gift,
+      route: "invite",
+      isSpecial: true,
+    },
+    {
+      id: "settings",
+      label: "Settings",
+      icon: Settings,
+      route: "settings",
+    },
+    {
+      id: "help",
+      label: "Help & Shortcuts",
+      icon: HelpCircle,
+      route: "help",
+    },
+  ];
+
+  return (
+    <div
+      className={cn(
+        "flex h-full w-full flex-col items-center justify-between",
+        "rounded-[26px] border border-stone-300/70 bg-[#f4f2ee]/95 backdrop-blur-md shadow-xl",
+        "dark:border-stone-800/80 dark:bg-[#141210]/95",
+        "p-1.5 py-3 transition-colors select-none",
+      )}
+    >
+      {/* Top Section: Brand Mark + Primary Navigation */}
+      <div className="flex w-full flex-col items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => onSelect("dictation")}
+          title="HushWrite Dictation"
+          aria-label="HushWrite Dictation"
+          className="flex h-8 w-8 items-center justify-center rounded-xl transition-opacity hover:opacity-75 cursor-pointer mb-1"
+        >
+          <Mark label="HushWrite" size="md" />
+        </button>
+
+        <nav aria-label="Primary navigation" className="flex w-full flex-col items-center gap-1">
+          {topItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeRoute === item.route;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => onSelect(item.route)}
+                title={item.label}
+                aria-label={item.label}
+                aria-current={isActive ? "page" : undefined}
+                className={cn(
+                  "flex size-9 shrink-0 items-center justify-center rounded-xl transition-all duration-150 cursor-pointer",
+                  isActive
+                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold shadow-xs"
+                    : "text-stone-500 dark:text-stone-400 hover:bg-stone-200/60 dark:hover:bg-stone-800/60 hover:text-stone-900 dark:hover:text-white",
+                )}
+              >
+                <Icon className="size-4 shrink-0" aria-hidden="true" />
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* Divider */}
+      <div className="w-5 h-[1px] bg-stone-300/60 dark:bg-stone-800/80 my-1 shrink-0" />
+
+      {/* Bottom Section: Pro / Secondary Navigation */}
+      <nav aria-label="Secondary navigation" className="flex w-full flex-col items-center gap-1">
+        {bottomItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeRoute === item.route;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onSelect(item.route)}
+              title={item.label}
+              aria-label={item.label}
+              aria-current={isActive ? "page" : undefined}
+              className={cn(
+                "flex size-9 shrink-0 items-center justify-center rounded-xl transition-all duration-150 cursor-pointer",
+                isActive
+                  ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold shadow-xs"
+                  : item.isSpecial
+                    ? "text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100/60 dark:hover:bg-emerald-950/50 hover:scale-105"
+                    : "text-stone-500 dark:text-stone-400 hover:bg-stone-200/60 dark:hover:bg-stone-800/60 hover:text-stone-900 dark:hover:text-white",
+              )}
+            >
+              <Icon className="size-4 shrink-0" aria-hidden="true" />
+            </button>
+          );
+        })}
+      </nav>
+    </div>
   );
 }
+

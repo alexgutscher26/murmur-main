@@ -10,17 +10,12 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
+import { emitTo } from "@tauri-apps/api/event";
 import {
   Bell,
-  BookOpen,
-  HelpCircle,
-  Mic,
-  PanelLeft,
-  Settings,
   User,
   WandSparkles,
   X,
-  Gauge,
   Check,
   ArrowRight,
   ShieldCheck,
@@ -45,7 +40,6 @@ import {
   ShortcutsModal,
   ChangelogModal,
 } from "@/components/global";
-import { cn } from "@/lib/utils";
 import { BillingView } from "./billing";
 import { navigateTo, useHashRoute } from "./use-hash-route";
 import { dictationModeFrom, type DictationMode } from "@/lib/dictation-mode";
@@ -82,7 +76,6 @@ export function Dashboard() {
   const settings = useSettings();
   const { route, section } = useHashRoute();
 
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -113,7 +106,18 @@ export function Dashboard() {
       : 0;
   const isAirGapped = settings.data?.["privacy.air_gap_mode"]?.value === true;
 
-  useTauriEvent(navSelectedChannel, (payload) => navigateTo(payload.route));
+  useTauriEvent(navSelectedChannel, (payload) => {
+    if (payload.route === "help") {
+      setShowShortcuts(true);
+    } else if (payload.route === "invite") {
+      const url = referralStatus.data?.referral_url || "https://HushWrite.app/pricing";
+      void unwrapCommand(() => commands.copyText({ text: url })).then(() =>
+        showToast("Personal referral link copied to clipboard!"),
+      );
+    } else {
+      navigateTo(payload.route);
+    }
+  });
 
   // Global dashboard keyboard shortcuts (Cmd/Ctrl + 1..4, and '?')
   useEffect(() => {
@@ -178,6 +182,11 @@ export function Dashboard() {
         ? route
         : "dictation";
 
+  // Synchronize route state with detached sidebar pill window
+  useEffect(() => {
+    void emitTo("sidebar", "nav-route-sync", { route: activeRoute });
+  }, [activeRoute]);
+
   if (registry.error) {
     return (
       <main className="flex h-screen items-center justify-center bg-[#f4f2ee] dark:bg-[#141210]">
@@ -191,23 +200,15 @@ export function Dashboard() {
       {/* ── Top Window Bar (Traffic-light / Window Controls) ─────────────── */}
       <header
         data-tauri-drag-region
-        className="flex h-10 shrink-0 items-center justify-between px-3"
+        className="flex h-10 shrink-0 items-center justify-between px-3.5"
       >
-        {/* Top Left: Sidebar collapse toggle + User profile */}
+        {/* Top Left: User profile */}
         <div data-tauri-drag-region={false} className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setSidebarCollapsed((v) => !v)}
-            title="Toggle sidebar"
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
-          >
-            <PanelLeft className="h-4 w-4" />
-          </button>
           <button
             type="button"
             onClick={() => showToast("Alex's Personal Account")}
             title="Alex Gutscher"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors cursor-pointer"
           >
             <User className="h-4 w-4" />
           </button>
@@ -236,142 +237,17 @@ export function Dashboard() {
             type="button"
             onClick={() => setShowChangelog(true)}
             title="Notifications & Updates"
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-stone-500 hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/60 dark:hover:text-white transition-colors cursor-pointer"
           >
             <Bell className="h-3.5 w-3.5" />
           </button>
         </div>
       </header>
 
-      {/* ── Main App Shell Body (Sidebar + Content Canvas) ────────────────── */}
-      <div className="flex min-h-0 flex-1 overflow-hidden">
-        {/* ── Left Sidebar ───────────────────────────────────────────────── */}
-        <aside
-          className={cn(
-            "flex flex-col justify-between py-2 transition-all duration-200 shrink-0",
-            sidebarCollapsed ? "w-14 px-2" : "w-56 px-4",
-          )}
-        >
-          {/* Top Branding & Main Navigation */}
-          <div className="flex flex-col min-h-0">
-            {/* Logo */}
-            <div className="flex items-center gap-2 px-2 py-3 mb-2">
-              <div className="flex items-center gap-[2.5px] h-4">
-                <div className="w-[3px] h-3 bg-stone-900 dark:bg-white rounded-full" />
-                <div className="w-[3px] h-5 bg-stone-900 dark:bg-white rounded-full" />
-                <div className="w-[3px] h-3.5 bg-stone-900 dark:bg-white rounded-full" />
-                <div className="w-[3px] h-2 bg-stone-900 dark:bg-white rounded-full" />
-              </div>
-              {!sidebarCollapsed && (
-                <span className="font-bold text-base tracking-tight text-stone-900 dark:text-white">
-                  HushWrite
-                </span>
-              )}
-            </div>
-
-            {/* Navigation items */}
-            <nav className="flex flex-col gap-0.5">
-              {/* Dictation (Primary Home) */}
-              <button
-                type="button"
-                onClick={() => navigateTo("dictation")}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
-                  activeRoute === "dictation"
-                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
-                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
-                )}
-                title="Dictation"
-              >
-                <Mic className="h-4 w-4 shrink-0" />
-                {!sidebarCollapsed && <span>Dictation</span>}
-              </button>
-
-              {/* Insights */}
-              <button
-                type="button"
-                onClick={() => navigateTo("insights")}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
-                  activeRoute === "insights"
-                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
-                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
-                )}
-                title="Insights"
-              >
-                <Gauge className="h-4 w-4 shrink-0" />
-                {!sidebarCollapsed && <span>Insights</span>}
-              </button>
-
-              {/* Dictionary */}
-              <button
-                type="button"
-                onClick={() => navigateTo("dictionary")}
-                className={cn(
-                  "flex items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-colors",
-                  activeRoute === "dictionary"
-                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
-                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
-                )}
-                title="Dictionary"
-              >
-                <BookOpen className="h-4 w-4 shrink-0" />
-                {!sidebarCollapsed && <span>Dictionary</span>}
-              </button>
-            </nav>
-          </div>
-
-          {/* Middle/Bottom Sidebar: Secondary Links */}
-          <div className="flex flex-col gap-1">
-            {/* Secondary navigation */}
-            <div className="flex flex-col gap-0.5">
-              <button
-                type="button"
-                onClick={() => {
-                  const url = referralStatus.data?.referral_url || "https://HushWrite.app/pricing";
-                  void unwrapCommand(() => commands.copyText({ text: url })).then(() =>
-                    showToast("Personal referral link copied to clipboard!"),
-                  );
-                }}
-                className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors cursor-pointer"
-                title="Invite friends & get Pro packs"
-              >
-                <Gift className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                {!sidebarCollapsed && <span>Invite & Earn Pro</span>}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigateTo("settings")}
-                className={cn(
-                  "flex items-center justify-between rounded-xl px-2.5 py-1.5 text-xs font-medium transition-colors",
-                  activeRoute === "settings"
-                    ? "bg-[#eae5de] dark:bg-stone-800 text-stone-900 dark:text-white font-semibold"
-                    : "text-stone-600 dark:text-stone-400 hover:bg-stone-200/50 dark:hover:bg-stone-800/40 hover:text-stone-900 dark:hover:text-white",
-                )}
-                title="Settings"
-              >
-                <div className="flex items-center gap-3">
-                  <Settings className="h-4 w-4 shrink-0" />
-                  {!sidebarCollapsed && <span>Settings</span>}
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowShortcuts(true)}
-                className="flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-xs text-stone-600 hover:bg-stone-200/50 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800/40 dark:hover:text-white transition-colors"
-                title="Help"
-              >
-                <HelpCircle className="h-4 w-4 shrink-0" />
-                {!sidebarCollapsed && <span>Help</span>}
-              </button>
-            </div>
-          </div>
-        </aside>
-
+      {/* ── Main App Shell Body (Content Canvas) ─────────────────────────── */}
+      <div className="flex min-h-0 flex-1 overflow-hidden px-3 pb-3">
         {/* ── Main Canvas (Rounded Card) ─────────────────────────────────── */}
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[26px] border border-stone-200/70 bg-white shadow-xs dark:border-stone-800/80 dark:bg-[#1b1917] text-stone-900 dark:text-stone-100 m-1 mr-3 mb-3">
+        <main className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-[26px] border border-stone-200/70 bg-white shadow-xs dark:border-stone-800/80 dark:bg-[#1b1917] text-stone-900 dark:text-stone-100">
           {/* Adaptive Onboarding Re-entry Banner */}
           {isOnboardingIncomplete && !resumeCardDismissed && (
             <div className="flex items-center justify-between border-b border-amber-200/70 bg-gradient-to-r from-amber-50/80 via-orange-50/50 to-amber-50/80 px-5 py-3 dark:border-amber-900/40 dark:from-amber-950/30 dark:via-orange-950/20 dark:to-amber-950/30 animate-in fade-in slide-in-from-top-1 shrink-0">

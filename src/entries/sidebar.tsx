@@ -21,42 +21,45 @@
  * WHERE: Loaded by sidebar.html, which bootstrap opens and attaches.
  */
 
-import { useState } from "react";
-import { emitTo } from "@tauri-apps/api/event";
+import { useEffect, useState } from "react";
+import { emitTo, listen } from "@tauri-apps/api/event";
 import { SidebarWindow } from "@/app/sidebar";
-import { commands } from "@/lib/bindings";
-import { useCommand } from "@/lib/ipc";
 import { NAV_SELECTED } from "@/lib/window-events";
-
-/** The dashboard window's label, as declared in tauri.conf.json. */
-const DASHBOARD_LABEL = "dashboard";
 import "@/styles/global.css";
 import { createRoot } from "react-dom/client";
 
+/** The dashboard window's label, as declared in tauri.conf.json. */
+const DASHBOARD_LABEL = "dashboard";
+
 function SidebarEntry() {
-  const registry = useCommand(commands.getRegistry, []);
+  const [route, setRoute] = useState("dictation");
 
-  const items = (registry.data?.capabilities ?? [])
-    .flatMap((capability) => (capability.nav ? [capability.nav] : []))
-    .sort((a, b) => a.order - b.order);
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    void listen<{ route: string }>("nav-route-sync", (event) => {
+      if (event.payload?.route) {
+        setRoute(event.payload.route);
+      }
+    }).then((fn) => {
+      unlisten = fn;
+    });
 
-  const [route, setRoute] = useState("");
-  // Falls back to the first item so the rail and the dashboard agree on first
-  // paint, before anything has been selected.
-  const active = items.some((item) => item.route === route) ? route : (items[0]?.route ?? "");
+    return () => {
+      if (unlisten) unlisten();
+    };
+  }, []);
+
+  const handleSelect = (next: string) => {
+    if (next !== "invite" && next !== "help") {
+      setRoute(next);
+    }
+    void emitTo(DASHBOARD_LABEL, NAV_SELECTED, { route: next });
+  };
 
   return (
     <SidebarWindow
-      items={items}
-      activeRoute={active}
-      onSelect={(next) => {
-        setRoute(next);
-        // emitTo, not emit. A broadcast relies on the dashboard's listener
-        // being registered for globally-emitted events; targeting the window
-        // by label is unambiguous and cannot silently miss. The rail's whole
-        // job is to reach that one window.
-        void emitTo(DASHBOARD_LABEL, NAV_SELECTED, { route: next });
-      }}
+      activeRoute={route}
+      onSelect={handleSelect}
     />
   );
 }
@@ -65,3 +68,4 @@ const container = document.getElementById("root");
 if (!container) throw new Error("sidebar.html is missing its #root element.");
 
 createRoot(container).render(<SidebarEntry />);
+
