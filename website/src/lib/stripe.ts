@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 
 export type PlanTierKey = "pro_lifetime" | "pro_annual";
-export type DiscountCode = "SWITCHER-40" | "STUDENT-50" | "OSS-50";
+export type DiscountCode = "SWITCHER-40" | "STUDENT-50" | "OSS-50" | string;
 
 export interface PricingDetails {
   tier: PlanTierKey;
@@ -13,14 +13,41 @@ export interface PricingDetails {
   originalAmountCents: number;
 }
 
+export interface CheckoutSessionDetails {
+  sessionId: string;
+  customerEmail: string | null;
+  customerName: string | null;
+  amountTotal: number | null;
+  currency: string | null;
+  paymentStatus: string;
+  status: string | null;
+  licenseKey: string;
+  tier: PlanTierKey;
+  discountCode: string | null;
+  isSubscription: boolean;
+  subscriptionId?: string | null;
+  invoiceUrl?: string | null;
+}
+
+let stripeInstance: Stripe | null = null;
+
 export function getStripeClient(): Stripe | null {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) return null;
 
-  return new Stripe(secretKey, {
-    apiVersion: "2025-02-24.acacia" as unknown as Stripe.LatestApiVersion,
-    typescript: true,
-  });
+  if (!stripeInstance) {
+    stripeInstance = new Stripe(secretKey, {
+      apiVersion: "2025-02-24.acacia" as unknown as Stripe.LatestApiVersion,
+      typescript: true,
+      appInfo: {
+        name: "HushWrite",
+        version: "0.1.0",
+        url: "https://hushwrite.app",
+      },
+    });
+  }
+
+  return stripeInstance;
 }
 
 export function calculatePrice(tier: PlanTierKey, discountCode?: string | null): PricingDetails {
@@ -54,7 +81,7 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
       };
     }
 
-    if (normalizedDiscount?.startsWith("HushWrite-") || normalizedDiscount?.startsWith("REF-")) {
+    if (normalizedDiscount?.startsWith("HUSHWRITE-") || normalizedDiscount?.startsWith("REF-")) {
       return {
         tier,
         name: "HushWrite Founding Beta (Referral Bonus)",
@@ -104,7 +131,7 @@ export function calculatePrice(tier: PlanTierKey, discountCode?: string | null):
     };
   }
 
-  if (normalizedDiscount?.startsWith("HushWrite-") || normalizedDiscount?.startsWith("REF-")) {
+  if (normalizedDiscount?.startsWith("HUSHWRITE-") || normalizedDiscount?.startsWith("REF-")) {
     return {
       tier,
       name: "HushWrite Pro Annual Pass (Referral Bonus)",
@@ -154,4 +181,12 @@ export function generateLicenseKey(tier: PlanTierKey, discountCode?: string | nu
   }
 
   return `${prefix}-${chunk(4)}-${chunk(4)}-${chunk(4)}`;
+}
+
+/** Formats cents into human readable dollar strings (e.g. 4900 -> "$49.00") */
+export function formatCents(cents: number, currency = "USD"): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency,
+  }).format(cents / 100);
 }

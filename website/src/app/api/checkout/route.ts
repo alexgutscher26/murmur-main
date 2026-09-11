@@ -27,9 +27,13 @@ export async function POST(req: NextRequest) {
     }
 
     const pricing = calculatePrice(tier, discountCode);
-    const origin = req.nextUrl.origin || "http://localhost:3000";
-    const licenseKey = generateLicenseKey(tier, discountCode);
+    const origin =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      req.headers.get("origin") ||
+      req.nextUrl.origin ||
+      "http://localhost:3000";
 
+    const licenseKey = generateLicenseKey(tier, discountCode);
     const stripe = getStripeClient();
 
     if (!stripe) {
@@ -43,6 +47,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         url: successUrl.toString(),
+        sessionId: mockSessionId,
         mode: "mock",
         pricing,
         licenseKey,
@@ -57,7 +62,6 @@ export async function POST(req: NextRequest) {
     const isSubscription = tier === "pro_annual";
 
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
@@ -66,7 +70,7 @@ export async function POST(req: NextRequest) {
               name: pricing.name,
               description: pricing.discountApplied
                 ? `Includes special discount: ${pricing.discountApplied}`
-                : "HushWrite 100% on-device voice-to-text with Whisper Large v3 Turbo.",
+                : "HushWrite 100% on-device voice-to-text with Whisper Large v3 Turbo & Medium.",
             },
             unit_amount: pricing.amountCents,
             ...(isSubscription
@@ -81,13 +85,17 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: isSubscription ? "subscription" : "payment",
-      customer_email: customerEmail || undefined,
+      allow_promotion_codes: true,
+      billing_address_collection: "auto",
+      tax_id_collection: { enabled: true },
+      customer_email: customerEmail?.trim() || undefined,
       success_url: successUrl,
       cancel_url: cancelUrl,
       metadata: {
         tier,
         discountCode: discountCode || "NONE",
         licenseKey,
+        customerEmail: customerEmail?.trim() || "",
       },
       ...(isSubscription
         ? {
@@ -96,13 +104,18 @@ export async function POST(req: NextRequest) {
                 tier,
                 discountCode: discountCode || "NONE",
                 licenseKey,
+                customerEmail: customerEmail?.trim() || "",
               },
             },
           }
         : {}),
     });
 
-    return NextResponse.json({ url: session.url, sessionId: session.id, licenseKey });
+    return NextResponse.json({
+      url: session.url,
+      sessionId: session.id,
+      licenseKey,
+    });
   } catch (err: unknown) {
     console.error("Stripe checkout error:", err);
     const message = err instanceof Error ? err.message : "Failed to create checkout session";

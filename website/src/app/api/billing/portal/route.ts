@@ -9,8 +9,26 @@ export async function POST(req: NextRequest) {
       licenseKey?: string;
     };
 
+    const cleanKey = licenseKey?.trim().toUpperCase();
+
+    // Lifetime/Founding licenses do not have recurring subscription cycles
+    if (cleanKey && (cleanKey.startsWith("FOUNDING-") || cleanKey.startsWith("LIFETIME-"))) {
+      return NextResponse.json(
+        {
+          error:
+            "Your license is a Perpetual Lifetime License. There are no recurring subscriptions or billing cycles to manage.",
+          isLifetime: true,
+        },
+        { status: 400 },
+      );
+    }
+
     const stripe = getStripeClient();
-    const origin = req.nextUrl.origin || "http://localhost:3000";
+    const origin =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      req.headers.get("origin") ||
+      req.nextUrl.origin ||
+      "http://localhost:3000";
     const returnUrl = `${origin}/pricing`;
 
     if (!stripe) {
@@ -24,16 +42,18 @@ export async function POST(req: NextRequest) {
     let customerId: string | null = null;
 
     // 1. Try finding customer by license key in subscription metadata
-    if (licenseKey) {
+    if (cleanKey) {
       try {
         const search = await stripe.subscriptions.search({
-          query: `metadata['licenseKey']:'${licenseKey.trim().toUpperCase()}'`,
+          query: `metadata['licenseKey']:'${cleanKey}'`,
           limit: 1,
         });
         if (search.data.length > 0 && typeof search.data[0].customer === "string") {
           customerId = search.data[0].customer;
         }
-      } catch {}
+      } catch (err) {
+        console.warn("Stripe subscription search by metadata error:", err);
+      }
     }
 
     // 2. Try finding customer by email
@@ -46,7 +66,9 @@ export async function POST(req: NextRequest) {
         if (customers.data.length > 0) {
           customerId = customers.data[0].id;
         }
-      } catch {}
+      } catch (err) {
+        console.warn("Stripe customer list by email error:", err);
+      }
     }
 
     if (!customerId) {
