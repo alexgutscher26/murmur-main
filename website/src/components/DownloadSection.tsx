@@ -71,12 +71,12 @@ export function DownloadSection() {
     {
       file: "HushWrite_0.1.0_x64-setup.exe",
       platform: "Windows 64-bit Installer",
-      sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      sha256: "640b80dbf21addd5ab869795b890a348eb71fb08ae3f8d5a6f7caca97d34faf0",
     },
     {
       file: "HushWrite_0.1.0_x64_en-US.msi",
       platform: "Windows MSI Package",
-      sha256: "9f83c605ae7109b801f806b740a6f543b809506e19294a20f9802639987b0e2f",
+      sha256: "54a6f32cf318eba007e2d90a479ff15bfe7b726ebd0b93e3feb7373ccb219c78",
     },
     {
       file: "HushWrite_0.1.0_aarch64.dmg",
