@@ -72,9 +72,6 @@ export function Navbar() {
           >
             <GithubIcon className="w-3.5 h-3.5 text-neutral-700 group-hover:text-neutral-950 transition-colors" />
             <span>GitHub</span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-neutral-100 text-neutral-600 border border-neutral-200/70">
-              4.8k
-            </span>
           </a>
 
           {/* Primary CTA button matching Hero's #141416 pill */}
