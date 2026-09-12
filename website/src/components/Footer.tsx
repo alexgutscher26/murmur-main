@@ -80,7 +80,7 @@ const ECOSYSTEM_LINKS: FooterLink[] = [
     href: "https://github.com/alexgutscher26/HushWrite/tags",
     label: "Official Releases & SHA256",
     external: true,
-    badge: "v1.0.0",
+    badge: "v1.0.1",
   },
   {
     href: "https://apps.microsoft.com/search?query=HushWrite",
