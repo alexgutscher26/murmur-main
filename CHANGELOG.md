@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.2] - 2026-09-12
+
+### Changed & Fixed
+
+- **Stripe Checkout & Managed Payments**:
+  - Upgraded Stripe API version to `2025-03-31.basil` for Managed Payments compliance.
+  - Added digital software tax codes (`txcd_10103000`) across all dynamic checkout line items.
+- **Production Engine Optimization**:
+  - Refactored LLM transform sorting and pattern matching for zero Clippy warnings.
+  - Hardened app profile iterator flattening in database service.
+
 ## [0.1.0] - 2026-08-31
 
 ### Added
