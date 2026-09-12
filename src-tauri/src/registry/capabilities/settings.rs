@@ -194,7 +194,7 @@ pub fn settings_capability() -> Capability {
             advanced(string_setting(
                 keys::VOICE_TRANSFORM_TRIGGER,
                 "Voice transform trigger phrase",
-                "Spoken wake prefix used to initiate voice transformations (e.g., “Hey HushWrite”).",
+                "Spoken prefix used while dictating to transform tone or formatting (e.g., “Hey HushWrite, make that formal: ...”).",
                 SettingSection::Output,
                 Some("Hey HushWrite"),
                 "Hey HushWrite",

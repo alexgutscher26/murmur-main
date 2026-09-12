@@ -106,6 +106,12 @@ impl LlmTextEnhancer {
             Some(VoiceTransformIntent::EmailDraft) => {
                 Self::format_email_draft(&intermediate)
             }
+            Some(VoiceTransformIntent::FixGrammarOnly) => {
+                intermediate
+            }
+            Some(VoiceTransformIntent::Translate { target_language: _ }) => {
+                intermediate
+            }
             Some(VoiceTransformIntent::Custom { instruction }) => {
                 Self::apply_custom_instruction(&intermediate, &instruction)
             }
