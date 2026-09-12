@@ -211,8 +211,8 @@ export function Footer() {
         }
       `}</style>
 
-      {/* Pixelated square-cell matrix grid */}
-      <div className="absolute inset-0 pointer-events-none opacity-45 overflow-hidden [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,#000_60%,transparent_100%)]">
+      {/* Pixelated square-cell matrix grid with firework-burst upward fade */}
+      <div className="absolute inset-0 pointer-events-none opacity-45 overflow-hidden [mask-image:radial-gradient(ellipse_75%_85%_at_50%_100%,#000_20%,rgba(0,0,0,0.4)_55%,transparent_85%)]">
         <svg className="w-full h-full text-neutral-300" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="footer-pixel-matrix-grid" width="16" height="16" patternUnits="userSpaceOnUse">
