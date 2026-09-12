@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Mic, Copy, Check, Volume2, Cpu } from "lucide-react";
 
 interface Scenario {
@@ -101,24 +101,74 @@ export function InteractivePlayground() {
   const [isLiveMic, setIsLiveMic] = useState(false);
   const [liveTranscript, setLiveTranscript] = useState("");
   const [audioLevels, setAudioLevels] = useState<number[]>([
-    12, 28, 45, 80, 50, 30, 15, 60, 40, 20,
+    10, 14, 18, 22, 18, 14, 10, 14, 18, 14, 10, 14, 16, 12, 14, 10,
   ]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const isRecordingRef = useRef<boolean>(false);
+
+  const stopLiveMic = useCallback(() => {
+    isRecordingRef.current = false;
+    setIsLiveMic(false);
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.stop();
+      } catch {
+        // ignore if already stopped
+      }
+      recognitionRef.current = null;
+    }
+
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+
+    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+
+    setAudioLevels([10, 14, 18, 22, 18, 14, 10, 14, 18, 14, 10, 14, 16, 12, 14, 10]);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopLiveMic();
+    };
+  }, [stopLiveMic]);
+
+  // Handle synthetic animation when playing preset simulations
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isPlaying || isLiveMic) {
+    if (isPlaying && !isLiveMic) {
       interval = setInterval(() => {
         setAudioLevels(Array.from({ length: 16 }, () => Math.floor(Math.random() * 55) + 12));
       }, 80);
-    } else {
+    } else if (!isLiveMic) {
       setAudioLevels([10, 14, 18, 22, 18, 14, 10, 14, 18, 14, 10, 14, 16, 12, 14, 10]);
     }
-    return () => clearInterval(interval);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
   }, [isPlaying, isLiveMic]);
 
   const handleScenarioSelect = (scenario: Scenario) => {
+    stopLiveMic();
     setActiveScenario(scenario);
-    setIsLiveMic(false);
     setIsPlaying(true);
     setDisplayedText("");
 
@@ -136,63 +186,126 @@ export function InteractivePlayground() {
     }, 12);
   };
 
-  const toggleLiveMic = () => {
-    if (isLiveMic) {
-      setIsLiveMic(false);
-      return;
+  const startLiveMic = async () => {
+    stopLiveMic();
+    isRecordingRef.current = true;
+    setIsLiveMic(true);
+    setLiveTranscript("Listening to your voice... Speak into your microphone.");
+
+    // Setup real-time audio visualizer via Web Audio API
+    if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStreamRef.current = stream;
+
+        // @ts-expect-error WebkitAudioContext
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioCtx();
+        audioContextRef.current = audioCtx;
+
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        const updateAudioBars = () => {
+          if (!isRecordingRef.current) return;
+          analyser.getByteFrequencyData(dataArray);
+
+          // Downsample to 16 bars
+          const newLevels: number[] = [];
+          for (let b = 0; b < 16; b++) {
+            const rawVal = dataArray[b] || 0;
+            // Map 0..255 to reasonable visual height
+            const level = Math.max(10, Math.min(85, Math.floor((rawVal / 255) * 80) + 10));
+            newLevels.push(level);
+          }
+          setAudioLevels(newLevels);
+          animationFrameRef.current = requestAnimationFrame(updateAudioBars);
+        };
+
+        animationFrameRef.current = requestAnimationFrame(updateAudioBars);
+      } catch (err) {
+        console.warn("Could not start Web Audio analyzer:", err);
+      }
     }
 
-    if (
-      typeof window !== "undefined" &&
-      ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)
-    ) {
+    // Setup Speech Recognition
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognition = typeof window !== "undefined" ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
+
+    if (SpeechRecognition) {
       try {
-        // @ts-expect-error WebkitSpeechRecognition
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
+        recognition.lang = typeof navigator !== "undefined" ? (navigator.language || "en-US") : "en-US";
+        recognition.maxAlternatives = 1;
 
         recognition.onstart = () => {
-          setIsLiveMic(true);
-          setLiveTranscript("Listening to your voice... Speak now.");
+          if (isRecordingRef.current) {
+            setIsLiveMic(true);
+          }
         };
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         recognition.onresult = (event: any) => {
-          let current = "";
-          for (let i = 0; i < event.results.length; i++) {
-            current += event.results[i][0].transcript;
+          let fullFinal = "";
+          let interim = "";
+          for (let i = 0; i < event.results.length; ++i) {
+            const transcriptChunk = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              fullFinal += transcriptChunk + " ";
+            } else {
+              interim += transcriptChunk;
+            }
           }
-          setLiveTranscript(current);
+          const fullText = (fullFinal + interim).trim();
+          if (fullText) {
+            setLiveTranscript(fullText);
+          }
         };
 
-        recognition.onerror = () => {
-          setIsLiveMic(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onerror = (event: any) => {
+          console.warn("Speech recognition error:", event.error);
+          if (event.error === "no-speech") {
+            return;
+          }
+          if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+            setLiveTranscript("Microphone permission was denied. Please allow microphone access in your browser.");
+            return;
+          }
         };
 
         recognition.onend = () => {
-          setIsLiveMic(false);
+          if (isRecordingRef.current && recognitionRef.current) {
+            try {
+              recognition.start();
+            } catch {
+              // Ignore if already active
+            }
+          }
         };
 
+        recognitionRef.current = recognition;
         recognition.start();
-      } catch {
-        simulateMicFallback();
+      } catch (err) {
+        console.error("Speech recognition start failed:", err);
       }
     } else {
-      simulateMicFallback();
+      setLiveTranscript("Microphone active. (Note: Browser Web Speech API is supported in Chrome, Edge, and Safari; HushWrite desktop app runs 100% offline with whisper.cpp on all platforms).");
     }
   };
 
-  const simulateMicFallback = () => {
-    setIsLiveMic(true);
-    setLiveTranscript("Simulating microphone audio capture...");
-    setTimeout(() => {
-      setLiveTranscript(
-        "HushWrite transcribed: Local speech recognition is fast, private, and powerful.",
-      );
-      setIsLiveMic(false);
-    }, 3000);
+  const toggleLiveMic = () => {
+    if (isLiveMic) {
+      stopLiveMic();
+    } else {
+      startLiveMic();
+    }
   };
 
   const handleCopy = () => {
@@ -272,7 +385,7 @@ export function InteractivePlayground() {
               </div>
 
               {/* Real Mic Trigger */}
-              <div className="mt-4 pt-4 border-t border-neutral-200/80">
+              {/* <div className="mt-4 pt-4 border-t border-neutral-200/80">
                 <button
                   onClick={toggleLiveMic}
                   aria-pressed={isLiveMic}
@@ -287,7 +400,7 @@ export function InteractivePlayground() {
                   />
                   <span>{isLiveMic ? "Stop microphone" : "Test live with microphone"}</span>
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* Telemetry Stats */}
@@ -401,7 +514,7 @@ export function InteractivePlayground() {
               {/* Output Box */}
               <div className="p-5 rounded-xl bg-neutral-900 text-neutral-100 font-mono text-xs sm:text-sm min-h-[180px] whitespace-pre-wrap leading-relaxed shadow-inner border border-neutral-800">
                 {isLiveMic ? liveTranscript : displayedText}
-                {isPlaying && (
+                {(isPlaying || isLiveMic) && (
                   <span className="inline-block w-2 h-4 bg-emerald-400 ml-1 motion-safe:animate-pulse shadow-[0_0_8px_#10b981]" />
                 )}
               </div>
