@@ -81,12 +81,12 @@ export function DownloadSection() {
     {
       file: "HushWrite_1.0.0_aarch64.dmg",
       platform: "macOS Apple Silicon (M1/M2/M3/M4)",
-      sha256: "a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e",
+      sha256: "95d8c8e26b8e9fe8f5c2a6eb089cb1857d2053d70fe339c635391494016f60d5",
     },
     {
       file: "HushWrite_1.0.0_x64.dmg",
       platform: "macOS Intel 64-bit",
-      sha256: "5d41402abc4b2a76b9719d911017c59261a8a25c1b6414731a5c68f9b7c84ef3",
+      sha256: "95d8c8e26b8e9fe8f5c2a6eb089cb1857d2053d70fe339c635391494016f60d5",
     },
   ];
 
