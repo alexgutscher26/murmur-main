@@ -739,7 +739,9 @@ pub fn format_markdown_mode(text: &str) -> String {
     out = replace_whole_words(&out, "insert pr template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false, false);
     out = replace_whole_words(&out, "pr template", "\n### 🚀 Pull Request\n**Summary:**\n\n**Key Changes:**\n- \n\n**Testing Checklist:**\n- [ ] Automated tests pass\n- [ ] Manual verification completed\n", false, false);
 
+    out = replace_whole_words(&out, "pr checklists", "\n### ✅ PR Checklist\n- [ ] Code follows style conventions\n- [ ] Unit & integration tests pass\n- [ ] Documentation updated\n- [ ] No sensitive credentials or debug logs\n", false, false);
     out = replace_whole_words(&out, "pr checklist", "\n### ✅ PR Checklist\n- [ ] Code follows style conventions\n- [ ] Unit & integration tests pass\n- [ ] Documentation updated\n- [ ] No sensitive credentials or debug logs\n", false, false);
+    out = replace_whole_words(&out, "pull request checklists", "\n### ✅ PR Checklist\n- [ ] Code follows style conventions\n- [ ] Unit & integration tests pass\n- [ ] Documentation updated\n- [ ] No sensitive credentials or debug logs\n", false, false);
     out = replace_whole_words(&out, "pull request checklist", "\n### ✅ PR Checklist\n- [ ] Code follows style conventions\n- [ ] Unit & integration tests pass\n- [ ] Documentation updated\n- [ ] No sensitive credentials or debug logs\n", false, false);
 
     out = replace_whole_words(&out, "environment setup", "\n### 🛠️ Environment Setup\n1. Clone repository\n2. Copy `.env.example` to `.env`\n3. Run `bun install` / `pnpm install`\n4. Start dev server: `bun run dev`\n", false, false);

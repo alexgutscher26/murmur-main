@@ -113,16 +113,18 @@ export function transformDeveloperText(rawInput: string): TransformResult {
   }
 
   // 0. Pre-cleaning speech recognition anomalies
-  // Fix "tagfile" -> "tag file"
   text = text.replace(/\btagfile\b/gi, "tag file");
+  text = text.replace(/\btag-file\b/gi, "tag file");
   text = text.replace(/\batfile\b/gi, "at file");
-  // Fix common STT mishearings in developer prompts
   text = text.replace(/\bvariant\s+prompt\b/gi, "variant prop");
   text = text.replace(/\bsecondary\s+to\s+variant\s+prop\b/gi, "secondary variant prop");
   text = text.replace(/\bsecondary\s+to\s+variant\s+prompt\b/gi, "secondary variant prop");
 
+  // Normalize spoken "dot <ext>" into ".<ext>" (e.g. "dot tsx" -> ".tsx", "dot js" -> ".js", "dot json" -> ".json")
+  text = text.replace(new RegExp(`\\bdot\\s+(${KNOWN_EXTENSIONS})\\b`, "gi"), ".$1");
+
   // 1. Voice Snippets & Macros
-  if (/\b(?:pr|pull request)\s+checklist\b/i.test(text)) {
+  if (/\b(?:pr|pull\s*request|pullrequest)s?\s*(?:review\s*)?check\s*lists?\b/i.test(text)) {
     matchedRules.push("PR Checklist Macro");
     text = `### ✅ PR Checklist
 - [ ] Code follows style conventions
@@ -171,10 +173,9 @@ export function transformDeveloperText(rawInput: string): TransformResult {
   }
 
   // 3. AI IDE File Tagging (@src/components/Button.tsx)
-  // Handles both explicit extensions and fuzzy speech recognition paths:
-  // e.g. "Look at tagfile.src. /Components/button.tsx, and add a secondary variant prop"
+  // Handles: "tag <file>", "tag file <file>", "look at tag <file>", "tag folder <folder>", etc.
   const tagFileWithExtRegex = new RegExp(
-    `\\b(look\\s+at\\s+)?(?:tag|at|mention|context)\\s*files?(?:\\s*[:.])?\\s*([a-zA-Z0-9_\\-./\\\\\\s]+?\\.${KNOWN_EXTENSIONS})(?:[,;])?`,
+    `\\b(look\\s+at\\s+)?(?:tag|at|mention|context)(?:\\s+(?:files?|folders?|dirs?|directory))?(?:\\s*[:.])?\\s*([a-zA-Z0-9_./\\\\\\s-]+?\\.${KNOWN_EXTENSIONS})(?:[,;])?`,
     "gi"
   );
 
@@ -186,11 +187,11 @@ export function transformDeveloperText(rawInput: string): TransformResult {
       return `${prefix}${cleanedPath}`;
     });
   } else {
-    // Fallback pattern without explicit extension
-    const tagFileGeneralRegex = /\b(look\s+at\s+)?(?:tag|at|mention|context)\s*files?(?:\s*[:.])?\s*([a-zA-Z0-9_\-./\\\s]+?)(?=\s+(?:and|with|then|to|in|for)\b|[,;.]|$)/gi;
-    if (tagFileGeneralRegex.test(text)) {
-      matchedRules.push("Context-Aware @file Tagging");
-      text = text.replace(tagFileGeneralRegex, (match, lookAtPrefix, rawPath) => {
+    // Explicit folder / directory tagging: e.g. "tag folder src slash components" or "tag dir src/components"
+    const tagFolderRegex = /\b(look\s+at\s+)?(?:tag|at|mention|context)\s+(?:folders?|dirs?|directory)(?:\s*[:.])?\s*([a-zA-Z0-9_./\\\s-]+?)(?=\s+(?:and|with|then|to|in|for)\b|[,;.]|$)/gi;
+    if (tagFolderRegex.test(text)) {
+      matchedRules.push("Context-Aware @folder Tagging");
+      text = text.replace(tagFolderRegex, (match, lookAtPrefix, rawPath) => {
         const cleanedPath = cleanPathString(rawPath);
         const prefix = lookAtPrefix ? "look at @" : "@";
         return `${prefix}${cleanedPath}`;
