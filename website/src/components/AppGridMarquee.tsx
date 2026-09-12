@@ -48,7 +48,7 @@ const APPS_ROW_2: AppItem[] = [
 
 export function AppGridMarquee() {
   return (
-    <section className="py-16 md:py-20 relative overflow-hidden bg-white border-y border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white">
+    <section className="py-16 md:py-20 relative overflow-hidden bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white">
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[320px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 

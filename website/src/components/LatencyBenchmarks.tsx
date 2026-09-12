@@ -103,7 +103,7 @@ export function LatencyBenchmarks() {
   return (
     <section
       id="benchmarks"
-      className="py-24 md:py-32 relative overflow-hidden bg-white border-t border-neutral-200/80 text-neutral-900 selection:bg-neutral-900 selection:text-white"
+      className="py-24 md:py-32 relative overflow-hidden bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white"
     >
       {/* Subtle Ambient Light Glow matching Hero */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100/90 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
