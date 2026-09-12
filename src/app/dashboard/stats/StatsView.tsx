@@ -220,10 +220,6 @@ export function StatsView({ metrics, hotkey, mode }: StatsViewProps) {
       )}
 
       <div data-scroll-area className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-6">
-        {/* ── Greeting Header ────────────────────────────────────────────── */}
-        <h1 className="text-2xl font-bold tracking-tight text-stone-900 dark:text-white mb-6">
-          Welcome back, Alex
-        </h1>
 
         {/* ── Two Column Grid ────────────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6 items-start">
