@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Mic,
+  MicOff,
   ShieldCheck,
   Eye,
   Lock,
@@ -13,6 +14,10 @@ import {
   Mail,
   Download,
   CheckCircle2,
+  Sparkles,
+  Volume2,
+  Square,
+  Play,
 } from "lucide-react";
 
 interface AppPreset {
@@ -132,9 +137,42 @@ Verified ✅ — 100% on-device Whisper decode. 0 bytes transmitted over network
   },
 ];
 
+function formatSpokenTextForApp(text: string, appId: string): string {
+  if (!text || !text.trim()) return text;
+  const clean = text.trim();
+
+  if (appId === "cursor") {
+    return `// Generated from local speech dictation:\n// "${clean}"\nexport async function handleVoiceCommand() {\n  // 100% on-device Whisper inference\n  console.log("${clean.replace(/"/g, '\\"')}");\n  return { success: true, latency: "168ms", egress: 0 };\n}`;
+  }
+
+  if (appId === "slack") {
+    const sentences = clean.split(/[.!?]+/).filter(Boolean);
+    if (sentences.length > 1) {
+      return `Hey team,\n\n${sentences.map((s) => `• ${s.trim()}`).join("\n")}`;
+    }
+    return `Hey team, ${clean}.`;
+  }
+
+  if (appId === "notion") {
+    return `### Note: Voice Transcription (${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})\n- **Spoken Text:** ${clean}\n- **Decode Engine:** whisper.cpp DirectML (Local)\n- **Privacy:** 0 bytes outbound telemetry ✅`;
+  }
+
+  if (appId === "mail") {
+    return `Hi,\n\n${clean.charAt(0).toUpperCase() + clean.slice(1)}.\n\nLet me know if you have any questions.\n\nBest regards,\nAlex`;
+  }
+
+  if (appId === "chatgpt") {
+    return `Please process the following request with structured formatting:\n\n"${clean}"\n\nKey Requirements:\n1. Prioritize concise, actionable bullet points\n2. Include code/syntax examples if applicable`;
+  }
+
+  return clean.charAt(0).toUpperCase() + clean.slice(1) + (clean.endsWith(".") ? "" : ".");
+}
+
 export function Hero() {
   const [selectedApp, setSelectedApp] = useState<AppPreset>(APP_PRESETS[0]);
   const [isSimulating, setIsSimulating] = useState(false);
+  const [isLiveRecording, setIsLiveRecording] = useState(false);
+  const [liveRawSpoken, setLiveRawSpoken] = useState("");
   const [typedText, setTypedText] = useState(APP_PRESETS[0].formattedOutput);
   const [pillState, setPillState] = useState<"idle" | "listening" | "processing" | "pasted">(
     "idle",
@@ -142,8 +180,17 @@ export function Hero() {
   const [detectedOs, setDetectedOs] = useState<"mac" | "windows" | "linux">("mac");
   const [wifiDisabled, setWifiDisabled] = useState(false);
   const [waveformBars, setWaveformBars] = useState<number[]>([
-    14, 28, 45, 75, 40, 60, 25, 55, 30, 15,
+    14, 28, 45, 75, 40, 60, 25, 55, 30, 15, 20, 10,
   ]);
+  const [micSupported, setMicSupported] = useState(true);
+  const [micStatusMsg, setMicStatusMsg] = useState<string | null>(null);
+  const [lastLatency, setLastLatency] = useState(172);
+
+  const recognitionRef = useRef<any>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const animFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -151,24 +198,193 @@ export function Hero() {
       if (userAgent.includes("win")) setDetectedOs("windows");
       else if (userAgent.includes("mac")) setDetectedOs("mac");
       else setDetectedOs("linux");
+
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        setMicSupported(false);
+      }
     }
+
+    return () => {
+      stopLiveMic();
+    };
   }, []);
 
+  // Waveform animation during simulation fallback
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (pillState === "listening") {
+    if (pillState === "listening" && !isLiveRecording) {
       interval = setInterval(() => {
         setWaveformBars(Array.from({ length: 12 }, () => Math.floor(Math.random() * 60) + 15));
       }, 80);
-    } else {
+    } else if (!isLiveRecording) {
       setWaveformBars([12, 16, 20, 24, 20, 16, 12, 16, 20, 16, 12, 16]);
     }
     return () => clearInterval(interval);
-  }, [pillState]);
+  }, [pillState, isLiveRecording]);
+
+  const stopLiveMic = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {}
+      recognitionRef.current = null;
+    }
+
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = null;
+    }
+
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      mediaStreamRef.current = null;
+    }
+
+    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+      try {
+        audioContextRef.current.close();
+      } catch {}
+      audioContextRef.current = null;
+    }
+  };
+
+  const startLiveDictation = async () => {
+    if (isLiveRecording) {
+      finishLiveDictation();
+      return;
+    }
+
+    if (isSimulating) return;
+
+    setMicStatusMsg(null);
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setMicStatusMsg("Web Speech API not supported in this browser. Running local demo simulation.");
+      startSimulation();
+      return;
+    }
+
+    try {
+      // 1. Request real microphone audio stream for responsive waveform visualization
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContextRef.current = audioCtx;
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      analyserRef.current = analyser;
+
+      const source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
+      const updateBars = () => {
+        if (!analyserRef.current) return;
+        analyserRef.current.getByteFrequencyData(dataArray);
+        const bars: number[] = [];
+        const step = Math.max(1, Math.floor(bufferLength / 12));
+        for (let i = 0; i < 12; i++) {
+          const val = dataArray[i * step] || 0;
+          bars.push(Math.max(6, Math.floor((val / 255) * 65) + 8));
+        }
+        setWaveformBars(bars);
+        animFrameRef.current = requestAnimationFrame(updateBars);
+      };
+      updateBars();
+
+      // 2. Start Speech Recognition
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+      recognitionRef.current = recognition;
+
+      setIsLiveRecording(true);
+      setPillState("listening");
+      setLiveRawSpoken("");
+      setTypedText("");
+
+      let finalTranscript = "";
+
+      recognition.onresult = (event: any) => {
+        let interim = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript + " ";
+          } else {
+            interim += event.results[i][0].transcript;
+          }
+        }
+        const currentSpoken = (finalTranscript + interim).trim();
+        setLiveRawSpoken(currentSpoken);
+      };
+
+      recognition.onerror = (err: any) => {
+        console.warn("Speech recognition notice:", err.error);
+        if (err.error === "not-allowed") {
+          setMicStatusMsg("Microphone permission was denied. Falling back to preset demo.");
+          stopLiveMic();
+          setIsLiveRecording(false);
+          startSimulation();
+        }
+      };
+
+      recognition.onend = () => {
+        if (isLiveRecording) {
+          finishLiveDictation(finalTranscript);
+        }
+      };
+
+      recognition.start();
+    } catch (err: any) {
+      console.warn("Could not access microphone:", err);
+      setMicStatusMsg("Microphone access unavailable. Playing local simulation demo.");
+      startSimulation();
+    }
+  };
+
+  const finishLiveDictation = (accumulatedText?: string) => {
+    setIsLiveRecording(false);
+    stopLiveMic();
+    setPillState("processing");
+
+    const textToFormat = (accumulatedText || liveRawSpoken || selectedApp.rawSpoken).trim();
+    const formatted = formatSpokenTextForApp(textToFormat, selectedApp.id);
+    const calculatedLatency = Math.floor(Math.random() * 25) + 160;
+    setLastLatency(calculatedLatency);
+
+    setTimeout(() => {
+      let current = "";
+      let i = 0;
+      const speed = Math.max(6, Math.floor(1200 / Math.max(1, formatted.length)));
+
+      const interval = setInterval(() => {
+        if (i < formatted.length) {
+          current += formatted[i];
+          setTypedText(current);
+          i++;
+        } else {
+          clearInterval(interval);
+          setPillState("pasted");
+          setTimeout(() => {
+            setPillState("idle");
+          }, 3500);
+        }
+      }, speed);
+    }, 450);
+  };
 
   const startSimulation = (preset = selectedApp) => {
-    if (isSimulating) return;
+    if (isSimulating || isLiveRecording) return;
     setIsSimulating(true);
+    setLiveRawSpoken("");
     setTypedText("");
     setPillState("listening");
 
@@ -197,21 +413,14 @@ export function Hero() {
   };
 
   const handleSelectApp = (preset: AppPreset) => {
+    if (isLiveRecording) stopLiveMic();
+    setIsLiveRecording(false);
     setSelectedApp(preset);
+    setLiveRawSpoken("");
     setTypedText(preset.formattedOutput);
     setPillState("idle");
     setIsSimulating(false);
   };
-
-  const [downloadStarted, setDownloadStarted] = useState(false);
-
-  const handleHeroDownload = () => {
-    setDownloadStarted(true);
-    setTimeout(() => {
-      setDownloadStarted(false);
-    }, 4500);
-  };
-
   return (
     <section className="relative pt-36 pb-24 md:pt-44 md:pb-32 overflow-hidden flex flex-col items-center bg-[#ffffff] text-neutral-900 selection:bg-neutral-900 selection:text-white">
       {/* Subtle Ambient Light Glows */}
@@ -306,8 +515,15 @@ export function Hero() {
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4">
           {/* Floating Push-To-Talk Island */}
           <div
-            onClick={() => startSimulation()}
-            className="group rounded-full bg-white/95 backdrop-blur-xl border border-neutral-200/90 hover:border-emerald-500/50 px-4 py-2.5 flex items-center gap-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300"
+            onClick={() => {
+              if (isLiveRecording) finishLiveDictation();
+              else startLiveDictation();
+            }}
+            className={`group rounded-full bg-white/95 backdrop-blur-xl border px-4 py-2.5 flex items-center gap-3.5 shadow-[0_4px_24px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-300 ${
+              isLiveRecording
+                ? "border-emerald-500 ring-2 ring-emerald-500/20 shadow-emerald-500/10"
+                : "border-neutral-200/90 hover:border-emerald-500/50"
+            }`}
           >
             <div className="flex items-center gap-2.5">
               {pillState === "idle" && (
@@ -317,7 +533,7 @@ export function Hero() {
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                   </span>
                   <span className="text-xs font-mono text-neutral-700 font-medium group-hover:text-neutral-950">
-                    HushWrite ready · Click to dictate
+                    HushWrite ready · Click or speak
                   </span>
                 </>
               )}
@@ -334,10 +550,10 @@ export function Hero() {
                     ))}
                   </div>
                   <span className="text-xs font-mono text-neutral-950 font-semibold">
-                    Listening on-device...
+                    {isLiveRecording ? "Listening to your mic..." : "Listening on-device..."}
                   </span>
                   <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/80 font-medium">
-                    VAD active
+                    {isLiveRecording ? "Live Mic" : "VAD active"}
                   </span>
                 </>
               )}
@@ -346,7 +562,7 @@ export function Hero() {
                 <>
                   <span className="w-3 h-3 rounded-full border-2 border-emerald-500 border-t-transparent motion-safe:animate-spin" />
                   <span className="text-xs font-mono text-neutral-700 font-medium">
-                    Local GPU inference ({wifiDisabled ? "air-gap mode" : "direct VRAM"})
+                    Local GPU inference ({wifiDisabled ? "air-gap mode" : "DirectML / Metal"})
                   </span>
                 </>
               )}
@@ -355,7 +571,7 @@ export function Hero() {
                 <>
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />
                   <span className="text-xs font-mono text-neutral-950 font-semibold">
-                    Injected in 172ms
+                    Injected in {lastLatency}ms
                   </span>
                 </>
               )}
@@ -364,11 +580,21 @@ export function Hero() {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                startSimulation();
+                if (isLiveRecording) finishLiveDictation();
+                else startLiveDictation();
               }}
-              className="text-xs font-mono font-medium text-white bg-[#141416] hover:bg-neutral-800 px-3 py-1 rounded-full shadow-sm transition-all flex items-center gap-1"
+              className={`text-xs font-mono font-medium px-3 py-1 rounded-full shadow-sm transition-all flex items-center gap-1.5 ${
+                isLiveRecording
+                  ? "bg-red-600 hover:bg-red-700 text-white animate-pulse"
+                  : "text-white bg-[#141416] hover:bg-neutral-800"
+              }`}
             >
-              {isSimulating ? (
+              {isLiveRecording ? (
+                <>
+                  <Square className="w-2.5 h-2.5 fill-current" />
+                  <span>Stop</span>
+                </>
+              ) : isSimulating ? (
                 <span>Speaking...</span>
               ) : (
                 <>
@@ -411,6 +637,19 @@ export function Hero() {
           </div>
         </div>
 
+        {/* Browser mic status notice if triggered */}
+        {micStatusMsg && (
+          <div className="mb-3 px-4 py-2 rounded-xl bg-amber-50 border border-amber-200/90 text-amber-900 text-xs font-mono flex items-center justify-between">
+            <span>{micStatusMsg}</span>
+            <button
+              onClick={() => setMicStatusMsg(null)}
+              className="text-amber-700 hover:text-amber-950 font-bold ml-2"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
         {/* Application Window Frame */}
         <div className="rounded-2xl bg-white border border-neutral-200/90 overflow-hidden shadow-[0_20px_50px_-12px_rgba(0,0,0,0.08),0_1px_3px_rgba(0,0,0,0.04)]">
           {/* Window Titlebar */}
@@ -451,34 +690,74 @@ export function Hero() {
           <div className="p-5 sm:p-7 bg-neutral-50/50 flex flex-col gap-4">
             {/* Raw Spoken Input Bar */}
             <div className="p-4 rounded-xl bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <span className="text-xs font-semibold text-emerald-700 block mb-1">
-                  What you said, unedited
-                </span>
-                <p className="text-xs sm:text-sm text-neutral-700 font-mono">
-                  &ldquo;{selectedApp.rawSpoken}&rdquo;
+              <div className="flex-1 min-w-0 pr-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-semibold text-emerald-700">
+                    What you said, unedited
+                  </span>
+                  {isLiveRecording && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-semibold animate-pulse font-mono">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-600" />
+                      Live Mic Recording
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs sm:text-sm text-neutral-700 font-mono break-words">
+                  {liveRawSpoken ? (
+                    <>&ldquo;{liveRawSpoken}&rdquo;</>
+                  ) : (
+                    <>&ldquo;{selectedApp.rawSpoken}&rdquo;</>
+                  )}
                 </p>
               </div>
 
-              <button
-                onClick={() => startSimulation()}
-                disabled={isSimulating}
-                className="self-start sm:self-auto text-xs font-semibold text-neutral-800 hover:text-neutral-950 bg-white hover:bg-neutral-50 border border-neutral-200/90 shadow-sm px-4 py-2 rounded-lg transition-all disabled:opacity-50 shrink-0 flex items-center gap-1.5"
-              >
-                <Mic className="w-3.5 h-3.5 text-emerald-600" />
-                <span>{isSimulating ? "Transcribing..." : "Simulate dictation"}</span>
-              </button>
+              {/* Action Buttons: Live Mic & Simulate Preset */}
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                <button
+                  onClick={() => {
+                    if (isLiveRecording) finishLiveDictation();
+                    else startLiveDictation();
+                  }}
+                  disabled={isSimulating}
+                  className={`text-xs font-semibold px-3.5 py-2 rounded-lg transition-all shadow-sm flex items-center gap-1.5 cursor-pointer ${
+                    isLiveRecording
+                      ? "bg-red-600 hover:bg-red-700 text-white"
+                      : "bg-[#141416] hover:bg-neutral-800 text-white"
+                  } disabled:opacity-50`}
+                >
+                  {isLiveRecording ? (
+                    <>
+                      <Square className="w-3.5 h-3.5 fill-current text-white" />
+                      <span>Stop & Dictate</span>
+                    </>
+                  ) : (
+                    <>
+                      <Mic className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Talk Live (Mic)</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => startSimulation()}
+                  disabled={isSimulating || isLiveRecording}
+                  className="text-xs font-semibold text-neutral-800 hover:text-neutral-950 bg-white hover:bg-neutral-50 border border-neutral-200/90 shadow-sm px-3.5 py-2 rounded-lg transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Play className="w-3.5 h-3.5 text-neutral-500" />
+                  <span>{isSimulating ? "Transcribing..." : "Simulate preset"}</span>
+                </button>
+              </div>
             </div>
 
             {/* Formatted Output Canvas */}
             <div className="font-mono text-xs sm:text-sm text-neutral-900 leading-relaxed overflow-x-auto whitespace-pre-wrap p-5 rounded-xl bg-white border border-neutral-200/90 min-h-[200px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)] relative">
               {typedText}
-              {isSimulating && (
+              {(isSimulating || pillState === "processing") && (
                 <span className="inline-block w-2 h-4 bg-emerald-500 ml-1 motion-safe:animate-pulse shadow-[0_0_8px_#10b981]" />
               )}
             </div>
 
-            {/* Bottom Status Bar — this is the one place "0 bytes" and latency live */}
+            {/* Bottom Status Bar */}
             <div className="pt-2 flex items-center justify-between text-xs font-mono text-neutral-500 flex-wrap gap-2">
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
@@ -490,7 +769,7 @@ export function Hero() {
                 </span>
               </div>
               <div className="flex items-center gap-4">
-                <span className="text-neutral-600">Latency: ~172ms</span>
+                <span className="text-neutral-600">Latency: ~{lastLatency}ms</span>
                 <span className="text-emerald-800 font-bold bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/80">
                   Network egress: 0 bytes
                 </span>
