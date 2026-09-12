@@ -123,7 +123,7 @@ impl VoiceTransformParser {
         candidates.push(vec!["hush".into(), "write".into()]);
 
         // Sort longest candidate sequences first
-        candidates.sort_by(|a, b| b.len().cmp(&a.len()));
+        candidates.sort_by_key(|a| std::cmp::Reverse(a.len()));
         candidates.dedup();
         candidates
     }
@@ -139,8 +139,8 @@ impl VoiceTransformParser {
             if tokens.len() >= cand.len() {
                 let matches = cand.iter().enumerate().all(|(i, word)| tokens[i].norm == *word);
                 if matches {
-                    let last_token_idx = cand.len() - 1;
-                    return Some(tokens[last_token_idx].end);
+                    let last_idx = cand.len() - 1;
+                    return Some(tokens[last_idx].end);
                 }
             }
         }
@@ -265,7 +265,7 @@ impl VoiceTransformParser {
             if lower.starts_with(trans_prefix) {
                 let after = &text[trans_prefix.len()..];
                 let parts: Vec<&str> = after
-                    .splitn(2, |c: char| c == ':' || c == ',' || c == '.' || c == ' ')
+                    .splitn(2, [':', ',', '.', ' '])
                     .collect();
                 if parts.len() == 2 {
                     let lang = parts[0].trim().trim_matches([':', ',', '.']);

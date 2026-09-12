@@ -119,9 +119,8 @@ impl LlmTextEnhancer {
                 // If custom system prompt specifies email or if dictation starts with a clear greeting in transform mode
                 if context.custom_system_prompt.to_lowercase().contains("email")
                     || context.custom_system_prompt.to_lowercase().contains("mail")
+                    || (context.voice_transforms_enabled && Self::is_email_like(&intermediate))
                 {
-                    Self::format_email_draft(&intermediate)
-                } else if context.voice_transforms_enabled && Self::is_email_like(&intermediate) {
                     Self::format_email_draft(&intermediate)
                 } else {
                     intermediate
@@ -173,13 +172,7 @@ impl LlmTextEnhancer {
             if lower.starts_with(prefix) {
                 let words: Vec<&str> = trimmed.split_whitespace().collect();
                 if words.len() >= 2 {
-                    let greeting_candidate = if words.len() >= 3 && prefix.starts_with("good ") {
-                        format!("{} {}", words[0], words[1])
-                    } else if words.len() >= 3 && words[1].ends_with(',') {
-                        format!("{} {}", words[0], words[1])
-                    } else {
-                        format!("{} {}", words[0], words[1])
-                    };
+                    let greeting_candidate = format!("{} {}", words[0], words[1]);
 
                     let clean_greeting = greeting_candidate.trim_end_matches([',', '.']);
                     let cap_greeting = clean_greeting

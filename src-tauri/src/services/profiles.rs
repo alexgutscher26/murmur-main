@@ -87,26 +87,24 @@ pub fn get_profile(db: &Database, bundle_id: &str) -> AppResult<Option<AppProfil
         let rows = stmt.query_map([], row_to_profile)?;
 
         let mut matched: Option<AppProfile> = None;
-        for row in rows {
-            if let Ok(profile) = row {
-                let prof_lower = profile.bundle_id.to_lowercase();
-                let prof_without_exe = prof_lower.strip_suffix(".exe").unwrap_or(&prof_lower);
+        for profile in rows.flatten() {
+            let prof_lower = profile.bundle_id.to_lowercase();
+            let prof_without_exe = prof_lower.strip_suffix(".exe").unwrap_or(&prof_lower);
 
-                // 1. Exact match
-                if profile.bundle_id == raw || prof_lower == lower || prof_without_exe == without_exe {
-                    return Ok(Some(profile));
-                }
+            // 1. Exact match
+            if profile.bundle_id == raw || prof_lower == lower || prof_without_exe == without_exe {
+                return Ok(Some(profile));
+            }
 
-                // 2. Alias match (e.g. Code.exe matching com.microsoft.VSCode or VSCode)
-                if (alias_key == "vscode" && (prof_lower.contains("vscode") || prof_lower.contains("code")))
-                    || (alias_key == "slack" && prof_lower.contains("slack"))
-                    || (alias_key == "notion" && prof_lower.contains("notion"))
-                    || (alias_key == "chrome" && prof_lower.contains("chrome"))
-                    || (alias_key == "discord" && prof_lower.contains("discord"))
-                    || (alias_key == "terminal" && prof_lower.contains("terminal"))
-                {
-                    matched = Some(profile);
-                }
+            // 2. Alias match (e.g. Code.exe matching com.microsoft.VSCode or VSCode)
+            if (alias_key == "vscode" && (prof_lower.contains("vscode") || prof_lower.contains("code")))
+                || (alias_key == "slack" && prof_lower.contains("slack"))
+                || (alias_key == "notion" && prof_lower.contains("notion"))
+                || (alias_key == "chrome" && prof_lower.contains("chrome"))
+                || (alias_key == "discord" && prof_lower.contains("discord"))
+                || (alias_key == "terminal" && prof_lower.contains("terminal"))
+            {
+                matched = Some(profile);
             }
         }
         Ok(matched)
