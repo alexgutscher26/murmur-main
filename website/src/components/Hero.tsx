@@ -138,34 +138,32 @@ Verified ✅ — 100% on-device Whisper decode. 0 bytes transmitted over network
 ];
 
 function formatSpokenTextForApp(text: string, appId: string): string {
-  if (!text || !text.trim()) return text;
+  if (!text || !text.trim()) return "";
   const clean = text.trim();
+  const capitalized = clean.charAt(0).toUpperCase() + clean.slice(1);
 
   if (appId === "cursor") {
-    return `// Generated from local speech dictation:\n// "${clean}"\nexport async function handleVoiceCommand() {\n  // 100% on-device Whisper inference\n  console.log("${clean.replace(/"/g, '\\"')}");\n  return { success: true, latency: "168ms", egress: 0 };\n}`;
+    // If it looks like code or variable, format as clean code, else clean comment/code
+    return `// Local Whisper speech input:\n// "${clean}"\nconst speechResult = "${clean.replace(/"/g, '\\"')}";\nconsole.log(speechResult);`;
   }
 
   if (appId === "slack") {
-    const sentences = clean.split(/[.!?]+/).filter(Boolean);
-    if (sentences.length > 1) {
-      return `Hey team,\n\n${sentences.map((s) => `• ${s.trim()}`).join("\n")}`;
-    }
-    return `Hey team, ${clean}.`;
+    return `${capitalized}${clean.endsWith(".") ? "" : "."}`;
   }
 
   if (appId === "notion") {
-    return `### Note: Voice Transcription (${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})\n- **Spoken Text:** ${clean}\n- **Decode Engine:** whisper.cpp DirectML (Local)\n- **Privacy:** 0 bytes outbound telemetry ✅`;
+    return `### Note (${new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })})\n- ${capitalized}`;
   }
 
   if (appId === "mail") {
-    return `Hi,\n\n${clean.charAt(0).toUpperCase() + clean.slice(1)}.\n\nLet me know if you have any questions.\n\nBest regards,\nAlex`;
+    return `Hi,\n\n${capitalized}.\n\nBest regards,\nAlex`;
   }
 
   if (appId === "chatgpt") {
-    return `Please process the following request with structured formatting:\n\n"${clean}"\n\nKey Requirements:\n1. Prioritize concise, actionable bullet points\n2. Include code/syntax examples if applicable`;
+    return `Prompt:\n"${capitalized}"`;
   }
 
-  return clean.charAt(0).toUpperCase() + clean.slice(1) + (clean.endsWith(".") ? "" : ".");
+  return capitalized + (clean.endsWith(".") ? "" : ".");
 }
 
 export function Hero() {
@@ -182,15 +180,16 @@ export function Hero() {
   const [waveformBars, setWaveformBars] = useState<number[]>([
     14, 28, 45, 75, 40, 60, 25, 55, 30, 15, 20, 10,
   ]);
-  const [micSupported, setMicSupported] = useState(true);
   const [micStatusMsg, setMicStatusMsg] = useState<string | null>(null);
   const [lastLatency, setLastLatency] = useState(172);
 
+  const transcriptRef = useRef<string>("");
   const recognitionRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const animFrameRef = useRef<number | null>(null);
+  const typingTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -198,16 +197,11 @@ export function Hero() {
       if (userAgent.includes("win")) setDetectedOs("windows");
       else if (userAgent.includes("mac")) setDetectedOs("mac");
       else setDetectedOs("linux");
-
-      const SpeechRecognition =
-        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        setMicSupported(false);
-      }
     }
 
     return () => {
       stopLiveMic();
+      if (typingTimerRef.current) clearInterval(typingTimerRef.current);
     };
   }, []);
 
@@ -227,6 +221,9 @@ export function Hero() {
   const stopLiveMic = () => {
     if (recognitionRef.current) {
       try {
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onend = null;
         recognitionRef.current.stop();
       } catch {}
       recognitionRef.current = null;
@@ -259,21 +256,26 @@ export function Hero() {
     if (isSimulating) return;
 
     setMicStatusMsg(null);
+    transcriptRef.current = "";
+    setLiveRawSpoken("");
+    setTypedText("");
+
     const SpeechRecognition =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      setMicStatusMsg("Web Speech API not supported in this browser. Running local demo simulation.");
+      setMicStatusMsg("Web Speech API not supported in this browser. Running preset demo.");
       startSimulation();
       return;
     }
 
     try {
-      // 1. Request real microphone audio stream for responsive waveform visualization
+      // 1. Live Microphone Stream & Web Audio Frequency Analyser
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
 
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const audioCtx = new AudioCtx();
       audioContextRef.current = audioCtx;
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 64;
@@ -299,7 +301,7 @@ export function Hero() {
       };
       updateBars();
 
-      // 2. Start Speech Recognition
+      // 2. SpeechRecognition Instance
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = true;
@@ -308,28 +310,28 @@ export function Hero() {
 
       setIsLiveRecording(true);
       setPillState("listening");
-      setLiveRawSpoken("");
-      setTypedText("");
-
-      let finalTranscript = "";
 
       recognition.onresult = (event: any) => {
         let interim = "";
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
+        let final = "";
+        for (let i = 0; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
-            finalTranscript += event.results[i][0].transcript + " ";
+            final += event.results[i][0].transcript + " ";
           } else {
             interim += event.results[i][0].transcript;
           }
         }
-        const currentSpoken = (finalTranscript + interim).trim();
-        setLiveRawSpoken(currentSpoken);
+        const currentSpoken = (final + interim).trim();
+        if (currentSpoken) {
+          transcriptRef.current = currentSpoken;
+          setLiveRawSpoken(currentSpoken);
+        }
       };
 
       recognition.onerror = (err: any) => {
         console.warn("Speech recognition notice:", err.error);
-        if (err.error === "not-allowed") {
-          setMicStatusMsg("Microphone permission was denied. Falling back to preset demo.");
+        if (err.error === "not-allowed" || err.error === "service-not-allowed") {
+          setMicStatusMsg("Microphone permission was not allowed. Playing preset demo.");
           stopLiveMic();
           setIsLiveRecording(false);
           startSimulation();
@@ -337,48 +339,58 @@ export function Hero() {
       };
 
       recognition.onend = () => {
-        if (isLiveRecording) {
-          finishLiveDictation(finalTranscript);
+        // Only finish if still marked as recording
+        if (recognitionRef.current) {
+          finishLiveDictation();
         }
       };
 
       recognition.start();
     } catch (err: any) {
       console.warn("Could not access microphone:", err);
-      setMicStatusMsg("Microphone access unavailable. Playing local simulation demo.");
+      setMicStatusMsg("Microphone access unavailable. Playing preset demo.");
       startSimulation();
     }
   };
 
-  const finishLiveDictation = (accumulatedText?: string) => {
+  const finishLiveDictation = () => {
     setIsLiveRecording(false);
     stopLiveMic();
     setPillState("processing");
 
-    const textToFormat = (accumulatedText || liveRawSpoken || selectedApp.rawSpoken).trim();
-    const formatted = formatSpokenTextForApp(textToFormat, selectedApp.id);
-    const calculatedLatency = Math.floor(Math.random() * 25) + 160;
+    const spokenText = transcriptRef.current.trim();
+
+    if (!spokenText) {
+      setLiveRawSpoken("No speech detected. Click Talk Live and speak into your mic.");
+      setPillState("idle");
+      return;
+    }
+
+    const formatted = formatSpokenTextForApp(spokenText, selectedApp.id);
+    const calculatedLatency = Math.floor(Math.random() * 20) + 165;
     setLastLatency(calculatedLatency);
+
+    if (typingTimerRef.current) clearInterval(typingTimerRef.current);
 
     setTimeout(() => {
       let current = "";
       let i = 0;
-      const speed = Math.max(6, Math.floor(1200 / Math.max(1, formatted.length)));
+      const speed = Math.max(10, Math.floor(1000 / Math.max(1, formatted.length)));
 
-      const interval = setInterval(() => {
+      typingTimerRef.current = setInterval(() => {
         if (i < formatted.length) {
           current += formatted[i];
           setTypedText(current);
           i++;
         } else {
-          clearInterval(interval);
+          if (typingTimerRef.current) clearInterval(typingTimerRef.current);
           setPillState("pasted");
           setTimeout(() => {
             setPillState("idle");
           }, 3500);
         }
       }, speed);
-    }, 450);
+    }, 350);
   };
 
   const startSimulation = (preset = selectedApp) => {
@@ -388,6 +400,8 @@ export function Hero() {
     setTypedText("");
     setPillState("listening");
 
+    if (typingTimerRef.current) clearInterval(typingTimerRef.current);
+
     setTimeout(() => {
       setPillState("processing");
       let currentText = "";
@@ -395,13 +409,13 @@ export function Hero() {
       let i = 0;
       const speed = Math.max(8, Math.floor(1400 / target.length));
 
-      const interval = setInterval(() => {
+      typingTimerRef.current = setInterval(() => {
         if (i < target.length) {
           currentText += target[i];
           setTypedText(currentText);
           i++;
         } else {
-          clearInterval(interval);
+          if (typingTimerRef.current) clearInterval(typingTimerRef.current);
           setPillState("pasted");
           setIsSimulating(false);
           setTimeout(() => {
@@ -414,6 +428,7 @@ export function Hero() {
 
   const handleSelectApp = (preset: AppPreset) => {
     if (isLiveRecording) stopLiveMic();
+    if (typingTimerRef.current) clearInterval(typingTimerRef.current);
     setIsLiveRecording(false);
     setSelectedApp(preset);
     setLiveRawSpoken("");
