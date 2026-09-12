@@ -279,27 +279,6 @@ export function Hero() {
         </a>
       </div>
 
-      {/* Pixelated square-cell matrix grid matching screenshot */}
-      <div className="absolute inset-x-0 bottom-0 h-48 pointer-events-none opacity-45 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white_35%,white)]">
-        <svg className="w-full h-full text-neutral-300" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="pixel-matrix-grid" width="16" height="16" patternUnits="userSpaceOnUse">
-              <rect
-                x="2"
-                y="2"
-                width="10"
-                height="10"
-                rx="1.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#pixel-matrix-grid)" />
-        </svg>
-      </div>
-
       {/* Interactive Desktop Product Simulator */}
       <div className="w-full max-w-5xl px-4 relative z-10">
         {/* Simulator Controls & Wi-Fi Mode Toggle */}

@@ -211,6 +211,27 @@ export function Footer() {
         }
       `}</style>
 
+      {/* Pixelated square-cell matrix grid */}
+      <div className="absolute inset-0 pointer-events-none opacity-45 overflow-hidden [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,#000_60%,transparent_100%)]">
+        <svg className="w-full h-full text-neutral-300" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="footer-pixel-matrix-grid" width="16" height="16" patternUnits="userSpaceOnUse">
+              <rect
+                x="2"
+                y="2"
+                width="10"
+                height="10"
+                rx="1.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#footer-pixel-matrix-grid)" />
+        </svg>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-neutral-200/80">
           {/* Brand */}
