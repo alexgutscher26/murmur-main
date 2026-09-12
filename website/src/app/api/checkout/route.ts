@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
               description: pricing.discountApplied
                 ? `Includes special discount: ${pricing.discountApplied}`
                 : "HushWrite 100% on-device voice-to-text with Whisper Large v3 Turbo & Medium.",
+              tax_code: process.env.STRIPE_PRODUCT_TAX_CODE || "txcd_10103000",
             },
             unit_amount: pricing.amountCents,
             ...(isSubscription
