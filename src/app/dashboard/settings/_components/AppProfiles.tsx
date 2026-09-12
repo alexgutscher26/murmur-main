@@ -33,12 +33,14 @@ const FIELD_CLASS =
   "hairline h-8 min-w-0 rounded-input bg-sunken px-2 text-body text-text-primary text-stone-900 dark:text-white dark:bg-stone-800/80";
 
 const POPULAR_APP_PRESETS = [
-  { bundle_id: "com.microsoft.VSCode", name: "VS Code" },
-  { bundle_id: "com.tinyspeck.slackmacgap", name: "Slack" },
-  { bundle_id: "notion.id", name: "Notion" },
-  { bundle_id: "com.google.Chrome", name: "Chrome" },
-  { bundle_id: "com.apple.mail", name: "Apple Mail" },
-  { bundle_id: "com.apple.Terminal", name: "Terminal" },
+  { bundle_id: "Code.exe", name: "VS Code / Cursor" },
+  { bundle_id: "slack.exe", name: "Slack" },
+  { bundle_id: "Notion.exe", name: "Notion" },
+  { bundle_id: "chrome.exe", name: "Chrome" },
+  { bundle_id: "Discord.exe", name: "Discord" },
+  { bundle_id: "WindowsTerminal.exe", name: "Terminal" },
+  { bundle_id: "com.microsoft.VSCode", name: "VS Code (macOS)" },
+  { bundle_id: "com.tinyspeck.slackmacgap", name: "Slack (macOS)" },
 ];
 
 /** "com.apple.Terminal" → "Terminal". A starting point the user can edit. */

@@ -58,16 +58,58 @@ pub fn list_profiles(db: &Database) -> AppResult<Vec<AppProfile>> {
 
 /// None means this app has no profile — the common case, and not an error.
 pub fn get_profile(db: &Database, bundle_id: &str) -> AppResult<Option<AppProfile>> {
+    let raw = bundle_id.trim();
+    let lower = raw.to_lowercase();
+    let without_exe = lower.strip_suffix(".exe").unwrap_or(&lower);
+
+    // Common app aliases bridging Windows process names and macOS bundle identifiers
+    let alias_key = if lower.contains("code") || lower.contains("vscode") {
+        "vscode"
+    } else if lower.contains("slack") {
+        "slack"
+    } else if lower.contains("notion") {
+        "notion"
+    } else if lower.contains("chrome") {
+        "chrome"
+    } else if lower.contains("discord") {
+        "discord"
+    } else if lower.contains("terminal") || lower.contains("windowsterminal") {
+        "terminal"
+    } else {
+        without_exe
+    };
+
     db.with_connection(|conn| {
         let mut stmt = conn.prepare(
             "SELECT bundle_id, display_name, settings_json, enabled
-               FROM app_profiles WHERE bundle_id = ?1 AND enabled = 1",
+               FROM app_profiles WHERE enabled = 1",
         )?;
-        let mut rows = stmt.query(params![bundle_id])?;
-        match rows.next()? {
-            Some(row) => Ok(row_to_profile(row).ok()),
-            None => Ok(None),
+        let rows = stmt.query_map([], row_to_profile)?;
+
+        let mut matched: Option<AppProfile> = None;
+        for row in rows {
+            if let Ok(profile) = row {
+                let prof_lower = profile.bundle_id.to_lowercase();
+                let prof_without_exe = prof_lower.strip_suffix(".exe").unwrap_or(&prof_lower);
+
+                // 1. Exact match
+                if profile.bundle_id == raw || prof_lower == lower || prof_without_exe == without_exe {
+                    return Ok(Some(profile));
+                }
+
+                // 2. Alias match (e.g. Code.exe matching com.microsoft.VSCode or VSCode)
+                if (alias_key == "vscode" && (prof_lower.contains("vscode") || prof_lower.contains("code")))
+                    || (alias_key == "slack" && prof_lower.contains("slack"))
+                    || (alias_key == "notion" && prof_lower.contains("notion"))
+                    || (alias_key == "chrome" && prof_lower.contains("chrome"))
+                    || (alias_key == "discord" && prof_lower.contains("discord"))
+                    || (alias_key == "terminal" && prof_lower.contains("terminal"))
+                {
+                    matched = Some(profile);
+                }
+            }
         }
+        Ok(matched)
     })
 }
 

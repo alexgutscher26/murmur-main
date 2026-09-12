@@ -104,12 +104,188 @@ impl LlmTextEnhancer {
                 Self::apply_tone_adjustment(&intermediate, VoiceTransformIntent::BulletedList)
             }
             Some(VoiceTransformIntent::EmailDraft) => {
-                Self::apply_tone_adjustment(&intermediate, VoiceTransformIntent::EmailDraft)
+                Self::format_email_draft(&intermediate)
             }
-            _ => intermediate,
+            Some(VoiceTransformIntent::Custom { instruction }) => {
+                Self::apply_custom_instruction(&intermediate, &instruction)
+            }
+            _ => {
+                // If custom system prompt specifies email or if dictation starts with a clear greeting in transform mode
+                if context.custom_system_prompt.to_lowercase().contains("email")
+                    || context.custom_system_prompt.to_lowercase().contains("mail")
+                {
+                    Self::format_email_draft(&intermediate)
+                } else if context.voice_transforms_enabled && Self::is_email_like(&intermediate) {
+                    Self::format_email_draft(&intermediate)
+                } else {
+                    intermediate
+                }
+            }
         };
 
         Ok(final_text)
+    }
+
+    fn is_email_like(text: &str) -> bool {
+        let lower = text.trim().to_lowercase();
+        let greeting_starters = ["hey ", "hi ", "hello ", "dear ", "good morning ", "good afternoon "];
+        let has_greeting = greeting_starters.iter().any(|&g| lower.starts_with(g));
+        let has_signoff = lower.contains("thanks") || lower.contains("thank you") || lower.contains("regards") || lower.contains("let me know");
+        has_greeting && has_signoff
+    }
+
+    fn apply_custom_instruction(text: &str, instruction: &str) -> String {
+        let lower = instruction.to_lowercase();
+        if lower.contains("email") || lower.contains("mail") {
+            Self::format_email_draft(text)
+        } else if lower.contains("bullet") || lower.contains("list") {
+            Self::apply_tone_adjustment(text, VoiceTransformIntent::BulletedList)
+        } else if lower.contains("formal") {
+            Self::apply_tone_adjustment(text, VoiceTransformIntent::Formal)
+        } else if lower.contains("casual") {
+            Self::apply_tone_adjustment(text, VoiceTransformIntent::Casual)
+        } else if lower.contains("concise") || lower.contains("short") {
+            Self::apply_tone_adjustment(text, VoiceTransformIntent::Concise)
+        } else {
+            text.to_string()
+        }
+    }
+
+    fn format_email_draft(text: &str) -> String {
+        let trimmed = text.trim();
+        if trimmed.is_empty() {
+            return String::new();
+        }
+
+        let lower = trimmed.to_lowercase();
+        let greeting_prefixes = ["hey ", "hi ", "hello ", "dear ", "good morning ", "good afternoon "];
+        
+        let mut greeting = String::new();
+        let mut rest_of_text = trimmed;
+
+        for prefix in greeting_prefixes {
+            if lower.starts_with(prefix) {
+                let words: Vec<&str> = trimmed.split_whitespace().collect();
+                if words.len() >= 2 {
+                    let greeting_candidate = if words.len() >= 3 && prefix.starts_with("good ") {
+                        format!("{} {}", words[0], words[1])
+                    } else if words.len() >= 3 && words[1].ends_with(',') {
+                        format!("{} {}", words[0], words[1])
+                    } else {
+                        format!("{} {}", words[0], words[1])
+                    };
+
+                    let clean_greeting = greeting_candidate.trim_end_matches([',', '.']);
+                    let cap_greeting = clean_greeting
+                        .split_whitespace()
+                        .map(|w| {
+                            let mut c = w.chars();
+                            match c.next() {
+                                None => String::new(),
+                                Some(f) => f.to_uppercase().collect::<String>() + c.as_str(),
+                            }
+                        })
+                        .collect::<Vec<_>>()
+                        .join(" ");
+
+                    greeting = format!("{cap_greeting},");
+                    let char_count = greeting_candidate.len();
+                    if trimmed.len() >= char_count {
+                        rest_of_text = trimmed[char_count..].trim_start_matches([',', ' ']);
+                    }
+                }
+                break;
+            }
+        }
+
+        // Detect sign-off phrases
+        let lower_rest = rest_of_text.to_lowercase();
+        let sign_off_triggers = [
+            "thanks for your help",
+            "thanks and let me know",
+            "thank you so much",
+            "thank you",
+            "thanks",
+            "best regards",
+            "warm regards",
+            "best,",
+            "cheers",
+            "talk soon",
+        ];
+
+        let mut sign_off = String::new();
+        let mut body = rest_of_text.to_string();
+
+        for trigger in sign_off_triggers {
+            if let Some(pos) = lower_rest.rfind(trigger) {
+                if pos > 0 && (lower_rest.as_bytes()[pos - 1] == b' ' || lower_rest.as_bytes()[pos - 1] == b'.' || lower_rest.as_bytes()[pos - 1] == b',') {
+                    let before = rest_of_text[..pos].trim().trim_end_matches([',', '.']);
+                    let after = rest_of_text[pos..].trim();
+                    body = before.to_string();
+                    
+                    let mut cap_after = after.to_string();
+                    if let Some(first_char) = cap_after.chars().next() {
+                        cap_after = first_char.to_uppercase().to_string() + &cap_after[first_char.len_utf8()..];
+                    }
+                    if !cap_after.ends_with('!') && !cap_after.ends_with('.') && !cap_after.ends_with(',') {
+                        cap_after.push('!');
+                    }
+                    sign_off = cap_after;
+                    break;
+                }
+            }
+        }
+
+        // Structure body paragraphs on common transitional phrases
+        let transition_phrases = [
+            (" let me know ", ".\n\nLet me know "),
+            (" please let me know ", ".\n\nPlease let me know "),
+            (" whenever you have a moment ", ".\n\nWhenever you have a moment "),
+            (" could you please ", ".\n\nCould you please "),
+            (" on another note ", ".\n\nOn another note, "),
+            (" as an update ", ".\n\nAs an update, "),
+        ];
+
+        let mut formatted_body = body;
+        for (from, to) in transition_phrases {
+            let lower_b = formatted_body.to_lowercase();
+            if let Some(pos) = lower_b.find(from) {
+                let (first, second) = formatted_body.split_at(pos);
+                let first_clean = first.trim_end_matches(['.', ',', ' ']);
+                let second_clean = &second[from.len()..];
+                let second_cap = if let Some(fc) = second_clean.chars().next() {
+                    fc.to_uppercase().to_string() + &second_clean[fc.len_utf8()..]
+                } else {
+                    second_clean.to_string()
+                };
+                let replacement_clause = to.trim_start_matches('.');
+                formatted_body = format!("{first_clean}.{replacement_clause}{second_cap}");
+            }
+        }
+
+        // Capitalize sentence start
+        if let Some(fc) = formatted_body.chars().next() {
+            if fc.is_alphabetic() && !fc.is_uppercase() {
+                formatted_body = fc.to_uppercase().to_string() + &formatted_body[fc.len_utf8()..];
+            }
+        }
+        if !formatted_body.is_empty() && !formatted_body.ends_with('.') && !formatted_body.ends_with('?') && !formatted_body.ends_with('!') {
+            formatted_body.push('.');
+        }
+
+        // Assemble final email
+        let mut final_email = String::new();
+        if !greeting.is_empty() {
+            final_email.push_str(&greeting);
+            final_email.push_str("\n\n");
+        }
+        final_email.push_str(&formatted_body);
+        if !sign_off.is_empty() {
+            final_email.push_str("\n\n");
+            final_email.push_str(&sign_off);
+        }
+
+        final_email
     }
 
     fn apply_tone_adjustment(text: &str, intent: VoiceTransformIntent) -> String {
@@ -148,7 +324,6 @@ impl LlmTextEnhancer {
                 out
             }
             VoiceTransformIntent::Concise => {
-                // Eliminate common filler and wordy idioms
                 let wordy_phrases = [
                     ("in order to ", "to "),
                     ("at this point in time", "now"),
@@ -180,9 +355,7 @@ impl LlmTextEnhancer {
                     format!("- {text}")
                 }
             }
-            VoiceTransformIntent::EmailDraft => {
-                format!("Subject: Update\n\nHi team,\n\n{text}\n\nBest regards,")
-            }
+            VoiceTransformIntent::EmailDraft => Self::format_email_draft(text),
             _ => text.to_string(),
         }
     }
