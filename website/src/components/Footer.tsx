@@ -243,7 +243,7 @@ export function Footer() {
               <div className="flex items-center gap-2">
                 <span className="font-bold text-base text-neutral-950 tracking-tight">HushWrite</span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 font-mono font-medium">
-                  v1.0.0
+                  v1.0.1
                 </span>
               </div>
             </div>
