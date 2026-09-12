@@ -1,11 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Mark } from "@/components/Mark";
+import { transformCreatorText, CreatorTransformResult } from "@/lib/creatorTransform";
 import {
   Mic,
   Brain,
@@ -18,6 +19,7 @@ import {
   Download,
   ArrowRight,
   Share2,
+  Sparkles,
 } from "lucide-react";
 
 const CREATOR_DEMOS = [
@@ -25,20 +27,6 @@ const CREATOR_DEMOS = [
     id: "youtube-script",
     title: "YouTube Video Script",
     spoken: "youtube script template title why offline ai is the future of productivity",
-    output: `### 🎬 YouTube Video Script
-**Title Idea:** why offline ai is the future of productivity
-**Hook (0:00 - 0:30):**
-
-**Intro & Value Proposition:**
-
-**Main Points:**
-1. 
-2. 
-3. 
-
-**Sponsor / Mid-roll CTA:**
-
-**Conclusion & Next Video CTA:**`,
     target: "Google Docs / Notion / Word",
     badge: "Scriptwriting",
   },
@@ -46,12 +34,6 @@ const CREATOR_DEMOS = [
     id: "viral-hook",
     title: "3-Part Content Hook",
     spoken: "content hook template on how creators burn out from typing everything",
-    output: `### 🪝 Content Hook Framework
-**1. Curiosity Gap / Pattern Interrupt:**
-
-**2. Stakes & Problem Statement:**
-
-**3. Promise & Payoff:**`,
     target: "TikTok / Reels / Shorts",
     badge: "Hook Framework",
   },
@@ -59,20 +41,6 @@ const CREATOR_DEMOS = [
     id: "substack-draft",
     title: "Substack Newsletter",
     spoken: "substack draft on leaving cloud subscriptions for local tools",
-    output: `### 💌 Newsletter Draft
-**Subject Line Options:**
-1. 
-2. 
-
-**Preview Text:**
-
-**Core Essay:**
-
-**Key Takeaways:**
-- 
-
-**Recommended Links:**
-- `,
     target: "Substack / Beehiiv / Medium",
     badge: "Long-form",
   },
@@ -80,16 +48,6 @@ const CREATOR_DEMOS = [
     id: "social-caption",
     title: "Social Caption & Hashtags",
     spoken: "instagram caption template for today's desk setup video",
-    output: `### 📱 Social Caption
-**Hook Line:**
-
-**Body / Story:**
-
-**Call to Action:**
-👉 
-
-**Hashtags:**
-# `,
     target: "Instagram / X / Threads",
     badge: "Social Media",
   },
@@ -97,39 +55,13 @@ const CREATOR_DEMOS = [
     id: "podcast-notes",
     title: "Podcast Episode Outline",
     spoken: "podcast show notes episode 84 with guest alex on local intelligence",
-    output: `### 🎙️ Podcast Episode Outline
-**Episode Title:** 
-**Guest:** alex
-**Core Theme:** local intelligence
-
-**Discussion Questions:**
-- 
-- 
-- 
-
-**Key Timestamps:**
-- 00:00 Intro
-- 
-
-**Links Mentioned:**
-- `,
-    target: "Descript / Spotify / Apple",
+    target: "Descript / Spotify / Apple Podcasts",
     badge: "Podcasting",
   },
   {
     id: "sponsor-read",
     title: "60s Sponsor Read",
     spoken: "sponsor read template for audio hardware partner",
-    output: `### 📢 Sponsor Read (60s)
-**Organic Transition:**
-
-**Product Problem & Solution:**
-
-**Personal Experience:**
-
-**Offer & Discount Code:**
-
-**Call to Action URL:**`,
     target: "Sponsorships & Ads",
     badge: "Monetization",
   },
@@ -137,21 +69,6 @@ const CREATOR_DEMOS = [
     id: "linkedin-post",
     title: "LinkedIn Thought Leadership",
     spoken: "linkedin post template on why we stopped streaming microphone audio to cloud servers",
-    output: `### 💼 LinkedIn Post
-**Hook:** Why we stopped streaming microphone audio to cloud servers
-
-**The Problem / Insight:**
-Cloud voice AI tools require your data to leave your machine. When engineers and founders dictate proprietary codebase secrets, auth tokens, or unreleased strategy into remote cloud endpoints, privacy evaporates.
-
-**Key Lessons / Framework:**
-• Local inference with DirectML and Metal runs at sub-150ms latency
-• Zero outbound bytes means zero compliance or NDA headaches
-• Open-weights Whisper models match cloud accuracy on modern laptops
-
-**Takeaway & Question:**
-👉 Have you audited which third-party cloud servers receive your voice recordings during dictation?
-
-#Tech #Productivity #Engineering #OpenSource #Privacy`,
     target: "LinkedIn Web / Taplio / Buffer",
     badge: "Thought Leadership",
   },
@@ -159,27 +76,6 @@ Cloud voice AI tools require your data to leave your machine. When engineers and
     id: "x-thread",
     title: "X (Twitter) Thread",
     spoken: "x thread template breakdown of our directml whisper speech benchmarks",
-    output: `### 🧵 X (Twitter) Thread
-**1/ 🧵 [Hook & Big Promise]:**
-We benchmarked local whisper.cpp against cloud speech APIs on Windows 11.
-The results shocked us: on-device was 3.2x faster with 0 bytes sent.
-Here is the full technical breakdown: 👇
-
-**2/ [The Context & Pain]:**
-Cloud dictation incurs WebSocket handshake delay + server queuing + roundtrip network overhead (~450ms tail latency).
-
-**3/ [The Solution / Core Breakthrough]:**
-By compiling Whisper with DirectML and FP16 weights, the GPU executes inference right in VRAM in <120ms.
-
-**4/ [Detailed Breakdown]:**
-• Realtime factor: 0.08x on mid-range laptops
-• Memory consumption: <380 MB RAM
-• Network egress: Absolute 0.00 KB verified by Wireshark
-
-**5/ [Conclusion & Bookmark CTA]:**
-If you build software or write online:
-1. Follow @alexgutscher for local AI architectures
-2. Repost the first post to share with other builders 🔄`,
     target: "X.com / Typefully / Hypefury",
     badge: "Virality Threads",
   },
@@ -263,10 +159,204 @@ const CREATOR_COMPARISONS = [
 
 export default function CreatorsPage() {
   const [selectedDemo, setSelectedDemo] = useState(CREATOR_DEMOS[0]);
+  const [currentSpoken, setCurrentSpoken] = useState(CREATOR_DEMOS[0].spoken);
+  const [transformResult, setTransformResult] = useState<CreatorTransformResult>(() =>
+    transformCreatorText(CREATOR_DEMOS[0].spoken)
+  );
+  const [displayedOutput, setDisplayedOutput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isLiveMic, setIsLiveMic] = useState(false);
+  const [audioLevels, setAudioLevels] = useState<number[]>([10, 14, 18, 22, 18, 14, 10, 14]);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const isRecordingRef = useRef<boolean>(false);
+
+  const stopLiveMic = useCallback(() => {
+    isRecordingRef.current = false;
+    setIsLiveMic(false);
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.stop();
+      } catch {
+        // ignore
+      }
+      recognitionRef.current = null;
+    }
+
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+      mediaStreamRef.current = null;
+    }
+
+    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+
+    setAudioLevels([10, 14, 18, 22, 18, 14, 10, 14]);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopLiveMic();
+    };
+  }, [stopLiveMic]);
+
+  // Animate typed output when preset or text updates
+  const animateOutput = useCallback((targetText: string) => {
+    setIsTyping(true);
+    setDisplayedOutput("");
+    let i = 0;
+    const speed = Math.max(6, Math.floor(600 / Math.max(targetText.length, 1)));
+    const interval = setInterval(() => {
+      if (i < targetText.length) {
+        setDisplayedOutput(targetText.slice(0, i + 1));
+        i += 2;
+      } else {
+        clearInterval(interval);
+        setDisplayedOutput(targetText);
+        setIsTyping(false);
+      }
+    }, speed);
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    const res = transformCreatorText(CREATOR_DEMOS[0].spoken);
+    setTransformResult(res);
+    setDisplayedOutput(res.transformed);
+  }, []);
+
+  const handleSelectPreset = (preset: (typeof CREATOR_DEMOS)[0]) => {
+    stopLiveMic();
+    setSelectedDemo(preset);
+    setCurrentSpoken(preset.spoken);
+    const result = transformCreatorText(preset.spoken);
+    setTransformResult(result);
+    animateOutput(result.transformed);
+  };
+
+  const handleInputChange = (text: string) => {
+    setCurrentSpoken(text);
+    const result = transformCreatorText(text);
+    setTransformResult(result);
+    setDisplayedOutput(result.transformed);
+  };
+
+  const startLiveMic = async () => {
+    stopLiveMic();
+    isRecordingRef.current = true;
+    setIsLiveMic(true);
+
+    // Audio Visualizer
+    if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStreamRef.current = stream;
+
+        // @ts-expect-error WebkitAudioContext
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioCtx();
+        audioContextRef.current = audioCtx;
+
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        const updateBars = () => {
+          if (!isRecordingRef.current) return;
+          analyser.getByteFrequencyData(dataArray);
+          const levels: number[] = [];
+          for (let b = 0; b < 8; b++) {
+            const raw = dataArray[b] || 0;
+            levels.push(Math.max(8, Math.min(50, Math.floor((raw / 255) * 45) + 8)));
+          }
+          setAudioLevels(levels);
+          animationFrameRef.current = requestAnimationFrame(updateBars);
+        };
+        animationFrameRef.current = requestAnimationFrame(updateBars);
+      } catch (err) {
+        console.warn("Web Audio mic stream error:", err);
+      }
+    }
+
+    // Web Speech Recognition
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognition = typeof window !== "undefined" ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
+
+    if (SpeechRecognition) {
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = typeof navigator !== "undefined" ? navigator.language || "en-US" : "en-US";
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+          if (isRecordingRef.current) setIsLiveMic(true);
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onresult = (event: any) => {
+          let fullFinal = "";
+          let interim = "";
+          for (let i = 0; i < event.results.length; ++i) {
+            const chunk = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              fullFinal += chunk + " ";
+            } else {
+              interim += chunk;
+            }
+          }
+          const spoken = (fullFinal + interim).trim();
+          if (spoken) {
+            handleInputChange(spoken);
+          }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onerror = (event: any) => {
+          if (event.error === "no-speech") return;
+          console.warn("Speech recognition error:", event.error);
+        };
+
+        recognition.onend = () => {
+          if (isRecordingRef.current && recognitionRef.current) {
+            try {
+              recognition.start();
+            } catch {
+              // ignore
+            }
+          }
+        };
+
+        recognitionRef.current = recognition;
+        recognition.start();
+      } catch (err) {
+        console.warn("Recognition start failed:", err);
+      }
+    }
+  };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(selectedDemo.output);
+    navigator.clipboard.writeText(transformResult.transformed);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -338,12 +428,11 @@ export default function CreatorsPage() {
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 flex items-center gap-2.5">
                 <span>Interactive Creator Voice Templates</span>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-semibold">
-                  Voice Macros
+                  Live Engine Active
                 </span>
               </h2>
               <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-                Click a creator workflow below to see spoken voice triggers expand into structured
-                content schemas.
+                Click presets or use your microphone to test real-time creator schemas and voice templates.
               </p>
             </div>
 
@@ -351,7 +440,7 @@ export default function CreatorsPage() {
               {CREATOR_DEMOS.map((demo) => (
                 <button
                   key={demo.id}
-                  onClick={() => setSelectedDemo(demo)}
+                  onClick={() => handleSelectPreset(demo)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     selectedDemo.id === demo.id
                       ? "bg-neutral-950 text-white font-semibold shadow-sm"
@@ -370,22 +459,63 @@ export default function CreatorsPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono text-neutral-500 uppercase tracking-wider flex items-center gap-1.5 font-medium">
-                    <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        isLiveMic ? "bg-rose-500 animate-ping" : "bg-rose-500"
+                      }`}
+                    />
                     What You Speak Out Loud
                   </span>
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-neutral-100 text-neutral-600 border border-neutral-200/60">
-                    Mic Input
-                  </span>
+
+                  {/* Interactive Live Microphone Button */}
+                  <button
+                    onClick={isLiveMic ? stopLiveMic : startLiveMic}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium transition-all cursor-pointer ${
+                      isLiveMic
+                        ? "bg-rose-50 text-rose-700 border border-rose-200 shadow-sm animate-pulse"
+                        : "bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/80"
+                    }`}
+                  >
+                    {isLiveMic ? (
+                      <>
+                        <div className="flex items-center gap-0.5 h-3">
+                          {audioLevels.map((lvl, idx) => (
+                            <span
+                              key={idx}
+                              className="w-0.5 bg-rose-500 rounded-full transition-all duration-75"
+                              style={{ height: `${Math.max(4, lvl / 3)}px` }}
+                            />
+                          ))}
+                        </div>
+                        <span>Listening... (Click to stop)</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-3.5 h-3.5 text-neutral-600" />
+                        <span>Test with Mic</span>
+                      </>
+                    )}
+                  </button>
                 </div>
-                <div className="bg-neutral-50/70 p-3.5 rounded-lg border border-neutral-100">
-                  <p className="text-sm sm:text-base text-neutral-900 font-mono leading-relaxed italic">
-                    "{selectedDemo.spoken}"
-                  </p>
+
+                {/* Editable / Interactive Voice Input Area */}
+                <div className="bg-neutral-50/70 p-3.5 rounded-lg border border-neutral-200/80 focus-within:border-emerald-500 focus-within:bg-white transition-all">
+                  <textarea
+                    value={currentSpoken}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    placeholder="Speak into microphone or type: 'youtube script template title my first video'..."
+                    rows={3}
+                    className="w-full bg-transparent font-mono text-xs sm:text-sm text-neutral-900 resize-none focus:outline-none leading-relaxed"
+                  />
+                  <div className="flex items-center justify-between pt-1 border-t border-neutral-200/60 text-[11px] text-neutral-400 font-mono">
+                    <span>💡 Edit text or speak creator commands</span>
+                    <span>{currentSpoken.length} chars</span>
+                  </div>
                 </div>
               </div>
 
               <div className="text-xs text-neutral-500 font-mono pt-1">
-                Primary Apps: {selectedDemo.target}
+                Primary Apps: <strong className="text-neutral-700 font-semibold">{selectedDemo.target}</strong>
               </div>
             </div>
 
@@ -414,17 +544,31 @@ export default function CreatorsPage() {
                     )}
                   </button>
                 </div>
-                <pre className="text-xs sm:text-sm font-mono text-neutral-100 bg-[#0e0e11] p-3.5 rounded-xl border border-neutral-800 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto shadow-inner selection:bg-neutral-800 selection:text-white">
-                  {selectedDemo.output}
+                <pre className="text-xs sm:text-sm font-mono text-neutral-100 bg-[#0e0e11] p-3.5 rounded-xl border border-neutral-800 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto shadow-inner selection:bg-neutral-800 selection:text-white min-h-[140px]">
+                  {displayedOutput}
+                  {isTyping && (
+                    <span className="inline-block w-2 h-4 bg-emerald-500 ml-1 animate-pulse shadow-[0_0_8px_#10b981]" />
+                  )}
                 </pre>
               </div>
 
-              <div className="flex items-center justify-between text-xs font-mono text-neutral-600 pt-1">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 border border-neutral-200/60 font-medium">
-                  Type: {selectedDemo.badge}
-                </span>
+              <div className="flex items-center justify-between text-xs font-mono text-neutral-600 pt-1 flex-wrap gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 border border-neutral-200/60 font-medium text-[11px]">
+                    Type: {selectedDemo.badge}
+                  </span>
+                  {transformResult.matchedRules.map((rule, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-medium text-[11px]"
+                    >
+                      <Sparkles className="w-2.5 h-2.5 text-emerald-600" />
+                      {rule}
+                    </span>
+                  ))}
+                </div>
                 <span className="text-emerald-700 font-medium">
-                  Latency: &lt; 200ms DirectML/Metal
+                  Latency: ~{transformResult.latencyUs}µs rule eval · 100% on-device
                 </span>
               </div>
             </div>
