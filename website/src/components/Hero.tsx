@@ -205,18 +205,18 @@ export function Hero() {
     };
   }, []);
 
-  // Waveform animation during simulation fallback
+  // Waveform animation whenever listening
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (pillState === "listening" && !isLiveRecording) {
+    if (pillState === "listening") {
       interval = setInterval(() => {
-        setWaveformBars(Array.from({ length: 12 }, () => Math.floor(Math.random() * 60) + 15));
-      }, 80);
-    } else if (!isLiveRecording) {
+        setWaveformBars(Array.from({ length: 12 }, () => Math.floor(Math.random() * 50) + 16));
+      }, 75);
+    } else {
       setWaveformBars([12, 16, 20, 24, 20, 16, 12, 16, 20, 16, 12, 16]);
     }
     return () => clearInterval(interval);
-  }, [pillState, isLiveRecording]);
+  }, [pillState]);
 
   const stopLiveMic = () => {
     if (recognitionRef.current) {
@@ -683,24 +683,38 @@ export function Hero() {
             {/* Raw Spoken Input Bar */}
             <div className="p-4 rounded-xl bg-white border border-neutral-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.04)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex-1 min-w-0 pr-2">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1.5">
                   <span className="text-xs font-semibold text-emerald-700">
                     What you said, unedited
                   </span>
                   {isLiveRecording && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-semibold animate-pulse font-mono">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-600" />
-                      Live Mic Recording
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-700 text-[10px] font-semibold font-mono">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping" />
+                      Live Mic Active
                     </span>
                   )}
                 </div>
-                <p className="text-xs sm:text-sm text-neutral-700 font-mono break-words">
-                  {liveRawSpoken ? (
-                    <>&ldquo;{liveRawSpoken}&rdquo;</>
-                  ) : (
-                    <>&ldquo;{selectedApp.rawSpoken}&rdquo;</>
+
+                <div className="flex items-center gap-2.5">
+                  {isLiveRecording && (
+                    <div className="flex items-center gap-0.5 h-4 shrink-0">
+                      {waveformBars.slice(0, 8).map((bar, i) => (
+                        <span
+                          key={i}
+                          className="w-1 bg-emerald-500 rounded-full transition-all duration-75"
+                          style={{ height: `${Math.max(4, bar / 3.5)}px` }}
+                        />
+                      ))}
+                    </div>
                   )}
-                </p>
+                  <p className="text-xs sm:text-sm text-neutral-800 font-mono break-words">
+                    {liveRawSpoken ? (
+                      <>&ldquo;{liveRawSpoken}&rdquo;</>
+                    ) : (
+                      <>&ldquo;{selectedApp.rawSpoken}&rdquo;</>
+                    )}
+                  </p>
+                </div>
               </div>
 
               {/* Action Buttons: Live Mic & Simulate Preset */}
