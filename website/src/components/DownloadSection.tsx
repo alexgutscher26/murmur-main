@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Download,
-  Terminal,
   Check,
   Copy,
   Laptop,
@@ -27,7 +26,6 @@ import {
 
 export function DownloadSection() {
   const [detectedOs, setDetectedOs] = useState<"mac" | "windows" | "linux">("mac");
-  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [copiedChecksum, setCopiedChecksum] = useState<string | null>(null);
   const [showMacInstructions, setShowMacInstructions] = useState(false);
   const [showChecksumModal, setShowChecksumModal] = useState(false);
@@ -55,12 +53,6 @@ export function DownloadSection() {
     }
   }, []);
 
-  const copyCommand = (text: string, index: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2500);
-  };
-
   const copyChecksum = (hash: string, id: string) => {
     navigator.clipboard.writeText(hash);
     setCopiedChecksum(id);
@@ -87,25 +79,6 @@ export function DownloadSection() {
       file: "HushWrite_1.0.0_x64.dmg",
       platform: "macOS Intel 64-bit",
       sha256: "95d8c8e26b8e9fe8f5c2a6eb089cb1857d2053d70fe339c635391494016f60d5",
-    },
-  ];
-
-  const cliCommands = [
-    {
-      platform: "Windows Winget",
-      command: "winget install snackforcode.HushWrite",
-    },
-    {
-      platform: "Windows PowerShell",
-      command: "irm https://hushwrite.app/downloads/HushWrite-setup.exe -OutFile HushWrite-setup.exe; .\\HushWrite-setup.exe",
-    },
-    {
-      platform: "macOS Homebrew",
-      command: "brew install --cask hushwrite",
-    },
-    {
-      platform: "Source / GitHub Clone",
-      command: "git clone https://github.com/alexgutscher26/HushWrite.git",
     },
   ];
 
@@ -519,41 +492,6 @@ export function DownloadSection() {
                 <span><em>For a local-first dictation app, this transparency matters as much as the binary itself.</em></span>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Terminal Package Manager Quickstart */}
-        <div className="p-6 rounded-2xl bg-neutral-50 border border-neutral-200/80 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Terminal className="w-3.5 h-3.5 text-emerald-700" />
-            <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider font-mono">
-              Install via Command Line Package Managers
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {cliCommands.map((item, idx) => (
-              <div
-                key={idx}
-                className="p-3.5 rounded-xl bg-white border border-neutral-200/80 shadow-sm flex flex-col justify-between gap-2.5"
-              >
-                <span className="text-[11px] font-mono text-neutral-500">{item.platform}</span>
-                <div className="flex items-center justify-between gap-2 font-mono text-xs text-neutral-900 bg-neutral-100/80 p-2.5 rounded-lg border border-neutral-200/80">
-                  <span className="truncate">{item.command}</span>
-                  <button
-                    onClick={() => copyCommand(item.command, idx)}
-                    className="p-1.5 rounded-md bg-white hover:bg-neutral-50 text-neutral-700 border border-neutral-200/80 shadow-sm transition-all shrink-0"
-                    title="Copy to clipboard"
-                  >
-                    {copiedIndex === idx ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 

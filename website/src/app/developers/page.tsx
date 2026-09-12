@@ -1,12 +1,13 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Mark } from "@/components/Mark";
 import { GithubIcon } from "@/components/GithubIcon";
+import { transformDeveloperText, TransformResult } from "@/lib/developerTransform";
 import {
   Code,
   Terminal,
@@ -17,6 +18,10 @@ import {
   Check,
   FileCode2,
   Download,
+  Mic,
+  MicOff,
+  Sparkles,
+  Volume2,
 } from "lucide-react";
 
 const DEMO_PRESETS = [
@@ -25,44 +30,35 @@ const DEMO_PRESETS = [
     title: "AI IDE File Tagging",
     spoken:
       "look at tag file src slash components slash Button dot tsx and add a secondary variant prop",
-    output: "look at @src/components/Button.tsx and add a secondary variant prop",
-    target: "Cursor / Windsurf / Claude Code",
+    target: "Works in Any Code Editor (Cursor, Windsurf, Claude Code, VS Code, Zed, Neovim, Terminal)",
     badge: "Context Injection",
   },
   {
     id: "camel-case",
     title: "Code Casing Directive",
     spoken: "create a camel case user authentication service and connect it to database",
-    output: "create a userAuthenticationService and connect it to database",
-    target: "VS Code / Neovim / Zed",
+    target: "Works in Any Code Editor (VS Code, Cursor, Neovim, Zed, JetBrains, Terminal)",
     badge: "Syntax Smart",
   },
   {
     id: "pr-checklist",
     title: "Voice Snippet Macro",
     spoken: "please review pr checklist before merge",
-    output: `### ✅ PR Checklist
-- [ ] Code follows style conventions
-- [ ] Unit & integration tests pass
-- [ ] Documentation updated
-- [ ] No sensitive credentials or debug logs`,
-    target: "GitHub PR / Linear / GitLab",
+    target: "Works in Any App (GitHub PR, Linear, GitLab, Jira, Slack, Docs)",
     badge: "Voice Snippets",
   },
   {
     id: "code-block",
     title: "Code Block Scaffolding",
     spoken: "code block typescript const config equals defineConfig open brace close brace",
-    output: "```typescript\nconst config = defineConfig({})\n```",
-    target: "Documentation / Issues",
+    target: "Works in Any Code Editor & Documentation Tool",
     badge: "Markdown Mode",
   },
   {
     id: "tech-entities",
     title: "Developer Vocabulary",
     spoken: "deploying next js with tailwind css and drizzle orm to supabase via github actions",
-    output: "Deploying Next.js with Tailwind CSS and Drizzle ORM to Supabase via GitHub Actions.",
-    target: "All Developer Tools",
+    target: "Works Across All Developer Tools & Terminals",
     badge: "80+ Tech Entities",
   },
 ];
@@ -149,10 +145,204 @@ const COMPARISON_ROWS = [
 
 export default function DevelopersPage() {
   const [selectedDemo, setSelectedDemo] = useState(DEMO_PRESETS[0]);
+  const [currentSpoken, setCurrentSpoken] = useState(DEMO_PRESETS[0].spoken);
+  const [transformResult, setTransformResult] = useState<TransformResult>(() =>
+    transformDeveloperText(DEMO_PRESETS[0].spoken)
+  );
+  const [displayedOutput, setDisplayedOutput] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [isLiveMic, setIsLiveMic] = useState(false);
+  const [audioLevels, setAudioLevels] = useState<number[]>([10, 14, 18, 22, 18, 14, 10, 14]);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
+  const mediaStreamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const isRecordingRef = useRef<boolean>(false);
+
+  const stopLiveMic = useCallback(() => {
+    isRecordingRef.current = false;
+    setIsLiveMic(false);
+
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
+        recognitionRef.current.onresult = null;
+        recognitionRef.current.stop();
+      } catch {
+        // ignore
+      }
+      recognitionRef.current = null;
+    }
+
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach((t) => t.stop());
+      mediaStreamRef.current = null;
+    }
+
+    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+
+    setAudioLevels([10, 14, 18, 22, 18, 14, 10, 14]);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopLiveMic();
+    };
+  }, [stopLiveMic]);
+
+  // Animate typed output when preset or text updates
+  const animateOutput = useCallback((targetText: string) => {
+    setIsTyping(true);
+    setDisplayedOutput("");
+    let i = 0;
+    const speed = Math.max(6, Math.floor(600 / Math.max(targetText.length, 1)));
+    const interval = setInterval(() => {
+      if (i < targetText.length) {
+        setDisplayedOutput(targetText.slice(0, i + 1));
+        i += 2;
+      } else {
+        clearInterval(interval);
+        setDisplayedOutput(targetText);
+        setIsTyping(false);
+      }
+    }, speed);
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    const res = transformDeveloperText(DEMO_PRESETS[0].spoken);
+    setTransformResult(res);
+    setDisplayedOutput(res.transformed);
+  }, []);
+
+  const handleSelectPreset = (preset: (typeof DEMO_PRESETS)[0]) => {
+    stopLiveMic();
+    setSelectedDemo(preset);
+    setCurrentSpoken(preset.spoken);
+    const result = transformDeveloperText(preset.spoken);
+    setTransformResult(result);
+    animateOutput(result.transformed);
+  };
+
+  const handleInputChange = (text: string) => {
+    setCurrentSpoken(text);
+    const result = transformDeveloperText(text);
+    setTransformResult(result);
+    setDisplayedOutput(result.transformed);
+  };
+
+  const startLiveMic = async () => {
+    stopLiveMic();
+    isRecordingRef.current = true;
+    setIsLiveMic(true);
+
+    // Audio Visualizer
+    if (typeof navigator !== "undefined" && navigator.mediaDevices?.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaStreamRef.current = stream;
+
+        // @ts-expect-error WebkitAudioContext
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioCtx();
+        audioContextRef.current = audioCtx;
+
+        const source = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        source.connect(analyser);
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        const updateBars = () => {
+          if (!isRecordingRef.current) return;
+          analyser.getByteFrequencyData(dataArray);
+          const levels: number[] = [];
+          for (let b = 0; b < 8; b++) {
+            const raw = dataArray[b] || 0;
+            levels.push(Math.max(8, Math.min(50, Math.floor((raw / 255) * 45) + 8)));
+          }
+          setAudioLevels(levels);
+          animationFrameRef.current = requestAnimationFrame(updateBars);
+        };
+        animationFrameRef.current = requestAnimationFrame(updateBars);
+      } catch (err) {
+        console.warn("Web Audio mic stream error:", err);
+      }
+    }
+
+    // Web Speech Recognition
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const SpeechRecognition = typeof window !== "undefined" ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
+
+    if (SpeechRecognition) {
+      try {
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = typeof navigator !== "undefined" ? navigator.language || "en-US" : "en-US";
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+          if (isRecordingRef.current) setIsLiveMic(true);
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onresult = (event: any) => {
+          let fullFinal = "";
+          let interim = "";
+          for (let i = 0; i < event.results.length; ++i) {
+            const chunk = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              fullFinal += chunk + " ";
+            } else {
+              interim += chunk;
+            }
+          }
+          const spoken = (fullFinal + interim).trim();
+          if (spoken) {
+            handleInputChange(spoken);
+          }
+        };
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        recognition.onerror = (event: any) => {
+          if (event.error === "no-speech") return;
+          console.warn("Speech recognition error:", event.error);
+        };
+
+        recognition.onend = () => {
+          if (isRecordingRef.current && recognitionRef.current) {
+            try {
+              recognition.start();
+            } catch {
+              // ignore
+            }
+          }
+        };
+
+        recognitionRef.current = recognition;
+        recognition.start();
+      } catch (err) {
+        console.warn("Recognition start failed:", err);
+      }
+    }
+  };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(selectedDemo.output);
+    navigator.clipboard.writeText(transformResult.transformed);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -226,11 +416,11 @@ export default function DevelopersPage() {
               <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-950 flex items-center gap-2.5">
                 <span>Interactive Developer Voice Demo</span>
                 <span className="px-2.5 py-0.5 rounded-full text-xs font-mono bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-semibold">
-                  Live Engine Rules
+                  Live Engine Active
                 </span>
               </h2>
               <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-                Click any preset below to see how spoken developer cues transform instantly into code.
+                Click presets or use your microphone to test live syntax & code transformations.
               </p>
             </div>
 
@@ -238,7 +428,7 @@ export default function DevelopersPage() {
               {DEMO_PRESETS.map((preset) => (
                 <button
                   key={preset.id}
-                  onClick={() => setSelectedDemo(preset)}
+                  onClick={() => handleSelectPreset(preset)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     selectedDemo.id === preset.id
                       ? "bg-neutral-950 text-white font-semibold shadow-sm"
@@ -257,22 +447,63 @@ export default function DevelopersPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-mono text-neutral-500 uppercase tracking-wider flex items-center gap-1.5 font-medium">
-                    <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        isLiveMic ? "bg-rose-500 animate-ping" : "bg-rose-500"
+                      }`}
+                    />
                     Spoken Voice Input
                   </span>
-                  <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-neutral-100 text-neutral-600 border border-neutral-200/60">
-                    Mic Input
-                  </span>
+
+                  {/* Interactive Live Microphone Button */}
+                  <button
+                    onClick={isLiveMic ? stopLiveMic : startLiveMic}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-medium transition-all cursor-pointer ${
+                      isLiveMic
+                        ? "bg-rose-50 text-rose-700 border border-rose-200 shadow-sm animate-pulse"
+                        : "bg-neutral-100 hover:bg-neutral-200 text-neutral-700 border border-neutral-200/80"
+                    }`}
+                  >
+                    {isLiveMic ? (
+                      <>
+                        <div className="flex items-center gap-0.5 h-3">
+                          {audioLevels.map((lvl, idx) => (
+                            <span
+                              key={idx}
+                              className="w-0.5 bg-rose-500 rounded-full transition-all duration-75"
+                              style={{ height: `${Math.max(4, lvl / 3)}px` }}
+                            />
+                          ))}
+                        </div>
+                        <span>Listening... (Click to stop)</span>
+                      </>
+                    ) : (
+                      <>
+                        <Mic className="w-3.5 h-3.5 text-neutral-600" />
+                        <span>Test with Mic</span>
+                      </>
+                    )}
+                  </button>
                 </div>
-                <div className="bg-neutral-50/70 p-3.5 rounded-lg border border-neutral-100">
-                  <p className="text-sm sm:text-base text-neutral-900 font-mono leading-relaxed italic">
-                    "{selectedDemo.spoken}"
-                  </p>
+
+                {/* Editable / Interactive Voice Input Area */}
+                <div className="bg-neutral-50/70 p-3.5 rounded-lg border border-neutral-200/80 focus-within:border-emerald-500 focus-within:bg-white transition-all">
+                  <textarea
+                    value={currentSpoken}
+                    onChange={(e) => handleInputChange(e.target.value)}
+                    placeholder="Speak into microphone or type: 'tag file src slash auth dot ts'..."
+                    rows={3}
+                    className="w-full bg-transparent font-mono text-xs sm:text-sm text-neutral-900 resize-none focus:outline-none leading-relaxed"
+                  />
+                  <div className="flex items-center justify-between pt-1 border-t border-neutral-200/60 text-[11px] text-neutral-400 font-mono">
+                    <span>💡 Edit text or speak commands</span>
+                    <span>{currentSpoken.length} chars</span>
+                  </div>
                 </div>
               </div>
 
               <div className="text-xs text-neutral-500 font-mono pt-1">
-                Context: {selectedDemo.target}
+                Context: <strong className="text-neutral-700 font-semibold">{selectedDemo.target}</strong>
               </div>
             </div>
 
@@ -301,17 +532,28 @@ export default function DevelopersPage() {
                     )}
                   </button>
                 </div>
-                <pre className="text-xs sm:text-sm font-mono text-neutral-100 bg-[#0e0e11] p-3.5 rounded-xl border border-neutral-800 whitespace-pre-wrap leading-relaxed shadow-inner overflow-x-auto selection:bg-neutral-800 selection:text-white">
-                  {selectedDemo.output}
+                <pre className="text-xs sm:text-sm font-mono text-neutral-100 bg-[#0e0e11] p-3.5 rounded-xl border border-neutral-800 whitespace-pre-wrap leading-relaxed shadow-inner overflow-x-auto selection:bg-neutral-800 selection:text-white min-h-[90px]">
+                  {displayedOutput}
+                  {isTyping && (
+                    <span className="inline-block w-2 h-4 bg-emerald-500 ml-1 animate-pulse shadow-[0_0_8px_#10b981]" />
+                  )}
                 </pre>
               </div>
 
-              <div className="flex items-center justify-between text-xs font-mono text-neutral-600 pt-1">
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-neutral-100 text-neutral-700 border border-neutral-200/60 font-medium">
-                  {selectedDemo.badge}
-                </span>
+              <div className="flex items-center justify-between text-xs font-mono text-neutral-600 pt-1 flex-wrap gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {transformResult.matchedRules.map((rule, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-medium text-[11px]"
+                    >
+                      <Sparkles className="w-2.5 h-2.5 text-emerald-600" />
+                      {rule}
+                    </span>
+                  ))}
+                </div>
                 <span className="text-emerald-700 font-medium">
-                  Latency: ~4µs rule eval · 100% on-device
+                  Latency: ~{transformResult.latencyUs}µs rule eval · 100% on-device
                 </span>
               </div>
             </div>
