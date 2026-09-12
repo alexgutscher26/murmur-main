@@ -217,8 +217,8 @@ export function Hero() {
       {/* Subtle Ambient Light Glows */}
       <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-gradient-to-b from-neutral-100 to-transparent rounded-full blur-3xl pointer-events-none opacity-80" />
 
-      {/* Subtle Pixel Grid Texture matching the screenshot */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%,#000_60%,transparent_100%)] pointer-events-none opacity-45" />
+      {/* Subtle Pixel Grid Texture filling entire Hero section */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:1.5rem_1.5rem] [mask-image:radial-gradient(ellipse_95%_90%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none opacity-45" />
 
       {/* Two-Tier Headline matching the screenshot */}
       <div className="relative text-center max-w-4xl px-4 mx-auto mb-6 z-10">
