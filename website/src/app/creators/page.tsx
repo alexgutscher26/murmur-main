@@ -25,48 +25,17 @@ import {
 const CREATOR_DEMOS = [
   {
     id: "youtube-script",
+    platform: "YouTube / Video",
+    icon: "🎬",
     title: "YouTube Video Script",
     spoken: "youtube script template title why offline ai is the future of productivity",
-    target: "Google Docs / Notion / Word",
+    target: "Google Docs / Notion / YouTube Studio",
     badge: "Scriptwriting",
   },
   {
-    id: "viral-hook",
-    title: "3-Part Content Hook",
-    spoken: "content hook template on how creators burn out from typing everything",
-    target: "TikTok / Reels / Shorts",
-    badge: "Hook Framework",
-  },
-  {
-    id: "substack-draft",
-    title: "Substack Newsletter",
-    spoken: "substack draft on leaving cloud subscriptions for local tools",
-    target: "Substack / Beehiiv / Medium",
-    badge: "Long-form",
-  },
-  {
-    id: "social-caption",
-    title: "Social Caption & Hashtags",
-    spoken: "instagram caption template for today's desk setup video",
-    target: "Instagram / X / Threads",
-    badge: "Social Media",
-  },
-  {
-    id: "podcast-notes",
-    title: "Podcast Episode Outline",
-    spoken: "podcast show notes episode 84 with guest alex on local intelligence",
-    target: "Descript / Spotify / Apple Podcasts",
-    badge: "Podcasting",
-  },
-  {
-    id: "sponsor-read",
-    title: "60s Sponsor Read",
-    spoken: "sponsor read template for audio hardware partner",
-    target: "Sponsorships & Ads",
-    badge: "Monetization",
-  },
-  {
     id: "linkedin-post",
+    platform: "LinkedIn",
+    icon: "💼",
     title: "LinkedIn Thought Leadership",
     spoken: "linkedin post template on why we stopped streaming microphone audio to cloud servers",
     target: "LinkedIn Web / Taplio / Buffer",
@@ -74,10 +43,57 @@ const CREATOR_DEMOS = [
   },
   {
     id: "x-thread",
+    platform: "X (Twitter)",
+    icon: "🧵",
     title: "X (Twitter) Thread",
     spoken: "x thread template breakdown of our directml whisper speech benchmarks",
     target: "X.com / Typefully / Hypefury",
     badge: "Virality Threads",
+  },
+  {
+    id: "substack-draft",
+    platform: "Substack / Newsletter",
+    icon: "💌",
+    title: "Substack Newsletter",
+    spoken: "substack draft on leaving cloud subscriptions for local tools",
+    target: "Substack / Beehiiv / Medium",
+    badge: "Long-form",
+  },
+  {
+    id: "viral-hook",
+    platform: "TikTok / Reels / Shorts",
+    icon: "🪝",
+    title: "3-Part Content Hook",
+    spoken: "content hook template on how creators burn out from typing everything",
+    target: "TikTok / Reels / Shorts",
+    badge: "Hook Framework",
+  },
+  {
+    id: "social-caption",
+    platform: "Instagram",
+    icon: "📱",
+    title: "Social Caption & Hashtags",
+    spoken: "instagram caption template for today's desk setup video",
+    target: "Instagram / X / Threads",
+    badge: "Social Media",
+  },
+  {
+    id: "podcast-notes",
+    platform: "Podcasts / Spotify",
+    icon: "🎙️",
+    title: "Podcast Episode Outline",
+    spoken: "podcast show notes episode 84 with guest alex on local intelligence",
+    target: "Descript / Spotify / Apple Podcasts",
+    badge: "Podcasting",
+  },
+  {
+    id: "sponsor-read",
+    platform: "Sponsorships & Ads",
+    icon: "📢",
+    title: "60s Sponsor Read",
+    spoken: "sponsor read template for audio hardware partner",
+    target: "Sponsorships & Brand Deals",
+    badge: "Monetization",
   },
 ];
 
@@ -441,13 +457,14 @@ export default function CreatorsPage() {
                 <button
                   key={demo.id}
                   onClick={() => handleSelectPreset(demo)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     selectedDemo.id === demo.id
-                      ? "bg-neutral-950 text-white font-semibold shadow-sm"
+                      ? "bg-neutral-950 text-white font-semibold shadow-sm scale-[1.02]"
                       : "bg-white text-neutral-600 hover:text-neutral-950 border border-neutral-200/80 hover:bg-neutral-100/80"
                   }`}
                 >
-                  {demo.title}
+                  <span>{demo.icon}</span>
+                  <span>{demo.platform}</span>
                 </button>
               ))}
             </div>

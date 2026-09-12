@@ -27,6 +27,8 @@ import {
 const DEMO_PRESETS = [
   {
     id: "file-tagging",
+    platform: "Cursor / Windsurf",
+    icon: "⚡",
     title: "AI IDE File Tagging",
     spoken:
       "look at tag file src slash components slash Button dot tsx and add a secondary variant prop",
@@ -34,21 +36,27 @@ const DEMO_PRESETS = [
     badge: "Context Injection",
   },
   {
-    id: "camel-case",
-    title: "Code Casing Directive",
-    spoken: "create a camel case user authentication service and connect it to database",
-    target: "Works in Any Code Editor (VS Code, Cursor, Neovim, Zed, JetBrains, Terminal)",
-    badge: "Syntax Smart",
-  },
-  {
     id: "pr-checklist",
+    platform: "GitHub / Linear",
+    icon: "🐙",
     title: "Voice Snippet Macro",
     spoken: "please review pr checklist before merge",
     target: "Works in Any App (GitHub PR, Linear, GitLab, Jira, Slack, Docs)",
     badge: "Voice Snippets",
   },
   {
+    id: "camel-case",
+    platform: "Code Casing",
+    icon: "🐪",
+    title: "Code Casing Directive",
+    spoken: "create a camel case user authentication service and connect it to database",
+    target: "Works in Any Code Editor (VS Code, Cursor, Neovim, Zed, JetBrains, Terminal)",
+    badge: "Syntax Smart",
+  },
+  {
     id: "code-block",
+    platform: "Markdown / Docs",
+    icon: "📝",
     title: "Code Block Scaffolding",
     spoken: "code block typescript const config equals defineConfig open brace close brace",
     target: "Works in Any Code Editor & Documentation Tool",
@@ -56,6 +64,8 @@ const DEMO_PRESETS = [
   },
   {
     id: "tech-entities",
+    platform: "Dev Vocabulary",
+    icon: "🚀",
     title: "Developer Vocabulary",
     spoken: "deploying next js with tailwind css and drizzle orm to supabase via github actions",
     target: "Works Across All Developer Tools & Terminals",
@@ -429,13 +439,14 @@ export default function DevelopersPage() {
                 <button
                   key={preset.id}
                   onClick={() => handleSelectPreset(preset)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
                     selectedDemo.id === preset.id
-                      ? "bg-neutral-950 text-white font-semibold shadow-sm"
+                      ? "bg-neutral-950 text-white font-semibold shadow-sm scale-[1.02]"
                       : "bg-white text-neutral-600 hover:text-neutral-950 border border-neutral-200/80 hover:bg-neutral-100/80"
                   }`}
                 >
-                  {preset.title}
+                  <span>{preset.icon}</span>
+                  <span>{preset.platform}</span>
                 </button>
               ))}
             </div>
