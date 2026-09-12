@@ -257,7 +257,7 @@ export function Hero() {
 
     setMicStatusMsg(null);
     transcriptRef.current = "";
-    setLiveRawSpoken("");
+    setLiveRawSpoken("Listening... speak now");
     setTypedText("");
 
     const SpeechRecognition =
@@ -270,85 +270,62 @@ export function Hero() {
     }
 
     try {
-      // 1. Live Microphone Stream & Web Audio Frequency Analyser
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaStreamRef.current = stream;
-
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const audioCtx = new AudioCtx();
-      audioContextRef.current = audioCtx;
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 64;
-      analyserRef.current = analyser;
-
-      const source = audioCtx.createMediaStreamSource(stream);
-      source.connect(analyser);
-
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-
-      const updateBars = () => {
-        if (!analyserRef.current) return;
-        analyserRef.current.getByteFrequencyData(dataArray);
-        const bars: number[] = [];
-        const step = Math.max(1, Math.floor(bufferLength / 12));
-        for (let i = 0; i < 12; i++) {
-          const val = dataArray[i * step] || 0;
-          bars.push(Math.max(6, Math.floor((val / 255) * 65) + 8));
-        }
-        setWaveformBars(bars);
-        animFrameRef.current = requestAnimationFrame(updateBars);
-      };
-      updateBars();
-
-      // 2. SpeechRecognition Instance
+      // Create and configure SpeechRecognition without conflicting audio context locking
       const recognition = new SpeechRecognition();
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = "en-US";
+      recognition.maxAlternatives = 1;
       recognitionRef.current = recognition;
 
       setIsLiveRecording(true);
       setPillState("listening");
 
+      recognition.onstart = () => {
+        setLiveRawSpoken("Listening... speak now");
+      };
+
+      recognition.onspeechstart = () => {
+        setLiveRawSpoken("Hearing voice...");
+      };
+
       recognition.onresult = (event: any) => {
-        let interim = "";
-        let final = "";
+        let transcript = "";
         for (let i = 0; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            final += event.results[i][0].transcript + " ";
-          } else {
-            interim += event.results[i][0].transcript;
-          }
+          transcript += event.results[i][0].transcript;
         }
-        const currentSpoken = (final + interim).trim();
-        if (currentSpoken) {
-          transcriptRef.current = currentSpoken;
-          setLiveRawSpoken(currentSpoken);
+        const cleaned = transcript.trim();
+        if (cleaned) {
+          transcriptRef.current = cleaned;
+          setLiveRawSpoken(cleaned);
         }
       };
 
       recognition.onerror = (err: any) => {
         console.warn("Speech recognition notice:", err.error);
+        if (err.error === "no-speech") {
+          // Keep listening or allow user to speak
+          return;
+        }
         if (err.error === "not-allowed" || err.error === "service-not-allowed") {
-          setMicStatusMsg("Microphone permission was not allowed. Playing preset demo.");
+          setMicStatusMsg("Microphone permission denied. Please allow mic access in your browser bar.");
           stopLiveMic();
           setIsLiveRecording(false);
-          startSimulation();
+          setPillState("idle");
         }
       };
 
       recognition.onend = () => {
-        // Only finish if still marked as recording
-        if (recognitionRef.current) {
+        if (isLiveRecording && recognitionRef.current) {
+          // If stopped by silence or browser timeout, finish dictation
           finishLiveDictation();
         }
       };
 
       recognition.start();
     } catch (err: any) {
-      console.warn("Could not access microphone:", err);
-      setMicStatusMsg("Microphone access unavailable. Playing preset demo.");
+      console.warn("Could not start speech recognition:", err);
+      setMicStatusMsg("Could not start microphone dictation. Running preset demo.");
       startSimulation();
     }
   };
@@ -360,8 +337,8 @@ export function Hero() {
 
     const spokenText = transcriptRef.current.trim();
 
-    if (!spokenText) {
-      setLiveRawSpoken("No speech detected. Click Talk Live and speak into your mic.");
+    if (!spokenText || spokenText === "Listening... speak now" || spokenText === "Hearing voice...") {
+      setLiveRawSpoken("No speech detected. Please speak clearly into your mic and try again.");
       setPillState("idle");
       return;
     }
